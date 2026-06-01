@@ -1416,7 +1416,9 @@ window.SubscriptionsManager = (function () {
     if (draftConfig) {
       renderFromDraft();
     } else {
-      loadSubscriptions();
+      loadSubscriptions().then(() => {
+        // ensure render after async load completes
+      });
     }
   };
 
