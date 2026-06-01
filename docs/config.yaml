@@ -25,3 +25,117 @@ subscriptions:
     stage: A
     diff_threshold_pct: 15
   keyword_recall_mode: or
+  intent_profiles:
+    - tag: MP
+      description: 货币政策
+      enabled: true
+      paper_sources:
+        - arxiv
+        - scopus
+        - wos
+        - repec
+        - google_scholar
+      keywords:
+        - keyword: monetary policy
+          keyword_cn: 货币政策
+          query: monetary policy transmission mechanisms and central bank decisions
+        - keyword: interest rate
+          keyword_cn: 利率
+          query: interest rate dynamics and monetary policy instruments
+        - keyword: quantitative easing
+          keyword_cn: 量化宽松
+          query: unconventional monetary policy and quantitative easing effects
+      intent_queries:
+        - query: how does monetary policy affect economic growth and inflation
+          query_cn: 货币政策如何影响经济增长和通胀
+          enabled: true
+          source: manual
+          note: ''
+    - tag: ETR
+      description: 经济尾部风险
+      enabled: true
+      paper_sources:
+        - arxiv
+        - scopus
+        - wos
+        - repec
+        - google_scholar
+      keywords:
+        - keyword: tail risk
+          keyword_cn: 尾部风险
+          query: economic tail risk measurement and modeling
+        - keyword: growth-at-risk
+          keyword_cn: 增长在险值
+          query: growth-at-risk framework and downside risk to GDP
+      intent_queries:
+        - query: methods for measuring and predicting economic tail risks
+          query_cn: 经济尾部风险的测量与预测方法
+          enabled: true
+          source: manual
+          note: ''
+    - tag: PN
+      description: 生产网络
+      enabled: true
+      paper_sources:
+        - arxiv
+        - scopus
+        - wos
+        - repec
+        - google_scholar
+      keywords:
+        - keyword: production network
+          keyword_cn: 生产网络
+          query: inter-industry production networks and input-output linkages
+        - keyword: supply chain
+          keyword_cn: 供应链
+          query: supply chain networks and shock propagation
+      intent_queries:
+        - query: how production network structure amplifies economic shocks
+          query_cn: 生产网络结构如何放大经济冲击
+          enabled: true
+          source: manual
+          note: ''
+    - tag: PE
+      description: 政策效应
+      enabled: true
+      paper_sources:
+        - arxiv
+        - scopus
+        - wos
+        - repec
+        - google_scholar
+      keywords:
+        - keyword: policy evaluation
+          keyword_cn: 政策评估
+          query: causal inference and policy evaluation methods
+        - keyword: fiscal policy
+          keyword_cn: 财政政策
+          query: fiscal policy multipliers and government spending effects
+      intent_queries:
+        - query: causal methods for evaluating macroeconomic policy effects
+          query_cn: 评估宏观经济政策效果的因果方法
+          enabled: true
+          source: manual
+          note: ''
+    - tag: ER
+      description: 经济韧性
+      enabled: true
+      paper_sources:
+        - arxiv
+        - scopus
+        - wos
+        - repec
+        - google_scholar
+      keywords:
+        - keyword: economic resilience
+          keyword_cn: 经济韧性
+          query: economic resilience to shocks and recovery dynamics
+        - keyword: economic recovery
+          keyword_cn: 经济复苏
+          query: post-crisis economic recovery patterns and determinants
+      intent_queries:
+        - query: determinants of economic resilience across regions and countries
+          query_cn: 不同地区和国家经济韧性的决定因素
+          enabled: true
+          source: manual
+          note: ''
