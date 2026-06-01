@@ -1,0 +1,514 @@
+Title: Partial Identification of Causal Effects that Vary by Setting
+
+URL Source: https://arxiv.org/pdf/2605.25483v1
+
+Published Time: Tue, 26 May 2026 01:51:17 GMT
+
+Number of Pages: 32
+
+Markdown Content:
+# Partial Identification of Causal Effects that Vary by Setting 
+
+Nick Huntington-Klein a
+
+> a
+
+Seattle University, Department of Economics, Seattle, United States of America, 
+
+Abstract 
+
+The estimation of causal effects using quasiexperiments often relies on the use of unusual or serendipitous sources of exogenous variation. When the goal is estimating the same causal effects across many different settings, the same unusual exogenous variation often does not exist in all settings, and the only available form of identification is selection-on-observables, which relies on a conditional independence assumption. Partial identification is especially valuable in this context, as it allows conditional independence to not hold perfectly. This paper proposes a method that sharpens the jointly identified set of causal effects across many settings by making use of unobserved relationships between omitted variable biases across settings. 
+
+> ∗
+
+Corresponding author 
+
+Email address: nhuntington-klein@seattleu.edu (Nick Huntington-Klein) 
+
+> arXiv:2605.25483v1 [econ.EM] 25 May 2026
+
+1. Introduction 
+
+In the applied social sciences, researchers often want to estimate and report “the effect” of a given policy or treatment, with a causal interpretation. “The effect” is a knowingly fictional estimand, as it implies that a given policy or treatment has only one effect. Researchers generally acknowledge that a given policy is likely to have many different effects depending on location or the population being treated (Huntington-Klein, 2021). As a result, there is a large and growing literature on ways to estimate heterogeneous treatment effects, or “conditional average treatment effects” (CATE), which are effects that are allowed to vary across the population based on observed criteria like setting or demographics (e.g., Wager and Athey, 2018, among many others). However, there is an inherent limitation in the application of heterogeneous treatment effects in the context of causal inference. In many cases, we estimate causal effects using quasiexperiments that rely on some source of exogenous variation in a treatment. Estimating a heterogeneous effect for a quasiexperiment requires that that same source of exogenous variation applies in each of the different settings where we estimate an effect. Since many sources of exogenous variation are bespoke, unusual, or serendipitous, this is unlikely. Identification using a conditional independence assumption, if it is plausible, can be applied in a much wider range of settings than a design relying on an instrumental variable, difference-in-differences design, or similar. As a result, methods for estimating heterogeneous treatment effects often focus on cases where identification relies on selection-on-observables (the use of covariates / control variables with no explicit source of exogenous variation). In many fields, especially in economics, we are skeptical that causal effects can be identified using selection on observables. However, if we doubt the conditional independence assumption (or, similarly, d-separation) assumption necessary to 2identify a causal effect using control variables alone, we can quantify that doubt and provide a set of partial identification (or “set identification”) bounds that allow for conditional independence to not hold exactly. Partial identification bounds for the case of residual omitted variable bias are often calculated as a form of sensitivity bounds, where estimates are recalculated under a bounded range of plausible assumption violations (Cinelli and Hazlett, 2019; Oster, 2019). In this paper, I provide a method for bridging the gap between, on one hand, heterogeneous causal effect estimation, and on the other hand partial identification when the conditional independence assumption does not hold exactly. Methods like Cinelli and Hazlett (2019) can already produce partial identifi-cation bounds in many different settings independently. However, estimating partial identification bounds separately by setting ignores the fact that there are likely to be dependencies between the assumption violations in different settings. For example, if omitted variable bias in setting j is positive, then this might make us more likely to believe that it is positive in setting k as well. This paper uses those dependencies to add additional information. In some cases this additional information can shrink partial identification bounds on individual effects, but more often the additional information shrinks bounds on the partially identified joint distribution of effects, producing a more informative result. The joint distribution of effects can then be explored by “pinning” estimates - forcing an effect in setting j to some part of its identified set, such as the upper or lower end of that distribution, and seeing what effects in other settings are consistent with that estimate. The method is fairly general and requires only a set of partial identification bounds for each setting, which can be produced by any number of different methods, like Cinelli and Hazlett (2019). I add to this a matrix of bounds that 3tie together the residual omitted variable bias across settings. This matrix can be proposed by assumption, but I also propose a method of “supershort” regression that can produce plausible bounds. This matrix can be used to narrow the provided set of partial identification bounds, and can also answer questions like “if the effect in setting j is near the upper end of its range, what is the identified set of estimates for setting k?” In this paper I briefly review the literature on partial identification and het-erogeneous treatment effect estimation, then introduce the method. I present software packages able to implement the method in R, Python, and Stata, and then demonstrate the method using an example where I estimate the labor market returns to attending college in the United States and see how the return differs over time and across states. 
+
+2. Partial Identification and Heterogeneous Treatment Effects 
+
+Researchers have long been aware of the fact that our typical approach to performing causal inference relies on assumptions that are necessary to identify an effect but are unlikely to be true (“strong” assumptions). Two potential reactions to this fact are either to ignore the problem, or to conclude that this makes causal inference impossible. A third approach is partial identification, also known as set identification, in which the author only makes assumptions that they actually believe are plausible (“weak” assumptions), and then asks which estimates are consistent with those assumptions, accepting that what is identified may be a range of answers rather than a single answer (Manski, 2020). Partial identification is a general approach. The procedure for constructing identified sets differs depending on the analysis being performed as well as which assumptions are being weakened, and there are many approaches to doing so (Tamer, 2010). In this paper we focus specifically on the case of omitted variable 4bias in linear models. In a standard case, a researcher wishes to identify the causal effect of X on Y by conditioning on a set of control variables Z:
+
+Y = β0 + β1X + β2Z + ε
+
+Concluding that a regression of Y on X and Z produces a ˆβ1 that identifies the causal effect of X on Y requires the assumption Cov (X, ε ) = 0 . We can refer to this as a conditional independence assumption, or think of the closely related concept of d-separation in the field of structural causal modeling (Pearl and Mackenzie, 2018). Current approaches to partial identification concerning the conditional inde-pendence assumption often take the form of imposing weaker restrictions on 
+
+Cov (X, ε ), for instance assuming that Cov (X, ε ) ∈ [μL, μ U ] instead of requiring 
+
+Cov (X, ε ) = 0 . Any non-0 value implies that ˆβ1 is a biased estimate of β1, but the Cov (X, ε ) ∈ [μL, μ U ] bounds limit the potential size of the bias and thus imply a set of bounds on β1.Allowing Cov (X, ε )̸ = 0 and calculating the implied β1 values that result from the weakening of this assumption is also referred to as sensitivity analysis. Results follow directly and clearly from the standard formula for omitted variable bias, and the only remaining task is to determine plausible [μL, μ U ] bounds, which often proceeds by looking at the amount of bias removed by the inclusion of measured controls. There is a long history of this approach, dating back at least as far as Cornfield et al. (1959). This sensitivity analysis process has seen renewed interest over the past few decades, spurred by Imbens (2003) and Altonji et al. (2005) and with work following through to the current day with Oster (2019) and a nonparametric 5variant in Masten and Poirier (2018). There is a long related literature taking a similar approach in the domain of matching, which generally follows from Rosenbaum and Rubin (1983) and for which there are many modern variants (e.g., Liu et al., 2013; Yadlowsky et al., 2022). Cinelli and Hazlett (2019) produced a general and updated framework for sensitivity analysis using partial R2 values to bound omitted variable bias and produce plausibility bounds for estimated parameters. Chernozhukov et al. (2026) extends that framework in application to debiased machine learning. This paper links the work on partial identification in cases of omitted variable bias with work on heterogeneous treatment effects. There is considerable interest in being able to estimate treatment effects that are heterogeneous across many different settings, especially in the developing field of causal machine learning (e.g., Wager and Athey, 2018, among many others). However, identification in these methods often relies on a conditional independence assumption. There is already work on partial identification of heterogeneous effects. In some cases this is a straightforward extension - the aforementioned methods that perform sensitivity analysis for average treatment effects can simply be applied in different settings to produce bounds on conditional average treatment effects (CATE). In some cases the link between the ATE and CATE bounds are made explicit, as in Yadlowsky et al. (2022) or Lanners et al. (2026) where bounds on the CATE inform the sensitivity analsysis for the ATE. Other methods more explicitly focus on heterogeneous treatment effects (CATE or otherwise) and their partial identification bounds. Fan and Park (2010) use Fréchet–Hoeffding bounds, which limit the differences between two distributions (in this case, observed and counterfactual) to produce sharp partial identification bounds on the distribution of treatment effects. The method is intended for use 6in a randomized experiment context, but allows adjustment for covariates. Chen et al. (2023) look at cases where two treatment variables are available. They use a differential-effect approach and show that effects can be bounded between a differential-effects estimate and an estimate generated by inverse probability weighting. They specify partial identification bounds as well as the conditions under which this allows for both average treatment effects and conditional average treatment effects to be point identified. The closest structural analogue to the present paper is Rambachan and Roth (2023), which imposes restrictions on the change in parallel-trends violations across periods in difference-in-differences contexts. Like in this paper, Rambachan and Roth (2023) bounds the degree to which effects vary across settings. I pursue an analogous agenda for a general omitted variable bias setting. This paper expands upon previous work in partial identification of conditional average treatment effects, in particular the sensitivity analysis approach. 
+
+3. Partial Identification of Effect Variation 
+
+3.1. Notation 
+
+Let S = {1, . . . , K } denote a finite set of distinct settings, such as geographic regions, time periods, or subgroups. 
+
+Assumption 1 (Partially Linear Model) . In each setting i ∈ S , the data-generating process satisfies the partially linear model 
+
+Y i = θiDi + f i(Xi, A i) + εi,
+
+where Y i is a continuously-valued outcome, Di is a real-valued treatment, Xi
+
+is a vector of observed covariates, Ai is a vector of unobserved covariates, and 
+
+7E[εi | Di, X i, A i] = 0 . The object of interest is the setting-specific causal effect 
+
+θi.
+
+Since Ai is unobserved, the researcher estimates θi using the “short” regression that omits Ai:
+
+Y i = θisDi + f is(Xi) + εis.
+
+Following Chernozhukov et al. (2026), we can express the “long” parameter θi
+
+via a Frisch-Waugh-Lovell decomposition as the projection of Y i on the residuals from predicting Di using Ai and Xi:
+
+θi = E
+
+[
+
+Y i Di − E[Di|Xi, A i]
+
+E [( Di − E[Di|Xi, A i]) 2]
+
+]
+
+≡ E[Y iαi]
+
+and similarly θis ≡ E[Y iαis], where αis omits Ai in the denominator projection. 
+
+gi represents the outcome regression function such that gi = E[Y i|Di, X i, A i]
+
+and gis = E[Y i|Di, X i]. Then, the omitted variable bias (OVB) incurred by using the short regression is: 
+
+Bi ≡ θis − θi = E[( gis − gi)( αis − αi)] 
+
+This is effectively the correlation between regression error ( gis − gi) and error in prediction of the treatment ( αis − αi). From here I begin to deviate from Chernozhukov et al. (2026). From the definition of bias, we can assume a bound on the size of that bias, which immediately implies an identified set for θis:
+
+Assumption 2 (OVB Boundedness) . For each setting i ∈ S , the omitted 
+
+8variable bias satisfies 
+
+Bi ∈ [νil , ν iu]
+
+for known constants νil ≤ νiu.
+
+Section 4.2 discusses how to choose [νil , ν iu] in practice. The implied bounds on 
+
+θi follow immediately from the definition θi = θis − Bi.
+
+Proposition 1 (The Identified Set for an Individual Setting) . Under Assump-tions 1 and 2, the true causal parameter satisfies 
+
+θi ∈ I i ≡ [θis − νiu, θ is − νil ].
+
+The individual bounds Ii treat each setting independently. The remainder of the paper exploits cross-setting dependence to obtain additional restrictions. 
+
+3.2. Omitted Variable Bias in Multiple Settings 
+
+Consider two settings j, k ∈ S . Two short regressions estimated separately in each of these settings would be affected by omitted variable biases (OVB) in those settings Bj and Bk. Assumptions bounding those biases would lead to two identified sets θj and θk. If we assume that those biases are related in some way, then the joinly identified set [θj , θ k] can have narrower bounds than each of the setting-specific identified sets alone. Here consider a case where a proportionality assumption applies, whereby the bias in one setting is an unknown proportion of the bias in another setting: 
+
+Assumption 3 (Proportional Bias Relationship) . For settings j, k ∈ S , the omitted variable biases satisfy 
+
+Bj = ρjk Bk,
+
+9where ρjk ∈ [ρjk l , ρ jk u ] for known constants 0 < ρ jk l ≤ 1 and ρjk u ≥ 1.
+
+Structural motivation. A natural data-generating process that produces Assumption 3 is a single-factor model for unobserved confounding. Ai is made up of a single common unobserved factor (or a composite factor representing multiple variables). In this case, the omitted variable bias in each setting is a scalar: the product of the relationship between Di and Ai, and the direct impact of Ai on Y i. The ratio of these scalars is itself scalar and so there is a proportional relationship, as long as the signs match. Outside of the univariate context, the partial-R2 parameterization for OLS bias from Cinelli and Hazlett (2019) can also justify a proportionality relationship between the two biases. Given the proportionality assumption, bounding ρjk is then equivalent to bounding the relative strength of unobserved confounding across settings. 
+
+Implicit sign restriction. Assumption 3 with ρjk ∈ [ρjk l , ρ jk u ] and ρjk u ≥
+
+ρjk l ≥ 0 implies that Bj and Bk have the same sign (or at least one is zero). This is a substantive restriction. The direction of selection can plausibly differ across contexts. Researchers should assess whether same-sign bias is plausible before applying Assumption 3. If sign reversals are plausible for a given j and k,then the researcher may not wish to consider bias in one setting as informative of bias in another, and would not want to apply Assumption 3 to that pair. 
+
+The zero-bias pathology. If Bk = 0 exactly, then Assumption 3 forces Bj = 0 
+
+regardless of ρjk u . In practice, a near-zero estimated bias in one setting may reflect sampling noise rather than genuine absence of confounding. Researchers should be cautious: if a setting’s bias is near zero, cross-setting restrictions propagated through that setting will be artificially tight. The proportionality assumption allows for the bounds on the effect in each setting to shrink the jointly identified bounds: 10 Definition 1 (Bias Difference Set) . Under Assumptions 2 and 3, define Djk =
+
+Bj − Bk = ( ρjk − 1) Bk. Since Djk is the product of ρjk ∈ [ρjk l , ρ jk u ] and 
+
+Bk ∈ [νkl , ν ku ], the bounds on Djk come from a set of candidate extremes Cjk :
+
+Cjk =
+
+{
+
+(ρjk l − 1) νkl , (ρjk u − 1) νkl , (ρjk l − 1) νku , (ρjk u − 1) νku
+
+}
+
+,
+
+and let cjk l = min( Cjk ) and cjk u = max( Cjk ). Then Djk ∈ [cjk l , c jk u ].
+
+The value of ρjk as well as the signs of νkl and νku determine which of the four elements of Cjk is the minimum or maximum, so we do not simplify further in general. Depending on context, it may be justifiable to add an additional restriction on the proportionality assumption that the bounds are proportionally symmetrical such that ρjk l = 1 /ρ jk u . In that case the bounds on Djk can be simplified to be dependent on three parameters rather than four: 
+
+Definition 2 (Bias Difference Set Under Symmetry) . Under Assumptions 2 and 3, define Djk = Bj − Bk = ( ρjk − 1) Bk. Since Djk is the product of 
+
+ρjk ∈ [1 /ρ jk u , ρ jk u ] and Bk ∈ [νkl , ν ku ], the bounds on Djk come from a set of candidate extremes Cjk :
+
+Cjk =
+
+{ 1 − ρjk u
+
+ρjk u
+
+νkl , (ρjk u − 1) νkl , 1 − ρjk u
+
+ρjk u
+
+νku , (ρjk u − 1) νku
+
+}
+
+,
+
+and let cjk l = min( Cjk ) and cjk u = max( Cjk ). Then Djk ∈ [cjk l , c jk u ].3.3. The Jointly Identified Set 
+
+Using Definition 1 (or, alternately, Definition 2), we can now state the main result for two settings: the joint identified set for the pair (θj , θ k).
+
+Proposition 2 (Joint Identified Set for Two Settings) . Under Assumptions 1, 
+
+11 2, and 3, the true pair (θj , θ k) belongs to the joint identified set 
+
+J jk =
+
+{
+
+(θj , θ k) : θj ∈ I j , θ k ∈ I k, θ j − θk ∈ I jk D
+
+}
+
+where 
+
+Ijk D =
+
+[
+
+(θjs − θks ) − cjk u , (θjs − θks ) − cjk l
+
+]
+
+.
+
+Proof. By Proposition 1, θj ∈ I j and θk ∈ I k. For the difference constraint, note that 
+
+θj − θk = ( θjs − Bj ) − (θks − Bk) = ( θjs − θks ) − (Bj − Bk) = ( θjs − θks ) − Djk .
+
+Since Djk ∈ [cjk l , c jk u ] by Definition 1, it follows that 
+
+θj − θk ∈
+
+[
+
+(θjs − θks ) − cjk u , (θjs − θks ) − cjk l
+
+]
+
+= Ijk D ,
+
+which completes the proof. 
+
+Remark on joint versus marginal sets. Proposition 2 establishes that cross-setting restrictions constrain the joint identified set J jk . This may or may not constrain the marginal identified sets for θj and θk. Effectively, any value in Ij that is consistent with any value of θj ∈ I k will remain in the marginal identified set for θj , while only values that are inconsistent with all values of 
+
+θj ∈ I k will be omitted from the marginal identified set. So while the joint identified set adds information that reduces the jointly identified parameter space, shrinkage of the marginal identfied sets may occur sometimes but not always. The following proposition characterizes when marginal shrinkage occurs. 
+
+Proposition 3 (Marginal Sharpening Conditions) . The marginal identified set 
+
+12 for θj derived from the joint set J jk is 
+
+proj j (J jk ) = Ij ∩
+
+[
+
+θjs − νku − cjk u , θ js − νkl − cjk l
+
+]
+
+.
+
+Strict marginal sharpening occurs when proj j (J jk ) ⊊ Ij . Marginal sharpening happens if and only if at least one of the following holds: 
+
+1. νku + cjk u < ν ju (the lower bound of θj is raised); 
+
+2. νkl + cjk l > ν jl (the upper bound of θj is lowered). 
+
+Proof is in Appendix Section A. In addition to showing where the jointly identified set places restrictions on the marginal sets, the marginal sharpening conditions also show when the joint restrictions make a marginal set empty such that no parameter value is consistent with the assumed restrictions. In these cases, the bounds imposed on at least one of θj , θk, or ρjk are inconsistent with the data and must be relaxed. 
+
+Worked example and the value of the joint restriction. To see the implications of Proposition 2 and Corollary 1 in A, consider θjs = θks = 1 ,
+
+νjl = νkl = −1, νju = νku = 1 , and ρjk u = 2 . This is a symmetric equal-bounds case. By Corollary 1 in A, no marginal sharpening occurs: proj j (J jk ) = Ij = [0 , 2] .The elements of Cjk are {1/2, −1, −1/2, 1}, giving cjk l = −1 and cjk u = 1 , so the difference constraint is IDjk = [0 − 1, 0 + 1] = [ −1, 1] . The full restrictions are θj ∈ [0 , 2] , θk ∈ [0 , 2] , and θj − θk ∈ [−1, 1] . The third constraint rules out combinations like (θj , θ k) = (0 , 2) or (2 , 0) , which would have been permitted by the individual bounds alone. This is the value of the joint restriction: it restricts the set of admissible combinations, even when it does not shrink the individual ranges. 13 3.4. Extension to K > 2 Settings 
+
+With K > 2 settings, the proportionality assumption (Assumption 3) is applied for each pair (j, k ) where a restriction is desired. A researcher may choose to impose no constraint on some pairs (j, k ) where bias in one setting is presumed not to be informative about bias in the other by setting ρjk l = −∞ and ρjk u = ∞
+
+(ρjk l < 0 violates Assumption 3 for that pair since their biases are not assumed to have a proportional relationship). 
+
+Proposition 4 (K-Setting Joint Identified Set) . Under Assumption 1 and Assumption 2 for all i ∈ S , and Assumption 3 for all pairs (j, k ), the true vector 
+
+(θ1, . . . , θ K ) belongs to the polytope 
+
+J = {(θ1, . . . , θ K ) : θi ∈ I i∀i, θ j − θk ∈ I Djk ∀(j, k )} .
+
+This polytope is defined by at most 2K + K(K − 1) linear inequality constraints in K unknowns. The marginal identified set for any θi is the interval [θi, θ i]
+
+where 
+
+θi = min  
+
+> (θ1,...,θ K)∈J
+
+θi, θi = max  
+
+> (θ1,...,θ K)∈J
+
+θi,
+
+each of which is the solution to a linear program. Proof. By Proposition 2 applied to each pair, the true vector belongs to J jk for all relevant pairs. The intersection of all these pairwise joint sets and the individual bounds gives J . Each individual bound θi ∈ [θis − νiu, θ is − νil ] contributes 2 linear constraints; each difference bound θj − θk ∈ [djk l , d jk u ] contributes 2 linear constraints for each ordered pair. With K(K − 1) /2 pairs, each contributing 2 constraints, plus 2K individual constraints, the total number of constraints is 
+
+2K + K(K − 1) , some of which may be trivial constraints for pairs with infinitely wide bounds on their differences. 14 Remark on pairwise consistency. With K settings, the K(K − 1) /2
+
+pairwise proportionality assumptions are not mutually independent. Transitivity constraints apply: if Bj = ρjk Bk and Bk = ρkm Bm, then Bj = ρjk ρkm Bm,implying ρjm = ρjk ρkm . If the three pairwise bounds ρjk u , ρkm u , ρjm u are estimated separately such that their values are not jointly determined, there is no guarantee that they satisfy this transitivity. Inconsistent pairwise bounds may cause the joint polytope J to be small or perhaps null, because the difference constraints impose implicit cross-constraints. 
+
+Remark on statistical inference. The identified sets J and its projections are population objects: they characterize the range of (θ1, . . . , θ K ) consistent with the stated assumptions, treating the short-regression estimates θis and the bias bounds as known. In practice, ˆθis is estimated with sampling error, and the estimated bias bounds also carry uncertainty. A complete inference framework must address both identification uncertainty (the width of the identified set) and sampling uncertainty (variability of ˆθis and ˆν). Imbens and Manski (2004) and Stoye (2009) provide frameworks for constructing confidence regions for partially identified parameters in the single-setting case; extending these frameworks to the multi-setting joint polytope J is a natural direction for future work. In the current paper, the reported bounds should be interpreted as population identified sets under the stated assumptions, rather than as confidence sets that account for sampling error. 
+
+4. Details in Application 
+
+4.1. Exploring the Joint Set via “Pinning” 
+
+The addition of joint restrictions on bias is not guaranteed to shrink marginal identified sets. The primary contribution of this paper is therefore the restriction on the joint identified set J jk , which restricts the heterogeneity in effects by 15 bounding the difference θj − θk. The resulting identified set is then an N -dimensional object, where N is the number of settings. Reporting an estimated 
+
+N -dimensional object is qualitatively difficult, and conclusions may be difficult to draw. A meaningful way to explore the resulting identified set is by “pinning” one of the settings, where a single value is chosen for one of the settings j (the estimated effect in setting j is “pinned” to a specific value). Any restrictions between setting j and other settings then sharpens the jointly identified set, showing plausible values of estimates in other settings given the initial pinned value. Then, by exploring the jointly identified set given different pinned values from different parts of the marginal identified set of j, the researcher can demonstrate the joint dependencies between settings and make claims like “conditional on the effect in setting j being near the (upper end / lower end / middle) of its marginal identified set, then here are the marginal distributions of effects in other settings consistent with that value.” More colloquially, “at the low end, the identified sets look like this, and at the high end, they look like this.” 
+
+Definition 3 (Conditional Identified Set / Pinning) . Given the joint identified set J jk from Proposition 2 and a fixed value t ∈ I j , the conditional identified set for θk given θj = t is 
+
+Ik(t) = Ik ∩
+
+[
+
+t − (θjs − θks ) + cjk l , t − (θjs − θks ) + cjk u
+
+]
+
+.
+
+This set is always at most as large as Ik and may be strictly smaller whenever the cross-setting constraint is active. Derivation. Given θj = t, the constraint θj − θk ∈ I Djk = [ dl, d u] implies 
+
+θk ∈ [t − du, t − dl]. Substituting du = ( θjs − θks ) − cjk l and dl = ( θjs − θks ) − cjk u
+
+gives the result. 16 Continuing the worked example from Section 3.3: fixing t = 0 (the lower end of Ij ), 
+
+Ik(0) = [0 , 2] ∩ [0 − 0 + ( −1) , 0 − 0 + 1] = [0 , 2] ∩ [−1, 1] = [0 , 1] .
+
+So pinning θj to its lower bound restricts θk to [0 , 1] , halving its range. Sym-metrically, fixing t = 2 restricts θk to [1 , 2] .
+
+4.2. Selecting Baseline Plausible Bounds 
+
+There are two kinds of plausible bounds that must be selected to perform the method in Section 3.2. The first is the selection of the individual-setting bounds 
+
+[νil , ν iu] which bound the degree of omitted variable bias in each setting i. This can be done in any number of ways, for example using the methods outlined in Cinelli and Hazlett (2019), Chernozhukov et al. (2026), or even via matching with a derivative of Rosenbaum bounds. The second parameter that must be bounded is ρjk , the omitted variable bias proportionality coefficient for each pair of settings (j, k ).
+
+ρjk can be bounded using external knowledge. For example, if the settings represent geographic locations, plausibility can be used to bound ρjk for adjacent locations, and then non-adjacent locations can have no modeled relationship, or the relationship can decay be widening the bounds on the relationship as a function of distance. A data-based approach to bounding (either for all pairs of settings or a subset) can make use of an approach similar to Cinelli and Hazlett (2019) where we use the bias resolved by a set of observed variables as a benchmark for bias that might be resolved by the addition of unobserved variables. We begin with the short regression to be applied in setting i:17 Y i = θisDi + f is(X) + εis
+
+and further segment Xi into two covariate sets, Xi 
+
+> 1
+
+and Xi
+
+> 2
+
+, where Xi 
+
+> 2
+
+is non-empty. Then, we estimate the short regression in setting i, as well as the super-short regression: 
+
+Y i = θiss Di + f iss (Xi
+
+> 1
+
+) + εiss 
+
+Then, the difference between the estimated θis and θiss is the omitted variable bias that is removed by the addition of Xi 
+
+> 2
+
+to the model, Biss = ˆθis − ˆθiss .The formal justification for using Biss to bound ρjk rests on the following assumption. 
+
+Assumption 4 (Proportional Confounding Across Settings) . For settings j and 
+
+k for which sign (Bj ) = sign (Bk), the ratio of unobserved OVBs is bounded by the ratio of observed covariate-induced biases: 
+
+ρjk ∈
+
+[
+
+min { Bjss 
+
+Bkss 
+
+, Bkss 
+
+Bjss 
+
+}, max { Bjss 
+
+Bkss 
+
+, Bkss 
+
+Bjss 
+
+}
+
+]
+
+,
+
+Assumption 4 states that the settings where observed confounders generate more bias (i.e. the supershort analysis leads to large changes in the estimate) are also the settings where unobserved confounders generate more bias, in the same relative proportion. The ratio of observed-covariate biases between two settings then acts as a guide for the ratio of unobserved-covariate biases. This is analogous to how Cinelli and Hazlett (2019) and similar studies use observed confounding to bound unobserved confounding, but applied across settings rather than within a single setting. The assumption fails if the degree of observed 18 confounding is not correlated with the degree of unobserved confounding across settings. 
+
+Remark on the supershort estimator’s limitations. The supershort approach has several important practical limitations. First, Bjss and Bkss are estimated with sampling error, and the ratio of two estimated quantities is unstable when the denominator is near zero. If a setting’s observed covariate-induced bias change is near zero, the bounds on ρjk will be too wide to be informative. Given that the proportionality assumption 3 likely fails in these contexts anyway, the supershort method’s imposition of very loose bounds is desirable. Similarly, the supershort method cannot be meaningfully applied when sign (Bi)̸ = sign (Bj ), but this is a case where the data provides little information on the relationship between biases in these scenarios and so failing to impose a restriction in that context is desirable. Second, the choice of which variables to include in Xi 
+
+> 1
+
+versus Xi 
+
+> 2
+
+is consequential: different partitions yield different supershort estimates and therefore different 
+
+ρjk u values. Researchers should report sensitivity to this partitioning choice. 
+
+5. Software 
+
+In order to make the application of the method in this paper easier to execute, I provide software packages capable of producing matrices of ρjk bounds, as well as partial identification bounds by setting, and the narrowed partial identification bounds that emerge as a result of applying the ρjk restrictions. The package is called hetset , short for het erogeneous-effect set iden-tification, and is available for the R language on CRAN (install with 
+
+install.packages( 'hetset ')), for the Python language on PyPi (install with 
+
+pip install hetset ), and for the Stata language on ssc (install with ssc 
+
+19 install hetset ). In all three packages, the method can be applied by first estimating partial identi-fication bounds separately in each setting with the ovb_bounds_by_setting func-tion. By default, this uses the sensemakr package (also available in all three lan-guages) to apply Cinelli and Hazlett (2019). Then, the user can specify their own set of ρjk bounds, or can use the function supershort_rho_bounds_proposal 
+
+to get a set of ρjk values from the “supershort” method in Section 4.2. With the bounds matrix and the data, the user can build a set of partial identification bounds using build_bounds , which can then be displayed using 
+
+univariate_bounds_table . The univariate_bounds_table function also has a pin_values option allowing the user to fix the effect in a chosen setting at a given part of its range (implementing “pinning” from Definition 3), to see how this impacts the estimates in other settings. 
+
+6. The Returns to College Education over Time 
+
+In this section I apply the methods proposed in this paper to produce partial identification bounds on the labor market returns to attending college in different settings in the United States. I first evaluate how the labor market returns change over time. For this application I use data from the American Community Survey (ACS), a large scale annual data set collected by the US Census which has data on educational attainment, income, and a set of background characteristics. Five-year data files for 2003, 2008, 2013, 2018, and 2023 were collected from IPUMS (Ruggles et al., 2025). Because there is no apparent quasiexperiment that would allow for a sharp identification of the returns to college separately in each year in this data set, I 20 instead partially identify the effect using selection on observables. I first limit the data to individuals who have completed high school, are not currently in the military, and have some nonzero level of income. Then, the treatment variable is having attended college for at least one year (not necessarily graduating). Identification of the effect uses selection on observables, where income is regressed on college attendance and a set of control variables. Control variables are race (white / black / Asian / other), age, an indicator for being hispanic, sex, veteran status, state, and an indicator for speaking English. 1 There is almost certainly residual omitted variable bias afer accounting for this set of controls, due to the omission of factors like personality, parental socioeconomic status, and academic ability, among other things. To get a baseline set of partial identification bounds, I first apply Cinelli and Hazlett (2019) separately in each year. While there are important omitted variables, I believe I have included some of the most important sources of endogeneity, and so I assume that the set of omitted variables is no more than half as strong, as sources of bias, as the set of included variables. 2 This generates a set of “original” partial identification bounds for the effect in each year. Next, following the “supershort” method in Section 4.2, I estimate the effect of college attendance on income separately in each year with and without any controls, calculate the change in the estimate as a result of the removal of bias, and then calculate a matrix of proportionally symmetric bounds on ρjk by seeing how the change in estimates is related across settings. The table is shown in Table 1. Using these bounds, the partially identified set for each year shrinks, since some effects in some years are incompatible with possible values in other 
+
+> 1Person-level survey weights are included.
+> 2This section is intended as a demonstration of methods. The plausibility of any of the specific choices made for the purposes of partial identification could be debated.
+
+21 Table 1: Matrix of Bounds 
+
+Year 2003 2008 2013 2018 2023 2003 1.312 1.008 1.210 1.557 2008 0.762 1.301 1.586 2.042 2013 0.992 0.769 1.219 1.569 2018 0.827 0.630 0.820 1.287 2023 0.642 0.490 0.637 0.777 Upper-triangle and lower-triangle values show estimated upper and lower bounds on the proportional bias re years, given the ρjk bounds. I refer to these as “univariate” bounds. The original and univariate bounds are shown in Table 2. Notably, the addition of bounds between years does not shrink the marginal partial identification bounds by much. Only 2013 has its range reduced. This result is consistent with Section A whereby marginal sharpening only occurs under certain conditions. The supershort ρjk bounds shown in Table 1 are also fairly wide, indicating that observed confounders resolve bias in similarly proportioned but not tightly correlated ways across years. As such each part of the identified range for most years is consistent with some part of the range of other years. However, the impact of the bounds can be shown in the way that they restrict the effects in different years to move together. Figure 1 shows, on the left, the original and univariate bounds. On the right I fix the 2003 estimate at the top and bottom of its partial identification range, “pinning” it to those values (implementing Definition 3), and show the conditional identified ranges of the effect in other years. Here we see a considerable reduction of plausible ranges for the estimates. These estimates permit a wide range of partially identified effects in general, but the joint restrictions show that, wherever the true value is in that range, the assumptions made so far restrict the estimates in each year to be at roughly similar levels, and identifies ranges that show how the effect evolves over time. 22 Table 2: Partial Identification Bounds by Year 
+
+Year Estimate New Lower Bound New Upper Bound Original Lower Bound Original Upper Bound 2003 0.403 0.335 0.471 0.335 0.471 2008 0.401 0.332 0.470 0.332 0.470 2013 0.445 0.376 0.513 0.368 0.521 2018 0.439 0.367 0.512 0.367 0.512 2023 0.459 0.386 0.531 0.386 0.531 Full Bounds Pinned          
+
+> 2003 2008 2013 2018 2023 2003 2008 2013 2018 2023
+> 0.35 0.40 0.45 0.50
+
+Setting 
+
+Estimated Effect and Plausible Interval 
+
+Bounds 
+
+> Original
+> Univariate
+> Pinned Low
+> Pinned High
+
+Figure 1: Partial Identification Bounds Using Observed Bias Relationships 
+
+23 Figure 2 repeats the analysis of Figure 1, but instead of constructing the matrix of ρjk values using the supershort method and observational data, it imposes a time-based maximum distance. ρjk is set to be in the range [.95 , 1/. 95] 
+
+for adjacent 5-year blocks, [.95 2, 1/(.95 2)] for effects that are two five-year blocks away, and so on. The results are fairly similar, although slightly more restrictive, given that the resulting bounds permit smaller differences than under the supershort method, in this particular application. Full Bounds Pinned          
+
+> 2003 2008 2013 2018 2023 2003 2008 2013 2018 2023
+> 0.35 0.40 0.45 0.50
+> Setting
+> Estimated Effect and Plausible Interval
+> Bounds
+> Original
+> Univariate
+> Pinned Low
+> Pinned High
+
+Figure 2: Partial Identification Bounds Using Pre-Set .95 One-Year Bounds Restriction 
+
+7. The Returns to College Education by Geography 
+
+In this section we will apply the same methodology as in the previous section, but look at heterogeneity of effects over geography rather than over time. In this context, the plausible assumptions on the bounds between contexts is different. Similar to in the previous section, I first construct a matrix of proportionally symmetric ρjk bounds based on the “supershort” method. However, I only apply this restriction to geographically adjacent states that share a border, setting no bound on the bias relationship between non-adjacent states. Then, I impose an adjacent-state set of restrictions, setting all ρjk values to 1.1, but only for adjacent states. States that are geographically adjacent are restricted 24 to ρjk = 1 .1, and non-adjacent states are set to have no restriction between them. 3,4 
+
+Results are shown in Figure 3. Like in Section 6, the supershort method suggests bounds that are too wide to impose any additional restrictions on the partial identification bounds. However, the ρjk = 1 .1 for adjacent states restriction does meaningfully restrict partial identification bounds. Notably, the bounds are narrowed most sharply for states with the widest partial identification bounds on their estimates; between-state restrictions add information and narrow bounds in these cases where a state’s own data leaves a wide range. 
+
+8. Conclusion 
+
+This paper proposes a method that allows researchers to restrict the joint identified set for causal effect estimates across many different settings, using the dependence structure between omitted variable biases across settings. In many contexts, identification must often rely on a conditional independence assumption that is unlikely to hold exactly, and so partial identification is a more plausible approach to effect estimation. The method in this paper allows researchers using partial identification across settings to take advantage of the relationships between those settings to narrow the joint identified set and provide a more informative result. The paper’s primary formal contribution, established in Propositions 2 through 4, is a restriction on the joint identified polytope J
+
+for the vector of setting-specific effects. This kind of approach is valuable because in many contexts, we are interested   
+
+> 3This is just a demonstration of method; there are likely better assumptions to use here, either using the supershort method to get an average ρjk between adjacent states, or judging state similarity on a set of factors beyond geographic adjacency, also considering things like demographics.
+> 4English-speaking status has been dropped as a covariate since it is perfectly collinear with other predictors in some of the states.
+
+25 Observed Relationship Fixed to 1.1 
+
+0.3 0.6 0.9 0.3 0.6 0.9 
+
+Nevada Utah Wyoming Idaho South Dakota Vermont Hawaii Montana Iowa Alaska Rhode Island Wisconsin Louisiana North Dakota Oklahoma Colorado Florida Arizona Indiana Missouri New Mexico Kentucky Oregon Arkansas Minnesota South Carolina West Virginia Maine Alabama Washington Michigan Mississippi Kansas Texas Pennsylvania Nebraska Tennessee New Hampshire North Carolina Georgia Maryland Ohio California Illinois Connecticut New Jersey Delaware Virginia Massachusetts New York District of Columbia 
+
+Estimate and Plausible Interval 
+
+Type 
+
+Geographically Bound 
+
+Univariate Bounds Figure 3: Partial Identification Bounds for the Effect of Education by State 
+
+26 in the heterogeneous effect of a treatment or policy, but do not have a quasiexper-imental design that applies in more than one setting, or at least does not apply in all settings. Requiring only quasiexperimental results restricts researchers to areas where we happen to get lucky and find exogenous variation, and in multi-setting contexts requires that that same exogenous variation functions repeatedly. Partial identification with cross-setting restrictions is a principled middle ground. Simply using control variables relies on an arguably stronger assumption than making use of a quasiexperiment, but can also be implemented in a much wider range of settings. When the cross-setting proportionality assumptions are well-motivated, this is likely to lead to a more representative and informative body of causal inference results about effect heterogeneity. Marginal identified sets for individual settings are not always sharpened. Propo-sition 3 and Corollary 1 provide the formal conditions under which marginal sharpening occurs. However, the joint set can be meaningfully sharpened even when the marginal sets cannot. Then, the researcher can explore the joint set. The “pinning” operation (Definition 3) leverages this joint restriction to answer practically important questions about conditional heterogeneity: if the effect in one setting is near the upper end of its identified range, what can be said about other settings? An important limitation of the current paper is the absence of statistical inference. The identified sets Ii and J are population objects and do not account for sampling variability in ˆθis or in the estimated bias bounds. Extending the frameworks of Imbens and Manski (2004) and Stoye (2009) to the multi-setting joint polytope setting is a natural and important direction for future work. 27 9. Statement on the Use of AI Tools 
+
+Assistance in coding and software development as well as improvements to the mathematical formalization come from Claude Code using Opus 4.6. All concepts were human-created, and a fully human-written draft from before Claude made suggestions to improve the mathematical formalization is available from the author. 
+
+References 
+
+Altonji, J.G., Elder, T.E., Taber, C.R., 2005. Selection on observed and unob-served variables: Assessing the effectiveness of catholic schools. Journal of Political Economy 113, 151–184. Chen, K., Zhang, J., Wang, B., Small, D.S., 2023. A differential effect approach to partial identification of treatment effects. arXiv preprint arXiv:2303.06332 . Chernozhukov, V., Cinelli, C., Newey, W.K., Sharma, A., Syrgkanis, V., 2026. Long story short: Omitted variable bias in causal machine learning. Review of Economics and Statistics , 1–45doi: 10.1162/rest.a.1705 .Cinelli, C., Hazlett, C., 2019. Making sense of sensitivity: Extending omitted variable bias. Journal of the Royal Statistical Society Series B: Statistical Methodology 82, 39–67. doi: 10.1111/rssb.12348 .Cornfield, J., Haenszel, W., Hammond, E.C., Lilienfeld, A.M., Shimkin, M.B., Wynder, E.L., 1959. Smoking and lung cancer: Recent evidence and a discussion of some questions. Journal of the National Cancer Institute 22, 173–203. Fan, Y., Park, S.S., 2010. Sharp bounds on the distribution of treatment effects and their statistical inference. Econometric Theory 26, 931–951. 28 Huntington-Klein, N., 2021. The effect: An introduction to research design and causality. Chapman and Hall/CRC. Imbens, G.W., 2003. Sensitivity to exogeneity assumptions in program evaluation. American Economic Review 93, 126–132. Imbens, G.W., Manski, C.F., 2004. Confidence intervals for partially identified parameters. Econometrica 72, 1845–1857. Lanners, Q., Rudin, C., Volfovsky, A., Parikh, H., 2026. Data fusion for partial identification of causal effects. Advances in Neural Information Processing Systems 38, 150638–150702. Liu, W., Kuramoto, S.J., Stuart, E.A., 2013. An introduction to sensitivity analysis for unobserved confounding in nonexperimental prevention research. Prevention Science 14, 570–580. Manski, C.F., 2020. The lure of incredible certitude. Economics & Philosophy 36, 216–245. Masten, M.A., Poirier, A., 2018. Identification of treatment effects under conditional partial independence. Econometrica 86, 317–351. Oster, E., 2019. Unobservable selection and coefficient stability: Theory and evidence. Journal of Business & Economic Statistics 37, 187–204. Pearl, J., Mackenzie, D., 2018. The Book of Why: The New Science of Cause and Effect. Basic Books, New York City, New York. Rambachan, A., Roth, J., 2023. A more credible approach to parallel trends. Review of Economic Studies 90, 2555–2591. Rosenbaum, P.R., Rubin, D.B., 1983. Assessing sensitivity to an unobserved 29 binary covariate in an observational study with binary outcome. Journal of the Royal Statistical Society: Series B (Methodological) 45, 212–218. Ruggles, S., Flood, S., Sobek, M., Backman, D., Cooper, G., Drew, J.A.R., Richards, S., Rodgers, R., Schroeder, J., Williams, K., 2025. Ipums usa: Version 16.0. URL: https://usa.ipums.org, doi: 10.18128/D010.V16.0 .Stoye, J., 2009. More on confidence intervals for partially identified parameters. Econometrica 77, 1299–1315. Tamer, E., 2010. Partial identification in econometrics. Annual Review of Economics 2, 167–195. Wager, S., Athey, S., 2018. Estimation and inference of heterogeneous treatment effects using random forests. Journal of the American Statistical Association 113, 1228–1242. Yadlowsky, S., Namkoong, H., Basu, S., Duchi, J., Tian, L., 2022. Bounds on the conditional and average treatment effect with unobserved confounding factors. Annals of Statistics 50, 2587. 30 Appendix A: Marginal Sharpening Conditions 
+
+Proof. A value θj belongs to proj j (J jk ) if and only if there exists θk ∈ I k such that θj − θk ∈ I Djk = [ dl, d u], where dl = ( θjs − θks ) − cjk u and du = ( θjs − θks ) − cjk l .The condition θj − θk ∈ [dl, d u] is equivalent to θk ∈ [θj − du, θ j − dl]. The intersection [θj − du, θ j − dl] ∩ I k is non-empty if and only if 
+
+θj − du ≤ θks − νkl and θks − νku ≤ θj − dl.
+
+Substituting du = ( θjs − θks ) − cjk l and dl = ( θjs − θks ) − cjk u and simplifying: 
+
+θj − du = θj − θjs + θks + cjk l ≤ θks − νkl
+
+⇐⇒ θj ≤ θjs − νkl − cjk l ,θks − νku ≤ θj − dl = θj − θjs + θks + cjk u
+
+⇐⇒ θj ≥ θjs − νku − cjk u .
+
+Therefore proj j (J jk ) = Ij ∩ [θjs − νku − cjk u , θ js − νkl − cjk l ].Strict sharpening of the lower bound occurs when θjs − νku − cjk u > θ js − νju ⇒
+
+νju > ν ku + cjk u . Strict sharpening of the upper bound occurs when θjs − νkl − cjk l <θjs − νjl ⇒ νjl < ν kl + cjk l .Intuitively, this says that marginal sharpening occurs whenever there is a parameter value in one setting that is farther away from the other setting’s identified set than the widest possible difference between settings will allow. 
+
+Corollary 1 (No Marginal Sharpening with Equal Symmetric Bounds) . Suppose 
+
+νjl = −νju = −νj∗ < 0 and νkl = −νku = −νk∗ < 0 (symmetric bias bounds) and also Assumption 2 applies such that the proportional bounds are symmetric and 
+
+31 ρjk l = 1 /ρ jk u . Then, cjk u = ( ρjk u − 1) νk∗ and cjk l = −(ρjk u − 1) νk∗. The conditions for marginal sharpening (Proposition 3) reduce to νj∗ > ρ jk u νk∗. In particular, when both settings have equal bias bound magnitudes ( νj∗ = νk∗), strict marginal sharpening never occurs for any ρjk u > 1.Proof. With νkl = −νk∗, νku = νk∗, and ρjk l = 1 /ρ jk u , the elements of Cjk are 
+
+{− 1−ρjk u
+
+> ρjk u
+
+νk∗, (1 − ρjk u )νk∗, 1−ρjk u
+
+> ρjk u
+
+νk∗, (ρjk u − 1) νk∗}. Since ρjk u > 1 and ¯νk > 0,the maximum is cjk u = ( ρjk u − 1) νk∗ and the minimum is cjk l = (1 − ρjk u )νk∗.The lower-bound sharpening condition becomes νj∗ > ν k∗ + ( ρjk u − 1) νk∗ =
+
+ρjk u νk∗, which fails when νj∗ = νk∗ since this implies 1 > ρ jk u , when by assumption we have ρjk u > 1. The upper-bound sharpening condition becomes νj∗ <νk∗ + (1 − ρjk u )νk∗ = νk∗(2 − ρjk u ). This similarly fails when νj∗ = νk∗ since this also implies ρjk u < 1.32

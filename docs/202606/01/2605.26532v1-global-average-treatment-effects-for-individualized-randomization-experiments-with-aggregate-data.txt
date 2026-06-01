@@ -1,0 +1,2490 @@
+Title: Global Average Treatment Effects for Individualized Randomization Experiments with Aggregate Data
+
+URL Source: https://arxiv.org/pdf/2605.26532v1
+
+Published Time: Wed, 27 May 2026 00:33:28 GMT
+
+Number of Pages: 21
+
+Markdown Content:
+# Global Average Treatment Effects for Individualized Randomization Experiments with Aggregate Data 
+
+Shuguang Yu a∗
+
+, Ting Li a, Yuchen Lu a, Chengchun Shi b, Fan Zhou a, Zhichao Zou c,Peng Zhen c, and Hongtu Zhu d†
+
+> a
+
+Shanghai University of Finance and Economics, Shanghai, China 
+
+> b
+
+London School of Economics and Political Science, London, UK 
+
+> c
+
+DiDi China Ride Hailing Business Group, Beijing, China 
+
+> d
+
+University of North Carolina at Chapel Hill, North Carolina, USA 
+
+## Abstract 
+
+Individualized randomized experiments are central to online platforms for opti-mizing personalized decisions in complex environments. In two-sided markets, however, standard treatment effect estimation is often invalid due to strong temporal and cross-unit interference, a challenge compounded when only aggregated data are available because of privacy or system constraints. To address these issues, we iden-tify the Global Average Treatment Effect (GATE) using only group-level data from treatment and control groups. We first establish identification conditions based on aggregated observations, and then propose the Individualized Randomized Experi-ment Varying Coefficient Decision Process (IRE-VCDP) model, which accounts for interference through supply–demand dynamics. Building on this framework, we develop a complete procedure for estimation and statistical inference of the GATE, along with theoretical guarantees for the proposed test. Extensive simulations and real-world experiments using data from a leading ridesharing platform demonstrate the effectiveness of our approach. 
+
+## 1 Introduction 
+
+Individualized randomized experiments (IREs) assign treatments at the individual level over time, with treatment status held fixed within each experimental period. Policy evaluation under IREs is of particular importance in two-sided markets — such as ridesharing, food delivery, and freelance platforms — where interventions simultaneously affect both sides of the market and induce complex interactions and interference patterns across participants [Johari et al., 2022, Shi et al., 2023]. The primary objective is to introduce an intervention to a subset of the market and use the observed outcomes to estimate its effect if deployed at full scale. We refer to this estimand as the Global Average Treatment Effect (GATE, formally defined in (1) ). Accurate estimation of GATE is central to platform decisions about whether to roll out a new policy to the entire market. Our study is motivated by a concrete ridesharing marketplace setting, in which a city-scale online experiment is conducted to evaluate a new passenger subsidy policy. Passengers are randomly assigned at the outset to either a treatment group, receiving the new subsidy, or a control group, remaining under the existing policy, over a two- to four-week experimental period. In practice, individual-level data are often unavailable due to privacy constraints. Instead, only aggregated group-level metrics are observed in one-hour intervals, including Gross Merchandise Value (GMV), passenger demographic summaries, and key supply and demand variables such as order frequencies 
+
+> ∗The first two authors have contributed equally to this paper.
+> †Corresponding author. Email: htzhu@email.unc.edu Submitted to STAI-X 2026 (Full Paper Track). Do not distribute.
+> arXiv:2605.26532v1 [stat.ME] 26 May 2026
+
+and driver online hours. The platform’s goal is to quantify the causal impact of this policy on GMV under full deployment using only these aggregate observations. 
+
+Challenges. Despite the widespread adoption of IREs in two-sided markets, reliable treatment effect estimation in this dynamic setting remains fundamentally difficult, for three reasons. The first challenge is cross-unit interference: interventions applied to one side of the market, for example, a passenger subsidy, propagate through supply–demand interactions and affect outcomes on the other side, thereby violating the standard Stable Unit Treatment Value Assumption (SUTVA) [Imbens and Rubin, 2015]. The second challenge is temporal interference: treatment effects evolve over time through dynamic market adjustments, so that an intervention at one time point can influence both contemporaneous and future outcomes [Wang et al., 2023, Li et al., 2024, 2025]. Ignoring either form of interference leads to biased treatment effect estimates [Li et al., 2023]. The third challenge is data availability: privacy and system constraints restrict access to individual-level records, leaving only aggregated group-level observations for analysis — a regime that remains largely underexplored in the causal inference literature. Taken together, these challenges render classical causal inference methods inadequate and motivate the development of new approaches tailored to two-sided markets. 
+
+Contributions. The primary goal of this paper is to study the GATE in individualized randomized experiments within two-sided markets using aggregated data, while explicitly accounting for both cross-unit and temporal interference. Our contributions are fourfold. (i) Identification. We establish identification conditions for the GATE using only group-level data from the treatment and control groups, together with market-level features. This result enables valid GATE estimation without access to individual-level records. To the best of our knowledge, this is the first work to provide such identification based solely on aggregated data. (ii) Modeling framework. We propose a two-layer modeling framework, the Varying Coefficient Decision Process (VCDP), that separates the outcome process from the underlying supply–demand dynamics. Interference is encoded through the supply–demand mechanism, reflecting the intrinsic structure of two-sided markets in which units interact via matching. The VCDP accommodates time-varying treatment effects and dynamic interference, with supply and demand variables serving as mediators that jointly capture cross-unit and temporal interference. (iii) Estimation. We show that the GATE can be expressed as an explicit function of the VCDP model coefficients, and we develop a two-step estimation procedure that combines least squares estimation with kernel smoothing to improve efficiency and stability under weak signals and limited sample sizes. The GATE is then recovered via plug-in estimation from the fitted coefficients. (iv) Inference and empirical validation. We develop a bootstrap-based testing procedure to assess whether deploying the new treatment across the full market improves platform revenue relative to the baseline policy, and we establish its consistency using Gaussian approximation theory [Chernozhukov et al., 2013]. We further validate the practical effectiveness of our approach through an empirical study on data from a leading ridesourcing platform, demonstrating improved performance relative to classical testing methods. 
+
+1.1 Related Work Causal inference in A/B testing. The classical rationale for A/B testing rests on the SUTVA [Rubin, 1980], which requires that the treatment assigned to one unit does not affect the outcomes of others. In two-sided marketplaces, however, interference is typically unavoidable: interventions on one side of the market propagate through supply–demand interactions to affect outcomes on the other side, rendering standard A/B analyses causally invalid [Halloran and Hudgens, 2016, Sävje et al., 2021]. Within the switchback design literature, there is a rich body of work on policy evaluation under interference [Hu and Wager, 2022, Bojinov et al., 2023, Farias et al., 2023, Luo et al., 2024, Li et al., 2024]. By contrast, individualized randomized experiments (IREs) have received considerably less attention. The most closely related work is Liu and Hou [2023], who proposed UniTE to estimate individual-level conditional average treatment effects in two-sided markets via Robinson decomposition. While effective in principle, UniTE requires granular transaction-level data that are often severely sparse in practice — in a two-week experiment, a single passenger may complete only one ride. Practitioners constrained to aggregated group-level data are thus largely limited to simple mean differences or difference-in-differences estimators, which are well known to be biased in the 2presence of interference [Imbens and Rubin, 2015]. Bridging this gap between data availability and methodological requirements is the central motivation of this paper. 
+
+Varying coefficient models. Varying coefficient models, introduced by Hastie and Tibshirani [1993], allow regression coefficients to vary smoothly as functions of an index variable such as time. A rich estimation and inference theory has since developed, spanning kernel and local polynomial methods [Hoover et al., 1998, Fan and Zhang, 1999], spline-based approaches for longitudinal data [Chiang et al., 2001, Huang et al., 2004], and broad applications in spatial, epidemiological, and longitudinal settings [Sun et al., 2023, Zhang et al., 2025, Sadovnichiy et al., 2022]; see Park et al. [2015] for a comprehensive survey. More recently, varying coefficient models have been applied to online A/B testing, though existing work is confined to switchback designs [Luo et al., 2024, Li et al., 2024]. To the best of our knowledge, the present paper is the first to extend this framework to individualized randomized experiments, where interference must be handled through the supply–demand structure rather than the experimental design itself. 
+
+## 2 Problem Formulation 
+
+Data. Consider an experiment conducted over n consecutive days, each divided into m time intervals. At the outset, N = N0 + N1 subjects are randomly assigned to either a treatment group of size 
+
+N1 or a control group of size N0, with assignments held fixed throughout the experiment. For day 
+
+d ∈ { 1, . . . , n } and interval t ∈ { 1, . . . , m }, subjects in the treatment group receive the new policy (Adt = 1 ) and subjects in the control group receive the baseline policy ( Adt = 0 ). Let Y id (t) ∈ R
+
+denote the outcome for subject i at interval t on day d.Due to privacy constraints, individual-level outcomes are not observed. Instead, only group-level aggregates are available for each day d and interval t. Specifically, for each group Ck (k ∈ { 0, 1}), we observe three types of summaries: the average outcome Yd,C k (t) = N −1
+
+> k
+
+P 
+
+> i∈Ck
+
+Y id (t), the average covariate vector Xd,C k (t) ∈ Rp, and the group-level market variables Sd,C k (t) ∈ Rq , which capture supply and demand conditions faced by each group. Observations are assumed to be independent across days, while temporal dependence within each day is explicitly permitted. 
+
+Objective . We adopt the potential outcomes framework [Rubin, 2005] to formalize the problem. Let ¯ait = ( ai
+
+> 1
+
+, . . . , a it)⊤ ∈ { 0, 1}t denote the treatment history of subject i up to time t, and let 
+
+¯aN,t = (¯ a1 
+
+> t
+
+, . . . , ¯aNt ) denote the joint treatment history for all N subjects. Define S(t, ¯aN,t −1) and 
+
+Y i(t, ¯aN,t ) as the counterfactual market state and outcome for subject i, respectively, under treatment history ¯aN,t . Our primary objective is to quantify the Global Average Treatment Effect (GATE), defined as the difference in expected cumulative outcomes between deploying the new policy to the entire market and maintaining the baseline policy: GATE = 1
+
+N E{
+
+> m
+
+X
+
+> t=1
+> N
+
+X
+
+> i=1
+
+Y i t, 1N,t 
+
+} − 1
+
+N E{
+
+> m
+
+X
+
+> t=1
+> N
+
+X
+
+> i=1
+
+Y i t, 0N,t 
+
+}, (1) where 1N,t (respectively, 0N,t ) denotes that all entries in ¯aN,t are equal to 1 (respectively, 0). Our goal is to estimate the GATE using aggregated data and to test the hypothesis 
+
+H0 : GATE ≤ 0 versus H1 : GATE > 0, (2) which evaluates whether deploying the new policy leads to an improvement over the baseline in terms of overall market outcomes. 
+
+## 3 Identification 
+
+The SUTVA [Imbens and Rubin, 2015] is violated in our setting for two reasons. First, a subject’s outcome depends not only on their own current treatment, but also on their prior treatment history. Second, the treatment trajectories of other subjects affect individual outcomes through shared supply– demand dynamics, inducing both cross-unit and temporal interference. Without additional structure on the nature of this interference, identifying the treatment effect may be impossible [Basse and Airoldi, 2018, Liu et al., 2024]. We therefore impose the following four assumptions to identify the GATE from the observed aggregate data. 3Assumption 3.1 (Dynamic local interference) . For each t, if ait = ai′ 
+
+> t
+
+and the fraction of treated subjects coincides under ¯aN,t and ¯a′
+
+> N,t
+
+, then Y i(t, ¯aN,t ) = Y i(t, ¯a′
+
+> N,t
+
+) and S(t + 1 , ¯aN,t ) = 
+
+S(t + 1 , ¯a′
+
+> N,t
+
+).
+
+Assumption 3.2 (Consistency) . If the treatment policy satisfies ¯AN,t = ¯aN,t , then S(t) =
+
+S(t, ¯aN,t −1) and Y i(t) = Y i(t, ¯aN,t ).
+
+Assumption 3.3 (Sequential ignorability) . The treatment Ai(t) assigned to subject i at time t is conditionally independent of all potential variables given the observed data history. 
+
+Assumption 3.4 (Positivity) . For any t ≥ 1, the probability of {Ai(t) = 1 } given the current state is strictly bounded away from zero and one. We now discuss the role and justification of each assumption. Assumption 3.1 restricts the interference structure: it requires that a subject’s outcome and the subsequent market state depend on other subjects’ treatments only through the aggregate fraction of treated subjects, not through their individual identities or specific assignments. This mean-field interference structure is well established in the exposure mapping literature [Yang et al., 2018, Li and Wager, 2022, Shi et al., 2023] and generalizes the static local interference assumption of Johari et al. [2022] and Masoero et al. [2026] to a dynamic setting. It is particularly natural in two-sided markets, where individual outcomes are driven by market-level supply and demand conditions rather than by the identity of any particular treated peer. Assumption 3.2 is a standard consistency condition: it requires that potential outcomes and states, under the observed treatment history, coincide with the actually observed outcomes and states. Assumption 3.3 is a sequential ignorability condition requiring that, given the accumulated data history, the treatment at each period is conditionally independent of all remaining potential variables; this is a standard assumption in the dynamic treatment literature [Wang et al., 2018]. Assumption 3.4 ensures that each subject has a nonzero probability of receiving either treatment at every period, given the current state. Under the randomized design considered here, where subjects are assigned to treatment or control at the outset with fixed positive probability, Assumption 3.4 is automatically satisfied. 
+
+Proposition 3.5. Suppose Assumptions 3.1–3.4 hold, and that there exists a function R(·) such that 
+
+E
+
+
+
+Y i(t, ¯aN,t ) ¯aN,t , {S(j, ¯aN,j −1), f (j)}j≤t
+
+
+
+= R
+
+
+
+ait, {S(j, ¯aN,j −1), f (j)}j≤t
+
+
+
+, (3) 
+
+where f (j) denotes the fraction of treated subjects at time j. Then the following results hold. 
+
+(i) Identification of R(·) from observed data. Under the full-treatment policy ¯aN,t = 1N,t and the full-control policy ¯aN,t = 0N,t , the function R(·) can be learned from the observed data as 
+
+R
+
+
+
+a, {S(j), f (j)}j≤t
+
+
+
+= E
+
+
+
+N −1
+
+> a
+
+X
+
+> i∈Ca
+
+Y i(t) {S(j), f (j)}j≤t
+
+
+
+, (4) 
+
+where Na denotes the number of subjects with ait = a, for a ∈ { 0, 1}.
+
+(ii) Identification of GATE from observed data. The GATE defined in (1) is identifiable from the observed summary data. Specifically, 
+
+E
+
+
+
+Y i(t, ¯aN,t )
+
+
+
+= E
+
+h
+
+R
+
+
+
+a, {S(j, ¯aN,j −1), f (j)}j≤t
+
+i 
+
+(5) 
+
+= E
+
+h
+
+E
+
+n
+
+R
+
+
+
+a, {S(j), f (j)}j≤t
+
+ ¯AN,t = ¯ aN,t , {S(j), f (j)}j≤t, {Y (j)}j<t 
+
+oi 
+
+.
+
+Proposition 3.5 shows that the GATE can be presented as a function of the observed summary data, making it identifiable without access to the individual-level data. When ¯aN,t = 1N,t , the corresponding ratio is f (t) = 1 ; when ¯aN,t = 0N,t , we have f (t) = 0 .
+
+## 4 Models for the outcome and state variables 
+
+We introduce the IRE-VCDP model to jointly characterize outcome and state dynamics in two-sided markets. The state variables explicitly encode the platform’s demand–supply system. For each group 
+
+C ∈ { C0, C 1}, let Dd,C (t) denote group-specific demand and Sd(t) denote platform-wide supply, 4which is shared across groups since drivers serve all users regardless of group membership. We define the group-level state vector as Sd,C (t + 1) = ( Dd,C (t + 1) , S d(t + 1)) ⊤.The outcome and state evolution are modeled as 
+
+Yd,C (t) = gC
+
+ t, X d,C (t), S d,C (t) + ϵd,C (t),Sd,C (t + 1) = GC
+
+ t, eXd,C (t), S d,C (t), f d(t) + Ed,C (t + 1) ,
+
+where gC (·) and GC (·) are unknown regression functions. The outcome is driven by group charac-teristics Xd,C (t) and the current demand–supply state Sd,C (t), while the state transition depends additionally on the fraction of treated subjects fd(t), which serves as the channel through which the treatment propagates across groups. The error terms ϵd,C (t) and Ed,C (t + 1) are mutually indepen-dent; however, we allow correlation between ϵd,C 0 (t) and ϵd,C 1 (t) to accommodate shared latent shocks at the platform level. The inclusion of covariates Xd,C (t) and eXd,C (t) improves estimation efficiency [Su and Ding, 2021]. To enable tractable estimation and interpretation, we adopt the following linear approximations: 
+
+Yd,C (t) = α0,C (t) + α⊤ 
+
+> 1,C
+
+(t) Xd,C (t) + α⊤ 
+
+> 2,C
+
+(t) Sd,C (t) + ϵd,C (t), (6) 
+
+Sd,C (t + 1) = γ0,C (t) + fd(t) γ1,C (t) + Φ 0,C (t) eXd,C (t) + Φ 1,C (t) Sd,C (t) + Ed,C (t + 1) . (7) 
+
+This specification is motivated by both structural and empirical considerations. Structurally, it reflects the platform’s operational asymmetry: demand is group-specific, arising from user-level randomization, while supply is shared across groups. This asymmetry is the mechanism through which cross-group interference operates — a demand shock in one group affects service availability for the other through the common supply pool, and consequently affects outcomes. Empirically, linear varying coefficient models of this form have been shown to perform well in ridesharing systems [Luo et al., 2024, Li et al., 2024], providing a parsimonious yet flexible representation of dynamic demand–supply interactions. A key feature of two-sided markets is that the imbalance between supply and demand is a primary determinant of outcomes [Chen et al., 2024]. When supply is sufficient, demand and GMV exhibit an approximately linear relationship. Under excess demand, however, a fraction of ride requests cannot be fulfilled, and this congestion breaks down the linear relationship. To capture this nonlinearity, we incorporate the supply–demand gap 
+
+Gd(t) = max {Demand d(t) − Supply d(t), 0} (8) as a component of Xd,C (t), where Demand d(t) is the number of ride requests and Supply d(t) is the number of rides that can be fulfilled given total available driver hours, both in city d at time t.The gap Gd(t) captures congestion effects that are particularly pronounced during peak periods and play a crucial role in explaining GMV dynamics over the experimental horizon, as confirmed by our empirical analysis. Based on models (6) –(7) , the GATE in (1) admits a closed-form representation as a function of the model coefficients, which greatly facilitates estimation and inference. The coefficients in (6) – (7) can be consistently estimated using the observed aggregate data. The GATE estimator is then obtained by plugging these estimates into (5) , with f (t) = 1 corresponding to full-scale treatment and f (t) = 0 
+
+corresponding to the control. 
+
+Proposition 4.1. Suppose the conditions in Proposition 3.5 holds, and the potential outcomes admits the form of models in (6) -(7) , then we have 
+
+GATE =
+
+> m
+
+X
+
+> t=1
+
+(α0,C 1 (t) − α0,C 0 (t)) + 
+
+> m
+
+X
+
+> t=1
+
+h ¯XN (α1,C 1 (t) − α1,C 0 (t)) 
+
+i
+
++ (9) 
+
+> m
+
+X
+
+> t=1
+
+h
+
+α2,C 1 (t)⊤ t−1Y
+
+> l=1
+
+Φ1,C 1 (l)E(SC1 (1)) + 
+
+> t−1
+
+X
+
+> k=1
+
+{
+
+> t−1
+
+Y
+
+> l=k+1
+
+Φ1,C 1 (l) · [γ0,C 1 (k) + γ1,C 1 (k) + Φ 0,C 1 (t − 1) ¯˜XN (t)] }
+
+
+
+− α2,C 0 (t)⊤ t−1Y
+
+> l=1
+
+Φ1,C 0 (l)E(SC0 (1)) + 
+
+> t−1
+
+X
+
+> k=1
+
+{
+
+> t−1
+
+Y
+
+> l=k+1
+
+Φ1,C 0 (l) · [γ0,C 0 (k) + Φ 0,C 0 (t − 1) ¯˜XN (t)] }
+
+i 
+
+,
+
+where ¯XN = E(N −1 PNi=1 Xi(t)) and ¯˜XN (t) = E(N −1 PNi=1 ˜Xi(t)) , E(S(1)) denotes the demand and supply of all subjects, and Qt−1 
+
+> l=k+1
+
+Φ1,C 0 (l) = Qt−1 
+
+> l=k+1
+
+Φ1,C 1 (l) = 1 , if t − 1 < k + 1 .
+
+5From Proposition 4.1, the GATE can be estimated by plugging the estimated coefficients from models (6) – (7) into the closed-form expression. The resulting GATE admits a natural decomposition into three components: (i) the direct effect of treatment on the outcome at the same time point; (ii) the interaction between treatment and predictive covariates; and (iii) the interference effects across subjects and over time. If the predictive covariates are centered to have zero mean, the expression of the GATE in Proposi-tion 4.1 further simplifies. In practice, this can be achieved by centering the covariates across all subjects (rather than within each group). While such centering simplifies the expression, the inclusion of these covariates also improves estimation efficiency by reducing variance. To better illustrate the role of interference, we consider a naive treatment effect defined as the difference in mean outcomes between the two groups: τ = E
+
+ Pmt=1 YC1 (t)
+
+
+
+− E
+
+ Pmt=1 YC0 (t)
+
+
+
+.
+
+This estimand ignores interference across subjects. Under models (6) –(7) , τ can also be expressed in terms of the model coefficients, capturing both the direct treatment effect and its interactions with predictive and state variables. It can be viewed as a dynamic extension of the regression-adjusted estimator of Li and Ding [2020]. However, τ fails to account for temporal and cross-subject interference. Consequently, it coincides with the GATE only when the expected demand and supply processes are identical under full-scale treatment and under control—an assumption that is typically violated in practice. See Appendix C.1 for detailed derivations and discussion. 
+
+## 5 Estimation and Inference 
+
+This section presents the estimation procedure and statistical inference framework for the hypothe-sis (2), based on models (6)–(7). 
+
+Estimation . Estimation of the GATE proceeds in two steps. In the first step, the time-varying coefficients in models (6) –(7) are estimated by ordinary least squares at each time point. Specifically, for t = 1 , . . . , m (and t = 1 , . . . , m − 1 for the state equation), define 
+
+bθC (t) = arg min  
+
+> θC(t)
+> n
+
+X
+
+> d=1
+
+
+
+Yd,C (t) − Zd,C (t)⊤θC (t)
+
+2
+
+,
+
+bΘ(ν) 
+
+> C
+
+(t) = arg min 
+
+> Θ(ν)(t)
+> n
+
+X
+
+> d=1
+
+
+
+S(ν) 
+
+> d,C
+
+(t + 1) − eZd,C (t)⊤Θ(ν) 
+
+> C
+
+(t)
+
+2
+
+,
+
+where C ∈ { C0, C 1}, Zd,C (t) = [1 , X d,C (t)⊤, S d,C (t)⊤]⊤, S(ν) 
+
+> d,C
+
+(t+1) denotes the ν-th component of Sd,C (t + 1) , and eZd,C (t) = [1 , f (t), eXd,C (t)⊤, S d,C (t)⊤]⊤.In the second step, kernel smoothing is applied to the initial estimates to reduce variance, enforce temporal smoothness, and improve signal detection under weak effect sizes [Zhu et al., 2014]. For a kernel function K(·) with bandwidth h, the smoothed estimators are defined as 
+
+eθC (t) = 
+
+> m
+
+X
+
+> j=1
+
+ωj,h (t) bθC (j) and eΘ(ν) 
+
+> C
+
+(t) = 
+
+> m−1
+
+X
+
+> j=1
+
+ωj,h (t) bΘ(ν) 
+
+> C
+
+(j), (10) where ωj,h (t) = K(( j − t)/(mh ))  P mk=1 K(( k − t)/(mh )) are normalized kernel weights. We adopt the Gaussian kernel K(t) = exp( −t2). The smoothed estimators are weighted averages of the initial pointwise estimates, with weights decaying as a function of temporal distance. This yields continuous, stable coefficient trajectories that are particularly well-suited for settings in which the signal is weak or the underlying parameters evolve slowly over time. The GATE estimator \GATE is then obtained by substituting eθC (t) and eΘ(ν) 
+
+> C
+
+(t) into the closed-form expression of Proposition 4.1, with the population means of the predictive covariates and the initial state variable replaced by their empirical counterparts across all subjects (see Appendix C.2). 
+
+Inference . To test the hypothesis (2) , we use the test statistic T = \GATE . Under the null hypothesis, 
+
+T is expected to be non-positive or close to zero, so we reject H0 when T exceeds a sufficiently large positive threshold. Deriving the exact limiting distribution of T is analytically intractable due to its 6complex functional dependence on the estimated model parameters. We therefore approximate the null distribution of T via a multiplier bootstrap procedure adapted from Chernozhukov et al. [2013]. Specifically, after estimating the outcome and state models, fitted values and residuals are computed within each group. The residuals are then perturbed using independent standard normal multipliers to generate bootstrap pseudo-data, thereby mimicking the variability of the original observations. For each bootstrap sample, the full estimation procedure is repeated using the pseudo-data to obtain a bootstrap GATE estimate \GATE b
+
+. The bootstrap statistic is defined as T b = \GATE b
+
+− \GATE .
+
+Repeating this procedure over B replications provides an empirical approximation of the null limit distribution. Then we reject H0 at significance level α if T excedds the 1 − α quantile of {Tb}Bb=1 .The complete estimation and inference procedure is summarized in Algorithm 1 in Appendix A. The bootstrap-based critical value enables valid inference without requiring a closed-form asymptotic distribution. The theoretical validity of Algorithm 1 is established below. 
+
+Theorem 5.1. Suppose Assumptions D.1–D.4 in the supplement hold. If h = o(n−1/4), m ≍ nc2 for some 12 < c 2 < 32 , and mh → ∞ as n → ∞ , then 
+
+sup 
+
+> z
+
+P(T − GATE ≤ z) − P T b − T ≤ z | Data  ≤ eC
+
+√n h 2 + √n m −1 + n−1/8
+
+holds with probability approaching 1, for some positive constant eC.
+
+Theorem 5.1 establishes that the bootstrap distribution of T b − T consistently approximates the sampling distribution of T − GATE , with an explicit convergence rate. The bound comprises three terms: a smoothing bias O(√n h 2) from kernel estimation, a discretization error O(√n m −1) due to the finite number of time intervals, and the Gaussian approximation error O(n−1/8) inherited from the theory of Chernozhukov et al. [2013]. The bandwidth conditions h = o(n−1/4) and mh → ∞ 
+
+balance these three sources of error and ensure that the overall bound vanishes as n → ∞ . The proof is given in Appendix E.3. 
+
+## 6 Experiments 
+
+In this section, we conduct real-data–based simulation studies to assess the finite-sample performance of the proposed test for (2) . We then apply the method to real data from a leading ridesharing company. We compare our procedure against three alternatives: (i) a two-sample t-test, which is currently used within the company; (ii) a Difference-in-Differences (DiD) estimator, which compares pre-post outcome changes between treatment and control groups [Ashenfelter, 1978, Callaway and Sant’Anna, 2021]; and (iii) a Direct Effect (DE) estimator, which estimates the treatment effect by extending the regression adjustment approach in Li and Ding [2020] to a dynamic setting. The outcome is the GMV, the state variables are the number of order requests and the drivers’s total online time within each t. Detailed data-generating process and additional results are provided in Appendix B. 
+
+Example 6.1 (Real-data-based simulations within cities). We construct a simulation environment based on real A/A experimental data from a ridesharing platform across three cities of different sizes: a large city (5–10 million residents), a medium city (1–5 million), and a small city (0.5–1 million). In an A/A experiment, identical policies are applied to both groups, so the true GATE is zero by construction. Each day is divided into m = 24 time intervals, and the number of experimental days is set to n ∈ { 14 , 28 }. To assess power, we introduce a tunable parameter η ∈ [0 , 12] that scales the treatment effect, with η = 0 corresponding to the null and larger values of η yielding stronger effects. All results are based on 1,000 simulation replications, each using 500 bootstrap samples. Figure 1 summarizes the results. The left panel shows that the bootstrap distribution closely tracks the empirical null distribution of \GATE across replications, confirming the accuracy of the bootstrap approximation established in Theorem 5.1. The right panel reports the empirical rejection rates of the proposed IRE-VCDP-based test, the two-sample t-test, the DiD estimator, and the DE estimator. All methods control the type I error at the nominal 5% level; however, the proposed test demonstrates superior power, with particularly notable gains for small effect sizes. Figure 3 in the Appendix further confirms that the empirical p-value distributions under the null are approximately uniform across all city sizes and observation windows, indicating reliable Type I error control. 7Figure 1: Left panel: empirical and bootstrap sampling distributions of the estimated GATE under null; Right panel: empirical rejection rates of the proposed IRE-VCDP-based test, the t-test, the DiD estimator, and the DE estimator. 
+
+Example 6.2 (Real-data-based simulations across all cities). Beyond individual cities, our frame-work also accommodates joint evaluation across multiple cities. In this example, we define the GATE as the overall difference in GMV across the three cities between the treatment and control groups. The findings are qualitatively similar to those obtained for individual cities: the bootstrap approximation remains accurate under the null and the proposed test maintains a clear power advantage over all three alternative methods. Detailed results are deferred to Appendix B. 
+
+Example 6.3 (Real data analysis). We apply our method to a real-world A/B experiment conducted by Didi Chuxing from November 1 to November 21, 2025 (21 days), in which users were randomly assigned to treatment and control groups receiving different subsidy policies. The new policy was designed to increase GMV relative to the incumbent one. Before fitting the models, we examine the raw data. Figure 5 in the Appendix displays the temporal evolution of GMV, order requests, and drivers’ total online time across cities over the experimental period. GMV closely tracks order volume under normal conditions, but visibly decouples on days with abnormally high demand, when requests exceed available supply and cannot be fully converted into completed rides. This pattern motivates the inclusion of the supply–demand imbalance term (8) and confirms the suitability of models (6)–(7) for this setting. Figure 2 presents, for the medium city, the fitted values of GMV, order requests, and drivers’ total online time against their observed counterparts, together with the corresponding residuals. Figures 6 and 7 in the Appendix show analogous results for the large and small cities, respectively. Across all cities, the proposed models achieve a close fit to both the outcome and state variables, with residuals that fluctuate randomly and exhibit no systematic structure. Table 1 in Appendix B reports the p-values from all four methods for both A/A and A/B analyses across cities. The A/A results serve as a sanity check: all methods yield p-values above 5%, confirming proper Type I error control. For the A/B analysis, the proposed test shows a meaningful drop in p-values from the A/A period, with the small city reaching 0.078 (significant at the 10% level); no significant effects are detected for the medium or large cities. In contrast, the alternative methods yield similar p-values in both A/A and A/B periods, failing to distinguish between them, suggesting limited sensitivity to treatment effects transmitted through supply–demand dynamics. 
+
+## References 
+
+Orley Ashenfelter. Estimating the effect of training programs on earnings. The Review of Economics and Statistics , pages 47–57, 1978. Guillaume W Basse and Edoardo M Airoldi. Limitations of design-based causal inference and a/b testing under arbitrary and network interference. Sociological Methodology , 48(1):136–151, 2018. Iavor Bojinov, David Simchi-Levi, and Jinglong Zhao. Design and analysis of switchback experiments. 
+
+Management Science , 69(7):3759–3777, 2023. Brantly Callaway and Pedro HC Sant’Anna. Difference-in-differences with multiple time periods. 
+
+Journal of econometrics , 225(2):200–230, 2021. 80 25           
+
+> Time
+> 0.0
+> 0.5
+> Residuals
+> 025
+> Time
+> -0.25
+> 0.00
+> 0.25
+> 020
+> Time
+> 0
+> 2
+> 020
+> Time
+> -2
+> 0
+> 2
+> 020
+> Time
+> 0.0
+> 0.2
+> 0.0 2.5
+> yC1(t)
+> 0
+> 1
+> 2
+> yC1(t)
+> Fitted vs observed
+> 0.0 2.5
+> yC0(t)
+> 0
+> 2
+> yC0(t)
+> 010
+> DC1(t)
+> 0
+> 5
+> 10
+> DC1(t)
+> 010
+> DC0(t)
+> 0
+> 5
+> 10
+> DC0(t)
+> 123
+> S(t)
+> 1
+> 2
+> 3
+> S(t)
+
+Figure 2: Medium city: residuals (top row) and fitted vs. observed values (bottom row). Columns (left to right): GMV (treatment), GMV (control), number of requests (treatment), number of requests (control), and drivers’ total online time. Q Chen, Y Lei, and Stefanus Jasin. Real-time spatial-intertemporal dynamic pricing for balancing supply and demand in a ride-hailing network: near-optimal policies and the value of dynamic pricing. Operations Research , 72(5):2097–2118, 2024. Victor Chernozhukov, Denis Chetverikov, and Kengo Kato. Gaussian approximations and multiplier bootstrap for maxima of sums of high-dimensional random vectors. Annals of Statistics , 41(6): 2786–2819, 2013. Chin-Tsang Chiang, John A Rice, and Colin O Wu. Smoothing spline estimation for varying coefficient models with repeatedly measured dependent variables. Journal of the American Statistical Association , 96(454):605–619, 2001. Jianqing Fan and Wenyang Zhang. Statistical estimation in varying coefficient models. The annals of Statistics , 27(5):1491–1518, 1999. Vivek Farias, Hao Li, Tianyi Peng, Xinyuyang Ren, Huawei Zhang, and Andrew Zheng. Correcting for interference in experiments: A case study at douyin. In Proceedings of the 17th ACM Conference on Recommender Systems , pages 455–466, 2023. M Elizabeth Halloran and Michael G Hudgens. Dependent happenings: a recent methodological review. Current epidemiology reports , 3(4):297–305, 2016. Trevor Hastie and Robert Tibshirani. Varying-coefficient models. Journal of the Royal Statistical Society Series B: Statistical Methodology , 55(4):757–779, 1993. Donald R Hoover, John A Rice, Colin O Wu, and Li-Ping Yang. Nonparametric smoothing estimates of time-varying coefficient models with longitudinal data. Biometrika , 85(4):809–822, 1998. Yuchen Hu and Stefan Wager. Switchback experiments under geometric mixing. arXiv preprint arXiv:2209.00197 , 2022. Jianhua Z Huang, Colin O Wu, and Lan Zhou. Polynomial spline estimation and inference for varying coefficient models with longitudinal data. Statistica Sinica , pages 763–788, 2004. Guido W Imbens and Donald B Rubin. Causal inference in statistics, social, and biomedical sciences .Cambridge university press, 2015. Ramesh Johari, Hannah Li, Inessa Liskovich, and Gabriel Y Weintraub. Experimental design in two-sided platforms: An analysis of bias. Management Science , 68(10):7069–7089, 2022. Mengbing Li, Chengchun Shi, Zhenke Wu, and Piotr Fryzlewicz. Testing stationarity and change point detection in reinforcement learning. The Annals of Statistics , 53(3):1230–1256, 2025. 9Shuangning Li and Stefan Wager. Random graph asymptotics for treatment effect estimation under network interference. The Annals of Statistics , 50(4):2334–2358, 2022. Ting Li, Chengchun Shi, Jianing Wang, Fan Zhou, et al. Optimal treatment allocation for efficient policy evaluation in sequential decision making. Advances in Neural Information Processing Systems , 36:48890–48905, 2023. Ting Li, Chengchun Shi, Zhaohua Lu, Yi Li, and Hongtu Zhu. Evaluating dynamic conditional quantile treatment effects with applications in ridesharing. Journal of the American Statistical Association , 119(547):1736–1750, 2024. Xinran Li and Peng Ding. Rerandomization and regression adjustment. Journal of the Royal Statistical Society Series B: Statistical Methodology , 82(1):241–268, 2020. Runshi Liu and Zhipeng Hou. Unite: A unified treatment effect estimation method for one-sided and two-sided marketing. In Proceedings of the 32nd ACM International Conference on Information and Knowledge Management , pages 1472–1481, 2023. Yang Liu, Yifan Zhou, Ping Li, and Feifang Hu. Cluster-adaptive network a/b testing: From randomization to estimation. Journal of Machine Learning Research , 25(170):1–48, 2024. Shikai Luo, Ying Yang, Chengchun Shi, Fang Yao, Jieping Ye, and Hongtu Zhu. Policy evaluation for temporal and/or spatial dependent experiments. Journal of the Royal Statistical Society Series B: Statistical Methodology , 86(3):623–649, 2024. Lorenzo Masoero, Suhas Vijaykumar, Thomas S Richardson, James McQueen, Ido Rosen, Brian Burdick, Pat Bajari, and Guido Imbens. Multiple randomization designs: Estimation and inference with interference. Journal of the Royal Statistical Society Series B: Statistical Methodology , page qkaf073, 2026. Byeong U Park, Enno Mammen, Young K Lee, and Eun Ryung Lee. Varying coefficient regression models: a review and new developments. International Statistical Review , 83(1):36–64, 2015. Donald B Rubin. Randomization analysis of experimental data: The fisher randomization test comment. Journal of the American statistical association , 75(371):591–593, 1980. Donald B Rubin. Causal inference using potential outcomes: Design, modeling, decisions. Journal of the American statistical Association , 100(469):322–331, 2005. VA Sadovnichiy, Askar Akayevich Akaev, AI Zvyagintsev, and Askar Islamovich Sarygulov. Math-ematical modeling of overcoming the covid-19 pandemic and restoring economic growth. In 
+
+Doklady Mathematics , volume 106, pages 230–235. Springer, 2022. Fredrik Sävje, Peter Aronow, and Michael Hudgens. Average treatment effects in the presence of unknown interference. Annals of statistics , 49(2):673, 2021. Chengchun Shi, Runzhe Wan, Ge Song, Shikai Luo, Hongtu Zhu, and Rui Song. A multiagent reinforcement learning framework for off-policy evaluation in two-sided markets. The Annals of Applied Statistics , 17(4):2701–2722, 2023. Rober H Shumway. Time series analysis and its applications: With r examples, 2006. Fangzhou Su and Peng Ding. Model-assisted analyses of cluster-randomized experiments. Journal of the Royal Statistical Society Series B: Statistical Methodology , 83(5):994–1015, 2021. Yanqing Sun, Qiong Shou, Peter B Gilbert, Fei Heng, and Xiyuan Qian. Semiparametric additive time-varying coefficients model for longitudinal data with censored time origin. Biometrics , 79(2): 695–710, 2023. Jitao Wang, Chengchun Shi, and Zhenke Wu. A robust test for the stationarity assumption in sequential decision making. In International Conference on Machine Learning , pages 36355–36379. PMLR, 2023. Lan Wang, Yu Zhou, Rui Song, and Ben Sherwood. Quantile-optimal treatment regimes. Journal of the American Statistical Association , 113(523):1243–1254, 2018. 10 Yaodong Yang, Rui Luo, Minne Li, Ming Zhou, Weinan Zhang, and Jun Wang. Mean field multi-agent reinforcement learning. In International conference on machine learning , pages 5571–5580. PMLR, 2018. Yuzi Zhang, Howard H Chang, Angela D Iuliano, and Carrie Reed. A bayesian spatial–temporal varying coefficients model for estimating excess deaths associated with respiratory infections. 
+
+Journal of the Royal Statistical Society Series A: Statistics in Society , 188(3):843–858, 2025. Hongtu Zhu, Jianqing Fan, and Linglong Kong. Spatially varying coefficient model for neuroimaging data with jump discontinuities. Journal of the American Statistical Association , 109(507):1084– 1098, 2014. 11 Appendix 
+
+## A The proposed algorithm 
+
+Algorithm 1 Estimation and Inference for GATE 
+
+Require: Observed aggregate data {Yd,C (t), S d,C (t), X d,C (t), eXd,C (t), f (t)} for d = 1 , . . . , n ,
+
+t = 1 , . . . , m , C ∈ { C0, C 1}; number of bootstrap samples B; significance level α. 
+
+> 1:
+
+Estimate the time-varying coefficients in the outcome model (6) and the state model (7) via two-step kernel smoothing, yielding eθC (t) and eΘC as in (10) . Substitute these into (9) to obtain 
+
+\GATE.  
+
+> 2:
+
+For each d = 1 , . . . , n and C ∈ { C0, C 1}, compute the fitted values eSd,C (t + 1) and eYd,C (t),along with the residuals: 
+
+bϵd,C (t) = Yd,C (t) − Zd,C (t)⊤ eθC (t), t = 1 , . . . , m, 
+
+bEd,C (t + 1) = Sd,C (t + 1) − eΘC eZd,C (t), t = 1 , . . . , m − 1. 
+
+> 3:
+
+for b = 1 to B do  
+
+> 4:
+
+Draw i.i.d. standard normal multipliers ξbd,Y,C 0 , ξ bd,Y,C 1 , ξ bd,S,C 0 , ξ bd,S,C 1
+
+> nd=1
+
+. 
+
+> 5:
+
+Construct bootstrap pseudo-responses by perturbing the fitted values with the multiplier-weighted residuals: 
+
+bS bd,C (t + 1) = eSd,C (t + 1) + ξbd,S,C bEd,C (t + 1) ,
+
+bY bd,C (t) = eYd,C (t) + ξbd,Y,C bϵd,C (t). 
+
+> 6:
+
+Re-estimate the model using the pseudo-data { bS bd,C (t), bY bd,C (t)} to obtain eθ bC (t) and eΘ bC . 
+
+> 7:
+
+Compute the centered bootstrap statistic: 
+
+T b = \GATE b
+
+− \GATE . 
+
+> 8:
+
+end for  
+
+> 9:
+
+Reject H0 at significance level α if 
+
+T = \GATE > the (1 − α)-quantile of T b Bb=1 .
+
+Ensure: Estimate \GATE and the corresponding decision rule for testing H0.
+
+## B Additional Experiment Results 
+
+In this section, we describe the data-generating process for the real-data–based simulation and report additional experimental results. 
+
+Example 6.1 (continued). The A/A experiment spans two weeks, with each day divided into m = 24 
+
+time intervals. For the GMV outcome model, in addition to the supply and demand state variables, the predictive covariates include the other subsidy amount and the supply–demand gap Gd(t). The state-transition model uses temperature, precipitation, and a holiday indicator (equal to 1 if the time interval falls on a public holiday, and 0 otherwise) as predictors. We first fit models (6) – (7) using the full A/A dataset to obtain coefficient estimates {eα0, eα1, eα2} and {eγ0(t), eΦ0(t), eΦ1(t)}, along with estimated error processes eed(t) and eEd(t).To generate simulated data, we adopt a bootstrap procedure. In each run, we sample n ∈ { 14 , 28 }
+
+initial state observations and n estimated error trajectories with replacement. For each group C ∈
+
+12 {C0, C 1}, we sample the initial demand eDd,C (1) within the group and the initial supply eSd(1) 
+
+from platform-level supply. For each city and time interval t, predictive covariates are generated as follows. In the outcome model, the other subsidy amount and the supply–demand gap Gd(t) are independently drawn from uniform distributions over their empirical ranges at time t during the A/A period; the subsidy is sampled separately for treatment and control groups, while Gd(t) is shared. In the state-transition model, temperature and precipitation are sampled analogously and shared across groups, while the holiday indicator follows the calendar. We then generate n days of data under the VCDP model: 
+
+eYd,C (t) = α0,C (t) + α⊤ 
+
+> 1,C
+
+(t)Xd,C (t) + α⊤ 
+
+> 2,C
+
+(t) eSd,C (t) + eϵd,C (t),
+
+eSd,C (t + 1) = γ0,C (t) + Φ 0,C (t) eXd,C (t) + Φ 1,C (t) eSd,C (t) + eEd,C (t + 1) .
+
+We set {α0,C , α 1,C , α 2,C } = {eα0, eα1, eα2} for both groups C ∈ { C0, C 1}. The parameters γ0,C (t)
+
+and Φ1,C (t) are shared across groups and set equal to {eγ0(t), eΦ1(t)}. To control the magnitude of the GATE, we let Φ0,C 0 (t) = eΦ0(t) and Φ0,C 1 (t) = η eΦ0(t) for a constant η ≥ 0. When η = 0 , there is no treatment effect; when η > 0, the new policy is beneficial. For each city and each value of η,we generate 1000 independent datasets and apply the proposed test, the two-sample t-test, the DiD estimator, and the DE estimator at the 5% significance level. Figure 3 shows that the empirical distributions of bootstrap p-values under the null across the three cities closely approximate the uniform distribution, confirming the validity of the proposed testing procedure. 0.0 
+
+0.5 
+
+1.0 
+
+> Density
+> 14 days
+
+Small City Medium City Large City 
+
+0.0 0.5 1.0 
+
+p-value 
+
+0.0 
+
+0.5 
+
+1.0 
+
+> Density
+> 28 days
+
+0.0 0.5 1.0 
+
+p-value 
+
+0.0 0.5 1.0 
+
+p-value 
+
+Bootstrap p-values 
+
+Figure 3: Empirical distributions of bootstrap p-values under the null for three cities. 
+
+Example 6.2 (Continued). This example mimics a setting where the experiment is conducted simultaneously across R cities. In each city, treatment and control groups receive different subsidy amounts under a common budget constraint. The objective is to evaluate whether the new subsidy allocation policy improves the overall GMV across the R cities. Participants within each city are randomly selected to participate in the experiment. Let {Nr , r = 1 , . . . , R } denote the number of participants in the r-th city, and let N = PRr=1 Nr . The GATE is defined as GATE = N −1
+
+> R
+
+X
+
+> r=1
+
+h
+
+E
+
+ mX
+
+> t=1
+> Nr
+
+X
+
+> i=1
+
+Y i(t, 1N,t )
+
+
+
+− E
+
+ mX
+
+> t=1
+> Nr
+
+X
+
+> i=1
+
+Y i(t, 0N,t )
+
+i 
+
+. (11) The data-generating process is the same as in Example 6.1: data are generated independently within each city following the same procedure. However, the GATE is evaluated jointly across all cities. 13 Specifically, we first estimate the GATE within each city, and then aggregate these estimates to obtain the overall GATE. The bootstrap-based test is constructed accordingly. As shown in Figure 4, the distribution of the bootstrap statistic closely approximates the empirical sampling distribution of the estimated GATE. Under the null hypothesis, the empirical distribution of bootstrap p-values remains approximately uniform on [0 , 1] , indicating good calibration. Moreover, the proposed test demonstrates a clear power advantage over all three alternative methods, particularly for small effect sizes. 
+
+Figure 4: Joint simulation results pooling all three cities. Columns report GATE sampling distribu-tions, bootstrap p-value distributions under the null, and power curves of the proposed test versus the 
+
+t-test, the DiD estimator, and the DE estimator as a function of the true GATE; rows correspond to the two observation horizons ( n = 14 and n = 28 days). 
+
+Example 6.3 (Continued). Figure 5 illustrates the temporal evolution of GMV and key state variables capturing supply–demand dynamics (number of requests and drivers’ total online time) across cities over the experimental period. Figures 6–7 present the fitted values of GMV, number of requests, and drivers’ total online time against their observed counterparts, together with the corresponding residuals over time for both the small and large cities. These results demonstrate that the proposed VCDP model provides a good fit to both the outcome and state variables. Table 1 reports the p-values from all four methods for A/A and A/B analyses across cities. Detailed discussion is provided in Section 6. Table 1: P-value results for different methods and cities under A/A and A/B periods. Method Small City Medium City Large City All Cities AA AB AA AB AA AB AA AB IRE-VCDP 0.382 0.078 0.544 0.244 0.488 0.208 0.446 0.12 Two-sample t-test 0.485 0.476 0.397 0.525 0.405 0.415 0.391 0.553 DE 0.5 0.472 0.248 0.54 0.252 0.306 0.158 0.534 DiD 0.515 0.362 0.099 0.631 0.532 0.253 0.366 0.429 14 0 5 10 15 20 25 
+
+time 
+
+0
+
+2
+
+4
+
+6
+
+Small City: Gross Merchandise Value 
+
+0 5 10 15 20 25 
+
+time 
+
+0
+
+5
+
+10 
+
+15 
+
+20 
+
+25 
+
+Small City: Number of Requests 
+
+0 5 10 15 20 25 
+
+time 
+
+0
+
+1
+
+2
+
+3
+
+Small City: Driver's Total Online Time 0 5 10 15 20 25 
+
+time 
+
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+Medium City: Gross Merchandise Value 
+
+0 5 10 15 20 25 
+
+time 
+
+0
+
+5
+
+10 
+
+15 
+
+20 
+
+Medium City: Number of Requests 
+
+0 5 10 15 20 25 
+
+time 
+
+1
+
+2
+
+3
+
+Medium City: Driver's Total Online Time 0 5 10 15 20 25 
+
+time 
+
+0
+
+1
+
+2
+
+3
+
+4
+
+5 Large City: Gross Merchandise Value 
+
+0 5 10 15 20 25 
+
+time 
+
+0
+
+5
+
+10 
+
+15 
+
+Large City: Number of Requests 
+
+0 5 10 15 20 25 
+
+time 
+
+1
+
+2
+
+3
+
+Large City: Driver's Total Online Time Figure 5: Scaled business metrics from the small, medium and large cities across 21 days. 0 25 
+
+Time 
+
+-0.25 
+
+0.00 
+
+0.25 
+
+> Residuals
+
+0 25 
+
+Time 
+
+-0.25 
+
+0.00 
+
+0.25 
+
+0 20 
+
+Time 
+
+-2 
+
+0
+
+2
+
+0 20 
+
+Time 
+
+0.0 
+
+2.5 
+
+0 20 
+
+Time 
+
+-0.1 
+
+0.0 
+
+0.1 
+
+0.0 2.5 
+
+yC1(t)
+
+0
+
+1
+
+2
+
+> yC1(t)
+> Fitted vs observed
+
+0.0 2.5 
+
+yC0(t)
+
+0
+
+1
+
+2
+
+> yC0(t)
+
+0 5
+
+DC1(t)
+
+0
+
+5
+
+> DC1(t)
+
+0 5
+
+DC0(t)
+
+0
+
+5
+
+> DC0(t)
+
+1 2 3
+
+S(t)
+
+1
+
+2
+
+3
+
+> S(t)
+
+Figure 6: Large city: residuals (top row) and fitted vs. observed values (bottom row). Columns (left to right): GMV (treatment), GMV (control), number of requests (treatment), number of requests (control), and drivers’ total online time. 15 0 20          
+
+> Time
+> -0.5
+> 0.0
+> 0.5
+> Residuals
+> 020
+> Time
+> 0
+> 1
+> 020
+> Time
+> 0
+> 2
+> 020
+> Time
+> 0
+> 2
+> 020
+> Time
+> -0.2
+> 0.0
+> 0.2
+> 02
+> yC1(t)
+> 0
+> 2
+> yC1(t)
+> Fitted vs observed
+> 02
+> yC0(t)
+> 0
+> 2
+> yC0(t)
+> 010
+> DC1(t)
+> 0
+> 5
+> 10
+> DC1(t)
+> 010
+> DC0(t)
+> 0
+> 10
+> DC0(t)
+> 02
+> S(t)
+> 0
+> 2
+> S(t)
+
+Figure 7: Small city: residuals (top row) and fitted vs. observed values (bottom row). Columns (left to right): GMV (treatment), GMV (control), number of requests (treatment), number of requests (control), and drivers’ total online time. 
+
+## C Notation and Definitions 
+
+C.1 Formulation and Discussion of Straightforward Treatment Effect 
+
+τ =
+
+> m
+
+X
+
+> t=1
+
+(α0,C 1 (t) − α0,C 0 (t)) + 
+
+> m
+
+X
+
+> t=1
+
+h
+
+E(XC1 (t)) α1,C 1 (t) − E(XC0 (t)) α1,C 0 (t)
+
+i
+
++
+
+> m
+
+X
+
+> t=1
+
+h
+
+E(SC1 (t)) α2,C 1 (t) − E(SC0 (t)) α2,C 0 (t)
+
+i
+
+.
+
+If the means of the predictive covariates are equal across groups, such that E(N −1 PNi=1 Xi(t)) = 
+
+E(XC1 (t)) = E(XC0 (t)) , and E(S(t, 1N,t )) = E(S(t, 0N,t )) , then τ coincides with the GATE. In practice, ensuring that the mean of the predictive covariates is balanced between the two groups is relatively straightforward using covariate balancing techniques such as matching or weighting. However, achieving equality in the expected potential outcomes of the state variables is more challenging, as the treatment history often directly influences their evolution over time. 
+
+C.2 Formulation of GATE Estimator 
+
+\GATE =
+
+> m
+
+X
+
+> t=1
+
+(eα0,C 1 (t) − eα0,C 0 (t)) + 
+
+> m
+
+X
+
+> t=1
+
+h
+
+n−1
+
+> n
+
+X
+
+> d=1
+
+Xd(t)( eα1,C 1 (t) − eα1,C 0 (t)) 
+
+i
+
++
+
+> m
+
+X
+
+> t=1
+
+heα2,C 1 (t)⊤ t−1X
+
+> k=1
+
+{
+
+> t−1
+
+Y
+
+> l=k+1
+
+eΦ1,C 1 (l)
+
+heγ0,C 1 (k) + eγ1,C 1 (k) + n−1 eΦ0,C 1 (t)
+
+> n
+
+X
+
+> d=1
+
+Hd,C 1 (t)
+
+i
+
+} +
+
+> t−1
+
+Y
+
+> l=1
+
+eΦ1,C 1 (l)E(S(1)) 
+
+
+
+− eα2,C 0 (t)⊤ t−1X
+
+> k=1
+
+{
+
+> t−1
+
+Y
+
+> l=k+1
+
+eΦ1,C 0 (l)
+
+heγ0,C 0 (k) + n−1 eΦ0,C 0 (t)
+
+> n
+
+X
+
+> d=1
+
+Hd,C 0 (t)
+
+i
+
+} +
+
+> t−1
+
+Y
+
+> l=1
+
+eΦ1,C 0 (l)E(S(1)) 
+
+i 
+
+,
+
+where Xd(t) := N −1(N0Xd,C 0 (t) + N1Xd,C 1 (t)) .
+
+## D Assumptions for Theorem 5.1 
+
+In this section, we provide the regularity conditions for the bootstrap consistency theory. 
+
+Assumption D.1. The kernel function K(·) is a symmetric probability density function defined over the interval [−1, 1] . It is Lipschitz continuous and satisfies the condition R 1 
+
+> −1
+
+|tK ′(t)|dt < ∞,signifying its finiteness under the integral of its absolute derivative. 16 Assumption D.2. The covariates used in outcome model and state model are independent and identically distributed across d and are sub-Gaussian (uniformly over t). Furthermore, for any integer 
+
+t within the range 1 ≤ t ≤ m, the smallest eigenvalue of each population second-moment matrix of the covariates is bounded away from zero. 
+
+Assumption D.3. All components of θC0 (ms ), θC1 (ms ), ΘC0 (ms ) and ΘC1 (ms ) possess second-order derivatives with respect to s.
+
+Assumption D.4. There exist constants 0 < c 1 < 1, MΓ, M β > 0, and Mmin > 0 such that 
+
+∥Φ1,C (t)∥∞ ≤ c1, ∥α2,C (t)∥∞ ≤ Mα, and ∥Φ0,C (t)∥∞ ≤ MΦ, for ∀C ∈ { C0.C 1}.Assumption D.1 is mild as the kernel K(·) is user-specified. Assumption D.2 has been commonly used in the literature on varying coefficient models (see e.g., Zhu et al. [2014]). Assumption D.3 serves as a routine smoothness condition that guarantees the local approximation accuracy of the kernel estimator. Assumption D.4 ensures that the time series is stationary, since Φ( t) is the autoregressive coefficient. It is commonly imposed in the literature on time series analysis [Shumway, 2006]. 
+
+## E Proofs of Propositions and Theorems 
+
+E.1 Proof of Proposition 3.5 
+
+Proof. The proof proceeds in two steps. First, we show that the function R(·) can be identified from the observed data using the conditional expectation of the observed outcomes. Second, we apply the law of iterated expectations to show that the GATE is identifiable. 
+
+Step 1: Identification of R(·)
+
+By the law of iterated expectations, we have the following relationship: 
+
+E
+
+
+
+Y i(t) Ait = a, {S(j), f (j)}j≤t
+
+
+
+(12) 
+
+= E
+
+h
+
+E
+
+h
+
+Y i(t) Ait = a, {S(j), f (j)}j≤t, {Y (j)}j<t 
+
+i
+
+Ait = a, {S(j), f (j)}j≤t
+
+i
+
+.
+
+By taking out the inner expectation in Equation (12), we can further derive: 
+
+E
+
+h
+
+Y i(t) Ait = a, {S(j), f (j)}j≤t, {Y (j)}j<t 
+
+i
+
+> (i)
+
+=E
+
+h
+
+Y i(t) Ait = a, ¯AN,t −1 = ¯ aN,t −1, {S(j), f (j)}j≤t, {Y (j)}j<t 
+
+i
+
+> (ii )
+
+= E
+
+h
+
+Y i(t, ¯AN,t ) Ait = a, ¯AN,t −1 = ¯ aN,t −1, {S(j, ¯AN,j −1), f (j)}j≤t, {Y i(j, ¯AN,j )}j<t 
+
+i
+
+> (iii )
+
+= E
+
+h
+
+Y i(t, ¯aN,t ) Ait = a, ¯AN,t −1 = ¯ aN,t −1, {S(j, ¯AN,j −1), f (j)}j≤t, {Y i(j, ¯AN,j )}j<t 
+
+i
+
+> (iv )
+
+= E
+
+h
+
+Y i(t, ¯aN,t ) Ait = a, {S(j, ¯aN,j −1), f (j)}j≤t, {Y i(j, ¯aN,j )}j<t 
+
+i
+
+> (v)
+
+= R
+
+
+
+ait, {S(t), f (j)}j≤t
+
+
+
+. (13) Here, equality (i) follows from Assumption 3.1, Assumption 3.3 and 3.4; equalities (ii)-(iv) follow from the consistency Assumption 3.2. According to the definition of R(·) and the independence of {Y i(j, ¯aN,j )}j<t , substituting the result of Equation (13) into Equation (12) , and using the result of Assumption 3.3, we obtain immediately that: 
+
+R
+
+
+
+ait, {S(t), f (j)}j≤t
+
+
+
+= E
+
+
+
+Y i(t) Ait = a, {S(j), f (j)}j≤t
+
+
+
+.
+
+Consequently, R(·) can be estimated by the sample average over units receiving treatment a:
+
+R
+
+
+
+ait, {S(j), f (j)}j≤t
+
+
+
+= N −1 
+
+> a
+
+E
+
+ X
+
+> {i:ait=a}
+
+Y i(t) Ait = ait, {S(j), f (j)}j<t 
+
+
+
+,
+
+which completes the derivation of Equation (4). 17 Step 2: Identification of GATE 
+
+We next show Equation (5). By the law of iterated expectations, we have 
+
+E
+
+h
+
+R a, {S(j, ¯aN,j −1), f (j)}j≤t
+
+i
+
+= E
+
+h
+
+E
+
+n
+
+R a, {S(j, ¯aN,j −1), f (j)}j≤t
+
+ ¯AN, 1 = ¯ aN, 1, {S(j, ¯aN,j −1), f (j)}j≤t, {Y (j, ¯aN,t )}j<t 
+
+oi 
+
+.
+
+Under Assumption 3.2, we can replace Y (1 , ¯aN, 1) and S(2 , ¯aN, 1) with Y (1) and S(2) , respectively. Under Assumption 3.3 and 3.4, the event (A12, . . . , A N 
+
+> 2
+
+) = ( a12, . . . , a N 
+
+> 2
+
+) can be included in the conditioning set. This yields that 
+
+E
+
+h a, {S(j, ¯aN,j −1), f (j)}j≤t
+
+i
+
+= E
+
+h
+
+E
+
+n
+
+R a, {S(t, ¯aN,j −1), f (j)}j≤t, 
+
+¯AN, 2 = ¯ aN, 2, {S(j, ¯aN,j −1), f (j)}j≤t, {Y (j, ¯aN,t )}j<t , S (1) , S (2) , Y (1) 
+
+oi 
+
+.
+
+Iteratively applying this argument allows us to repeatedly replace the counterfactual variables with the observed ones. At the end, all the potential outcomes/states will be replaced with the observed versions conditional on the actions. The proof is hence completed. 
+
+E.2 Proof of Proposition 4.1 
+
+Proof. Let ζ(t) := N −1E(PNi=1 Y i(t, 1N,t )) − N −1E(PNi=1 Y i(t, 0N,t )) , which means that GATE = Pmt=1 ζ(t). Thus, we only need to prove that 
+
+ζ(t) = ( α0,C 1 (t) − α0,C 0 (t)) + 
+
+h
+
+(α1,C 1 (t) − α1,C 0 (t)) ⊤E(N −1
+
+> N
+
+X
+
+> i=1
+
+Xi(t)) 
+
+i
+
++
+
+h
+
+α2,C 1 (t)⊤ t−1X
+
+> k=1
+
+{
+
+> t−1
+
+Y
+
+> l=k+1
+
+Φ1,C 1 (l)[ γ0,C 1 (k) + γ1,C 1 (k) + Φ 0,C 1 (k)E(N −1
+
+> N
+
+X
+
+> i=1
+
+HiC1 (k))] } +
+
+> t−1
+
+Y
+
+> l=1
+
+Φ1,C 1 (l)E(S(1)) 
+
+
+
+− α2,C 0 (t)⊤ t−1X
+
+> k=1
+
+{
+
+> t−1
+
+Y
+
+> l=k+1
+
+Φ1,C 0 (l)[ γ0,C 0 (k) + Φ 0,C 0 (k)E(N −1
+
+> N
+
+X
+
+> i=1
+
+HiC0 (k))] } +
+
+> t−1
+
+Y
+
+> l=1
+
+Φ1,C 0 (l)E(S(1)) 
+
+i 
+
+.
+
+Since potential outcomes admits the form of models in (6)-(7), we have 
+
+ζ(t) = ( α0,C 1 (t) − α0,C 0 (t)) + ( α1,C 1 (t) − α1,C 0 (t)) ⊤E(N −1
+
+> N
+
+X
+
+> i=1
+
+Xi(t)) + α2,C 1 (t)⊤E(SC1 (t, 1N,t −1)) − α2,C 0 (t)⊤E(SC0 (t, 0N,t −1)) =( α0,C 1 (t) − α0,C 0 (t)) + ( α1,C 1 (t) − α1,C 0 (t)) ⊤E(N −1
+
+> N
+
+X
+
+> i=1
+
+Xi(t)) + α2,C 1 (t)⊤[γ0,C 1 (t − 1) + γ1,C 1 (t − 1) + Φ 0,C 1 (t − 1) E(SC1 (t − 1, 1N,t −2)) + Φ 1,C 1 (t − 1) E(N −1
+
+> N
+
+X
+
+> i=1
+
+Hi(t − 1))] 
+
+− α2,C 0 (t)⊤[γ0,C 0 (t − 1) + Φ 0,C 0 (t − 1) E(SC0 (t − 1, 1N,t −2)) + Φ 1,C 0 (t − 1) E(N −1
+
+> N
+
+X
+
+> i=1
+
+Hi(t − 1))] = · · · 
+
+=( α0,C 1 (t) − α0,C 0 (t)) + 
+
+h
+
+(α1,C 1 (t) − α1,C 0 (t)) ⊤E(N −1
+
+> N
+
+X
+
+> i=1
+
+Xi(t)) 
+
+i
+
++
+
+h
+
+α2,C 1 (t)⊤ t−1X
+
+> k=1
+
+{
+
+> t−1
+
+Y
+
+> l=k+1
+
+Φ1,C 1 (l)[ γ0,C 1 (k) + γ1,C 1 (k) + Φ 0,C 1 (k)E(N −1
+
+> N
+
+X
+
+> i=1
+
+HiC1 (k))] } +
+
+> t−1
+
+Y
+
+> l=1
+
+Φ1,C 1 (l)E(S(1)) 
+
+
+
+− α2,C 0 (t)⊤ t−1X
+
+> k=1
+
+{
+
+> t−1
+
+Y
+
+> l=k+1
+
+Φ1,C 0 (l)[ γ0,C 0 (k) + Φ 0,C 0 (k)E(N −1
+
+> N
+
+X
+
+> i=1
+
+HiC0 (k))] } +
+
+> t−1
+
+Y
+
+> l=1
+
+Φ1,C 0 (l)E(S(1)) 
+
+i 
+
+.
+
+18 The proof is hence completed. 
+
+E.3 Proof of Theorem 5.1 
+
+Proof. We focus on provide an upper error bound for 
+
+ρ∗(z) = P
+
+ 1
+
+m ˆT − 1
+
+m T ≤ z
+
+
+
+− P
+
+ 1
+
+m ˆT b − 1
+
+m ˆT ≤ z Data 
+
+
+
+.
+
+We begin with some notations. Note that, in outcome model, eθC (t), C ∈ { C0, C 1} can be expressed as 
+
+eθC (t) = θs,C (t) + 1
+
+n
+
+> n
+
+X
+
+> d=1
+
+
+
+> m
+
+X
+
+> j=1
+
+Bd,j,C (t)ed,C (j)
+
+ ,
+
+where 
+
+Bd,j,C (t) = ωj,h (t) 1
+
+n
+
+> n
+
+X
+
+> d′=1
+
+Zd′,C (j)⊤Zd′,C (j)
+
+!−1
+
+Zd,C (j),
+
+are independent of the random part ed,C (j), and θs,C (t) = Pmj=1 ωj,h (t)θC (j). Let 
+
+eθd,C (t) = Pmj=1 Bd,j,C (t)ed,C (j) =
+
+
+
+eα0,C  
+
+> d,C
+
+(t),
+
+
+
+eα1,C  
+
+> d,C
+
+(t)
+
+⊤
+
+,
+
+
+
+eα2,C  
+
+> d,C
+
+(t)
+
+⊤⊤
+
+and eθC (t) =
+
+n−1/2 Pnd=1 eθd,C (t). Similarly, we can represent eΘ( t) as 
+
+eΘ( t) = eΘs,C (t) + 1
+
+n
+
+> n
+
+X
+
+> d=1
+
+
+
+> m−1
+
+X
+
+> j=1
+
+eBd,j,C (t)Ed,C (t)
+
+ ,
+
+where 
+
+eBd,j,C (t) = ωj,h (t) 1
+
+n
+
+> D
+
+X
+
+> d′=1
+
+eZd′,C (j)⊤ eZd′,C (j)
+
+!−1
+
+eZd,C (j),
+
+are independent of the random part Ed,C (j), and Θs,C (t) = Pmj=1 ωj,h (t)Θ C (j). Let 
+
+EΘ 
+
+> d,C
+
+(t) = Pmj=1 eBd,j,C (t)Ed,C (j) = 
+
+
+
+Eγ0,C  
+
+> d,C
+
+(t),
+
+
+
+EΦ0,C  
+
+> d,C
+
+(t)
+
+⊤
+
+,
+
+
+
+EΦ1,C  
+
+> d,C
+
+(t)
+
+⊤⊤
+
+and EΘ 
+
+> C
+
+(t) = 
+
+n−1/2 Pnd=1 EΘ 
+
+> d,C
+
+(t).The OLS estimation corresponds to the special case h = 0 . We remark that EΘ 
+
+> C
+
+(t) is asymptotically normal when h = 0 and degenerates to a point distribution when mh → ∞ . To make the following analysis hold for the OLS-based test statistic, we view EΘ 
+
+> C
+
+(t) as a random variable in the discussion below. For simplicity, let vec (·) be the operator that reshapes a matrix into a vector by stacking its columns on top of one another. Denote 
+
+xd,C (t) = 
+
+
+
+eα0,C  
+
+> d,C
+
+(t),
+
+
+
+eα1,C  
+
+> d,C
+
+(t)
+
+⊤
+
+,
+
+
+
+eα2,C  
+
+> d,C
+
+(t)
+
+⊤
+
+,
+
+
+
+Eγ0,C  
+
+> d,C
+
+(t)
+
+⊤
+
+,
+
+n
+
+vec 
+
+
+
+EΦ0,C  
+
+> d,C
+
+(t)
+
+o ⊤
+
+,
+
+n
+
+vec 
+
+
+
+EΦ1,C  
+
+> d,C
+
+(t)
+
+o ⊤⊤
+
+,xd(t) = 
+
+h
+
+xd,C 0 (t)⊤, x d,C 1 (t)⊤i⊤
+
+∈ R2+ p+2 q(q+pH +2) ,xd =
+
+
+
+xd(2) ⊤, x d(3) ⊤, . . . , x d(m)⊤⊤
+
+∈ Rpx , px = ( m − 1)[2 + p + 2 q(q + pH + 2)] ,
+
+where pH is the dimension of eXd,C and eXd,S .Let {yd}d be independent mean zero Gaussian vectors with Eydy⊤ 
+
+> d
+
+= Exdx⊤ 
+
+> d
+
+. We similarly represent 
+
+yd as 
+
+yd,C (t) = 
+
+
+
+¯eα0,C  
+
+> d,C
+
+(t),
+
+
+
+¯eα1,C  
+
+> d,C
+
+(t)
+
+⊤
+
+,
+
+
+
+¯eα2,C  
+
+> d,C
+
+(t)
+
+⊤
+
+,
+
+ ¯Eγ0,C  
+
+> d,C
+
+(t)
+
+⊤
+
+,
+
+n
+
+vec 
+
+ ¯EΦ0,C  
+
+> d,C
+
+(t)
+
+o ⊤
+
+,
+
+n
+
+vec 
+
+ ¯EΦ1,C  
+
+> d,C
+
+(t)
+
+o ⊤⊤
+
+,yd(t) = 
+
+h
+
+yd,C 0 (t)⊤, y d,C 1 (t)⊤i⊤
+
+∈ R2+ p+2 q(q+pH +2) ,yd =
+
+
+
+yd(2) ⊤, y d(3) ⊤, . . . , y d(m)⊤⊤
+
+∈ Rpx , px = ( m − 1)[2 + p + 2 q(q + pH + 2)] ,
+
+19 Let {ebd,C 0 (j), e bd,C 1 (j), E bd,C 0 (j), E bd,C 1 (j)} be the empirical Gaussian analogs of 
+
+{ed,C 0 (j), e d,C 1 (j), E d,C 0 (j), E d,C 1 (j)}. In other words, for d = 1, . . . , n , j = 1, . . . , m ,let 
+
+ebd,C 0 (j) = ˆ ed,C 0 (j)ξd, e bd,C 1 (j) = ˆ ed,C 1 (j)ξd, E bd,C 0 (j) = ˆEd,C 0 (j)ξd, E bd,C 1 (j) = ˆEd,C 1 (j)ξd,
+
+where ξ1, . . . , ξ n are i.i.d. standard normal random variables. We next define 
+
+wd,C (t) = 
+
+
+
+¯eα0,C ,b d,C (t),
+
+
+
+¯eα1,C ,b d,C (t)
+
+⊤
+
+,
+
+
+
+¯eα2,C ,b d,C (t)
+
+⊤
+
+,
+
+ ¯Eγ0,C ,b d,C (t)
+
+⊤
+
+,
+
+n
+
+vec 
+
+ ¯EΦ0,C ,b d,C (t)
+
+o ⊤
+
+,
+
+n
+
+vec 
+
+ ¯EΦ1,C ,b d,C (t)
+
+o ⊤⊤
+
+,wd(t) = 
+
+h
+
+wd,C 0 (t)⊤, w d,C 1 (t)⊤i⊤
+
+∈ R2+ p+2 q(q+pH +2) ,wd =
+
+
+
+wd(2) ⊤, w d(3) ⊤, . . . , w d(m)⊤⊤
+
+∈ Rpx , px = ( m − 1)[2 + p + 2 q(q + pH + 2)] ,
+
+Let 
+
+X = ( X⊤ 
+
+> 2
+
+, X ⊤ 
+
+> 3
+
+, . . . , X ⊤
+
+> m
+
+) = 1
+
+√n
+
+> n
+
+X
+
+> d=1
+
+xd,Y = ( Y ⊤ 
+
+> 2
+
+, Y ⊤ 
+
+> 3
+
+, . . . , Y ⊤ 
+
+> m
+
+) = 1
+
+√n
+
+> n
+
+X
+
+> d=1
+
+yd,W = ( W ⊤ 
+
+> 2
+
+, W ⊤ 
+
+> 3
+
+, . . . , W ⊤ 
+
+> m
+
+) = 1
+
+√n
+
+> n
+
+X
+
+> d=1
+
+wd.
+
+Define the following function 
+
+FGATE (X; θC0 , θ C1 , ΘC0 , ΘC1 )
+
+≡ 1
+
+m
+
+> m
+
+X
+
+> t=2
+
+(α0,C 1 (t) − α0,C 0 (t) + eα0,C 1 
+
+> i,C
+
+(t)
+
+√n − eα0,C 0 
+
+> i,C
+
+(t)
+
+√n )+ 1
+
+m
+
+> m
+
+X
+
+> t=1
+
+h
+
+E(n−1
+
+> n
+
+X
+
+> i=1
+
+Xi(t))( α1,C 1 (t) − α1,C 0 (t) + eα1,C 1 
+
+> i,C
+
+(t)
+
+√n − eα1,C 0 
+
+> i,C
+
+(t)
+
+√n )
+
+i
+
++ 1
+
+m
+
+> m
+
+X
+
+> t=1
+
+h 
+
+α2,C 1 (t) + eα2,C 1 
+
+> i,C
+
+(t)
+
+√n
+
+⊤ t−1X
+
+> k=1
+
+{
+
+> t−1
+
+Y
+
+> l=k+1
+
+(Φ 2,C 1 (l) + EΦ2,C 1 
+
+> i,C
+
+(l)
+
+√n )(Φ 0,C 1 (k) + EΦ0,C 1 
+
+> i,C
+
+(k)
+
+√n
+
++(Φ 1,C 1 (t) + EΦ1,C 1 
+
+> i,C
+
+(t)
+
+√n )E(n−1
+
+> n
+
+X
+
+> i=1
+
+HiC1 (t))) } +
+
+> t−1
+
+Y
+
+> l=1
+
+(Φ 2,C 1 (l) + EΦ2,C 1 
+
+> i,C
+
+(l)
+
+√n )E(S(1)) 
+
+
+
+−
+
+
+
+α2,C 0 (t) + eα2,C 0 
+
+> i,C
+
+(t)
+
+√n
+
+⊤ t−1X
+
+> k=1
+
+{
+
+> t−1
+
+Y
+
+> l=k+1
+
+(Φ 2,C 0 (l) + EΦ2,C 0 
+
+> i,C
+
+(l)
+
+√n )(Φ 0,C 0 (k) + EΦ0,C 0 
+
+> i,C
+
+(k)
+
+√D
+
++(Φ 1,C 0 (t) + EΦ1,C 0 
+
+> i,C
+
+(t)
+
+√n )E(n−1
+
+> n
+
+X
+
+> i=1
+
+HiC0 (t))) } +
+
+> t−1
+
+Y
+
+> l=1
+
+(Φ 2,C 0 (l) + EΦ2,C 0 
+
+> i,C
+
+(l)
+
+√D )E(S(1)) 
+
+i 
+
+.
+
+We next represent the proposed test statistic and the bootstrap samples based on FGATE . Re-call that Θs,C (t) = Pmj=1 ωj,h (t)Θ C (j) and θs,C (t) = Pmj=1 ωj,h (t)θC (j) are the smoothed parameters, and eθC , eΘC correspond to the estimates. The difference between the proposed test statistic and the oracle indirect effect m−1( ˆT − GATE ) can be represented as T ∗ 
+
+> 0
+
+=
+
+FGATE (X; θs,C 0 , θ s,C 1 , Θs,C 0 , Θs,C 1 ) − FGATE (0; θC0 , θ C1 , ΘC0 , ΘC1 ). Similarly, we can represent 
+
+T −1( \GATE b
+
+− \GATE ) by W ∗ 
+
+> 0
+
+= FGATE (W ; eθC0 , eθC1 , eΘC0 , eΘC1 ) − FGATE (0; eθC0 , eθC1 , eΘC0 , eΘC1 ).By definition, we have 
+
+ρ∗(z) = P {T ∗ 
+
+> 0
+
+≤ z} − P {W ∗ 
+
+> 0
+
+≤ z} .
+
+We also define the oracle statistics: T0 = FGATE (X; θC0 , θ C1 , ΘC0 , ΘC1 ) −
+
+FGATE (0; θC0 , θ C1 , ΘC0 , ΘC1 ) = FGATE (X) − FGATE (0) , W0 = FGATE (W ; θC0 , θ C1 , ΘC0 , ΘC1 ) −
+
+20 FGATE (0; θC0 , θ C1 , ΘC0 , ΘC1 ) = FGATE (W ) − FGATE (0) by replacing θs,C , eθC , Θs,C and eΘC ,
+
+C ∈ { C0, C 1}, with the oracle values. This yields an upper bound for 
+
+ρ(z) = P {T0 ≤ z} − P {W0 ≤ z} .
+
+Following the derivation of Lemma 4 in Luo et al. [2024], we know sup z ρ(z) ≤ eCn −1/8, for some constant eC > 0.Notice that 
+
+ρ∗(z) = P {T ∗ 
+
+> 0
+
+≤ z} − P {W ∗ 
+
+> 0
+
+≤ z}
+
+≤ P {T ∗ 
+
+> 0
+
+≤ z} − P {T0 ≤ z} + P {W ∗ 
+
+> 0
+
+≤ z} − P {W0 ≤ z} + P {T0 ≤ z} − P {W0 ≤ z}
+
+≤ I1 + I2 + eCn −1/8,
+
+where I1 and I2 denote the above first two components, respectively. Define T ∗ 
+
+> 01
+
+:= FGATE (X; θs,C 0 , θ s,C 1 , Θs,C 0 , Θs,C 1 ) − FGATE (0; θs,C 0 , θ s,C 1 , Θs,C 0 , Θs,C 1 ). Then 
+
+I1 can be further divided into two part: 
+
+I1 = P {T ∗ 
+
+> 0
+
+≤ z} − P {T0 ≤ z}
+
+≤ P {T ∗ 
+
+> 0
+
+≤ z} − P {T ∗ 
+
+> 01
+
+≤ z} + P {T ∗ 
+
+> 01
+
+≤ z} − P {T0 ≤ z}
+
+= I11 + I12 ,
+
+where I11 and I12 denote the above two components, respectively. Similar to the proof of Theorem 2 in Luo et al. [2024], we can obtain that 
+
+I2 ≤ eCn −1/8, I 12 ≤ eCn −1/8.
+
+Also, according to the proof of Theorem 2 in Luo et al. [2024], we know that 
+
+I11 = O(n1/2h2 + n1/2m−1),
+
+holds with probability 1 as n → ∞ . The proof is hence completed. 21

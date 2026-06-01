@@ -1,0 +1,2438 @@
+Title: Measuring multivariate maximal tail dependence
+
+URL Source: https://arxiv.org/pdf/2605.25766v1
+
+Published Time: Tue, 26 May 2026 02:37:30 GMT
+
+Number of Pages: 29
+
+Markdown Content:
+# Measuring multivariate maximal tail dependence 
+
+## Takaaki Koike ∗† 
+
+## , Marius Hofert ‡ and Haruki Tsunekawa §
+
+## May 26, 2026 
+
+Abstract 
+
+The classical tail dependence coefficient (TDC) may fail to capture non-exchangeable fea-tures of bivariate tail dependence since it evaluates the underlying copula only along the diagonal. To address this limitation, several measures of strongest manifestation of tail de-pendence have been proposed in the bivariate case, including a measure based on the tail copula of the underlying bivariate copula. This paper introduces and investigates the multi-variate maximal tail concordance measure (MTCM) which extends the bivariate measure to the multivariate case. The MTCM quantifies the largest tail mass over lower hyperrectangles of common unit volume, while the associated maximizer identifies the direction of maximal tail probability. We establish fundamental properties of the MTCM in the multivariate case, including existence of an optimal direction. We also derive analytical representations for several important model classes. Closed-form expressions are further obtained for survival Marshall–Olkin copulas, Archimax and nested Archimedean copulas with regularly varying Archimedean generators. An application to trivariate annual sea-level maxima in England shows that the MTCM can reveal off-diagonal stress directions and substantial differences in the underlying extremal dependence not detected by likelihood- or TDC-based comparisons. 
+
+MSC classification: 60E05, 62G32, 62H10, 62H20. 
+
+Keywords: Archimax copula; copula; extreme value copula; nested Archimedean copula; tail cop-ula; tail non-exchangeability. 
+
+> ∗
+
+Corresponding author. 
+
+> †
+
+Graduate School of Economics, Hitotsubashi University, 2-1, Naka, Kunitachi, Tokyo 186-8601, Japan. Email: 
+
+takaaki.koike@r.hit-u.ac.jp 
+
+> ‡
+
+Department of Statistics and Actuarial Science, The University of Hong Kong, Pok Fu Lam, Hong Kong. Email: 
+
+mhofert@hku.hk 
+
+> §
+
+Graduate School of Economics, Hitotsubashi University, 2-1, Naka, Kunitachi, Tokyo 186-8601, Japan. Email: 
+
+em265009@g.hit-u.ac.jp 
+
+1
+
+> arXiv:2605.25766v1 [math.ST] 25 May 2026
+
+# 1 Introduction 
+
+Copulas, that is distribution functions with U(0 , 1) margins, are a standard tool for modeling stochastic dependence, in particular joint extremal dependence in applications in finance, insurance and risk management; see Nelsen (2006), Jaworski et al. (2010) or McNeil et al. (2015, Chapter 7). By considering suitable reflections, we can, without loss of generality, focus on the lower tail (around the origin) in this work. In the bivariate case, the classical (lower) tail dependence coefficient (TDC) 
+
+of Sibuya (1960) is 
+
+λ(C) = lim 
+
+> u↓0
+
+P(U1 ⩽ u, U 2 ⩽ u)
+
+u = lim 
+
+> u↓0
+
+C(u, u )
+
+u , (U1, U 2) ∼ C. 
+
+The TDC is widely used to summarize the strength of bivariate tail dependence. However, since only the diagonal of C enters the definition of λ(C), this notion may miss non-exchangeable or off-diagonal features of tail dependence. Several approaches have been proposed to describe or quantify more detailed tail behavior, such as the tail copula (Schmidt and Stadtm¨ uller, 2006), tail dependence function (Joe et al., 2010) or the tail order function (Hua and Joe, 2011) on the functional side; for scalar summaries, see Krupskii and Joe (2015), Lee et al. (2018), Hua et al. (2019) and Siburg et al. (2024). In the bivariate case, Koike et al. (2023) introduced the maximal tail concordance measure (MTCM) 
+
+λ∗(C) = sup 
+
+> b∈(0 ,∞)
+
+Λ
+
+
+
+b, 1
+
+b ; C
+
+
+
+,
+
+where Λ( x1, x 2; C) = lim 
+
+> t↓0
+
+C(tx 1, tx 2)
+
+t , (x1, x 2) ∈ (0 , ∞)2,
+
+denotes the tail copula of C. The MTCM λ∗(C) is also relevant to the notion of path-based tail dependence proposed by Furman et al. (2015); see Koike et al. (2026) for their relationship. The aim of this paper is to develop an extension of the MTCM to the multivariate case. The main idea is to maximize the tail copula over all hyperrectangles anchored at the origin and of unit volume. Hence the MTCM is not only a scalar measure of extremal dependence, but its maximizer also identifies an off-diagonal stress direction along which tail dependence is strongest. This proposal fits into a broader literature on multivariate tail summaries. Several multivari-ate extensions of the bivariate TDC summarize extremal dependence, such as Frahm (2006) and Schmid and Schmidt (2007). Within the extreme value framework, the stable tail dependence function provides the fundamental asymptotic object, and the extremal coefficient (Schlather and Tawn, 2002, 2003) and orthant tail dependence parameters (Li, 2009) provide informative scalar 2summaries. More recently, direction-sensitive approaches have been developed via multivariate directional tail-weighted dependence measures (Li and Joe, 2024) and tail dependence order-ings (Siburg and Strothmann, 2024). Properties of some multivariate tail dependence measures have been studied in Fern´ andez-S´ anchez et al. (2016) and Gijbels et al. (2020). The multivari-ate MTCM complements these approaches by focusing on maximal tail mass over comparable hyperrectangles. The paper is organized as follows. In Section 2, we introduce the multivariate notion of MTCM and establish its basic properties. In particular, we show that the appearing supremum is always attained, so the measure is well defined as a maximum. Sections 3 and 4 derive an analytical representation for various copula families. In Section 3, we first find a representation for the survival copula ˆC of a copula C in the maximum domain of attraction of an extreme value copula. This leads to a closed-form expression for the MTCM and its maximizer for survival Marshall– Olkin (MO) copulas, which naturally arise from common-shock constructions; see Marshall and Olkin (1967) and Lindskog and McNeil (2003) for applications and Li (2008) for tail dependence properties. In Section 4, we then consider Archimax (Mesiar and Jagr, 2013; Cap´ era` a et al., 2000; Charpentier et al., 2014) and nested Archimedean copulas (Joe, 1993, 1997; McNeil, 2008; Hofert, 2010, 2011) with regularly varying generators. In Section 5, we illustrate the practical usefulness of the multivariate MTCM in an application to trivariate annual sea-level maxima in England studied by Smith et al. (1990) and Tawn (1990). Re-examining the fitted extreme value models through the lens of MTCMs, we reveal differences in maximal tail dependence and off-diagonal stress directions that are not apparent from likelihood-based comparisons or the standard TDC alone. This is particularly relevant in flood-risk applications, where portfolio losses may be driven by off-diagonal joint extremes. Section 6 ends the main part of the paper with a conclusion. All proofs are deferred to Appendix A. 
+
+# 2 A measure of multivariate maximal tail dependence 
+
+In this section, we introduce a multivariate extension of the MTCM and study its basic prop-erties. Let C be a d-dimensional copula. If the limit Λ( x; C) := lim 
+
+> t↓0
+
+C(tx)
+
+t ,
+
+exists for every x ∈ (0 , ∞)d, then Λ : (0 , ∞)d → [0 , ∞) is called a (lower) tail copula of C. The tail copula Λ is non-degenerate if Λ ̸ ≡ 0, otherwise it is degenerate . Then our proposed multivariate extension of the MTCM is defined as follows. 
+
+Definition 1 (Multivariate extension of the MTCM) . Let B = {b ∈ (0 , ∞)d : Qdj=1 bj = 1 }
+
+3and C be a d-dimensional copula with tail copula Λ. The (multivariate) maximal tail concordance measure (MTCM) of C is defined as 
+
+λ∗(C) = sup 
+
+> b∈B
+
+Λ( b; C). (1) The unique maximizer of Λ( b; C), if it exists, is denoted by b∗ = b∗(C) ∈ B .Let Ib = Qdj=1 [0 , b j ], b ∈ [0 , ∞)d, and U ∼ C. Similar to the bivariate case, the MTCM λ∗(C)quantifies the maximal possible tail probability lim t↓0 P(U /t ∈ Ib)/t over all hyperrectangles Ib
+
+with unit volume and lower endpoint anchored at 0d = (0 , . . . , 0) ∈ Rd.The following proposition summarizes basic properties of MTCMs. To this end, let M (u) = min {u1, . . . , u d}, u ∈ [0 , 1] d, denote the comonotone copula and write Λ( ·) = Λ( ·; M ) for the corresponding tail copula. 
+
+Proposition 1 (Basic properties of the MTCM) . Let C, C1, C2 be d-dimensional copulas admit-ting tail copulas Λ, Λ 1, Λ 2, respectively. (i) The supremum in (1) is attained; hence λ∗(C) = max b∈B Λ( b; C). (ii) λ∗(C) = 1 if and only if Λ( ·; C) = Λ( ·). (iii) λ∗(C) = 0 if and only if Λ( ·; C) ≡ 0. (iv) λ∗(C1) ⩽ λ∗(C2) if Λ 1(x; C1) ⩽ Λ2(x; C2) for all x ∈ (0 , ∞)d.(v) λ∗(tC 1 + (1 − t)C2) ⩽ tλ ∗(C1) + (1 − t)λ∗(C2) for all t ∈ [0 , 1]. (vi) Let ( Cn)n∈N be a sequence of copulas. If Λ( ·; Cn) → Λ( ·; C) pointwise, then λ∗(Cn) → λ∗(C). Attainability (i) follows from the fact that Λ is continuous and vanishes at the boundaries. Property (ii) states that λ∗(C) = 1 if and only if C is tail comonotonic ; see Hua and Joe (2012a), Hua and Joe (2012b) and Cheung et al. (2019) for the notion of tail comonotonicity. Property (iii) shows that λ∗(C) = 0 if and only if C(tx) converges to 0 faster than t. By (iv), λ∗ is monotone with respect to the tail dependence order introduced in Siburg and Strothmann (2024). And (v) shows that λ∗ is convex. Finally, (vi) means that λ∗ is continuous with respect to pointwise convergence of copulas. 
+
+# 3 MTCM for extreme value copulas 
+
+## 3.1 Copulas in a maximum domain of attraction 
+
+A d-dimensional extreme value copula (EVC) is given by 
+
+Cℓ(u) = exp( −ℓ(− log u1, . . . , − log ud)) , u = ( u1, . . . , u d) ∈ [0 , 1] d, (2) 4where ℓ : [0 , ∞)d → [0 , ∞) is a stable tail dependence function ; see Gudendorf and Segers (2010) and Joe (2015, Section 3.15) on EVCs, and Hofmann (2009) and Ressel (2013) for a characterization of stable tail dependence functions in terms of D-norms. Stable tail dependence functions ℓ are convex, 1-homogeneous and satisfy max( x1, . . . , x d) ⩽ ℓ(x) ⩽ Pdj=1 xj , x ∈ [0 , ∞)d. A d-dimensional copula C is said to be in the maximum domain of attraction of an EVC Cℓ if lim n→∞ C(u1/n )n =
+
+Cℓ(u) for all u ∈ [0 , 1] d. Since Cℓ(u1/n )n = Cℓ(u) for all u ∈ [0 , 1] d and all integers n ⩾ 1, the EVC Cℓ is in the maximum domain of attraction of itself. In this section we study MTCMs for the (lower) tail of the survival copula of C, where C is in the maximum domain of attraction of an EVC Cℓ. This corresponds to focusing on the upper tail of the copula C under consideration. Denote by ˆC the survival copula of C.The relationship between the tail copula and the stable tail dependence function follows from the inclusion-exclusion principle; see Rootz´ en et al. (2018, Section 8): Λ( x; ˆC) = X
+
+> ∅̸ =S⊆{ 1,...,d }
+
+(−1) |S|− 1ℓS (x), x ∈ (0 , ∞)d, (3) where ℓS (x) = lim xj ↓0, j / ∈S ℓ(x). As a consequence, we have 
+
+λ∗( ˆC) = sup 
+
+> b∈B
+
+X
+
+> ∅̸ =S⊆{ 1,...,d }
+
+(−1) |S|− 1ℓS (b).
+
+For d = 2, we have ℓ(x, 0) = ℓ(0 , x ) = x, x > 0, and thus Λ( x, y ; ˆC) = x + y − ℓ(x, y ). A number of parametric families of EVCs have been proposed in the literature, such as the H¨ usler-Reiss (HR), t-EV, asymmetric Gumbel and Galambos copulas; see Tawn (1990), Jaworski et al. (2010, Chapter 6) and Joe (2015). 
+
+Example 1 (Multivariate t copulas) . Multivariate (Student’s) t copulas admit tail copulas which coincide with those of the corresponding t-EVCs (Demarta and McNeil, 2005; Nikoloulopoulos et al., 2009). In the bivariate case, it is shown in Koike et al. (2026) that the attaining b∗ is 1. For 
+
+d ⩾ 3, we observe by simulation of randomized correlation matrices R = ( rij ) that the attaining 
+
+b∗ typically deviates from 13 = (1 , 1, 1). Randomized R are constructed by rejection, that is by first sampling independent U(0 , 1) entries above the diagonal and then accepting the positive semi-definite R only. Figure 1 shows the corresponding realizations ( b∗
+
+> 1
+
+, b ∗
+
+> 2
+
+) of b∗ = ( b∗
+
+> 1
+
+, b ∗
+
+> 2
+
+, b ∗
+
+> 3
+
+) for the MTCM of a three-dimensional t copula with ν = 5 degrees of freedom. For comparison, we also provide ( b∗
+
+> 1
+
+, b ∗
+
+> 2
+
+) under the restriction that r1,3 = r2,3 = 0 .4. In this case, the first two coordinates are exchangeable, hence we naturally expect that b∗ 
+
+> 1
+
+= b∗
+
+> 2
+
+.50 2 4 6 802468b1*b2*    
+
+> 0246802468
+
+b1*b2*Figure 1: ( b∗
+
+> 1
+
+, b ∗
+
+> 2
+
+) values of b∗ = ( b∗
+
+> 1
+
+, b ∗
+
+> 2
+
+, 1/(b∗
+
+> 1
+
+b∗
+
+> 2
+
+)) for the MTCM of a three-dimensional t copula with ν = 5 degrees of freedom and a set of 300 randomized correlation matrices R. The left panel displays the case of unconstrained correlations, the right panel the constrained case r1,3 = r2,3 =0.4. 
+
+## 3.2 Survival Marshall–Olkin copulas 
+
+We consider a parametric subclass of EVCs with stable tail dependence functions 
+
+ℓα(x) = 
+
+> d
+
+X
+
+> j=1
+
+(1 − αj )xj + max 
+
+> 1⩽j⩽d
+
+{αj xj }, x ∈ [0 , ∞)d,
+
+where α1, . . . , α d ∈ (0 , 1). The corresponding EVC is the MO copula given by 
+
+CMO  
+
+> α
+
+(u) = 
+
+> d
+
+Y
+
+> j=1
+
+u1−αj
+
+> j
+
+!
+
+min 
+
+> 1⩽j⩽d
+
+{uαj 
+
+> j
+
+}, u ∈ [0 , 1] d. (4) Note that this is a special case of Mai and Scherer (2010, Equation (2)) with a single common shock affecting all components. The next proposition shows that, for this family, both the MTCM and the attaining b∗ are available in closed form. 
+
+Proposition 2 (MTCM for survival Marshall–Olkin copulas) . Let ˆCMO  
+
+> α
+
+be the survival copula of (4) for α = ( α1, . . . , α d) ∈ (0 , 1) d. Then the following statements hold: (i) ˆCMO  
+
+> α
+
+admits the tail copula Λ( x; ˆCMO  
+
+> α
+
+) = min 1⩽j⩽d{αj xj }, x ∈ (0 , ∞)d.(ii) Its MTCM is given by λ∗( ˆCMO  
+
+> α
+
+) = Qdj=1 α1/d j .6(iii) The maximizer in (1) is unique and equals 
+
+b∗( ˆCMO  
+
+> α
+
+) = 
+
+Qdj=1 α1/d j
+
+α1
+
+, . . . , 
+
+Qdj=1 α1/d j
+
+αd
+
+!
+
+∈ B .
+
+# 4 Archimax and nested Archimedean copulas 
+
+In this section, we derive the MTCM and its maximizer for Archimax and nested Archimedean copulas. 
+
+## 4.1 MTCM for Archimax copulas 
+
+A function ψ : [0 , ∞) → [0 , 1] is an Archimedean generator if it is continuous, decreasing with 
+
+ψ(0) = 1 and ψ(∞) := lim t→∞ ψ(t) = 0, and strictly decreasing on [0 , inf {t : ψ(t) = 0 }]. The set of all such ψ is denoted by Ψ. A d-dimensional copula C is an Archimedean copula if it is of the form 
+
+C(u) = ψ(ψ−1(u1) + · · · + ψ−1(ud)) , u ∈ [0 , 1] d,
+
+for a ψ ∈ Ψ with inverse ψ−1 : [0 , 1] → [0 , ∞] where ψ−1(0) = inf {t : ψ(t) = 0 }. According to Malov (2001) and McNeil and Neˇ slehov´ a (2009), C is a d-dimensional copula if and only if ψ is 
+
+d-monotone , that is ψ is continuous on [0 , ∞), admits derivatives up to the order d − 2 satisfying (−1) kψ(k)(t) ⩾ 0 for all k ∈ { 0, . . . , d − 2}, t ∈ (0 , ∞), and ( −1) d−2ψ(d−2) (t) is decreasing and convex on (0 , ∞). The set of all d-monotone Archimedean generators is denoted by Ψ d. An Archimedean generator ψ is completely monotone if it is d-monotone for all d ∈ N, that is ψ is differentiable of any order and ( −1) kψ(k) ⩾ 0 for all k ∈ N. The set of all completely monotone Archimedean generators is denoted by Ψ ∞.For an Archimedean generator ψ ∈ Ψd and a stable tail dependence function ℓ, the Archimax copula generated by ( ψ, ℓ ) is 
+
+Cψ,ℓ (u) = ψ  ℓ(ψ−1(u1), . . . , ψ −1(ud))  , u ∈ [0 , 1] d; (5) see Charpentier et al. (2014). As a special case, if ℓ(x) = ℓΠ(x) := Pdj=1 xj , then (5) reduces to the Archimedean copula with generator ψ ∈ Ψd. As another special case, if ψ(t) = e−t, then (5) reduces to the standard representation (2) of an EVC. We can now provide the tail copula of Archimax copulas with regularly varying generator 
+
+ψ ∈ Ψ∞. To this end, a function f : (0 , ∞) → (0 , ∞) is called regularly varying (at ∞) with index 
+
+ρ ∈ R if lim x→∞ f (tx )/f (x) = tρ for all t > 0. Denote by RV ρ the class of all regularly varying functions with index ρ ∈ R.7Proposition 3 (Tail copula of Archimax copulas) . Let ψ ∈ Ψ∞ ∩ RV −α for some α > 0, and let ℓ
+
+be a stable tail dependence function. Then the tail copula of the Archimax copula Cψ,ℓ generated by ( ψ, ℓ ) is Λ( x; Cψ,ℓ ) = ℓ
+
+
+
+x−1/α  
+
+> 1
+
+, . . . , x −1/α d
+
+−α
+
+, x ∈ (0 , ∞)d.
+
+For Archimedean copulas (the special case of ℓ = ℓΠ), we have Λ( x; Cψ,ℓ Π ) = 
+
+> d
+
+X
+
+> j=1
+
+x−1/α j
+
+!−α
+
+, x ∈ (0 , ∞)d. (6) The following example shows that various Archimedean generators are regularly varying and thus the corresponding Archimedean copulas admit tail copulas of Form (6). 
+
+Example 2 (Regularly varying Archimedean generators) .
+
+1) If ψ ∈ Ψ∞ ∩ RV −α and the inner power transform (Nelsen, 2006; Hofert, 2010) ˜ψ(t) = ψ(t)1/γ ,
+
+γ ∈ (0 , 1], is again a completely monotone Archimedean generator, then ˜ψ ∈ RV −α/γ since lim 
+
+> x→∞
+
+˜ψ(tx )˜ψ(x) =
+
+
+
+lim 
+
+> x→∞
+
+ψ(tx )
+
+ψ(x)
+
+1/γ 
+
+= t−α/γ , t ∈ (0 , ∞).
+
+2) If ψ ∈ Ψ∞ ∩RV −α, the corresponding completely monotone outer power Archimedean generator 
+
+(Nelsen, 2006; Hofert, 2010, 2011) is ˜ψ(t) = ψ(t1/β ), t ⩾ 0, β ⩾ 1. Then ˜ψ ∈ RV −α/β . To see this, let y = x1/β . Then y → ∞ and ˜ψ(tx )˜ψ(x) = ψ(t1/β y)
+
+ψ(y) → (t1/β )−α = t−α/β , x → ∞ ,
+
+lim 
+
+> x→∞
+
+˜ψ(tx )˜ψ(x) = lim 
+
+> x→∞
+
+ψ(t1/β x1/β )
+
+ψ(x1/β ) = lim 
+
+> x→∞
+
+ψ(t1/β x)
+
+ψ(x) = ( t1/β )−α = t−α/β , t ∈ (0 , ∞).
+
+In contrast to Clayton copulas, outer power Clayton copulas have upper tail dependence; see Hofert (2011) and, for an application of outer power Clayton copulas, Hofert and Scherer (2011). 3) For specific generators, more transformations are feasible. For example, consider the Clayton generator ψ(t) = (1 + t)−1/θ , t ⩾ 0, θ > 0, which is easily verified to satisfy ψ ∈ Ψ∞ ∩ RV −1/θ .(i) The corresponding tilted Clayton generator (Hofert, 2010, 2011) is ˜ψ(t) = ψ(( cβ +t)1/β −c), 8t ∈ [0 , ∞), β ⩾ 1, c ⩾ 0. Then ˜ψ ∈ RV −1/(θβ ) since lim 
+
+> x→∞
+
+˜ψ(tx )˜ψ(x) =
+
+
+
+lim 
+
+> x→∞
+
+1 + ( cβ + tx )1/β − c
+
+1 + ( cβ + x)1/β − c
+
+−1/θ 
+
+= t−1/(θβ ), t > 0.
+
+(ii) The corresponding shifted Archimedean generator (Hofert, 2010, 2011) is ˜ψ(t) = ψ(t +
+
+h)/ψ (h), t ⩾ 0, h ⩾ 0. Then, irrespective of h, we have ˜ψ ∈ RV −1/θ since lim 
+
+> x→∞
+
+˜ψ(tx )˜ψ(x) = lim 
+
+> x→∞
+
+ψ(tx + h)
+
+ψ(x + h) =
+
+
+
+lim 
+
+> x→∞
+
+1 + h + tx 
+
+1 + h + x
+
+−1/θ 
+
+= t−1/θ , t > 0.
+
+Based on Proposition 3, we can now provide the MTCM of Archimax copulas. 
+
+Theorem 1 (MTCM for Archimax copulas) . Let Cψ,ℓ be the Archimax copula generated by 
+
+ψ ∈ Ψ∞ ∩ RV −α, α > 0, and the stable tail dependence function ℓ. Then 
+
+λ∗(Cψ,ℓ ) = max  
+
+> b∈B
+
+ℓ(b−1/α  
+
+> 1
+
+, . . . , b −1/α d )−α =
+
+
+
+min  
+
+> z∈B
+
+ℓ(z)
+
+−α
+
+.
+
+Moreover, the following statements are equivalent: (i) Λ( ·; Cψ,ℓ ) is uniquely maximized at b∗ ∈ B .(ii) The function ℓ on B is uniquely minimized at z∗ = (( b∗
+
+> 1
+
+)−1/α , . . . , (b∗
+
+> d
+
+)−1/α ) ∈ B .For Archimax copulas, exchangeability of ℓ already implies that the maximizer is unique and satisfies b∗ = 1d = (1 , . . . , 1). 
+
+Corollary 1 (Archimax copulas under exchangeability) . Under the assumptions of Theorem 1, assume in addition that ℓ is exchangeable. Then λ∗(Cψ,ℓ ) = ℓ(1d)−α and the maximizer is uniquely given by b∗ = 1d.
+
+## 4.2 Nested Archimedean copulas 
+
+As a generalization of Archimedean copulas, we now consider nested Archimedean copulas ,which are Archimedean copulas with arguments possibly replaced by (nested) Archimedean cop-ulas. For a description of specific members of this class of copulas, we need some notions of the realm of graph theory. Let T = ( V, E) be an undirected, rooted tree with a set of vertices V and a set of edges 
+
+E ⊆ V × V . Denote by r the root, by L the set of leaves and by I := V \ L the set of internal vertices of T . For v ∈ V , let pa( v) denote the direct parent vertex of v and ch( v) the set of direct children of v, with pa( r) = ∅ and ch( v) = ∅, v ∈ L . Let le( v) ⊆ L denote the set of all leaves of v
+
+and d(v) := |le( v)| its cardinality (with le( v) = {v} and thus d(v) = 1 for all v ∈ L ). Furthermore, 9let an( v) denote the (possibly empty) set of all ancestors of v ∈ V , excluding the root r. For a subtree Tv = ( Vv, Ev) of T rooted at v ∈ V , we denote by Iv the set of internal vertices of Tv and by an v(w) the (possibly empty) set of all ancestors of w ∈ V v, excluding the root v.Based on the set Ψ T := {ψv}v∈I of Archimedean generators from Ψ ∞, a nested Archimedean copula can now be fully described by ( T , ΨT ), where we associate each vertex with a [0 , 1]-valued function and leaves with variables u1, . . . , u d. In particular, internal vertices represent marginal (nested) Archimedean copulas. To describe said function at a vertex v, recursively define 
+
+Cv(ule( v)) = 
+
+
+
+uv, v ∈ L ,ψv
+
+P 
+
+> w∈ch( v)
+
+ψ−1 
+
+> v
+
+(Cw(ule( w))) 
+
+
+
+, v ∈ I .
+
+Then C(T ,ΨT ) := Cr is the nested Archimedean copula associated with ( T , ΨT ). To guarantee that the resulting nested construction is indeed a proper copula, we assume the following sufficient nesting condition of McNeil (2008) to hold: (ψ−1pa( v) ◦ ψv)′ is completely monotone for every v ∈ I \ { r}.
+
+In addition, we say that a nested Archimedean copula C(T ,ΨT ) has regularly varying generators if for every v ∈ I there exists αv > 0 such that ψv ∈ Ψ∞ ∩ RV −αv .We can now describe the tail copula of a nested Archimedean copula C(T ,ΨT ) with regularly varying generators. 
+
+Proposition 4 (Tail copula of a nested Archimedean copula) . Let C(T ,ΨT ) be a nested Archime-dean copula with regularly varying generators. Let Λv(xle( v)) = 
+
+
+
+xv, v ∈ L ,
+
+P 
+
+> w∈ch( v)
+
+Λw(xle( w))−1/α v
+
+−αv
+
+, v ∈ I . (7) Then Λ( ·; Cv) = Λ v(·) for all v ∈ V .Under the same setup, the MTCM of a nested Archimedean copula C(T ,ΨT ) is given as follows. 
+
+Theorem 2 (MTCM for nested Archimedean copulas) . Let C(T ,ΨT ) be a nested Archimedean copula with regularly varying generators. Then the following statements hold. Below, an empty product is understood as 1. 10 (i) Recursively define 
+
+λ∗ 
+
+> v
+
+=
+
+
+
+1, v ∈ L ,d(v)−αv
+
+Y
+
+> w∈ch( v)
+
+{d(w)αv λ∗
+
+> w
+
+}d(w)/d (v) , v ∈ I . (8) Then λ∗(Λ v) = λ∗ 
+
+> v
+
+for all v ∈ I .(ii) For all v ∈ I , the MTCM of Cv admits the closed form 
+
+λ∗ 
+
+> v
+
+= d(v)−αv
+
+Y 
+
+> w∈I v\{ v}
+
+d(w)(αpa( w)−αw )d(w)/d (v). (9) (iii) For all v ∈ I , the maximizer b∗ 
+
+> v
+
+of the MTCM of Cv is unique and given by (b∗
+
+> v
+
+)j = λ∗ 
+
+> v
+
+d(v)αv
+
+Y 
+
+> w∈an v(j)
+
+d(w)αw −αpa( w) ,
+
+for each j associated with each leaf in le( v). 
+
+Example 3 (Two-level nested Archimedean copulas) . To construct a d-dimensional nested Archi-medean copula, write d = PSs=1 ds, where ds ⩾ 1. For s ∈ { 1, . . . , S } with ds ⩾ 2, let Cs be the 
+
+ds-dimensional Archimedean copula with generator ψs ∈ Ψ∞ ∩ RV −αs , αs > 0. For s ∈ { 1, . . . , S }
+
+with ds = 1, write Cs(us) = us. Denote by C0 the S-dimensional Archimedean copula with gener-ator ψ0 ∈ Ψ∞ ∩ RV −α0 , α0 > 0. Then the nested Archimedean copula corresponding to this tree structure is 
+
+C(u) = C0 (C1(u1), . . . , C S (uS )) , u = ( u1, . . . , uS ) ∈ [0 , 1] d,
+
+where us ∈ [0 , 1] ds , s = 1 , . . . , S . By Theorem 2, we can directly calculate the MTCM λ∗(C) and its unique maximizer b∗ = ( b∗ 
+
+> s,j
+
+)s=1 ,...,S, j =1 ,...,d s as follows: 
+
+λ∗(C) = d−α0
+
+> S
+
+Y
+
+> s=1
+
+dds(α0− ˜αs)/d s
+
+b∗ 
+
+> s,j
+
+= d˜αs−α0
+
+> sS
+
+Y
+
+> t=1
+
+ddt(α0− ˜αt)/d t , s = 1 , . . . , S, j = 1 , . . . , d s,
+
+where ˜ αs = α0 if ds = 1 and ˜ αs = αs if ds ⩾ 2. 
+
+Example 4 (Illustrative examples) . Consider two-level nested Archimedean copulas as in the setup of Example 3. We take Clayton generators, which are regularly varying with index −αs = −1/θ s,11 s ∈ { 0, . . . , S }. For these generators, the sufficient nesting conditions are θ0 ⩽ θs, s = 1 , . . . , S , or equivalently, α0 ⩾ max {α1, . . . , α S } (Joe, 1997; McNeil, 2008). (i) If C(u) = C0(C1(u1,1, u 1,2), C 2(u2,1, u 2,2, u 2,3)), we obtain 
+
+λ∗(C) = 5−α0
+
+22( α1−α0)/5 · 33( α2−α0)/5
+
+with maximizing b∗ = ( b∗
+
+1,1, b ∗
+
+1,2, b ∗
+
+2,1, b ∗
+
+2,2, b ∗
+
+2,3) given by 
+
+b∗
+
+1,1 = b∗
+
+1,2 = 2α1−α0
+
+22( α1−α0)/533( α2−α0)/5 , b∗
+
+2,1 = b∗
+
+2,2 = b∗
+
+2,3 = 3α2−α0
+
+22( α1−α0)/533( α2−α0)/5 .
+
+(ii) If C(u) = C0(u0,1, C 1(u1,1, u 1,2)), then 
+
+λ∗(C) = 3−α0
+
+22( α1−α0)/3
+
+with maximizing b∗ = ( b∗
+
+0,1, b ∗
+
+1,1, b ∗
+
+1,2) given by 
+
+b∗
+
+0,1 = 1α1−α0
+
+1 · 22( α1−α0)/3 = 2 2( α0−α1)/3, b∗
+
+1,1 = b∗
+
+1,2 = 2α1−α0
+
+1 · 22( α1−α0)/3 = 2 (α1−α0)/3.
+
+Figure 2 shows the MTCM λ∗(C) (left), maximizing b∗
+
+0,1 (center) and b∗
+
+1,1 = b∗
+
+1,2 (right) as functions of θs = 1 /α s, s = 0 , 1. 510 15 20 510 15 20 0.2 0.4 0.6 0.8 
+
+> θ0
+> θ1
+> λ*(C)510 15 20 510 15 20 1.0 1.5 2.0 2.5 3.0
+> θ0
+> θ1
+> b0,1 *510 15 20 510 15 20 0.2 0.4 0.6 0.8 1.0
+> θ0
+> θ1
+> b1,1 *
+
+Figure 2: MTCM λ∗(C) (left) and attaining b∗
+
+0,1 (center) and b∗
+
+1,1 (right) as functions of Clayton parameters θ0 and θ1 (with 0 < θ 0 ⩽ θ1), where θ0 = 1 /α 0 and θ1 = 1 /α 1. Note that a larger θ
+
+indicates larger concordance. 
+
+# 5 Application to sea-level models and flood risk 
+
+Smith et al. (1990) and Tawn (1990) analyze 40 years of trivariate annual sea-level maxima at the three sites Southend (dimension j = 1), Sheerness (dimension j = 2) and Kings Lynn 12 (dimension j = 3) on the south-east coast of England. Trivariate extreme value distributions are fitted to the data using the maximum likelihood method. As an application of MTCMs, this section revisits the models fitted in Tawn (1990) to assess the risk of simultaneous high sea levels. Let Y = ( Y1, Y 2, Y 3) ∼ H be the random vector of annual maxima, whose marginal distributions 
+
+H1, H 2, H 3 are generalized extreme value distributions. Let Xj = − log Hj (Yj ), j = 1 , 2, 3, so that 
+
+X = ( X1, X 2, X 3) ∼ G has standard exponential margins. Note that the upper joint tail of Y ,modeling jointly large sea levels and thus corresponding to an increased risk of a simultaneous flooding at the three sites, is transformed to the lower tail of X, which is suitable for our analysis as in Section 3.1. The model considered in Tawn (1990) is based on the survival function ¯G of G
+
+given by ¯G(x) = exp 
+
+
+
+−(x1 + x2 + x3)B
+
+ x1
+
+x1 + x2 + x3
+
+, x2
+
+x1 + x2 + x3
+
+ 
+
+, x = ( x1, x 2, x 3) ∈ (0 , ∞)3,
+
+where B is a function of a specific form on the simplex ∆ 2 = {(w1, w 2) ∈ [0 , ∞)2 : w1 + w2 ⩽ 1};see Tawn (1990, Equation (2 ·4)). This corresponds to assuming an EVC on Y with the stable tail dependence function 
+
+ℓ(x1, x 2, x 3) = ( x1 + x2 + x3)B
+
+ x1
+
+x1 + x2 + x3
+
+, x2
+
+x1 + x2 + x3
+
+
+
+,
+
+which can be found by comparing ¯G with (2). With w3 = 1 − w1 − w2, Tawn (1990) considered the two models 
+
+BI(w1, w 2) = (1 − θ3)w3 +
+
+" 2X
+
+> j=1
+
+{(1 − θj )wj }r
+
+#1/r 
+
++
+
+( 3X
+
+> j=1
+
+(θj wj )s
+
+)1/s 
+
+,BII (w1, w 2) = ϕ(( wrs  
+
+> 1
+
++ wrs  
+
+> 2
+
+)1/r + ws
+
+> 3
+
+)1/s + (1 − ϕ){(wt 
+
+> 1
+
++ wt
+
+> 2
+
+)1/t + w3},
+
+for different choices of r, s, t ⩾ 1 and θ1, θ 2, θ 3, ϕ ∈ [0 , 1]. In total, Tawn (1990) considered three models of type I (labeled I-1, I-2, I-3, with I-1 satisfying BI(w1, w 2) = ( ws 
+
+> 1
+
++ ws 
+
+> 2
+
++ (1 − w1 − w2)s)1/s ,thus inducing a symmetric Gumbel copula), two models of type II (labeled II-1, II-2) and the independence model. Table 1 lists the fitting results for the five parametric models among these six models. We now compare the five models listed in Table 1 in terms of their implied MTCM. For each model, we compute λ( ˆCℓ) = Λ(1 , 1, 1) (referred to as TDC even though d = 3 as this measure quantifies tail dependence along the diagonal in [0 , 1] 3), the MTCM λ∗( ˆCℓ) and its maximizer 
+
+b∗ ∈ B . To analyze Λ( b), b ∈ B , and find λ∗( ˆCℓ), we reparametrize b = ( b1, b 2, b 3) via xj = log( bj ), 13 Model Constraints Log-likelihood Parameter estimates Type I-1 θ1 = θ2 = θ3 = 1 −95 .93 s = 1 .59 Type I-2 θ1 = θ2 = 1 −88 .85 (s, θ 3) = (2 .48 , 0.25) Type I-3 θ1 = θ2 = θ −86 .15 (s, r, θ, θ 3) = (7 .44 , 2.21 , 0.23 , 0.55) Type II-1 ϕ = 1 −89 .26 (s, r ) = (1 .59 , 1.27) Type II-2 – −86 .09 (s, r, t, ϕ ) = (1 .69 , 1.25 , 7.44 , 0.74) Table 1: Models, constraints and parameter estimates of Tawn (1990, Section 5). 
+
+λ λ∗ b∗
+
+Type I-1 0.356 0.356 (1 .000 , 1.000 , 1.000) Type I-2 0.233 0.372 (0 .630 , 0.630 , 2.520) Type I-3 0.208 0.266 (1 .337 , 1.337 , 0.559) Type II-1 0.377 0.378 (0 .948 , 0.948 , 1.113) Type II-2 0.306 0.307 (0 .956 , 0.956 , 1.095) Table 2: TDC λ( ˆCℓ), MTCM λ∗( ˆCℓ) and its maximizer b∗ for the five models given in Table 1. 
+
+j = 1 , 2, 3, so that the constraint b1 + b2 + b3 = 1 yields x1 + x2 + x3 = 0. We then have 
+
+λ∗( ˆCℓ) = sup 
+
+> x1,x 2∈R
+
+Λ( ex1 , e x2 , e −(x1+x2); ˆCℓ).
+
+The results are summarized in Table 2. We observe different types of behavior among the five models which cannot be inferred from their log-likelihood values given in Table 1. Comparing type I and type II models, we find that the TDCs of the estimated type II models and the symmetric (Gumbel) model I-1 are approximately attained by the MTCM at b∗ = (1 , 1, 1), but this is not the case for the model I-2 (under the constraint θ1 = θ2 = 1) with MTCM attained at b∗ =(0 .630 , 0.630 , 2.520) and model I-3 (under the constraint θ1 = θ2 = θ) with MTCM attained at 
+
+b∗ = (1 .337 , 1.337 , 0.559). Since model I-3 has much smaller TDC and MTCM than I-2, the latter model may overestimate the degree of tail dependence quantified by these measures. From an insurance perspective, the distinction between λ and λ∗ is directly linked to accu-mulation risk. Coastal flood insurance payouts are driven by rare, high sea levels, and a single storm event can induce flood losses at multiple locations. Thus, the dependence structure in the upper tail of ( Y1, Y 2, Y 3) matters for loss aggregation, reinsurance attachment probabilities and capital requirements. In particular, a model with b∗̸ = (1 , 1, 1) indicates that the strongest tail co-movement may occur along an off-diagonal stress direction, meaning that simultaneous extremes are most likely when one site is relatively more extreme than the others. This type of information is relevant for stress testing and scenario design in flood catastrophe modeling. 14 6 Conclusion 
+
+We introduced a multivariate maximal tail concordance measure (MTCM) for tail-dependent copulas by maximizing the tail copula over rectangles of unit volume. In contrast to the classical tail dependence coefficient (TDC), which evaluates extremal dependence only along the diagonal, the proposed measure captures off-diagonal stress directions in the joint tail. The associated max-imizer b∗, when unique, provides an interpretable description of the direction along which tail dependence is strongest. We established several basic properties of the multivariate MTCM. We then derived analytical representations for important model classes, such as copulas in the maxi-mum domain of attraction of some extreme-value copulas, Marshall–Olkin copulas, Archimax and nested Archimedean copulas with regularly varying generators. An application to trivariate an-nual sea-level maxima illustrated the practical value of the proposed measure. As we saw, models with similar likelihood values, or even similar TDCs, can imply substantially different values of λ∗
+
+and markedly different maximizers b∗. Hence multivariate MTCMs can provide complementary information for model comparison, stress testing and risk assessment in settings where joint ex-tremes may be driven by off-diagonal tail behavior, which makes MTCMs an important tool for multivariate extreme value analysis. 
+
+# Acknowledgements 
+
+Takaaki Koike is supported by the Japan Society for the Promotion of Science (JSPS) KAK-ENHI grant numbers JP24K00273 and JP26K21178. 
+
+# References 
+
+Bertsekas, D. P. (2009). Convex Optimization Theory . Athena Scientific. Bingham, N. H., Goldie, C. M., and Teugels, J. L. (1987). Regular Variation . Cambridge University Press. Boyd, S. and Vandenberghe, L. (2004). Convex Optimization . Cambridge University Press. Cap´ era` a, P., Foug` eres, A.-L., and Genest, C. (2000). Bivariate distributions with given extreme value attractor. Journal of Multivariate Analysis , 72(1):30–49. Charpentier, A., Foug` eres, A.-L., Genest, C., and Neˇ slehov´ a, J. G. (2014). Multivariate Archimax copulas. Journal of Multivariate Analysis , 126:118–136. Cheung, K. C., Ling, H. K., Tang, Q., Yam, S. C. P., and Yuen, F. L. (2019). On additivity of tail comonotonic risks. Scandinavian Actuarial Journal , 2019(10):837–866. Demarta, S. and McNeil, A. J. (2005). The t copula and related copulas. International Statistical Review , 73(1):111–129. Fern´ andez-S´ anchez, J., Nelsen, R. B., Quesada-Molina, J. J., and ´Ubeda Flores, M. (2016). Inde-15 pendence results for multivariate tail dependence coefficients. Fuzzy Sets and Systems , 284:129– 137. Frahm, G. (2006). On the extremal dependence coefficient of multivariate distributions. Statistics & Probability Letters , 76(14):1470–1481. Furman, E., Su, J., and Zitikis, R. (2015). Paths and indices of maximal tail dependence. ASTIN Bulletin .Gijbels, I., Kika, V., and Omelka, M. (2020). Multivariate tail coefficients: Properties and estima-tion. Entropy , 22(7):728. Gudendorf, G. and Segers, J. (2010). Extreme-value copulas. In Copula Theory and Its Appli-cations: Proceedings of the Workshop Held in Warsaw, 25-26 September 2009 , pages 127–145. Springer. Hofert, M. (2010). Sampling Nested Archimedean Copulas with Applications to CDO Pricing .S¨ udwestdeutscher Verlag f¨ ur Hochschulschriften AG & Co. KG. PhD thesis. Hofert, M. (2011). Efficiently sampling nested Archimedean copulas. Computational Statistics & Data Analysis , 55:57–70. Hofert, M. and Scherer, M. (2011). CDO pricing with nested Archimedean copulas. Quantitative Finance , 11(5):775–787. Hofmann, D. (2009). Characterization of the d-norm corresponding to a multivariate extreme value distribution. Hua, L. and Joe, H. (2011). Tail order and intermediate tail dependence of multivariate copulas. 
+
+Journal of Multivariate Analysis , 102(10):1454–1471. Hua, L. and Joe, H. (2012a). Tail comonotonicity and conservative risk measures. ASTIN Bulletin ,42(2):601–629. Hua, L. and Joe, H. (2012b). Tail comonotonicity: Properties, constructions, and asymptotic additivity of risk measures. Insurance: Mathematics and Economics , 51(2):492–503. Hua, L., Polansky, A., and Pramanik, P. (2019). Assessing bivariate tail non-exchangeable depen-dence. Statistics & Probability Letters , 155:108556. Jaworski, P., Durante, F., Hardle, W. K., and Rychlik, T., editors (2010). Copula Theory and Its Applications , volume 198 of Lecture Notes in Statistics – Proceedings . Springer. Joe, H. (1993). Parametric families of multivariate distributions with given margins. Journal of multivariate analysis , 46(2):262–282. Joe, H. (1997). Multivariate models and multivariate dependence concepts . CRC press. Joe, H. (2015). Dependence Modeling with Copulas . CRC Press. Joe, H., Li, H., and Nikoloulopoulos, A. K. (2010). Tail dependence functions and vine copulas. 
+
+Journal of Multivariate Analysis , 101(1):252–270. Koike, T., Hofert, M., and Tsunekawa, H. (2026). Tail copula representation of path-based maximal tail dependence. arXiv preprint arXiv:2604.05985 .16 Koike, T., Kato, S., and Hofert, M. (2023). Measuring non-exchangeable tail dependence using tail copulas. ASTIN Bulletin , 53(2):466–487. Krupskii, P. and Joe, H. (2015). Tail-weighted measures of dependence. Journal of Applied Statistics , 42(3):614–629. Lee, D., Joe, H., and Krupskii, P. (2018). Tail-weighted dependence measures with limit being the tail dependence coefficient. Journal of Nonparametric Statistics , 30(2):262–290. Li, H. (2008). Tail dependence comparison of survival marshall–olkin copulas. Methodology and Computing in Applied Probability , 10(1):39–54. Li, H. (2009). Orthant tail dependence of multivariate extreme value distributions. Journal of Multivariate Analysis , 100(1):243–256. Li, X. and Joe, H. (2024). Multivariate directional tail-weighted dependence measures. Journal of Multivariate Analysis , 203:105319. Lindskog, F. and McNeil, A. J. (2003). Common poisson shock models: applications to insurance and credit risk modelling. ASTIN Bulletin , 33(2):209–238. Mai, J.-F. and Scherer, M. (2010). The pickands representation of survival marshall–olkin copulas. 
+
+Statistics & Probability Letters , 80(5-6):357–360. Malov, S. V. (2001). On finite-dimensional Archimedean copulas. In Balakrishnan, N., Ibragimov, I., and Nevzorov, V., editors, Asymptotic Methods in Probability and Statistics with Applications ,pages 19–35. Birkh¨ auser. Marshall, A. W. and Olkin, I. (1967). A multivariate exponential distribution. Journal of the American Statistical Association , 62(317):30–44. McNeil, A. J. (2008). Sampling nested Archimedean copulas. Journal of Statistical Computation and Simulation , 78(6):567–581. McNeil, A. J., Frey, R., and Embrechts, P. (2015). Quantitative risk management: Concepts, techniques and tools . Princeton University Press. McNeil, A. J. and Neˇ slehov´ a, J. (2009). Multivariate Archimedean copulas, d-monotone functions and ℓ1-norm symmetric distributions. Annals of Statistics , 37(5b):3059–3097. Mesiar, R. and Jagr, V. (2013). d-dimensional dependence functions and archimax copulas. Fuzzy Sets and Systems , 228:78–87. Nelsen, R. B. (2006). An Introduction to Copulas . Springer. Nikoloulopoulos, A. K., Joe, H., and Li, H. (2009). Extreme value properties of multivariate t copulas. Extremes , 12(2):129–148. Ressel, P. (2013). Homogeneous distributions – and a spectral representation of classical mean values and stable tail dependence functions. Journal of Multivariate Analysis , 117:246–256. Rootz´ en, H., Segers, J., and Wadsworth, J. L. (2018). Multivariate generalized pareto distributions: Parametrizations, representations, and properties. Journal of Multivariate Analysis , 165:117– 131. 17 Schlather, M. and Tawn, J. (2002). Inequalities for the extremal coefficients of multivariate extreme value distributions. Extremes , 5(1):87–102. Schlather, M. and Tawn, J. A. (2003). A dependence measure for multivariate and spatial extreme values: Properties and inference. Biometrika , 90(1):139–156. Schmid, F. and Schmidt, R. (2007). Multivariate conditional versions of spearman’s rho and related measures of tail dependence. Journal of Multivariate Analysis , 98(6):1123–1140. Schmidt, R. and Stadtm¨ uller, U. (2006). Non-parametric estimation of tail dependence. Scandi-navian Journal of Statistics , 33(2):307–335. Siburg, K. F. and Strothmann, C. (2024). Multivariate tail dependence and local stochastic dom-inance. Journal of Multivariate Analysis , 201:105267. Siburg, K. F., Strothmann, C., and Weiß, G. (2024). Comparing and quantifying tail dependence. 
+
+Insurance: Mathematics and Economics , 118:95–103. Sibuya, M. (1960). Bivariate extreme statistics, I. Annals of the Institute of Statistical Mathematics ,11(3):195–210. Smith, R., Tawn, J., and Yuen, H. (1990). Statistics of multivariate extremes. International Statistical Review/Revue Internationale de Statistique , pages 47–58. Tawn, J. A. (1990). Modelling multivariate extreme value distributions. Biometrika , 77(2):245–253. 
+
+# Appendix A Proofs 
+
+This appendix collects all the proofs. For two functions f, g : R → R, we write f (u) ≃ g(u), 
+
+u → u∗ ∈ [−∞ , ∞], if lim u→u∗ (f (u)/g (u)) = 1. 
+
+## A.1 Proposition 1 
+
+Proof of Proposition 1. For every tail copula Λ : (0 , ∞)d → [0 , ∞), we use the bounds 0 ⩽ Λ( x) ⩽ min( x1, . . . , x d), x ∈ (0 , ∞)d, (10) and 
+
+|Λ( x) − Λ( y)| ⩽ ∥x − y∥1, x, y ∈ (0 , ∞)d. (11) Indeed, if Λ is the tail copula of a copula C, then (10) follows from 0 ⩽ C(tx) ⩽ min( tx 1, . . . , tx d)for all sufficiently small t > 0, while (11) follows from the 1-Lipschitz property |C(u)−C(v)| ⩽ ∥u−
+
+v∥1, u, v ∈ [0 , 1] d, of all copulas. We also use that tail copulas are componentwise nondecreasing and 1-homogeneous. 18 (i) If Λ ≡ 0, then λ∗(C) = 0 and the supremum is attained, for instance at 1d. Assume now that Λ ̸ ≡ 0. Then there exists x ∈ (0 , ∞)d such that Λ( x; C) > 0. Set r =
+
+ Qdj=1 xj
+
+1/d 
+
+and ˜b = x/r ∈ B . By 1-homogeneity, we have Λ( ˜b; C) = r−1Λ( x; C) > 0. Choose c ∈ (0 , Λ( ˜b; C)) and define 
+
+Kc =
+
+
+
+b ∈ B : min  
+
+> 1⩽j⩽d
+
+bj ⩾ c
+
+
+
+, (12) which is closed in Rd. Moreover, since bj = 1 / Q 
+
+> i̸=j
+
+bi ⩽ c−(d−1) for every j ∈ { 1, . . . , d }, we have Kc ⊆ [c, c −(d−1) ]d, hence Kc is bounded. Therefore, Kc is compact. Next we claim that sup 
+
+> b∈B
+
+Λ( b; C) = sup 
+
+> b∈Kc
+
+Λ( b; C). (13) Indeed, if b ∈ B \ Kc, then min j bj < c . Therefore, by (10), we have Λ( b; C) ⩽ min j bj < c ,and consequently sup b∈B\ Kc Λ( b; C) ⩽ c < Λ( ˜b; C) ⩽ sup b∈B Λ( b; C). This implies (13). Finally, Λ( ·; C) is continuous by (11), and Kc is compact. Hence there exists b∗ ∈ Kc such that Λ( b∗; C) = max b∈Kc Λ( b; C) = sup b∈B Λ( b; C). Thus the supremum in (1) is attained and λ∗(C) = max b∈B Λ( b; C). (ii) If Λ( ·; C) = Λ( ·), then λ∗(C) = sup b∈B min {b1, . . . , b d} = 1 since Qdj=1 bj = 1 implies min {b1, . . . , b d} ⩽ 1, and equality is attained at b = 1d.Conversely, suppose that λ∗(C) = 1. By (i), there exists b∗ ∈ B such that Λ( b∗; C) = 1. Using (10), we have 1 = Λ( b∗; C) ⩽ min {b∗
+
+> 1
+
+, . . . , b ∗
+
+> d
+
+} ⩽ 1. Hence min {b∗
+
+> 1
+
+, . . . , b ∗
+
+> d
+
+} = 1. Since 
+
+Qdj=1 b∗ 
+
+> j
+
+= 1, one must have b∗ = 1d and thus Λ( 1d; C) = 1. Now fix x ∈ (0 , ∞)d and put m := min {x1, . . . , x d}. Since m1d ⩽ x componentwise, monotonicity and 1-homogeneity imply that Λ( x; C) ⩾ Λ( m1d; C) = m Λ( 1d; C) = m. To-gether with (10), this yields m ⩽ Λ( x; C) ⩽ m, so Λ( x; C) = m = Λ( x), x ∈ (0 , ∞)d. Hence Λ( ·; C) = Λ( ·). (iii) If Λ( ·; C) ≡ 0, then clearly λ∗(C) = 0. Conversely, suppose that λ∗(C) = 0. Then Λ( b; C) = 0, 
+
+b ∈ B . Let x ∈ (0 , ∞)d and set r =
+
+ Qdj=1 xj
+
+1/d 
+
+and b = x/r ∈ B . By 1-homogeneity, we have Λ( x; C) = Λ( rb; C) = r Λ( b; C) = 0. Hence Λ( ·; C) ≡ 0 on (0 , ∞)d.(iv) If Λ 1(x; C1) ⩽ Λ2(x; C2) for all x ∈ (0 , ∞)d, then λ∗(C1) = sup b∈B Λ1(b; C1) ⩽ sup b∈B Λ2(b; C2)= λ∗(C2). (v) Let t ∈ [0 , 1]. Since the set of all copulas is convex, tC 1 +(1 −t)C2 is again a copula. Moreover, Λ( x; tC 1 + (1 − t)C2) = lim 
+
+> u↓0
+
+tC 1(ux) + (1 − t)C2(ux)
+
+u = tΛ1(x; C1) + (1 − t)Λ 2(x; C2).
+
+19 Therefore, 
+
+λ∗(tC 1 + (1 − t)C2) = sup 
+
+> b∈B
+
+{tΛ1(b; C1) + (1 − t)Λ 2(b; C2)}
+
+⩽ t sup 
+
+> b∈B
+
+Λ1(b; C1) + (1 − t) sup 
+
+> b∈B
+
+Λ2(b; C2)= tλ ∗(C1) + (1 − t)λ∗(C2).
+
+(vi) Let Λ n(·) := Λ( ·; Cn) and Λ( ·) := Λ( ·; C). We first show that the convergence Λ n → Λ is uniform on every compact K ⊂ [0 , ∞)d. Fix any ε > 0. Then there exist z(1) , . . . , z(m) ∈ K
+
+such that K ⊂ Smk=1 B1(z(k), ε/ 3), where B1(z(k), ε/ 3) denotes the ball in 1-norm with radius 
+
+ε/ 3 centered at z(k). By pointwise convergence at these finitely many points, there exists 
+
+n0 ∈ N such that |Λn(z(k)) − Λ( z(k))| < ε/ 3, k = 1 , . . . , m for all n ⩾ n0. Fix n ⩾ n0 and 
+
+z ∈ K. Choose k such that ∥z − z(k)∥1 < ε/ 3. Then 
+
+|Λn(z) − Λ( z)| ⩽ |Λn(z) − Λn(z(k))| + |Λn(z(k)) − Λ( z(k))| + |Λ( z(k)) − Λ( z)| < ε, 
+
+where we used (11) for the first and third terms. Hence sup z∈K |Λn(z) − Λ( z)| → 0. Assume first that λ∗(C) > 0. Choose ˜b ∈ B such that Λ( ˜b) > 0, and fix c ∈ (0 , Λ( ˜b)). Define Kc by (12), which is compact as in (i). By (10), it follows that sup b∈B\ Kc Λn(b) ⩽ c
+
+and sup b∈B\ Kc Λ( b) ⩽ c. Since Λ n(˜b) → Λ( ˜b) > c , there exists n1 ∈ N such that Λ n(˜b) > c 
+
+for n ⩾ n1. Hence, for n ⩾ n1, we have λ∗(Cn) = sup b∈Kc Λn(b) and λ∗(C) = sup b∈Kc Λ( b). Since Λ n → Λ uniformly on Kc, we have 
+
+|λ∗(Cn) − λ∗(C)| ⩽ sup 
+
+> b∈Kc
+
+|Λn(b) − Λ( b)| → 0,
+
+and thus λ∗(Cn) → λ∗(C). Finally, assume λ∗(C) = 0. Then Λ ≡ 0 by (iii). Fix c ∈ (0 , 1) and define Kc as in (12). For every n ∈ N, since Λ n(b) ⩽ c on B \ Kc by (10), we have 
+
+λ∗(Cn) = sup 
+
+> b∈B
+
+Λn(b) ⩽ max 
+
+
+
+sup 
+
+> b∈Kc
+
+Λn(b), c 
+
+
+
+.
+
+Since Λ n → 0 uniformly on Kc, we obtain sup b∈Kc Λn(b) → 0. Therefore, lim sup n→∞ λ∗(Cn) ⩽
+
+c. As c ∈ (0 , 1) was arbitrary and λ∗(Cn) ⩾ 0, we conclude that λ∗(Cn) → 0 = λ∗(C). 
+
+## A.2 Proposition 2 
+
+Proof of Proposition 2. 
+
+20 (i) For each ∅̸ = S ⊆ { 1, . . . , d }, we have that 
+
+ℓα,S (x) = lim   
+
+> xj↓0, j / ∈S
+
+ℓα(x) = X
+
+> j∈S
+
+(1 − αj )xj + max  
+
+> j∈S
+
+{αj xj }.
+
+Substituting this into (3), we obtain Λ( x; ˆCMO  
+
+> α
+
+) = X
+
+> ∅̸ =S⊆{ 1,...,d }
+
+(−1) |S|− 1 X
+
+> j∈S
+
+(1 − αj )xj + X
+
+> ∅̸ =S⊆{ 1,...,d }
+
+(−1) |S|− 1 max  
+
+> j∈S
+
+{αj xj }. (14) The first term in (14) vanishes since 
+
+X
+
+> ∅̸ =S⊆{ 1,...,d }
+
+(−1) |S|− 1 X
+
+> j∈S
+
+(1 − αj )xj =
+
+> d
+
+X
+
+> j=1
+
+(1 − αj )xj
+
+X
+
+> S:j∈S
+
+(−1) |S|− 1,
+
+and P 
+
+> S:j∈S
+
+(−1) |S|− 1 = (1 − 1) d−1 = 0 for each fixed j.For the second term in (14), put yj = αj xj ⩾ 0 and let y(1) ⩽ · · · ⩽ y(d) denote the order statistics of y1, . . . , y d. Grouping subsets S according to the largest rank contained in S, we obtain Λ( x; ˆCMO  
+
+> α
+
+) = X
+
+> ∅̸ =S⊆{ 1,...,d }
+
+(−1) |S|− 1 max  
+
+> j∈S
+
+{yj } =
+
+> d
+
+X
+
+> k=1
+
+y(k)
+
+> k
+
+X
+
+> s=1
+
+k − 1
+
+s − 1
+
+
+
+(−1) s−1.
+
+Using that 
+
+> k
+
+X
+
+> s=1
+
+k − 1
+
+s − 1
+
+
+
+(−1) s−1 =
+
+> k−1
+
+X
+
+> s=0
+
+k − 1
+
+s
+
+
+
+(−1) s = (1 − 1) k−1 = 1{k=1 },
+
+we obtain Λ( x; ˆCMO  
+
+> α
+
+) = y(1) = min {y1, . . . , y d}, which is the desired formula. (ii) Next, we study the MTCM λ∗( ˆCMO  
+
+> α
+
+) = sup b∈B min 1⩽j⩽d{αj bj }. For every b ∈ B , we have (min 1⩽j⩽d{αj bj })d ⩽ Qdj=1 αj bj and thus min 
+
+> 1⩽j⩽d
+
+{αj bj } ⩽
+
+> d
+
+Y
+
+> j=1
+
+αj bj
+
+!1/d 
+
+=
+
+> d
+
+Y
+
+> j=1
+
+αjdY
+
+> j=1
+
+bj
+
+!1/d 
+
+=
+
+> d
+
+Y
+
+> j=1
+
+α1/d j . (15) Hence λ∗( ˆCMO  
+
+> α
+
+) ⩽ Qdj=1 α1/d j . On the other hand, let ¯ α = Qdj=1 α1/d j and b∗ 
+
+> j
+
+= ¯ α/α j , j =1, . . . , d . Then Qdj=1 b∗ 
+
+> j
+
+= 1 and thus b∗ ∈ B . Moreover, min 1⩽j⩽d{αj b∗ 
+
+> j
+
+} = min 1⩽j⩽d{¯α} = ¯ α,which implies λ∗( ˆCMO  
+
+> α
+
+) ⩾ ¯α. Consequently, we have λ∗( ˆCMO  
+
+> α
+
+) = ¯ α.(iii) In (15), equality holds if and only if α1b1 = · · · = αdbd. Hence any maximizer b ∈ B must 21 satisfy bj = c/α j , j = 1 , . . . , d , for some constant c > 0. Using the constraint Qdj=1 bj = 1, the constant is necessarily c = Qdj=1 α1/d j , which yields the desired formula. 
+
+## A.3 Proposition 3 
+
+For the proof of Proposition 3, we need the following notion. A function L : (0 , ∞) → (0 , ∞) is 
+
+slowly varying (at ∞) if lim x→∞ L(tx )/L (x) = 1 for all t > 0. Let SV denote the class of all slowly varying functions. According to Bingham et al. (1987, Theorem 1.4.1), any function f ∈ RV ρ,
+
+ρ ∈ R, can be represented by f (x) = xρL(x) for some L ∈ SV. 
+
+Proof of Proposition 3. Let ψ ∈ Ψ∞ ∩ RV −α for some α > 0. Then there exists L ∈ SV such that ψ(t) = t−αL(t). By Bingham et al. (1987, Theorem 1.5.12), we can also write ψ−1(u) = 
+
+u−1/α ˜L(1 /u ) for some ˜L ∈ SV. The two functions L, ˜L are related via ˜L
+
+ 1
+
+u
+
+−α
+
+L
+
+
+
+u−1/α ˜L
+
+ 1
+
+u
+
+ 
+
+= 1 (16) since, for every u ∈ (0 , 1), 
+
+u = ψ(ψ−1(u)) = ψ−1(u)−αL(ψ−1(u)) = 
+
+
+
+u−1/α ˜L
+
+ 1
+
+u
+
+ −α
+
+L
+
+
+
+u−1/α ˜L
+
+ 1
+
+u
+
+ 
+
+= u ˜L
+
+ 1
+
+u
+
+−α
+
+L
+
+
+
+u−1/α ˜L
+
+ 1
+
+u
+
+ 
+
+.
+
+Together with 1-homogeneity of ℓ, we have from (16) that, for any fixed x ∈ (0 , ∞)d and as t ↓ 0, 
+
+C(tx) = ψ  ℓ(ψ−1(tx 1), . . . , ψ −1(tx d)) 
+
+= ℓ(ψ−1(tx 1), . . . , ψ −1(tx d)) −α L  ℓ(ψ−1(tx 1), . . . , ψ −1(tx d)) 
+
+=
+
+
+
+ℓ
+
+
+
+(tx 1)−1/α ˜L
+
+ 1
+
+tx 1
+
+
+
+, . . . , (tx d)−1/α ˜L
+
+ 1
+
+tx d
+
+ −α
+
+· L
+
+
+
+ℓ
+
+
+
+(tx 1)−1/α ˜L
+
+ 1
+
+tx 1
+
+
+
+, . . . , (tx d)−1/α ˜L
+
+ 1
+
+tx d
+
+ 
+
+≃
+
+
+
+ℓ
+
+
+
+(tx 1)−1/α ˜L
+
+1
+
+t
+
+
+
+, . . . , (tx d)−1/α ˜L
+
+1
+
+t
+
+ −α
+
+· L
+
+
+
+ℓ
+
+
+
+(tx 1)−1/α ˜L
+
+1
+
+t
+
+
+
+, . . . , (tx d)−1/α ˜L
+
+1
+
+t
+
+ 
+
+=
+
+
+
+t−1/α ˜L
+
+1
+
+t
+
+
+
+ℓ
+
+
+
+x−1/α  
+
+> 1
+
+, . . . , x −1/α d
+
+−α
+
+L
+
+
+
+t−1/α ˜L
+
+1
+
+t
+
+
+
+ℓ
+
+
+
+x−1/α  
+
+> 1
+
+, . . . , x −1/α d
+
+
+
+= tℓ 
+
+
+
+x−1/α  
+
+> 1
+
+, . . . , x −1/α d
+
+−α ˜L
+
+1
+
+t
+
+−α
+
+L
+
+
+
+t−1/α ˜L
+
+1
+
+t
+
+
+
+ℓ
+
+
+
+x−1/α  
+
+> 1
+
+, . . . , x −1/α d
+
+
+
+22 ≃ tℓ 
+
+
+
+x−1/α  
+
+> 1
+
+, . . . , x −1/α d
+
+−α ˜L
+
+1
+
+t
+
+−α
+
+L
+
+
+
+t−1/α ˜L
+
+1
+
+t
+
+ 
+
+= tℓ 
+
+
+
+x−1/α  
+
+> 1
+
+, . . . , x −1/α d
+
+−α
+
+.
+
+## A.4 Theorem 1 
+
+Proof of Theorem 1. Since Qdj=1 bj = 1 if and only if Qdj=1 b−1/α j = 1, the map Tα : B → B defined by Tα(b) = ( b−1/α  
+
+> 1
+
+, . . . , b −1/α d ) is a bijection with inverse T −1 
+
+> α
+
+(z) = ( z−α 
+
+> 1
+
+, . . . , z −αd ). By Proposition 1, the maximum in the definition of λ∗(Cψ,ℓ ) is attained. By Proposition 3, we have that 
+
+λ∗(Cψ,ℓ ) = max  
+
+> b∈B
+
+Λ( b; Cψ,ℓ ) = max  
+
+> z∈B
+
+{ℓ(z)−α} =
+
+
+
+min  
+
+> z∈B
+
+ℓ(z)
+
+−α
+
+.
+
+The correspondence between maximizer and minimizer follows immediately. 
+
+## A.5 Corollary 1 
+
+Proof of Corollary 1. By Theorem 1, it suffices to minimize ℓ on B. Let z = ( z1, . . . , z d) ∈ B 
+
+and set ¯ z := (1 /d ) Pdj=1 zj . Let Sd be the set of all permutations of {1, . . . , d }, and write zπ =(zπ(1) , . . . , z π(d)) for π = ( π(1) , . . . , π (d)) ∈ Sd. Since ℓ is exchangeable and convex, we have 
+
+ℓ(¯ z1d) = ℓ 1
+
+d!
+
+X
+
+> π∈Sd
+
+zπ
+
+!
+
+⩽ 1
+
+d!
+
+X
+
+> π∈Sd
+
+ℓ(zπ) = ℓ(z).
+
+Since Qdj=1 zj = 1, the arithmetic–geometric mean inequality gives ¯ z ⩾ 1, with equality if and only if z1 = · · · = zd = 1. Using 1-homogeneity of ℓ, we thus obtain that 
+
+ℓ(z) ⩾ ℓ(¯ z1d) = ¯ z ℓ (1d) ⩾ ℓ(1d).
+
+Hence 1d is a minimizer of ℓ on B, and thus λ∗(Cψ,ℓ ) = ℓ(1d)−α.To prove uniqueness, let z ∈ B with z̸ = 1d. Then, by equality in the arithmetic–geometric mean inequality, we have ¯ z > 1. Hence ℓ(z) ⩾ ¯z ℓ (1d) > ℓ (1d). Therefore, 1d is the unique minimizer of ℓ on B. By Theorem 1, the maximizer of Λ( ·; Cψ,ℓ ) on B is thus unique and given by 
+
+b∗ = T −1 
+
+> α
+
+(1d) = 1d.
+
+## A.6 Proposition 4 
+
+Proof of Proposition 4. We proceed by induction on the height of the subtree rooted at v. If v ∈ L ,then (7) is obvious. Next, let v ∈ I and assume that the statement holds for every child w ∈ ch( v). By the induction hypothesis, we have Cw(txle( w)) ≃ t Λw(xle( w)), t ↓ 0, for every w ∈ ch( v). Write ψv(t) = t−αv Lv(t)23 and ψ−1 
+
+> v
+
+(u) = u−1/α v ˜Lv(1 /u ) for some Lv, ˜Lv ∈ SV. Then 
+
+ψ−1 
+
+> v
+
+(Cw(txle( w))) ≃ { tΛw(xle( w))}−1/α v ˜Lv
+
+ 1
+
+t Λw(xle( w))
+
+
+
+≃ { tΛw(xle( w))}−1/α v ˜Lv
+
+1
+
+t
+
+
+
+as t ↓ 0 and thus 
+
+X
+
+> w∈ch( v)
+
+ψ−1 
+
+> v
+
+(Cw(txle( w))) ≃ t−1/α v ˜Lv
+
+1
+
+t
+
+ X
+
+> w∈ch( v)
+
+Λw(xle( w))−1/α v .
+
+Together with ˜Lv (1 /u )−αv Lv
+
+
+
+u−1/α v ˜Lv (1 /u )
+
+
+
+= 1 as in (16), we have that 
+
+Cv(txle( v)) = ψv
+
+ X
+
+> w∈ch( v)
+
+ψ−1 
+
+> v
+
+(Cw(txle( w))) 
+
+
+
+≃
+
+t−1/α v ˜Lv
+
+1
+
+t
+
+ X
+
+> w∈ch( v)
+
+Λw(xle( w))−1/α v
+
+
+
+> −αv
+
+Lv
+
+t−1/α v ˜Lv
+
+1
+
+t
+
+ X
+
+> w∈ch( v)
+
+Λw(xle( w))−1/α v
+
+
+
+≃ t
+
+ X
+
+> w∈ch( v)
+
+Λw(xle( w))−1/α v
+
+
+
+> −αv
+
+˜Lv
+
+1
+
+t
+
+−αv
+
+Lv
+
+
+
+t−1/α v ˜Lv
+
+1
+
+t
+
+ 
+
+= t
+
+ X
+
+> w∈ch( v)
+
+Λw(xle( w))−1/α v
+
+
+
+> −αv
+
+.
+
+Hence (7) holds for all v ∈ I .
+
+## A.7 Theorem 2 
+
+Proof of Theorem 2. 
+
+(i) For v ∈ V and p > 0, define 
+
+Av(p) = 
+
+ble( v) ∈ (0 , ∞)d(v) : Y
+
+> i∈le( v)
+
+bi = p
+
+
+
+and 
+
+Mv(p) = sup  
+
+> ble( v)∈Av(p)
+
+Λv(ble( v)).
+
+Thus λ∗ 
+
+> v
+
+= Mv(1) . By induction on the height of v, we first prove that Mv(p) = λ∗ 
+
+> v
+
+p1/d (v) and the maximum is uniquely attained in Av(p) for every p > 0. These statements hold if v ∈ L 
+
+24 since d(v) = 1, Av(p) = {p} and Λ v(bv) = bv.Now let v ∈ I , and assume that the statements hold for every child w ∈ ch( v). Fix p > 0. For xw > 0, w ∈ ch( v), let 
+
+Sαv
+
+ (xw)w∈ch( v)
+
+ =
+
+ X
+
+> w∈ch( v)
+
+x−1/α v
+
+> w
+
+
+
+> −αv
+
+.
+
+Since αv > 0, the map Sαv is continuous and strictly increasing in each coordinate. By Proposition 4, for every ble( v) ∈ Av(p), we have Λ v(ble( v)) = Sαv
+
+ (Λ w(ble( w))) w∈ch( v)
+
+ . For 
+
+ble( v) ∈ Av(p), let 
+
+pw = Y
+
+> i∈le( w)
+
+bi, w ∈ ch( v).
+
+Then pw > 0 and Q 
+
+> w∈ch( v)
+
+pw = p. Conversely, any collection of pw > 0, w ∈ ch( v), satisfying 
+
+Q 
+
+> w
+
+pw = p, together with vectors ble( w) ∈ Aw(pw), determines an element of Av(p). Hence 
+
+Mv(p) = sup Q  
+
+> wpw=p
+
+(
+
+sup   
+
+> ble( w)∈Aw(pw), w ∈ch( v)
+
+Sαv
+
+ (Λ w(ble( w))) w∈ch( v)
+
+)
+
+. (17) By the induction hypothesis, Mw(pw) is attained for every child w ∈ ch( v) and every pw > 0. Therefore, using the componentwise monotonicity of Sαv , the inner supremum in (17) equals 
+
+Sαv
+
+ (Mw(pw)) w∈ch( v)
+
+ with Mw(pw) = λ∗ 
+
+> w
+
+p1/d (w) 
+
+> w
+
+, w ∈ ch( v). Consequently, we have that 
+
+Mv(p) = sup Q  
+
+> wpw=p
+
+X
+
+> w∈ch( v)
+
+(λ∗
+
+> w
+
+)−1/α v p−1/(αv d(w)) 
+
+> w
+
+
+
+> −αv
+
+.
+
+Since αv > 0, maximizing the last expression is equivalent to the following problem: minimize X
+
+> w∈ch( v)
+
+(λ∗
+
+> w
+
+)−1/α v p−1/(αv d(w))  
+
+> w
+
+subject to Y
+
+> w∈ch( v)
+
+pw = p. 
+
+With qw := log pw, this problem is equivalent to minimize Fv(q) := X
+
+> w∈ch( v)
+
+(λ∗
+
+> w
+
+)−1/α v exp 
+
+
+
+− qw
+
+αvd(w)
+
+
+
+subject to X
+
+> w∈ch( v)
+
+qw = log p. 
+
+The objective function Fv is strictly convex since the Hessian matrix of Fv is diagonal with 25 diagonal entries given by 
+
+∂2
+
+∂q 2
+
+> w
+
+Fv(q) = 1
+
+α2
+
+> v
+
+d(w)2 (λ∗
+
+> w
+
+)−1/α v exp 
+
+
+
+− qw
+
+αvd(w)
+
+
+
+> 0, w ∈ ch( v).
+
+This function is also coercive on the affine hyperplane 
+
+Hv(p) := 
+
+q ∈ R|ch( v)| : X
+
+> w∈ch( v)
+
+qw = log p
+
+ ,
+
+that is, Fv(q) → ∞ for q ∈ Hv(p) with ∥q∥ → ∞ .Since Fv is continuous and coercive on the non-empty closed affine subspace Hv(p), the restriction Fv|Hv (p) attains its minimum there. Moreover, Hv(p) is convex and Fv|Hv (p) is strictly convex; hence this minimizer is unique by the standard Weierstrass–coercivity exis-tence theorem and the uniqueness of minimizers of strictly convex functions; see Bertsekas (2009, Propositions. 3.1.1 and 3.2.1 in Appendix B). Consequently, the Lagrange first-order conditions for the affine constraint are necessary and sufficient (Boyd and Vandenberghe, 2004, Section 4.2.3). The Lagrangian is Lv(q, μ ) = Fv(q) + μ
+
+ P 
+
+> w∈ch( v)
+
+qw − log p
+
+
+
+, μ ∈ R. At the minimizer, it holds that 
+
+− 1
+
+αvd(w)(λ∗
+
+> w
+
+)−1/α v exp 
+
+
+
+− qw
+
+αvd(w)
+
+
+
++ μ = 0 , w ∈ ch( v),
+
+or, equivalently, (λ∗
+
+> w
+
+)−1/α v exp 
+
+
+
+− qw
+
+αvd(w)
+
+
+
+= αvμ d (w), w ∈ ch( v). (18) Since the left-hand side is positive, we have μ > 0. Let F min  
+
+> v
+
+denote the minimum value of Fv
+
+on Hv(p). Summing the preceding identities over all w ∈ ch( v), we obtain 
+
+F min  
+
+> v
+
+= αvμ X
+
+> w∈ch( v)
+
+d(w) = αvμ d (v).
+
+Hence Mv(p) = ( F min  
+
+> v
+
+)−αv = {αvμ d (v)}−αv . Furthermore, (18) implies that 
+
+pw = exp( qw) = 
+
+(λ∗
+
+> w
+
+)−1/α v
+
+αvμ d (w)
+
+αv d(w)
+
+, w ∈ ch( v).
+
+26 Using the constraint Q 
+
+> w
+
+pw = p, we get 
+
+p = Y
+
+> w∈ch( v)
+
+(λ∗
+
+> w
+
+)−1/α v
+
+αvμ d (w)
+
+αv d(w)
+
+,
+
+or, equivalently, p = ( αvμ)−αv d(v) Q 
+
+> w∈ch( v)
+
+{d(w)αv λ∗
+
+> w
+
+}−d(w) . Thus (αvμ)−αv = p1/d (v) Y
+
+> w∈ch( v)
+
+{d(w)αv λ∗
+
+> w
+
+}d(w)/d (v) .
+
+Substituting this into the expression for Mv(p), we obtain 
+
+Mv(p) = d(v)−αv p1/d (v) Y
+
+> w∈ch( v)
+
+{d(w)αv λ∗
+
+> w
+
+}d(w)/d (v) .
+
+Taking p = 1 gives the desired formula 
+
+λ∗ 
+
+> v
+
+= d(v)−αv
+
+Y
+
+> w∈ch( v)
+
+{d(w)αv λ∗
+
+> w
+
+}d(w)/d (v) .
+
+Consequently, we obtain Mv(p) = λ∗ 
+
+> v
+
+p1/d (v).
+
+Moreover, since the minimizer ( qw)w∈ch( v) is unique, so is ( pw)w∈ch( v) in the outer supremum in (17). From the preceding formulas, they are given by 
+
+p∗
+
+> w
+
+(p) = pd(w)/d (v)
+
+ d(v)αv λ∗
+
+> v
+
+d(w)αv λ∗
+
+> w
+
+d(w)
+
+, w ∈ ch( v). (19) For these optimal products, the induction hypothesis gives a unique maximizer in each child subtree. Combining these child-subtree maximizers therefore yields a maximizer in Av(p). It remains to prove uniqueness. Let ble( v) ∈ Av(p) be any maximizer, and set ˜ pw =
+
+Q 
+
+> i∈le( w)
+
+bi, w ∈ ch( v). By definitions of Mv and Mw, we also have 
+
+Mv(p) = Sαv
+
+ (Λ w(ble( w))) w
+
+ ⩽ Sαv
+
+ (Mw(˜ pw)) w
+
+ ⩽ Mv(p).
+
+Hence equality holds throughout. Therefore, the uniqueness of ( p∗
+
+> w
+
+(p)) w∈ch( v) yields ˜ pw =
+
+p∗
+
+> w
+
+(p), w ∈ ch( v). Moreover, the strict monotonicity of Sαv implies Λ w(ble( w)) = Mw(p∗
+
+> w
+
+(p)), 
+
+w ∈ ch( v). By the induction hypothesis, each child-subtree maximizer is unique. Therefore 
+
+ble( v) coincides with the maximizer constructed above, and Mv(p) is attained by this unique vector in Av(p). This completes the induction and proves the recursion (8). 27 (ii) If all children of v are leaves, then d(w) = 1 and λ∗ 
+
+> w
+
+= 1 for every w ∈ ch( v). Hence (8) gives 
+
+λ∗ 
+
+> v
+
+= d(v)−αv , which agrees with (9) since Iv \ { v} = ∅.Assume now that (9) holds for every internal child of v. By (8), leaf children only contribute the factor 1, hence 
+
+λ∗ 
+
+> v
+
+= d(v)−αv
+
+Y
+
+> w∈ch( v)∩I
+
+{d(w)αv λ∗
+
+> w
+
+}d(w)/d (v)
+
+= d(v)−αv
+
+Y
+
+> w∈ch( v)∩I
+
+d(w)(αv −αw )d(w)/d (v) Y
+
+> w∈ch( v)∩I
+
+Y 
+
+> ˜w∈I w\{ w}
+
+d( ˜ w)(αpa( ˜ w)−α ˜w )d( ˜ w)/d (v)
+
+ .
+
+Since w ∈ ch( v) ∩ I implies pa( w) = v, the first product can be written as 
+
+Y
+
+> w∈ch( v)∩I
+
+d(w)(αpa( w)−αw )d(w)/d (v).
+
+Moreover, the internal vertices in the subtree rooted at v, except for v itself, decompose disjointly as 
+
+Iv \ { v} = {ch( v) ∩ I} ⊎ ]
+
+> w∈ch( v)∩I
+
+(Iw \ { w}),
+
+where ⊎ denotes disjoint union. Hence 
+
+λ∗ 
+
+> v
+
+= d(v)−αv
+
+Y 
+
+> w∈I v\{ v}
+
+d(w)(αpa( w)−αw )d(w)/d (v),
+
+which proves (9). (iii) For ease of notation, we first show the case when v = r. Let j ∈ { 1, . . . , d } be a leaf, and let 
+
+v0 = r, v 1, . . . , v m = j for some m ∈ N denote the unique path from the root r to j. Let 
+
+P ∗ 
+
+> k
+
+= Y 
+
+> i∈le( vk)
+
+b∗ 
+
+> i
+
+, k = 0 , . . . , m, 
+
+where b∗ is the unique maximizer in B. Then P ∗ 
+
+> 0
+
+= 1, P ∗ 
+
+> m
+
+= b∗ 
+
+> j
+
+, d(vm) = 1 and λ∗ 
+
+> vm
+
+= 1. Applying (19) recursively along the path gives 
+
+P ∗ 
+
+> k
+
+= ( P ∗
+
+> k−1
+
+)d(vk )/d (vk−1)
+
+d(vk−1)αvk−1 λ∗
+
+> vk−1
+
+d(vk)αvk−1 λ∗
+
+> vk
+
+d(vk )
+
+, k = 1 , . . . , m, 
+
+28 equivalently, (P ∗ 
+
+> k
+
+)1/d (vk ) = ( P ∗
+
+> k−1
+
+)1/d (vk−1) d(vk−1)αvk−1 λ∗
+
+> vk−1
+
+d(vk)αvk−1 λ∗
+
+> vk
+
+.
+
+Iterating this identity and using P ∗ 
+
+> 0
+
+= 1, we obtain 
+
+b∗ 
+
+> j
+
+= P ∗ 
+
+> m
+
+=
+
+> m
+
+Y
+
+> k=1
+
+d(vk−1)αvk−1 λ∗
+
+> vk−1
+
+d(vk)αvk−1 λ∗
+
+> vk
+
+= dαr λ∗
+
+> rm−1
+
+Y
+
+> k=1
+
+d(vk)αvk −αvk−1 .
+
+Since λ∗ 
+
+> r
+
+= λ∗(C) and {v1, . . . , v m−1} = an( j), this is precisely 
+
+b∗ 
+
+> j
+
+= dαr λ∗(C) Y
+
+> v∈an( j)
+
+d(v)αv −αpa( v) .
+
+The uniqueness of b∗ follows from the uniqueness already proven for Mr(1). For a general internal vertex v, apply the same argument to the subtree rooted at v. Let 
+
+v0 = v, v 1, . . . , v m = j be the unique path from v to j ∈ le( v). Then the same telescoping argument as before yields (b∗
+
+> v
+
+)j = d(v)αv λ∗
+
+> vm−1
+
+Y
+
+> k=1
+
+d(vk)αvk −αvk−1 = d(v)αv λ∗
+
+> v
+
+Y 
+
+> w∈an v(j)
+
+d(w)αw −αpa( w) .
+
+Indeed, the uniqueness established in the proof of (i) implies that the restriction of the global maximizer to each subtree along the path is the unique maximizer of the corresponding problem 
+
+Mvk (P ∗ 
+
+> k
+
+); hence the optimal child-product formula (19) can be applied successively along the path. 29

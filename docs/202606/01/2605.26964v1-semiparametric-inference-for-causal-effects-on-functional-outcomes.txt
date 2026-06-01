@@ -1,0 +1,2312 @@
+Title: Semiparametric Inference for Causal Effects on Functional Outcomes
+
+URL Source: https://arxiv.org/pdf/2605.26964v1
+
+Published Time: Wed, 27 May 2026 01:24:09 GMT
+
+Number of Pages: 38
+
+Markdown Content:
+# Semiparametric Inference for Causal Effects on Functional Outcomes 
+
+Junzhu Nie 1, Chengxiu Ling 1, and Mengfei Ran ∗11Wisdom Lake Academy of Pharmacy, Xi’an Jiaotong-Liverpool University 
+
+Abstract 
+
+Difference-in-differences (DiD) is a cornerstone of causal inference, yet extending it to func-tional outcomes is not a routine scalar generalization; rather, it entails three fundamental chal-lenges in identification, inference, and observation. This paper develops a comprehensive semi-parametric inference framework for functional DiD with discretely observed data. First, we de-fine the functional average treatment effect under parallel trends and derive its efficient influence function (EIF), thereby establishing the semiparametric efficiency bound. Second, leveraging Neyman orthogonality and cross-fitting, we construct a debiased estimator that effectively mit-igates regularization bias arising from nonparametric reconstruction. Third, we establish weak convergence of the estimator and propose an asymptotically valid uniform confidence band, en-abling a rigorous transition from pointwise to curve-level inference. Finally, we demonstrate that reconstruction error under discrete sampling is asymptotically negligible for semiparamet-ric inference, ensuring practical feasibility. Simulations and empirical applications confirm that the proposed method achieves superior coverage and testing power in finite samples, providing a theoretically grounded and computationally tractable foundation for causal evaluation with functional data. 
+
+Keywords: functional data analysis; causal inference; difference-in-differences; semiparametric efficiency. 
+
+## 1 Introduction 
+
+Causal inference is a foundational tool for quantifying how an intervention changes an outcome. Traditional causal frameworks, including the potential outcomes model (Rubin, 1974) and propen-sity score theory (Rosenbaum and Rubin, 1983), were largely developed for scalar outcomes and are not directly equipped to handle the full complexity of functional data, see also Imbens and Rubin (2015); Hern´ an and Robins (2020) for modern approaches. Yet, technological advances in imaging, environmental sensing, and digital health increasingly generate outcomes recorded as functions over a continuum: circadian activity curves from wearables, within-day pollution profiles, longitudinal biomarker trajectories, and tract-indexed neuroimaging measurements (Wang et al., 2016). These functional outcomes preserve rich temporal or spatial structure and naturally live in infinite-dimensional spaces, making functional data analysis (FDA) a natural statistical framework for their representation, modeling, and inference (Ramsay and Silverman, 2005; Hsing and Eubank, 2015).  
+
+> ∗Corresponding author. mengfei.ran@xjtlu.edu.cn
+
+1
+
+> arXiv:2605.26964v1 [stat.ME] 26 May 2026
+
+When the outcome is functional, causal inference shifts from estimating a scalar treatment effect to characterizing how an intervention reshapes an entire trajectory. Common strategies either reduce each curve to scalar summaries or conduct pointwise analyses over a dense grid, yet both risk obscuring time-varying effects and complicating inference due to multiple comparisons (Degras, 2017). While FDA has developed simultaneous confidence bands and global curve-level procedures (Degras, 2011; Choi and Reimherr, 2018; Pini and Vantini, 2016, 2017; Liebl and Reimherr, 2023), these methods remain primarily descriptive or associational and do not address causal identification or confounding in observational studies. A critical gap therefore persists in methods that integrate functional outcomes with rigorous causal inference for observational settings. Difference-in-differences (DiD) offers a natural causal framework for before–after observational studies with treatment and control groups. For scalar outcomes, existing studies have established identification under parallel trends, covariate adjustment via semiparametric reweighting (Abadie, 2005), doubly robust estimation (Sant’Anna and Zhao, 2020), and extensive results for multi-period or staggered-adoption settings (Borusyak et al., 2024; Fang and Liebl, 2025). Extending DiD from scalar outcomes to functional outcomes, however, is not a routine substitution of a curve for a number. First, identification becomes functional, requiring the parallel-trends assumption to hold at the curve level, while extending covariate-adjusted DiD ideas from scalar outcomes to functional outcomes (Abadie, 2005). Second, inference becomes functional, demanding weak convergence in a function space together with simultaneous uncertainty quantification over the entire domain (van der Vaart and Wellner, 1996; Chernozhukov et al., 2014). Third, measurement becomes functional: curves are often observed only on noisy and possibly sparse grids, necessitating controlled reconstruction error (Yao et al., 2005). Recent work has addressed isolated components: FPCA-based reconstruction for sparse functional data (Yao et al., 2005) and functional treatment-effect estimation with simultaneous bands (Ecker et al., 2024; Sparkes et al., 2024). Nevertheless, no unified framework currently exists for the functional average treatment effect on the treated (fATT) in a DiD design that simultaneously integrates covariate-adjusted identification, doubly robust estimation, semiparametric efficiency, simultaneous confidence bands, and reconstruction from noisy functional measurements. Semiparametric theory provides a coherent route to address these challenges. Covariate ad-justment and flexible nuisance estimation motivate influence-function-based doubly robust esti-mation, semiparametric efficiency theory, and Neyman-orthogonal scores with cross-fitting (Bickel et al., 1993; Tsiatis, 2006; Robins et al., 1994; Chernozhukov et al., 2018). For curve-level infer-ence, empirical process theory and Gaussian approximation theory for suprema provide justifica-tion for multiplier/bootstrap-based simultaneous confidence bands (van der Vaart and Wellner, 1996; Chernozhukov et al., 2014). In the functional DiD setting, these tools must be reformu-lated for curve-valued causal estimands and combined with conditions under which discretization and smoothing errors from noisy grid observations are asymptotically negligible. This reformu-lation—integrating doubly robust functional DiD identification with simultaneous inference and sparse measurement—constitutes the central methodological contribution of this work. This paper develops a semiparametric inference framework for causal effects on functional out-comes in a two-period observational DiD design. We consider independent and identically dis-tributed (i.i.d.) units with baseline covariates X, group indicator D ∈ { 0, 1}, and functional out-comes observed before and after treatment, Y0(·) and Y1(·). Under a covariate-adjusted functional parallel trends condition and overlap, the target estimand is the functional average treatment effect on the treated (fATT) curve τ0(·). Our contributions are fourfold. First, we formulate and identify the fATT as a curve-valued causal estimand in a covariate-adjusted two-period DiD design. Second, we derive the efficient influence function for τ0(·) and construct an associated Neyman-orthogonal, doubly robust score. Third, we propose a cross-fitted estimator and establish weak convergence 2in L2(T ), enabling pointwise confidence intervals and multiplier-bootstrap simultaneous confidence bands. Fourth, we incorporate reconstruction from noisy grid observations and provide conditions under which discretization and smoothing errors are asymptotically negligible for both estimation and uniform inference. The remainder of the paper is organized as follows. Section 2 introduces the functional potential-outcomes framework and the fATT estimand in a two-period DiD design. It then presents identi-fication under covariate-adjusted functional parallel trends, derives the efficient influence function, and constructs the cross-fitted doubly robust estimator. Section 3 establishes asymptotic linearity and weak convergence in a Hilbert space, with additional conditions for process-level inference. Section 4 develops pointwise confidence intervals and multiplier-bootstrap simultaneous confidence bands. Section 5 reports simulation studies under dense and sparse functional observation designs. Section 6 applies the method to London ULEZ and hourly NO 2 profiles. Section 7 concludes with a discussion of limitations and possible extensions. 
+
+## 2 Methodology 
+
+This section develops a semiparametric framework for causal inference with functional outcomes in a two-period difference-in-differences (DiD) design. We formalize the functional potential-outcomes setup and target estimand, establish identification under covariate-adjusted functional parallel trends, derive the efficient influence function (EIF) and an orthogonal doubly robust score in a Hilbert-space formulation, and propose a cross-fitted estimator compatible with flexible nuisance learning. We also discuss reconstruction when curves are discretely observed with noise. 
+
+2.1 Setup and Notation 
+
+Let T ⊂ R be a compact interval (e.g., time-of-day) and let H = L2(T ) denote the separable Hilbert space of square-integrable real-valued functions on T with inner product ⟨f, g ⟩ = R 
+
+> T
+
+f (t)g(t) dt and norm ∥f ∥H = ⟨f, f ⟩1/2.We observe n i.i.d. units, indexed by i = 1 , . . . , n . Each unit is observed in two calendar periods 
+
+T ∈ { 0, 1} (pre and post). Let Di ∈ { 0, 1} indicate membership in the treated group; treatment is implemented only for units with Di = 1 in the post period T = 1. For each unit, we observe baseline covariates Xi ∈ Rp and a functional outcome curve YiT (·) ∈ H in each period T ∈ { 0, 1}.The pre–post functional change is ∆Yi(·) = Yi1(·) − Yi0(·) ∈ H .
+
+For compactness, we collect the observed variables as Wi = (∆ Yi, D i, X i) and denote by P the law of W .Following the potential outcomes framework (Rubin, 1974; Imbens and Rubin, 2015), let Y diT (·) ∈H denote the potential functional outcome at period T under treatment status d ∈ { 0, 1}. We im-pose standard consistency and no-interference conditions, the stable unit treatment value assump-tion (SUTVA). Because treatment is not implemented before the post period, the two potential pre-treatment outcomes coincide almost surely for each unit, namely 
+
+Y 1
+
+> i0
+
+(·) = Y 0
+
+> i0
+
+(·) a.s. Thus, observed outcomes satisfy 
+
+Yi0(·) = Y 0
+
+> i0
+
+(·),Yi1(·) = DiY 1
+
+> i1
+
+(·) + (1 − Di)Y 0
+
+> i1
+
+(·).
+
+3Define the potential changes ∆ Y di (·) = Y di1(·) − Y di0(·) for d ∈ { 0, 1}.
+
+2.2 Target Estimand 
+
+Our parameter of interest is the functional average treatment effect on the treated (fATT) curve, 
+
+τ0(t) = EY 1
+
+> i1
+
+(t) − Y 0
+
+> i1
+
+(t) | Di = 1 , t ∈ T . (1) Equivalently, by no anticipation, Y 1
+
+> i1
+
+(t) − Y 0
+
+> i1
+
+(t) = ∆ Y 1 
+
+> i
+
+(t) − ∆Y 0 
+
+> i
+
+(t) and hence 
+
+τ0(t) = E∆Y 1 
+
+> i
+
+(t) − ∆Y 0 
+
+> i
+
+(t) | Di = 1 .
+
+The object τ0(·) ∈ H summarizes the entire effect profile across T and naturally motivates simul-taneous (curve-level) inference in later sections. 
+
+2.3 Identification 
+
+Identification of (1) reduces to identifying the counterfactual mean post-period outcome for treated units under no treatment, or equivalently the untreated mean change for the treated group E{∆Y 0 
+
+> i
+
+(t) |
+
+Di = 1 }. To do so, for a ∈ { 0, 1}, we introduce nuisance functions 
+
+π0(x) = P(D = 1 | X = x),μa(x)( t) = E{∆Y (t) | X = x, D = a} .
+
+We impose a functional parallel trends condition conditional on X: for every t ∈ T ,
+
+E∆Y 0 
+
+> i
+
+(t) | Xi, D i = 1 = E∆Y 0 
+
+> i
+
+(t) | Xi, D i = 0 . (2) This assumption asserts that, after conditioning on baseline covariates, the untreated evolution of the outcome curve has the same conditional mean for treated and control units. We also assume overlap (positivity): there exists c ∈ (0 , 1/2) such that c ≤ π0(X) ≤ 1 − c a.s. This ensures that treated units have comparable controls at each covariate value. Under (2) and no anticipation, for any t ∈ T ,
+
+E{∆Y 0 
+
+> i
+
+(t) | Di = 1 } = EE{∆Y 0 
+
+> i
+
+(t) | Xi, D i = 1 } | Di = 1 
+
+= EE{∆Y 0 
+
+> i
+
+(t) | Xi, D i = 0 } | Di = 1  = E{μ0(Xi)( t) | Di = 1 }.
+
+Moreover, E{∆Yi(t) | Xi, D i = 1 } = μ1(Xi)( t) = E{∆Y 1 
+
+> i
+
+(t) | Xi, D i = 1 } by consistency. Combin-ing these yields 
+
+τ0(t) = E{μ1(Xi)( t) − μ0(Xi)( t) | Di = 1 } , t ∈ T . (3) Let p0 = P(D = 1). Using Bayes’ rule, the treated covariate distribution can be represented by a reweighted control distribution: for any integrable g(X), 
+
+E{g(X) | D = 1 } = E
+
+ (1 − D)π0(X)
+
+p0{1 − π0(X)} g(X)
+
+
+
+= E
+
+ Dp0
+
+g(X)
+
+
+
+.
+
+Applying this identity to g(X) = E{∆Y (t) | X, D = a} yields the functional analogue of Abadie’s semiparametric DiD representation (Abadie, 2005): 
+
+τ0(t) = E
+
+ Dp0
+
+∆Y (t)
+
+
+
+− E
+
+ (1 − D)π0(X)
+
+p0{1 − π0(X)} ∆Y (t)
+
+
+
+, t ∈ T . (4) Representations (3)–(4) motivate outcome-regression and inverse-weighting estimators; we next combine them through an orthogonal doubly robust construction. 42.4 Efficient Influence Function 
+
+We view τ0(·) as a parameter in the Hilbert space H and derive an EIF under the nonparametric model for W = (∆ Y, D, X ). Let η0 = ( π0, μ 0) collect the nuisance functions required by the proposed ATT score. The treated-regression function μ1(x)( t) = E{∆Y (t) | X = x, D = 1 } will appear only in an equivalent AIPW display. Define the centering constant p0 = P(D = 1). One algebraically equivalent display of the EIF for the fATT curve is 
+
+ϕ(W ; η0)( t) = Dp0
+
+{∆Y (t) − μ1(X)( t)} − (1 − D)π0(X)
+
+p0{1 − π0(X)} {∆Y (t) − μ0(X)( t)}
+
++ Dp0
+
+{μ1(X)( t) − μ0(X)( t)} − Dp0
+
+τ0(t).
+
+(5) Equivalently, after cancellation of μ1,
+
+ϕ(W ; η0)( t) = Dp0
+
+{∆Y (t) − μ0(X)( t) − τ0(t)} − (1 − D)π0(X)
+
+p0{1 − π0(X)} {∆Y (t) − μ0(X)( t)}.
+
+The factor D/p 0 multiplying τ0 is the ratio-parameter correction for the unknown treated-group probability p0. This expression extends the well-known scalar ATT EIF (Hahn, 1998; Tsiatis, 2006) to an H-valued parameter. Two properties of (5) are central for estimation and inference. 
+
+Proposition 1 (Pathwise derivative and efficiency) . Let τ (P ) denote the identified fATT functional defined by (4) . Under overlap and the stated moment conditions, for every regular parametric submodel {Pϵ : ϵ ∈ (−δ, δ )} through P0 = P with score S(W ),
+
+ddϵ τ (Pϵ) ϵ=0 
+
+= E{ϕ(W ; η0)S(W )} in H.
+
+Hence ϕ(W ; η0) is the canonical gradient, or efficient influence function, for τ0(·) in the nonpara-metric observed-data model. 
+
+Let Ψ( η)( t) = E{ψp0 (W ; η)( t)} for the uncentered score defined below with the treated prob-ability fixed at p0. The map η 7 → Ψ( η) is Neyman-orthogonal at η0, meaning that first-order perturbations of nuisance functions do not affect the target at the truth. This orthogonality un-derpins robustness to nuisance estimation error and allows √n inference under flexible nuisance learning when combined with cross-fitting (Chernozhukov et al., 2018). 
+
+2.5 Cross-fitted Doubly Robust Estimator 
+
+For estimation it is convenient to work with an uncentered orthogonal score ψ(W ; η)( t), where η =(π, μ 0) collects the propensity score π(x) and the control-regression function μ0(x)( t) = E{∆Y (t) |
+
+X = x, D = 0 }, and p = P(D = 1). To connect this score to the familiar AIPW representation, introduce the augmented tuple η+ = ( π, μ 0, μ 1) only for the following algebraic display: 
+
+ψ+(W ; η+)( t) = Dp
+
+n
+
+∆Y (t) − μ1(X)( t)
+
+o
+
+− (1 − D)π(X)
+
+p{1 − π(X)}
+
+n
+
+∆Y (t) − μ0(X)( t)
+
+o
+
++ Dp
+
+n
+
+μ1(X)( t) − μ0(X)( t)
+
+o
+
+, t ∈ T .
+
+(6) The treated-regression function μ1 cancels algebraically from this display. Therefore the proposed ATT score is implemented as 
+
+ψ(W ; η)( t) = Dp
+
+n
+
+∆Y (t) − μ0(X)( t)
+
+o
+
+− (1 − D)π(X)
+
+p{1 − π(X)}
+
+n
+
+∆Y (t) − μ0(X)( t)
+
+o
+
+. (7) 5Thus μ1 is useful for displaying the familiar AIPW form and for the OR comparator, but it is not required for implementing the proposed CF–DR estimator. When the dependence on the treated probability needs to be emphasized, we write ψp(W ; η) for the score in (7) with denominator p.For each t ∈ T , the score (7) satisfies a doubly robust moment condition: E{ψ(W ; η)( t)} = τ0(t)holds if either ( i) π = π0 or ( ii ) μ0 = μ0,true , where μ0,true (x)( t) = E{∆Y (t) | X = x, D = 0 }.In particular, the score does not require correct modeling of μ1(x)( t) = E{∆Y (t) | X = x, D =1}, since the treated-group mean enters through the observed ∆ Y among D = 1 units. This is a population moment identity; the root-n inference theory below additionally imposes nuisance consistency and product-rate conditions. To mitigate overfitting bias and enable high-dimensional or machine-learning nuisance estima-tion, we adopt K-fold cross-fitting (Chernozhukov et al., 2018). Partition {1, . . . , n } into disjoint folds {I k}Kk=1 . For each fold k, estimate nuisance functions on the auxiliary sample {i / ∈ I k},producing ˆη(−k) =  ˆπ(−k), ˆμ(−k)0
+
+.
+
+Let bp = n−1 Pni=1 Di. The cross-fitted doubly robust estimator of τ0(·) is ˆτ (t) = 1
+
+n
+
+> K
+
+X
+
+> k=1
+
+X
+
+> i∈I k
+
+ψ
+
+
+
+Wi; ˆ η(−k)
+
+(t), t ∈ T . (8) If an additional treated-regression learner ˆ μ1 is fitted, expanding (8) yields the equivalent familiar AIPW form: ˆτ (t) = 1
+
+n
+
+> K
+
+X
+
+> k=1
+
+X
+
+> i∈I k
+
+"
+
+Di
+
+ˆp
+
+n
+
+∆Yi(t) − ˆμ(−k)1 (Xi)( t)
+
+o
+
+− (1 − Di)ˆ π(−k)(Xi)ˆp{1 − ˆπ(−k)(Xi)}
+
+n
+
+∆Yi(t) − ˆμ(−k)0 (Xi)( t)
+
+o
+
++ Di
+
+ˆp
+
+n
+
+ˆμ(−k)1 (Xi)( t) − ˆμ(−k)0 (Xi)( t)
+
+o#
+
+.
+
+(9) The nuisance functions μa(x)( ·) are H-valued regressions. In practice we evaluate curves on a grid {tm}Mm=1 and treat μa(x) as an M -vector, or we use a low-dimensional basis representation. A convenient approach is coefficient learning: choose basis functions {bℓ}Lℓ=1 on T and approximate ∆Yi(t) ≈ PLℓ=1 θiℓ bℓ(t). Let θi = ( θi1, . . . , θ iL )⊤ denote coefficients obtained from reconstructed curves (Section 2.6). Then estimating μa(x)( ·) reduces to predicting θ from X within group D = a using any multivariate regression learner (e.g., penalized regression, forests, boosting, neural networks), and mapping predicted coefficients back to the function space: ˆ μa(x)( t) = PLℓ=1 ˆraℓ (x) bℓ(t). The propensity score 
+
+π0(x) can be estimated by standard classification methods. Cross-fitting ensures that evaluation-fold residuals are approximately orthogonal to the nuisance-fitting noise, which is essential for the asymptotic linearity established in Section 3. 
+
+2.6 Curve Reconstruction 
+
+Functional outcomes are frequently observed on finite grids and contaminated by measurement error. For each unit i and period T ∈ { 0, 1}, we observe 
+
+ZiT j = YiT (tiT j ) + εiT j , j = 1 , . . . , m iT ,
+
+where tiT j ∈ T may be irregular and unit-specific, and εiT j are mean-zero noises with finite variance. We reconstruct bYiT (·) from {(tiT j , Z iT j )}miT  
+
+> j=1
+
+using standard FDA tools (e.g., penalized splines for 6dense designs or FPCA/PACE-type methods for sparse designs; see Ramsay and Silverman, 2005; Yao et al., 2005; Hsing and Eubank, 2015). We then form the reconstructed change 
+
+d∆Y i(·) = bYi1(·) − bYi0(·),
+
+and apply (8) with ∆ Yi replaced by d∆Y i.For valid √n inference in H, reconstruction error must be asymptotically negligible relative to the sampling fluctuation of the causal estimator. We impose the L2 control max  
+
+> 1≤i≤n
+
+∥d∆Y i − ∆Yi∥H = op(n−1/2).
+
+For uniform bands based on sup t∈T |ˆτ (t) − τ0(t)|, we additionally require a stronger sup-norm control, max  
+
+> 1≤i≤n
+
+∥d∆Y i − ∆Yi∥∞ = op(n−1/2),
+
+or alternatively we construct bands on a sufficiently fine evaluation grid and interpret them as bands for the discretized effect curve. Conditions of this type are standard in FDA; see, for example, Yao et al. (2005); Horv´ ath and Kokoszka (2012). 
+
+## 3 Asymptotic Theory in H
+
+This section establishes first-order asymptotic theory for the cross-fitted doubly robust estimator 
+
+bτ (·) in (8). The main ingredients are a Hilbert-space asymptotic linear expansion driven by the efficient influence function and weak convergence to a Gaussian element in H = L2(T ). We also state a convenient sufficient condition for process-level (sup-norm) limits that underlie uniform confidence bands. 
+
+3.1 Preliminaries 
+
+Recall the orthogonal score ψp(W ; η)( t) in (7), and write η0 = ( π0, μ 0) for the true nuisance functions required by the proposed ATT score. Because the treated probability p0 = P (D = 1) is estimated, the first-order influence contribution is the ratio-corrected version 
+
+ϕ(W ; η0)( t) = ψp0 (W ; η0)( t) − Dp0
+
+τ0(t), t ∈ T .
+
+By construction, E{ϕ(W ; η0)( t)} = 0 for all t and ϕ(W ; η0) ∈ H almost surely under mild moment conditions. Let p0 = P(D = 1) and denote by Σ the covariance operator of ϕ(W ; η0) on H, i.e., 
+
+⟨f, Σg⟩ = Cov( ⟨f, ϕ ⟩, ⟨g, ϕ ⟩) for f, g ∈ H . When convenient, we also write the covariance kernel 
+
+C(s, t ) = Cov {ϕ(W ; η0)( s), ϕ (W ; η0)( t)}, (s, t ) ∈ T 2,
+
+which characterizes the Gaussian limit in both H and (under additional regularity) in ℓ∞(T ). 
+
+3.2 Assumptions 
+
+We collect sufficient conditions for asymptotic linearity and weak convergence. They are standard in orthogonal-score analysis with cross-fitting and functional outcomes. 7Assumption 1 (Sampling, overlap, and moments) . The observations {Wi}ni=1 are i.i.d. with 
+
+W = (∆ Y, D, X ). Overlap holds: there exists c ∈ (0 , 1/2) such that c ≤ π0(X) ≤ 1 − c almost surely, and p0 ∈ (0 , 1) . Moreover, E∥∆Y ∥2 
+
+> H
+
+< ∞ and E∥ϕ(W ; η0)∥2 
+
+> H
+
+< ∞. The untreated-change residual has uniformly bounded second moment: 
+
+sup 
+
+> x
+
+E{∥ ∆Y − μ0(X)∥2 
+
+> H
+
+| X = x, D = 0 } < ∞.
+
+Assumption 2 (Cross-fitting and stability of nuisance estimates) . The sample is split into K folds and nuisance estimators bη(−k) are trained on the complement of each fold as in Section 2.5. The fitted propensity scores satisfy a uniform positivity bound with probability tending to one, i.e., for some c ∈ (0 , 1/2) ,
+
+c ≤ bπ(−k)(Xi) ≤ 1 − c for all i ∈ I k, k = 1 , . . . , K 
+
+(possibly after deterministic clipping). The regression learners are stable in the sense that 
+
+max  
+
+> 1≤k≤K
+
+∥bμ(−k)0 ∥2 = Op(1) ,
+
+where ∥ · ∥ 2 denotes the relevant L2(P ; H) norm. 
+
+Assumption 3 (Product-rate condition for orthogonalization) . Let ∥ · ∥ 2 denote the L2(P) norm for scalar functions and the L2(P; H) norm for H-valued regressions. The nuisance estimators entering the ATT score satisfy 
+
+∥bμ0 − μ0∥2 = op(1) , ∥bπ − π0∥2 = op(1) , ∥bμ0 − μ0∥2 ∥bπ − π0∥2 = op(n−1/2).
+
+The treated-regression learner bμ1 is not part of the proposed ATT score; it may still be estimated for the plug-in OR comparator and for displaying (9) .
+
+Assumption 4 (Reconstruction error) . When ∆Yi is constructed from discretely observed noisy curves, the reconstruction step satisfies 
+
+max  
+
+> 1≤i≤n
+
+∥d∆Y i − ∆Yi∥H = op(n−1/2).
+
+When nuisance functions are trained using reconstructed curves, the rate conditions in Assumption 3 are understood to hold for the reconstructed-outcome learners, so any reconstruction-induced error in the nuisance fits is absorbed into those nuisance-rate bounds. 
+
+Assumptions 1 and 2 control the stochastic environment in which the orthogonal score is evalu-ated: they impose i.i.d. sampling, overlap/positivity and practical stability of the estimated propen-sity scores, e.g., via clipping, and moment/separability conditions that make ϕ(W ; η0) a well-defined 
+
+H-valued random element. Assumptions 3and 4 then quantify the impact of data-adaptive nui-sance learning and discretization: the product-rate condition ensures that plug-in errors in ( π, μ 0)are second order under Neyman orthogonality and cross-fitting, while the reconstruction bound guarantees that smoothing/discretization error is asymptotically negligible relative to the n−1/2
+
+sampling fluctuation (Chernozhukov et al., 2018). 
+
+3.3 Asymptotic Linearity in H
+
+We first establish a Hilbert-space asymptotic linear expansion. This result implies root-n consis-tency and provides the influence function that drives the Gaussian limit. 8Theorem 1 (Asymptotic linearity) . Suppose Assumptions 1–4 hold. Then 
+
+√n bτ − τ0
+
+ = 1
+
+√n
+
+> n
+
+X
+
+> i=1
+
+ϕ(Wi; η0) + rn in H,
+
+where ∥rn∥H = op(1) .
+
+The remainder term rn collects (i) the higher-order orthogonalization error from estimating (π0, μ 0), controlled by the product-rate condition in Assumption 3, (ii) sample-splitting error, and (iii) reconstruction error, controlled by Assumption 4. The leading term is the empirical average of the EIF, which is the same object that appears in classical semiparametric efficiency theory for scalar parameters (Bickel et al., 1993; Tsiatis, 2006) but now takes values in H.
+
+3.4 Weak Convergence in H
+
+We next obtain weak convergence to a Gaussian element in H. Since H is a separable Hilbert space, a central limit theorem applies under finite second moments. 
+
+Theorem 2 (Hilbert-space CLT) . Under the conditions of Theorem 1, 
+
+√n bτ − τ0
+
+ ⇒ G in H,
+
+where G is a mean-zero Gaussian element in H with covariance operator Σ induced by ϕ(W ; η0).Equivalently, for any fixed f ∈ H ,
+
+√n ⟨f, bτ − τ0⟩ ⇒ N  0, ⟨f, Σf ⟩.
+
+Theorem 2 provides a principled basis for inference on continuous linear summaries of the curve, such as projections ⟨f, τ 0⟩ with f ∈ H . Pointwise inference at fixed locations and global sup-norm inference require the additional sample-path regularity stated below, or alternatively may be interpreted on a finite evaluation grid. The covariance structure of the limiting Gaussian element is determined by the covariance kernel C(s, t ). 
+
+3.5 From H Limits to Uniform Inference 
+
+Uniform confidence bands concern the supremum norm sup t∈T |bτ (t) − τ0(t)|, which is not directly controlled by an L2 limit unless additional regularity is imposed. A convenient sufficient route is to strengthen the functional CLT to weak convergence in ℓ∞(T ) by assuming the influence function admits a version with sufficiently regular sample paths. 
+
+Assumption 5 (Uniform empirical-process regularity) . The class of functions 
+
+Fϕ = {ϕt(W ) = ϕ(W ; η0)( t) : t ∈ T } 
+
+is P -Donsker with a square-integrable envelope, and its Gaussian limit admits a version with almost surely uniformly continuous sample paths on T . Let σ2(t) = Var {ϕ(W ; η0)( t)} = C(t, t ). Assume 
+
+inf  
+
+> t∈T
+
+σ(t) > 0.
+
+For the nuisance estimators, the L2(P ; ℓ∞) analogues of Assumptions 2–3 hold, in particular 
+
+∥bμ0 − μ0∥2,∞ = op(1) , ∥bπ − π0∥2∥bμ0 − μ0∥2,∞ = op(n−1/2).
+
+Here ∥h∥2,∞ = {E∥h(X)∥2
+
+> ∞
+
+}1/2 for function-valued regressions. Moreover, the reconstruction error satisfies the stronger bound 
+
+max  
+
+> 1≤i≤n
+
+∥d∆Y i − ∆Yi∥∞ = op(n−1/2).
+
+9Theorem 3 (Process-level weak convergence) . Assume Theorem 1 holds and Assumption 5 is satisfied. Then √n bτ − τ0
+
+ ⇒ Z in ℓ∞(T ),
+
+where Z is a mean-zero tight Gaussian process on T with covariance kernel C(s, t ).
+
+Theorem 3 is the probabilistic input required for simultaneous confidence bands. In Section 4 we use a multiplier bootstrap to approximate the distribution of the studentized supremum sup 
+
+> t∈T
+
+|Z(t)/σ (t)| , σ2(t) = C(t, t ),
+
+and obtain asymptotically valid equal-precision bands; the validity follows from modern Gaussian approximation tools for suprema (Chernozhukov et al., 2014; van der Vaart and Wellner, 1996). 
+
+## 4 Inference and Confidence Bands 
+
+This section presents inference procedures for the fATT curve τ0(·). Pointwise confidence intervals are useful for inference at pre-specified locations, while simultaneous confidence bands (SCBs) pro-vide curve-level uncertainty quantification over t ∈ T . Our approach uses a multiplier bootstrap to approximate the distribution of the supremum of the centered empirical process; see Chernozhukov et al. (2014); van der Vaart and Wellner (1996) for general approximation results and Degras (2011); Liebl and Reimherr (2023) for related FDA perspectives. 
+
+4.1 Estimated Influence Contributions 
+
+Recall the cross-fitted score contributions induced by (7) and (8). For i ∈ I k, define 
+
+bψi(t) = ψ
+
+
+
+Wi; bη(−k)
+
+(t), bϕi(t) = bψi(t) − Di
+
+bp bτ (t), t ∈ T .
+
+These bϕi(·) act as empirical influence contributions and yield plug-in estimates of the covariance structure of the limiting Gaussian process. The ratio correction Dibτ / bp is essential for ATT inference because bp is estimated. In computation, we evaluate all function-valued quantities on a dense grid 
+
+{tm}Mm=1 ⊂ T and approximate suprema by maxima over this grid. 
+
+4.2 Pointwise Confidence Intervals 
+
+Fix a pre-specified evaluation point t ∈ T at which the process-level regularity conditions make point evaluation well-defined, or take t to be a point on the finite analysis grid. A natural variance estimator is the empirical second moment of the centered influence contributions: ¯bϕ(t) = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+bϕi(t), bσ2(t) = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+{ bϕi(t) − ¯bϕ(t)}2, bσ(t) = {bσ2(t)}1/2.
+
+Let z1−α/ 2 be the (1 −α/ 2) quantile of the standard normal distribution. The pointwise 100(1 −α)% confidence interval is 
+
+bτ (t) ± z1−α/ 2
+
+bσ(t)
+
+√n , t ∈ T .
+
+These intervals are not adjusted for multiplicity across t and are best interpreted for a small number of pre-specified locations. 10 4.3 Confidence Bands 
+
+To obtain SCBs, we approximate the distribution of the studentized supremum sup t∈T 
+
+√n |bτ (t) −
+
+τ0(t)|/σ (t) using a multiplier bootstrap built from bϕi(·). Let {ξi}ni=1 be i.i.d. multipliers independent of the data with E(ξi) = 0 and E(ξ2 
+
+> i
+
+) = 1 (e.g., Rademacher or standard normal). Define 
+
+G∗(t) = 1
+
+√n
+
+> n
+
+X
+
+> i=1
+
+ξi { bϕi(t) − ¯bϕ(t)}, t ∈ T . (10) On the evaluation grid {tm}Mm=1 , set the studentized maximum 
+
+T ∗ = max 
+
+> 1≤m≤M
+
+G∗(tm)
+
+bσ(tm) ,
+
+with the convention that very small bσ(tm) values are truncated away from zero in computation. Repeating this procedure for b = 1 , . . . , B draws yields {T ∗(b)}Bb=1 , and we let bc1−α be the empirical (1 − α) quantile of these maxima. The resulting (1 − α) equal-precision SCB is 
+
+C1−α(t) = 
+
+hbτ (t) ± bc1−αbσ(t)/√n
+
+i
+
+, t ∈ T . (11) 
+
+Assumption 6 (Multiplier approximation) . For the studentized multiplier process in (10) , the conditional distribution of 
+
+T ∗∞ = sup 
+
+> t∈T
+
+|G∗(t)/bσ(t)|
+
+consistently approximates the distribution of sup t∈T |Z(t)/σ (t)|, in the sense that the corresponding conditional Kolmogorov distance converges to zero in probability. This high-level condition is implied by standard multiplier central limit, Gaussian approximation, and anti-concentration conditions for suprema under the regularity assumptions above. 
+
+Theorem 4 (Validity of uniform confidence bands) . Assume the conditions of Theorem 3 so that 
+
+√n (bτ − τ0) ⇒ Z in ℓ∞(T ) for a tight mean-zero Gaussian process Z. Let σ2(t) = C(t, t ) and assume inf t∈T σ(t) > 0 and sup t∈T |bσ(t) − σ(t)| = op(1) . Assume that the distribution function of 
+
+sup t∈T |Z(t)/σ (t)| is continuous at its 100(1 − α)% quantile. Assume further that Assumption 6 holds. Finally, assume that the evaluation grid has mesh size tending to zero and approximates the supremum of the studentized process, i.e., 
+
+sup 
+
+> t∈T
+
+√n{bτ (t) − τ0(t)}
+
+bσ(t) − max 
+
+> 1≤m≤M
+
+√n{bτ (tm) − τ0(tm)}
+
+bσ(tm) = op(1) .
+
+Then the band (11) satisfies 
+
+P
+
+
+
+τ0(t) ∈ C 1−α(t) ∀t ∈ T 
+
+
+
+→ 1 − α. 
+
+4.4 Algorithm 
+
+We summarize the implementation as an explicit procedure. All function-valued objects are eval-uated on a dense grid {tm}Mm=1 ⊂ T , and the supremum in the bootstrap critical value is approxi-mated by a maximum over grid points. In practice, to avoid unstable weights in (7), we recommend clipping the estimated propensity scores to [ c, 1 − c] for a small c > 0, consistent with Assump-tion 2; the bootstrap repetition number B should be chosen large enough to stabilize the empirical quantile. 11 Algorithm 1 Cross-fitted DR estimation and uniform confidence bands  
+
+> 1:
+
+Input: data {(Di, X i, d∆Y i(·)) }ni=1 (with d∆Y i reconstructed if needed), number of folds K, grid 
+
+{tm}Mm=1 , bootstrap repetitions B, clipping constant c ∈ (0 , 1/2), nominal level α ∈ (0 , 1).  
+
+> 2:
+
+Randomly partition {1, . . . , n } into K disjoint folds {I k}Kk=1 . 
+
+> 3:
+
+Set bp ← n−1 Pni=1 Di. 
+
+> 4:
+
+for k = 1 , . . . , K do  
+
+> 5:
+
+Fit bπ(−k)(·) on {i / ∈ I k} using a probabilistic classifier for D on X. 
+
+> 6:
+
+Clip bπ(−k)(x) ← min {1 − c, max( c, bπ(−k)(x)) }. 
+
+> 7:
+
+Fit bμ(−k) 
+
+> a
+
+(·)( tm) on {i / ∈ I k, D i = a} by regressing d∆Y i(tm) on Xi, for a ∈ { 0, 1} and all 
+
+m = 1 , . . . , M . 
+
+> 8:
+
+for each i ∈ I k and each m = 1 , . . . , M do  
+
+> 9:
+
+Compute the score contribution bψi(tm) ← ψ(Wi; bη(−k))( tm) using (7) with p = bp and ∆Yi(tm) = d∆Y i(tm).  
+
+> 10:
+
+end for  
+
+> 11:
+
+end for  
+
+> 12:
+
+Compute bτ (tm) ← n−1 Pni=1 bψi(tm) for all m = 1 , . . . , M . 
+
+> 13:
+
+Compute ratio-corrected influence contributions bϕi(tm) ← bψi(tm) − Dibτ (tm)/bp for all i, m . 
+
+> 14:
+
+Estimate bσ2(tm) ← n−1 Pni=1 { bϕi(tm) − ¯bϕ(tm)}2 for all m. 
+
+> 15:
+
+for b = 1 , . . . , B do  
+
+> 16:
+
+Draw i.i.d. multipliers ξ(b)1 , . . . , ξ (b) 
+
+> n
+
+with E(ξ) = 0 and Var( ξ) = 1 (e.g., Rademacher or standard normal).  
+
+> 17:
+
+Compute G∗(b)(tm) ← n−1/2 Pni=1 ξ(b) 
+
+> i
+
+{ bϕi(tm) − ¯bϕ(tm)} for all m = 1 , . . . , M . 
+
+> 18:
+
+Compute T ∗(b) ← max 1≤m≤M G∗(b)(tm)/bσ(tm) . 
+
+> 19:
+
+end for  
+
+> 20:
+
+Set bc1−α ← empirical (1 − α) quantile of {T ∗(b)}Bb=1 . 
+
+> 21:
+
+Output: estimator bτ (tm) and SCB bτ (tm) ± bc1−αbσ(tm)/√n for m = 1 , . . . , M .
+
+## 5 Simulation Study 
+
+This section evaluates the finite-sample performance of the proposed cross-fitted doubly robust (CF–DR) estimator and its inference procedures for the functional ATT curve τ0(·). The simulation design reflects key features of the empirical setting targeted by this paper: (i) observational two-period DiD with covariate confounding, (ii) flexible nuisance components that may be misspecified under simple parametric models, and (iii) discretely observed noisy functional outcomes requiring a reconstruction step. We report estimation error, pointwise interval coverage, and uniform confidence band (SCB) coverage, highlighting the practical benefits of orthogonalization and sample splitting (Bang and Robins, 2005; Chernozhukov et al., 2018). 
+
+5.1 Data Generation 
+
+5.1.1 Covariates and Treatment 
+
+In each replication, we generate n i.i.d. units with baseline covariates Xi = ( Xi1, . . . , X ip )⊤ ∈ Rp.Unless otherwise stated, we set p = 20 and generate Xi ∼ N (0 , ΣX ) with (Σ X )jk = 0 .3|j−k|.Treatment-group membership Di ∈ { 0, 1} is generated from a nonlinear logistic propensity score 
+
+π0(Xi) = P(Di = 1 | Xi) = Λ  γ0 + γ1Xi1 + γ2Xi2 + γ3Xi3 + γ4Xi1Xi2 + γ5 sin( Xi4),
+
+12 where Λ( u) = exp( u){1+exp( u)}−1 and ( γ1, . . . , γ 5) = (0 .8, 0.6, −0.6, 0.5, 0.5). We choose γ0 so that 
+
+P(D = 1) ≈ 0.5. This mechanism induces confounding through both linear and nonlinear features and thus stresses nuisance estimation beyond simple parametric specifications. In implementation, we clip estimated propensity scores to [ c, 1−c] with c = 0 .01 to avoid ill-posed weighting in scenarios with near-violations of overlap. 
+
+5.1.2 Two-period Functional Outcomes under No Treatment 
+
+We take T = [0 , 1] and generate smooth functional outcomes via a low-rank factor representation. Let {φk}Kk=1 be orthonormal basis functions on T (Fourier bases in implementation). Draw in-dependent coefficients ξik ∼ N (0 , λ k) with ( λ1, . . . , λ K ) = (1 , 0.5, 0.25 , 0.15 , 0.1) and K = 5, and define a latent functional random effect 
+
+Ui(t) = 
+
+> K
+
+X
+
+> k=1
+
+ξik φk(t), t ∈ T .
+
+This yields heterogeneous baseline shapes and within-curve dependence, standard in FDA simula-tion designs (Ramsay and Silverman, 2005; Hsing and Eubank, 2015). Untreated potential outcomes follow an additive two-period structure: 
+
+Y 0
+
+> i0
+
+(t) = m0(t) + X⊤ 
+
+> i
+
+β0(t) + Ui(t), Y 0
+
+> i1
+
+(t) = Y 0
+
+> i0
+
+(t) + g(t) + X⊤ 
+
+> i
+
+β∆(t) + Vi(t),
+
+where m0(t) is a baseline mean curve, g(t) is a common time shock, β0(t) and β∆(t) are p-dimensional coefficient functions, and Vi(t) is an innovation process independent of ( Xi, D i) gener-ated as a K-term expansion with smaller variances (0 .25 λk)). This implies ∆Y 0 
+
+> i
+
+(t) = Y 0
+
+> i1
+
+(t) − Y 0
+
+> i0
+
+(t) = g(t) + X⊤ 
+
+> i
+
+β∆(t) + Vi(t),
+
+so that covariates can affect untreated trends. The design is constructed so that the covariate-adjusted functional parallel trends condition holds: for all t ∈ T ,
+
+E{∆Y 0 
+
+> i
+
+(t) | Xi, D i = 1 } = E{∆Y 0 
+
+> i
+
+(t) | Xi, D i = 0 }.
+
+This mirrors the identification conditions used in the main text (Section 2.3). 
+
+5.1.3 Treatment Effects in the Post Period and Target Estimand 
+
+Treatment is implemented only in the post period. We impose no anticipation: Y 1
+
+> i0
+
+(·) = Y 0
+
+> i0
+
+(·)almost surely. Post-treatment outcomes satisfy 
+
+Y 1
+
+> i1
+
+(t) = Y 0
+
+> i1
+
+(t) + τi(t).
+
+The target is the functional ATT curve 
+
+τ0(t) = E{Y 1
+
+> i1
+
+(t) − Y 0
+
+> i1
+
+(t) | Di = 1 } = E{τi(t) | Di = 1 }, t ∈ T .
+
+We consider two representative effect shapes: 
+
+τ (S) (t) = 0 .6 sin(2 πt ), τ (B) (t) = 0 .8 exp 
+
+
+
+− (t − 0.30) 2
+
+2 · 0.06 2
+
+
+
+− 0.6 exp 
+
+
+
+− (t − 0.75) 2
+
+2 · 0.08 2
+
+
+
+,
+
+where τ (S) is globally smooth and oscillatory, while τ (B) contains a localized positive “bump” and a negative “dip”, representing effects concentrated on subregions of T . To examine heterogeneity, in selected scenarios we set 
+
+τi(t) = τ (t){1 + 0 .4 tanh( Xi1)},
+
+so that selection into D = 1 alters the conditional average effect, emphasizing the ATT interpreta-tion. 13 5.2 Discrete Observation and Reconstruction 
+
+To emulate functional measurement, we do not observe YiT (·) directly. Instead, for each T ∈ { 0, 1}
+
+we observe noisy samples 
+
+ZiT j = YiT (tiT j ) + εiT j , j = 1 , . . . , m iT ,
+
+with εiT j ∼ N (0 , σ 2 
+
+> ε
+
+) independent across ( i, T, j ). We study two observation regimes. In the dense regime, we set miT = M and tiT j = tj = ( j − 1) /(M − 1) with M = 101. Each curve is reconstructed using penalized cubic B-splines with a second-derivative roughness penalty, selecting the smoothing parameter by GCV, as in standard FDA practice (Ramsay and Silverman, 2005). In the sparse regime, we draw miT ∈ { 10 , 15 , 20 } uniformly at random and sample tiT j iid 
+
+∼ Unif(0 , 1), then sort them. Curves are reconstructed using FPCA/PACE-type methods that pool information across subjects and exploit an estimated covariance structure (Yao et al., 2005; Horv´ ath and Kokoszka, 2012). The sparse regime probes sensitivity to reconstruction under irregular and noisy sampling. After reconstruction we compute d∆Y i(·) = bYi1(·) − bYi0(·) and run all causal estimators with ∆Yi replaced by d∆Y i. We vary σε ∈ { 0.1, 0.3} to assess robustness to measurement noise. 
+
+5.3 Estimators and nuisance learners 
+
+We compare the following estimators of τ0(·), evaluated on the grid {tm}Mm=1 .
+
+• Proposed CF–DR (ours). We implement the cross-fitted doubly robust estimator based on the Neyman-orthogonal score and K = 5 sample splits. The design follows the orthogonal-score template for semiparametric inference with flexible nuisance learning (Chernozhukov et al., 2018). 
+
+• Cross-fitted plug-in regression (OR). We estimate μa(x)( t) = E{∆Y (t) | X = x, D = a}
+
+and compute the regression representation by averaging bμ1(Xi)( t) − bμ0(Xi)( t) over treated units. This isolates sensitivity to outcome-regression specification. 
+
+• Inverse probability weighting (IPW). We implement the weighting representation using 
+
+bπ(X) with clipping. This isolates sensitivity to propensity estimation and overlap. 
+
+• Naive DiD without covariate adjustment. We compute bτnaive (t) = ¯∆Y 1(t) − ¯∆Y 0(t). This estimator is generally biased when untreated trends depend on X and X differs across groups. 
+
+• Oracle benchmark. For reference we report an oracle estimator that uses the true π0 and the true conditional means μa under the data generation, and uses the latent (noise-free) ∆ Y (·). This benchmark isolates intrinsic sampling variability from nuisance and reconstruction errors. We consider two nuisance-learning regimes: (a) Parametric models (logistic regression for π and linear models for basis coefficients in a spline expansion for ∆ Y ), and (b) Flexible models (random forests for π and random-forest regression for basis coefficients). The flexible regime is intended to match the orthogonal-score motivation: nuisance learners may converge slower than n−1/2, yet the CF–DR estimator can remain first-order valid under product-rate conditions (Chernozhukov et al., 2018). 14 5.4 Inference and Performance 
+
+For each estimator we compute pointwise confidence intervals using influence-function-based stan-dard errors. For CF–DR we also construct SCBs using the multiplier bootstrap described in Sec-tion 4, with B = 1000 bootstrap draws and standard-normal multipliers. The SCB targets global coverage over T and is motivated by Gaussian approximation for suprema (Chernozhukov et al., 2014); related SCB constructions in FDA include Degras (2011) and Liebl and Reimherr (2023). We focus SCB reporting on CF–DR, since OR and IPW can exhibit first-order instability under nuisance misspecification or poor overlap. Let {tm}Mm=1 be the evaluation grid. For each replication, we summarize the estimation error curve by the average bias (Bias) and Mean Absolute Bias (MAB), Bias = 1
+
+M
+
+> M
+
+X
+
+> m=1
+
+{bτ (tm) − τ0(tm)}, MAB = 1
+
+M
+
+> M
+
+X
+
+> m=1
+
+bτ (tm) − τ0(tm) ,
+
+and ISE = 1
+
+M
+
+> M
+
+X
+
+> m=1
+
+{bτ (tm) − τ0(tm)}2, SupErr = max  
+
+> 1≤m≤M
+
+bτ (tm) − τ0(tm) .
+
+The tables report Monte Carlo averages of these four quantities. We also use pointwise RMSE curves in the figures to show where along the functional domain the largest errors occur. For pointwise inference we report empirical coverage at representative locations (e.g., t ∈{0.25 , 0.50 , 0.75 }) and average pointwise width. For uniform inference we report SCB coverage 
+
+dCov SCB = 1
+
+R
+
+> R
+
+X
+
+> r=1
+
+I
+
+n
+
+τ0(tm) ∈ C (r)1−α(tm) ∀m = 1 , . . . , M 
+
+o
+
+,
+
+and the average band width M −1 PMm=1 Width( tm). These metrics quantify whether the SCB achieves nominal global coverage and whether it is informative (not overly conservative). 
+
+5.5 Scenarios 
+
+We use a factorial design across sample size, overlap strength, nuisance complexity, and observation regime. Unless otherwise stated, we set α = 0 .05, K = 5 folds, and evaluate curves on M = 101 equally spaced points in T = [0 , 1]. Sample sizes are n ∈ { 200 , 400 , 800 }, and we use R = 200 Monte Carlo replications. Table 1: Simulation scenarios. Scenario Effect shape Nuisance regime Observation regime Noise/overlap S1 τ (S) parametric (well-specified) dense grid ( M = 101) σε = 0 .1S2 τ (B) misspecified propensity, parametric outcome dense grid σε = 0 .1S3 τ (B) flexible ML dense grid σε = 0 .3S4 τ (B) flexible ML sparse irregular σε = 0 .3S5 heterogeneous τi flexible ML dense grid σε = 0 .1S6 τ (B) flexible ML dense grid poor overlap (stronger γ)We focus on six representative scenarios that isolate the principal phenomena. Table 1 sum-marizes the design. Scenario S2 deliberately misspecifies the parametric propensity model while keeping the outcome regression parametric; Scenario S4 probes reconstruction sensitivity under 15 sparse noisy sampling; Scenario S6 amplifies the propensity-score linear predictor (multiplying (γ1, . . . , γ 5) by 1 .5) to create near-violations of overlap, where clipping becomes essential and naive IPW can become unstable. 
+
+5.6 Results 
+
+We present the Monte Carlo results in two complementary formats. Tables 2–4 summarize scalar accuracy and inferential performance for n = 200 , 400 , 800, while Figures 1–9 show how the estima-tors behave over the functional domain. All numerical entries are based on R = 200 Monte Carlo replications. Tables 2 and 3 report Bias, MAB, ISE, and SupErr. The four metrics are intentionally read together. Bias captures the average signed error and can be close to zero even when positive and negative curve errors cancel. MAB, ISE, and SupErr are therefore more informative about curve-level accuracy. Across the feasible estimators, CF–DR is the most stable method overall: it is not uniformly best in every simple design, but it gives the smallest MAB, ISE, and SupErr in most of the complex settings and its errors decrease systematically as n increases. Table 2: Estimation accuracy in dense-grid scenarios (S1–S3). 
+
+Bias MAB ISE SupErr Scenario Method n = 200 n = 400 n = 800 n = 200 n = 400 n = 800 n = 200 n = 400 n = 800 n = 200 n = 400 n = 800 S1 CF–DR −0.0145 −0.0056 0.0040 0.1792 0.1149 0.0694 0.0568 0.0223 0.0077 0.3625 0.2333 0.1408 S1 OR −0.0056 −0.0006 −0.0007 0.1262 0.0883 0.0560 0.0255 0.0120 0.0049 0.2558 0.1804 0.1135 S1 IPW −0.0306 −0.0164 0.0009 0.1837 0.1206 0.0748 0.0735 0.0276 0.0092 0.3789 0.2554 0.1559 S1 Naive DiD −0.0017 −0.0032 −0.0011 0.2109 0.2037 0.1974 0.0666 0.0609 0.0565 0.4369 0.4150 0.3929 S1 Oracle −0.0071 −0.0090 0.0050 0.1268 0.0930 0.0619 0.0297 0.0150 0.0067 0.2552 0.1882 0.1246 S2 CF–DR −0.0058 0.0013 −0.0007 0.1434 0.0876 0.0653 0.0329 0.0122 0.0066 0.3072 0.1973 0.1524 S2 OR −0.0007 −0.0004 0.0014 0.1310 0.0830 0.0604 0.0271 0.0109 0.0057 0.2822 0.1896 0.1425 S2 IPW −0.0033 0.0073 0.0056 0.1210 0.0833 0.0683 0.0235 0.0112 0.0072 0.2639 0.1965 0.1629 S2 Naive DiD −0.0030 0.0005 0.0007 0.2093 0.2033 0.1987 0.0648 0.0607 0.0574 0.4512 0.4299 0.4221 S2 Oracle −0.0046 0.0164 0.0015 0.1167 0.0957 0.0712 0.0265 0.0193 0.0096 0.2331 0.1885 0.1440 S3 CF–DR 0.0068 0.0078 0.0027 0.1248 0.0927 0.0718 0.0247 0.0137 0.0082 0.2909 0.2256 0.1834 S3 OR 0.0080 0.0074 0.0026 0.1405 0.1094 0.0872 0.0314 0.0187 0.0119 0.3304 0.2631 0.2165 S3 IPW 0.0132 0.0195 0.0204 0.1541 0.1313 0.1153 0.0365 0.0261 0.0200 0.3594 0.3109 0.2827 S3 Naive DiD 0.0036 0.0062 0.0025 0.2078 0.2016 0.1985 0.0648 0.0595 0.0575 0.4639 0.4381 0.4265 S3 Oracle 0.0056 0.0119 0.0026 0.1231 0.0823 0.0682 0.0302 0.0117 0.0083 0.2468 0.1674 0.1383 
+
+Table 3: Estimation accuracy in challenging scenarios (S4–S6). 
+
+Bias MAB ISE SupErr Scenario Method n = 200 n = 400 n = 800 n = 200 n = 400 n = 800 n = 200 n = 400 n = 800 n = 200 n = 400 n = 800 S4 CF–DR −0.0042 0.0018 0.0009 0.1825 0.1567 0.1428 0.0495 0.0355 0.0287 0.4284 0.3673 0.3361 S4 OR −0.0043 0.0008 0.0003 0.1924 0.1651 0.1490 0.0544 0.0390 0.0308 0.4372 0.3737 0.3373 S4 IPW 0.0034 0.0152 0.0166 0.2059 0.1829 0.1697 0.0610 0.0471 0.0398 0.4570 0.4008 0.3668 S4 Naive DiD −0.0052 0.0008 −0.0010 0.2558 0.2493 0.2482 0.0905 0.0824 0.0797 0.5332 0.5023 0.4927 S4 Oracle −0.0026 0.0031 −0.0035 0.1305 0.0836 0.0634 0.0348 0.0123 0.0066 0.2612 0.1708 0.1290 S5 CF–DR −0.0016 0.0019 −0.0043 0.1206 0.0924 0.0714 0.0237 0.0136 0.0080 0.2866 0.2193 0.1772 S5 OR 0.0006 0.0010 −0.0042 0.1368 0.1088 0.0877 0.0302 0.0187 0.0118 0.3265 0.2548 0.2116 S5 IPW 0.0070 0.0140 0.0142 0.1495 0.1303 0.1153 0.0351 0.0257 0.0197 0.3509 0.3052 0.2777 S5 Naive DiD −0.0011 −0.0021 −0.0028 0.2040 0.2020 0.1983 0.0630 0.0597 0.0572 0.4526 0.4332 0.4214 S5 Oracle 0.0127 −0.0050 −0.0032 0.1332 0.0911 0.0649 0.0380 0.0167 0.0077 0.2729 0.1794 0.1328 S6 CF–DR −0.0042 −0.0011 0.0006 0.1483 0.1165 0.0945 0.0344 0.0210 0.0137 0.3374 0.2681 0.2249 S6 OR −0.0018 −0.0013 0.0005 0.1684 0.1376 0.1153 0.0443 0.0290 0.0200 0.3802 0.3132 0.2660 S6 IPW 0.0167 0.0268 0.0324 0.1806 0.1600 0.1490 0.0496 0.0377 0.0320 0.4027 0.3673 0.3466 S6 Naive DiD −0.0036 0.0008 −0.0010 0.2473 0.2422 0.2438 0.0907 0.0853 0.0861 0.5256 0.5119 0.5040 S6 Oracle −0.0114 −0.0044 0.0070 0.1535 0.1228 0.0879 0.0526 0.0305 0.0143 0.3112 0.2459 0.1769 
+
+Table 2 shows the dense-grid scenarios. In S1, where the outcome model is correctly specified and the design is comparatively simple, OR has the smallest feasible-estimator error for all three sample sizes. For example, at n = 800 its MAB is 0.0560 compared with 0.0694 for CF–DR. This 16 is expected: a correctly specified low-dimensional regression can be more efficient because it does not pay the finite-sample cost of estimating and combining both nuisance components. S2 is less clear-cut, with IPW best at n = 200 and OR slightly better at larger sample sizes. The more important dense result is S3, where flexible nuisance structure and a nonlinear effect shape make CF–DR the best feasible method across all sample sizes. Its ISE falls from 0.0247 at n = 200 to 0.0082 at n = 800, while OR and IPW remain larger. Table 3 contains the more challenging designs. S4 should be read primarily as a reconstruction-stress scenario rather than as a setting designed to show dominance of one causal estimator. Sparse noisy functional observations raise the error of every feasible estimator because reconstruction smooths and attenuates the localized bump–dip signal before the causal adjustment step is applied. This is consistent with the theoretical requirement that reconstruction error be asymptotically negligible, of order smaller than n−1/2, for first-order inference to be unaffected. In S5 and S6, which emphasize heterogeneous effects and weaker overlap under dense observation, CF–DR dominates OR and IPW across MAB, ISE, and SupErr for all three sample sizes. Naive DiD is consistently the least accurate non-oracle method in both dense and challenging designs. Its Bias can look small because positive and negative errors cancel, but its MAB, ISE, and SupErr remain large, showing substantial curve-level distortion. The oracle estimator provides a useful benchmark but is not implementable, because it uses true nuisance components. It generally has the smallest error, especially as n grows, and therefore indicates the finite-sample gap remaining after nuisance estimation and curve reconstruction. The main accuracy message is that CF–DR stays close to the best feasible estimator in simple settings and becomes clearly stronger in the complex dense-observation settings S3, S5, and S6. S4 plays a different role: it isolates the finite-sample impact of sparse noisy reconstruction, which can affect all feasible causal estimators before the causal adjustment step is even applied. Table 4 reports pointwise coverage at t = 0 .25 , 0.50 , 0.75 and average pointwise interval width for all estimators, again with separate columns for n = 200 , 400 , 800. SCB coverage and average band width are reported for CF–DR only, since the simultaneous band is constructed from the CF–DR influence function. The pointwise coverage results clarify the trade-off between point estimation and uncertainty quantification. OR intervals are often much too narrow, especially in S3–S6, leading to severe under-coverage despite reasonable point estimates in some scenarios. IPW sometimes attains good pointwise coverage, but it does so with wider intervals and worse point-estimation error in the complex settings. Naive DiD can have coverage equal to zero at selected time points. A value such as 0.00 means that, across the 200 replications, the nominal pointwise interval never covered the true effect at that location. This occurs because Naive DiD ignores the covariate-dependent untreated trend X⊤ 
+
+> i
+
+β∆(t); the resulting systematic bias can shift the interval away from the truth, particularly near the bump and dip regions of the effect curve. CF–DR provides more balanced pointwise inference than OR and Naive DiD. In S1 and S2, its pointwise coverage is generally close to the nominal level and its average interval width decreases substantially with n. For example, in S1 the average pointwise width falls from 0.707 at n = 200 to 0.318 at n = 800. Coverage is less satisfactory in S3, S5, and S6 at t = 0 .25 and t = 0 .75, where the target curve has high curvature and the nuisance/overlap difficulty is more pronounced. The SCB results are more demanding. CF–DR simultaneous coverage is acceptable in the easier dense settings but deteriorates in S4 and S6, where sparse reconstruction and weak overlap leave residual bias that is not fully absorbed by the band. Oracle pointwise coverage is generally closest to nominal because it uses true nuisance information; it is therefore included only as an infeasible benchmark. Figures 1–9 provide curve-level diagnostics that complement the scalar summaries. Since the 17 Table 4: Inferential performance. Pointwise coverage and interval width are reported for all estimators; SCB coverage and band width are reported for CF–DR only. Entries are Monte Carlo averages over 200 replications. 
+
+> Cov. (0.25)  Cov. (0.50)  Cov. (0.75)  Avg. CI width  SCB cov.  Avg. band width Scenario  Method  n = 200  n = 400  n = 800  n = 200  n = 400  n = 800  n = 200  n = 400  n = 800  n = 200  n = 400  n = 800  n = 200  n = 400  n = 800  n = 200  n = 400  n = 800 S1  CF–DR  0.920  0.850  0.940  0.870  0.890  0.945  0.895  0.915  0.905  0.707  0.467  0.318  0.850  0.835  0.910  0.957  0.635  0.433 S1  OR  0.570  0.325  0.295  0.580  0.375  0.300  0.565  0.390  0.280  0.257  0.114  0.055  – – – – – –S1  IPW  0.930  0.905  0.965  0.955  0.970  0.970  0.950  0.940  0.955  0.881  0.574  0.386  – – – – – –S1  Naive DiD  0.175  0.040  0.000  0.955  0.960  0.960  0.200  0.015  0.000  0.438  0.309  0.219  – – – – – –S1  Oracle  0.970  0.960  0.965  0.935  0.955  0.965  0.940  0.965  0.950  0.602  0.432  0.304  – – – – – –S2  CF–DR  0.875  0.905  0.860  0.885  0.925  0.890  0.885  0.895  0.885  0.597  0.387  0.260  0.790  0.830  0.740  0.814  0.529  0.357 S2  OR  0.555  0.380  0.250  0.510  0.415  0.320  0.575  0.450  0.310  0.254  0.116  0.055  – – – – – –S2  IPW  0.900  0.885  0.815  0.965  0.975  0.985  0.940  0.940  0.960  0.594  0.416  0.292  – – – – – –S2  Naive DiD  0.105  0.005  0.000  0.935  0.935  0.950  0.255  0.030  0.000  0.436  0.310  0.219  – – – – – –S2  Oracle  0.965  0.970  0.950  0.945  0.970  0.965  0.940  0.955  0.940  0.555  0.463  0.331  – – – – – –S3  CF–DR  0.695  0.590  0.455  0.965  0.955  0.920  0.820  0.840  0.770  0.449  0.316  0.223  0.655  0.540  0.380  0.632  0.444  0.314 S3  OR  0.050  0.035  0.030  0.180  0.230  0.175  0.165  0.080  0.075  0.082  0.055  0.037  – – – – – –S3  IPW  0.445  0.180  0.030  0.985  0.950  0.970  0.730  0.550  0.370  0.470  0.331  0.233  – – – – – –S3  Naive DiD  0.160  0.010  0.000  0.960  0.950  0.970  0.285  0.040  0.000  0.442  0.311  0.221  – – – – – –S3  Oracle  0.955  0.970  0.940  0.970  0.965  0.950  0.965  0.960  0.950  0.584  0.414  0.322  – – – – – –S4  CF–DR  0.920  0.865  0.715  0.925  0.870  0.765  0.905  0.805  0.580  0.558  0.397  0.281  0.365  0.020  0.000  0.778  0.552  0.392 S4  OR  0.290  0.215  0.180  0.205  0.180  0.155  0.305  0.205  0.140  0.102  0.069  0.046  – – – – – –S4  IPW  0.940  0.925  0.895  0.930  0.880  0.680  0.975  0.985  0.950  0.571  0.402  0.284  – – – – – –S4  Naive DiD  0.825  0.625  0.450  0.930  0.875  0.800  0.875  0.785  0.605  0.542  0.382  0.271  – – – – – –S4  Oracle  0.955  0.975  0.950  0.945  0.950  0.955  0.970  0.965  0.965  0.616  0.415  0.311  – – – – – –S5  CF–DR  0.700  0.575  0.460  0.930  0.935  0.925  0.800  0.750  0.690  0.451  0.316  0.223  0.695  0.580  0.440  0.626  0.438  0.309 S5  OR  0.075  0.020  0.010  0.235  0.170  0.160  0.175  0.140  0.050  0.099  0.068  0.045  – – – – – –S5  IPW  0.460  0.115  0.025  0.975  0.980  0.960  0.720  0.525  0.250  0.477  0.333  0.235  – – – – – –S5  Naive DiD  0.175  0.010  0.000  0.940  0.890  0.920  0.290  0.050  0.000  0.447  0.315  0.222  – – – – – –S5  Oracle  0.975  0.965  0.960  0.975  0.945  0.965  0.965  0.935  0.955  0.620  0.429  0.321  – – – – – –S6  CF–DR  0.455  0.430  0.270  0.890  0.875  0.870  0.645  0.580  0.525  0.445  0.320  0.228  0.470  0.340  0.150  0.620  0.445  0.316 S6  OR  0.035  0.030  0.000  0.225  0.215  0.210  0.075  0.050  0.030  0.086  0.061  0.041  – – – – – –S6  IPW  0.170  0.030  0.000  0.950  0.920  0.890  0.460  0.270  0.075  0.451  0.318  0.224  – – – – – –S6  Naive DiD  0.035  0.000  0.000  0.940  0.925  0.910  0.075  0.000  0.000  0.434  0.308  0.218  – – – – – –S6  Oracle  0.945  0.975  0.980  0.955  0.955  0.965  0.955  0.970  0.935  0.720  0.566  0.401  – – – – – –
+
+18 small representative plots duplicate panels already shown in the full scenario grids, we focus on the all-scenario figures for n = 200 , 400 , 800. The sequence of CF–DR figures shows the expected sample-size pattern: the average bands narrow and the mean curves become more stable as n
+
+increases. S1 and S2 are visually the easiest cases; S3, S5, and S6 retain the bump–dip structure but show larger deviations near local extrema, where the target curve changes rapidly. S4 has a different interpretation. Across n = 200 , 400 , 800, the CF–DR curve in S4 is visibly smoother than the truth and the positive bump is attenuated. The method-comparison and RMSE figures show that this is not a failure unique to CF–DR: OR, IPW, and Naive DiD are also affected because all feasible estimators use reconstructed functional outcomes. Thus S4 illustrates the role of the reconstruction condition in the theory. When the reconstruction error is large relative to the sampling error, it propagates into the causal estimators and the simultaneous bands; the orthogonal score protects against nuisance-estimation error, but it is not designed to eliminate first-order reconstruction bias. Figure 1: CF–DR estimates across all scenarios for n = 200. Each panel shows the true curve, the Monte Carlo mean of the CF–DR estimator, and the average simultaneous confidence band. 1.0                 
+
+> 0.5
+> 0.0
+> 0.5
+> 1.0
+> S1, n=200
+> True
+> CF-DR
+> S2, n=200 S3, n=200
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> 1.0
+> 0.5
+> 0.0
+> 0.5
+> 1.0
+> S4, n=200
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> S5, n=200
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> S6, n=200
+> t
+> ATT(t)
+
+Figures 4–6 compare all estimators across sample sizes. Naive DiD displays the most systematic shape distortion because it ignores covariate-driven untreated trends. OR performs well in S1 and S2 but is less reliable when nuisance structure, treatment-effect heterogeneity, or overlap become more demanding. IPW captures the broad shape in some panels but is generally more variable and less accurate in S3, S5, and S6. CF–DR is therefore best interpreted as the most robust feasible estimator across the difficult dense designs, while S4 highlights the separate challenge introduced by sparse functional reconstruction. Figures 7–9 show where the errors occur along the domain. RMSE is largest near the local extrema of the effect curve, rather than on the flatter portions. This is especially clear in S3, S5, and S6, where the estimator must recover high-curvature bump–dip features. In S4 the RMSE 19 Figure 2: CF–DR estimates across all scenarios for n = 400. 1.0 
+
+0.5 
+
+0.0 
+
+0.5 
+
+1.0 
+
+S1, n=400 
+
+True 
+
+CF-DR 
+
+S2, n=400 S3, n=400 
+
+0.0 0.2 0.4 0.6 0.8 1.0 
+
+1.0 
+
+0.5 
+
+0.0 
+
+0.5 
+
+1.0 
+
+S4, n=400 
+
+0.0 0.2 0.4 0.6 0.8 1.0 
+
+S5, n=400 
+
+0.0 0.2 0.4 0.6 0.8 1.0 
+
+S6, n=400 
+
+t
+
+> ATT(t)
+
+Figure 3: CF–DR estimates across all scenarios for n = 800. 0.5 
+
+0.0 
+
+0.5 
+
+1.0 
+
+S1, n=800 
+
+True 
+
+CF-DR 
+
+S2, n=800 S3, n=800 
+
+0.0 0.2 0.4 0.6 0.8 1.0 
+
+0.5 
+
+0.0 
+
+0.5 
+
+1.0 
+
+S4, n=800 
+
+0.0 0.2 0.4 0.6 0.8 1.0 
+
+S5, n=800 
+
+0.0 0.2 0.4 0.6 0.8 1.0 
+
+S6, n=800 
+
+t
+
+> ATT(t)
+
+20 Figure 4: Monte Carlo mean curves for all estimators across scenarios for n = 200. 1.0 
+
+0.5 
+
+0.0 
+
+0.5 
+
+1.0 
+
+S1, n=200 
+
+> True
+> CF-DR
+> OR
+> IPW
+> NaiveDiD
+> Oracle
+
+S2, n=200 S3, n=200 
+
+0.0 0.2 0.4 0.6 0.8 1.0 
+
+1.0 
+
+0.5 
+
+0.0 
+
+0.5 
+
+1.0 
+
+S4, n=200 
+
+0.0 0.2 0.4 0.6 0.8 1.0 
+
+S5, n=200 
+
+0.0 0.2 0.4 0.6 0.8 1.0 
+
+S6, n=200 
+
+t
+
+> ATT(t)
+
+Figure 5: Monte Carlo mean curves for all estimators across scenarios for n = 400. 1.0 
+
+0.5 
+
+0.0 
+
+0.5 
+
+1.0 
+
+S1, n=400 
+
+> True
+> CF-DR
+> OR
+> IPW
+> NaiveDiD
+> Oracle
+
+S2, n=400 S3, n=400 
+
+0.0 0.2 0.4 0.6 0.8 1.0 
+
+1.0 
+
+0.5 
+
+0.0 
+
+0.5 
+
+1.0 
+
+S4, n=400 
+
+0.0 0.2 0.4 0.6 0.8 1.0 
+
+S5, n=400 
+
+0.0 0.2 0.4 0.6 0.8 1.0 
+
+S6, n=400 
+
+t
+
+> ATT(t)
+
+21 Figure 6: Monte Carlo mean curves for all estimators across scenarios for n = 800. 1.0 
+
+0.5 
+
+0.0 
+
+0.5 
+
+1.0 
+
+S1, n=800 
+
+> True
+> CF-DR
+> OR
+> IPW
+> NaiveDiD
+> Oracle
+
+S2, n=800 S3, n=800 
+
+0.0 0.2 0.4 0.6 0.8 1.0 
+
+1.0 
+
+0.5 
+
+0.0 
+
+0.5 
+
+1.0 
+
+S4, n=800 
+
+0.0 0.2 0.4 0.6 0.8 1.0 
+
+S5, n=800 
+
+0.0 0.2 0.4 0.6 0.8 1.0 
+
+S6, n=800 
+
+t
+
+> ATT(t)
+
+Figure 7: Pointwise RMSE curves across scenarios for n = 200. Errors are largest near the localized bump and dip, and the sparse noisy setting produces the largest reconstruction-driven errors. 0.10 
+
+0.15 
+
+0.20 
+
+0.25 
+
+0.30 
+
+0.35 
+
+0.40 
+
+S1, n=200 
+
+> CF-DR
+> OR
+> IPW
+> NaiveDiD
+
+0.10 
+
+0.15 
+
+0.20 
+
+0.25 
+
+0.30 
+
+0.35 
+
+0.40 
+
+S2, n=200 
+
+0.10 
+
+0.15 
+
+0.20 
+
+0.25 
+
+0.30 
+
+0.35 
+
+0.40 
+
+S3, n=200 
+
+0.0 0.2 0.4 0.6 0.8 1.0 
+
+0.1 
+
+0.2 
+
+0.3 
+
+0.4 
+
+0.5 
+
+S4, n=200 
+
+0.0 0.2 0.4 0.6 0.8 1.0 
+
+0.10 
+
+0.15 
+
+0.20 
+
+0.25 
+
+0.30 
+
+0.35 
+
+0.40 
+
+S5, n=200 
+
+0.0 0.2 0.4 0.6 0.8 1.0 
+
+0.1 
+
+0.2 
+
+0.3 
+
+0.4 
+
+0.5 
+
+S6, n=200 
+
+t
+
+> Pointwise RMSE
+
+22 Figure 8: Pointwise RMSE curves across scenarios for n = 400. 0.05 
+
+0.10 
+
+0.15 
+
+0.20 
+
+0.25 
+
+0.30 
+
+0.35 
+
+0.40 
+
+S1, n=400 
+
+> CF-DR
+> OR
+> IPW
+> NaiveDiD
+
+0.05 
+
+0.10 
+
+0.15 
+
+0.20 
+
+0.25 
+
+0.30 
+
+0.35 
+
+0.40 
+
+S2, n=400 
+
+0.10 
+
+0.15 
+
+0.20 
+
+0.25 
+
+0.30 
+
+0.35 
+
+0.40 
+
+S3, n=400 
+
+0.0 0.2 0.4 0.6 0.8 1.0 
+
+0.1 
+
+0.2 
+
+0.3 
+
+0.4 
+
+0.5 
+
+S4, n=400 
+
+0.0 0.2 0.4 0.6 0.8 1.0 
+
+0.10 
+
+0.15 
+
+0.20 
+
+0.25 
+
+0.30 
+
+0.35 
+
+0.40 
+
+S5, n=400 
+
+0.0 0.2 0.4 0.6 0.8 1.0 
+
+0.1 
+
+0.2 
+
+0.3 
+
+0.4 
+
+0.5 
+
+S6, n=400 
+
+t
+
+> Pointwise RMSE
+
+Figure 9: Pointwise RMSE curves across scenarios for n = 800. 0.05 
+
+0.10 
+
+0.15 
+
+0.20 
+
+0.25 
+
+0.30 
+
+0.35 
+
+S1, n=800 
+
+> CF-DR
+> OR
+> IPW
+> NaiveDiD
+
+0.1 
+
+0.2 
+
+0.3 
+
+0.4 
+
+S2, n=800 
+
+0.1 
+
+0.2 
+
+0.3 
+
+0.4 
+
+S3, n=800 
+
+0.0 0.2 0.4 0.6 0.8 1.0 
+
+0.1 
+
+0.2 
+
+0.3 
+
+0.4 
+
+0.5 
+
+S4, n=800 
+
+0.0 0.2 0.4 0.6 0.8 1.0 
+
+0.05 
+
+0.10 
+
+0.15 
+
+0.20 
+
+0.25 
+
+0.30 
+
+0.35 
+
+0.40 
+
+S5, n=800 
+
+0.0 0.2 0.4 0.6 0.8 1.0 
+
+0.1 
+
+0.2 
+
+0.3 
+
+0.4 
+
+0.5 
+
+S6, n=800 
+
+t
+
+> Pointwise RMSE
+
+23 is elevated over a broader portion of the domain, confirming that sparse reconstruction creates persistent functional error rather than isolated pointwise noise. The n = 800 figures are useful here because they show that increasing sample size improves sampling variability, but reconstruction-induced smoothing can remain visible when the observation process is sparse and noisy. Overall, the simulation results support the proposed CF–DR estimator as a robust and inference-oriented procedure, especially in settings involving flexible nuisance learning, heterogeneous treat-ment effects, and limited overlap. The expanded sample-size results show a clear convergence pattern, with CF–DR errors decreasing from n = 200 to n = 800 in every scenario. In the simpler parametric settings S1 and parts of S2, OR can be slightly more efficient, but CF–DR remains highly competitive: its MAB, ISE, and SupErr are close to the best feasible estimator and improve steadily as the sample size increases. This indicates that the proposed method retains the robust-ness advantages of orthogonalization, double robustness, and cross-fitting without sacrificing much accuracy in simple settings. The advantage of CF–DR becomes more evident in S3, S5, and S6, where nuisance functions are more complex, treatment effects are more heterogeneous, or overlap is weaker. In these realistic and challenging dense-observation settings, CF–DR generally achieves smaller curve-level errors than OR, IPW, and Naive DiD, and the figures show that it better preserves the main bump–dip structure of the target effect curve. S4 complements this message by showing that sparse noisy reconstruction is a distinct source of difficulty shared by all feasible causal estimators, which directly echoes the theoretical requirement that reconstruction error be negligible for first-order inference. Table 4 also shows that CF–DR provides more balanced uncertainty quantification than the main feasible alternatives. The method should therefore be interpreted as a robust and inference-oriented estimator rather than a uniformly minimum-error estimator in every finite-sample design. Taken together, Tables and Figures demonstrate that CF–DR offers a substantial practical advantage for functional DiD: it remains close to the best feasible estimator in simple cases, becomes clearly more reliable in complex causal designs, and gives an interpretable way to separate causal-estimation difficulty from reconstruction-driven functional error. 
+
+## 6 Application 
+
+6.1 London ULEZ and hourly NO 2 profiles 
+
+We apply the proposed functional DiD method to study changes in traffic-related nitrogen dioxide (NO 2) after the launch of the central London Ultra Low Emission Zone (ULEZ). 1 The central ULEZ began operating on April 8, 2019 and charged non-compliant vehicles entering the central zone (Gregg et al., 2025). Because road transport is a major contributor to urban NO 2, especially near roadside and kerbside monitors, the policy provides a natural empirical setting in which the treatment effect may vary systematically over the day rather than being adequately summarized by a scalar daily average. The application should be interpreted as an illustrative functional DiD analysis rather than a definitive policy evaluation, because the number of monitoring sites is small and residual spatial or serial dependence may remain. The outcome is the within-day NO 2 concentration profile, measured hourly from midnight to 11pm. Thus, for each monitoring-site day, the functional outcome is a 24-dimensional discretization of a daily curve, 
+
+Y (·) = {Y (0) , Y (1) , . . . , Y (23) }, 
+
+> 1Hourly air-quality monitoring data are available from the London Air Quality Network Data Download page at
+> https://www.londonair.org.uk/london/asp/datadownload.asp . Policy background is available from Transport for London at https://tfl.gov.uk/modes/driving/ultra-low-emission-zone .
+
+24 where Y (h) denotes NO 2 concentration at hour h, measured in μg/m3. The analysis uses London Air Quality Network monitoring data and focuses on traffic-related monitoring sites. The treated group consists of five central ULEZ traffic sites: CT6, MY1, WM6, WMA, and WMB. The control group consists of five traffic sites outside the central ULEZ comparison area: CR5, HV1, HV3, KT4, and RI1. Control sites were selected among traffic-related monitoring stations outside the central ULEZ area with available hourly NO 2 measurements over the same calendar windows. This choice keeps the monitor type comparable while avoiding direct exposure to the central-zone charge. We also use site metadata, including site type, local authority, latitude and longitude, and daily meteorological variables from historical weather data, including temperature, relative humidity, precipitation, wind speed, and wind direction. The main post-policy window is April 8 to June 30, 2019. For each post-policy date, we construct a matched pre-period date 84 days earlier. The functional response used in the DiD analysis is the hourly pre–post change, ∆Yi(h) = Yi, post (h) − Yi, pre (h), h = 0 , . . . , 23 .
+
+Baseline covariates include summaries of the pre-period NO 2 curve, namely the daily mean and morning, midday, and evening averages, together with weather changes between the matched pre and post dates, site type, month, weekday, and weekend indicators. Counting categorical variables before any internal expansion by the learning algorithm, the adjustment set contains 14 variables: four baseline NO 2 summaries, pre mean , pre morning , pre midday , and pre evening ; six mete-orological change variables, d temp mean , d rh mean , d precip sum , d wind mean , d wind u mean ,and d wind v mean ; one site-type variable, SiteType ; and three calendar variables, month , dow ,and weekend . These covariates are used to adjust for differences in baseline pollution levels, mete-orological conditions, monitoring-site characteristics, and calendar composition. 
+
+6.2 Estimators and empirical comparison 
+
+The empirical comparison focuses on three nuisance-based estimators: the proposed cross-fitted doubly robust estimator (CF–DR), an outcome-regression estimator (OR), and an inverse-probability-weighted estimator (IPW). All three estimators use the same observed covariate information and the same traffic-site sample. Nuisance functions are estimated flexibly using random forests with site-level cross-fitting. Propensity scores are clipped away from zero and one to avoid unstable weights, and uncertainty for the CF–DR curve is summarized using the site-cluster multiplier bootstrap described in Section 4. Let Di = 1 indicate a central ULEZ traffic site and let Xi denote the observed baseline pollution, meteorological, site, and calendar covariates. For each held-out fold, we estimate ˆ π(Xi), ˆ μ0(Xi)( h), and ˆ μ1(Xi)( h) using only the training folds, where 
+
+μa(x)( h) = E{∆Yi(h) | Xi = x, D i = a}, a ∈ { 0, 1}, h = 0 , . . . , 23 .
+
+With ˆ p = n−1 Pni=1 Di, the empirical CF–DR curve is computed hour-by-hour as ˆτCFDR (h) = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+ Di
+
+ˆp {∆Yi(h) − ˆμ0(Xi)( h)} − (1 − Di)ˆ π(Xi)ˆp{1 − ˆπ(Xi)} {∆Yi(h) − ˆμ0(Xi)( h)}
+
+
+
+. (12) 25 The two comparator curves are constructed from the same nuisance estimates: ˆτOR (h) = 1
+
+n1
+
+X
+
+> i:Di=1
+
+{ˆμ1(Xi)( h) − ˆμ0(Xi)( h)},
+
+ˆτIPW (h) = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+ Di
+
+ˆp ∆Yi(h) − (1 − Di)ˆ π(Xi)ˆp{1 − ˆπ(Xi)} ∆Yi(h)
+
+
+
+.
+
+Thus OR relies on the fitted conditional mean contrast, IPW relies on propensity-score reweighting, and CF–DR combines both pieces through the orthogonal score in (12). We do not include the raw Naive DiD estimator in the main empirical comparison. The reason is that Naive DiD does not use baseline functional outcomes, meteorological changes, monitoring-site characteristics, or calendar covariates, and therefore is not directly comparable to CF–DR, OR, and IPW as a nuisance-based estimator. In this application, the main goal is to compare methods that use the same observed covariate information but differ in how they combine outcome modeling and weighting. Naive DiD is better interpreted as a simple descriptive benchmark and is therefore excluded from the main method-comparison tables. Because the true treatment effect is unobserved in the empirical application, the main effect estimates themselves should not be ranked by magnitude. A more negative estimate is not auto-matically more accurate. We therefore report the estimated functional effects as descriptive policy estimates and evaluate method performance using falsification and stability diagnostics with clear directions of comparison. Placebo windows are constructed by shifting the pseudo-policy date to pre-ULEZ calendar windows and applying the same lagged matching rule between post and pre curves; the matched 2018 placebo uses the same April–June calendar window and 84-day lag as the main specification. Because no actual ULEZ treatment occurs in these placebo windows, the target functional effect is treated as zero. The resulting placebo estimates are used only as falsification diagnostics, not as formal proof of the identifying assumptions. The first four diagnostic columns in Table 6 are computed from these placebo windows: smaller absolute average bias, mean abso-lute bias, RMSE, and supremum error indicate less spurious functional effect. We also report the traffic-period signal divided by the placebo-window RMSE and the net traffic-period signal after subtracting the placebo-window RMSE; for these two diagnostics, larger values indicate that the policy-relevant traffic-period signal is stronger relative to falsification noise. 
+
+6.3 Results 
+
+We now summarize the empirical evidence from the London ULEZ application. The results are organized to first show the estimated functional effect over the daily NO 2 profile, and then to com-pare the stability and diagnostic performance of the feasible estimators through a set of empirical metrics. Table 5: Estimated effects on hourly NO 2 profiles. Entries are summaries of the estimated functional ATT curve in μg/m3.Method Average Minimum Maximum Morning Midday Evening CF–DR −6.516 −12.995 0.451 −6.114 −10.259 −8.203 OR −5.279 −8.980 −1.872 −4.051 −3.685 −6.874 IPW −9.064 −13.454 −1.961 −8.559 −9.812 −11.850 26 −10 −5 0         
+
+> 036912 15 18 21
+> Hour of day
+> Estimated effect ( μg/m 3 )
+> CF−−DR IPW OR
+> CF−−DR, OR, and IPW use the same observed covariates and nuisance−learning setup
+> Estimated ULEZ traffic−site NO2 effect curves
+
+Figure 10: Functional effect estimates for the London ULEZ traffic-site analysis. Points show hourly estimates and curves show smoothed daily profiles for visualization. Table 5 and Figure 10 show that all three main methods estimate negative average NO 2 changes associated with the central ULEZ launch. CF–DR gives an average effect of −6.516 μg/m3, with the largest reductions concentrated during midday and evening traffic-related hours. OR also estimates negative effects but with smaller midday reductions. IPW produces the most extreme average reduction, which is consistent with the greater sensitivity of weighting estimators to limited overlap and variable propensity weights. CF–DR lies between the more model-dependent OR curve and the more extreme IPW curve, while preserving a clear time-of-day pattern. −25 025        
+
+> 036912 15 18 21
+> Hour of day
+> CF−−DR effect ( μg/m  3 )
+> Negative values indicate lower hourly NO2 after the central ULEZ launch
+> CF−−DR functional effect with simultaneous band
+
+Figure 11: CF–DR estimate with site-cluster simultaneous confidence band. Negative values are consistent with lower hourly NO 2 after the ULEZ launch. Figure 11 displays the CF–DR effect curve with a site-cluster simultaneous confidence band. The point estimate is negative for most hours, with stronger reductions over the daytime and evening portions of the curve. The simultaneous band is wide, reflecting the small number of monitoring sites and the conservative nature of site-cluster curve-level inference. We therefore interpret the empirical application primarily as evidence of a policy-relevant functional pattern rather than as a high-powered site-level policy evaluation. This is precisely the type of setting where functional 27 inference is useful: the environmental question concerns when during the day pollution changes, not only whether a scalar average changes. Table 6: Method diagnostic metrics. 
+
+Method AbsAvgBias MAB RMSE SupErr Signal/RMSE NetSignal CF–DR 5.139 5.742 6.935 13.514 1.181 1.257 OR 6.933 6.951 8.030 14.061 0.606 −3.160 IPW 11.501 11.501 12.367 18.349 0.815 −2.293 
+
+Table 6 compares the three main methods using metrics that have an interpretable direction. CF–DR performs best on all six diagnostics. Its AbsAvgBias, MAB, RMSE, and SupErr are smaller than those of OR and IPW, indicating less spurious functional signal in falsification set-tings. CF–DR also has the largest Signal/RMSE and the largest NetSignal. These diagnostics are important because they separate the descriptive magnitude of the estimated policy effect from method performance in settings where the benchmark is known to be zero. Table 7: CF–DR window-sensitivity analysis. Entries summarize the CF–DR functional effect curve across alternative post-policy windows. Window Average Minimum Maximum Morning Midday Evening Traffic main 12w −5.031 −9.808 1.474 −5.357 −7.733 −5.640 Traffic early 6w −2.996 −9.237 4.024 −4.293 −6.137 −0.814 Traffic late 6w −4.515 −9.849 2.446 −2.925 −7.375 −4.848 −10 −5 0         
+
+> 036912 15 18 21
+> Hour of day
+> Estimated CF−−DR effect ( μg/m  3 )
+> Traffic early 6w Traffic late 6w Traffic main 12w
+> The negative traffic−site pattern persists across the main, early, and late windows
+
+CF−−DR window−sensitivity curves 
+
+Figure 12: CF–DR window-sensitivity curves. The negative traffic-site pattern persists across the main, early, and late post-policy windows. The window-sensitivity analysis in Table 7 and Figure 12 provides an additional robustness check. The CF–DR average effect remains negative in the 12-week main window, the early 6-week window, and the late 6-week window. The midday reduction is also consistently negative across windows, ranging from −6.137 to −7.733 μg/m3. The early window has a weaker evening effect, whereas the late window shows a clearer evening reduction. This pattern is environmentally 28 plausible: traffic-related emissions and local atmospheric mixing vary over the day, and the policy effect may be more visible during periods when traffic activity and near-road exposure are higher. Overall, the empirical application supports the usefulness of the proposed CF–DR estimator for illustrative functional policy analysis. The estimated effect is not simply a scalar reduction in average pollution; rather, it is a time-of-day profile suggesting that the central ULEZ is associated with lower traffic-site NO 2 over much of the day, especially during policy-relevant daytime and evening periods. Compared with OR and IPW, CF–DR has the most favorable diagnostic profile and avoids relying solely on either outcome modeling or weighting. From an environmental per-spective, this matters because reductions in NO 2 during traffic-intensive hours are directly relevant for population exposure near roads. The application therefore illustrates how functional causal inference can reveal when an air-quality intervention is associated with its strongest changes, while also providing diagnostics for whether the estimated daily curve is credible under observational confounding. 
+
+## 7 Discussion 
+
+This paper developed a semiparametric framework for difference-in-differences analysis with func-tional outcomes. The proposed CF–DR estimator combines outcome regression and IPW through a Neyman-orthogonal score, allowing flexible nuisance learning while preserving first-order valid-ity under suitable rate conditions. The theory establishes identification, asymptotic linearity in a Hilbert space, and simultaneous confidence bands based on a multiplier bootstrap. The simulation results show that CF–DR is especially useful when nuisance functions are complex, treatment effects are heterogeneous, or overlap is limited, while also clarifying the role of functional reconstruction error. The London ULEZ application illustrates the empirical value of treating the outcome as a curve: rather than reducing air-quality changes to a single daily average, the method identifies a time-of-day pattern associated with lower traffic-site NO 2 and provides falsification diagnostics for comparing feasible estimators. Several extensions remain important for future work. First, many policy settings involve stag-gered adoption, repeated treatment timing, or continuous exposure intensity, and extending the present framework to these designs would broaden its applicability. Second, environmental and health applications often contain spatial dependence, serial dependence, and site-level clustering, so developing sharper inference procedures for dependent functional panels is a natural next step. Third, the theory highlights that curve reconstruction must be accurate enough for first-order causal inference; future work could integrate adaptive smoothing, functional basis selection, or measurement-error correction more directly into the causal estimator. Finally, richer empirical applications with larger monitoring networks or individual-level functional outcomes would allow the proposed framework to be used not only for average functional effects, but also for subgroup heterogeneity and policy targeting over time. 
+
+## References 
+
+Abadie, A. (2005). Semiparametric difference-in-differences estimators. The Review of Economic Studies 72: 1–19. Bang, H. and Robins, J. M. (2005). Doubly robust estimation in missing data and causal inference models. Biometrics 61: 962–973. 29 Bickel, P. J., Klaassen, C. A. J., Ritov, Y. and Wellner, J. A. (1993). Efficient and Adaptive Estimation for Semiparametric Models. Baltimore: Johns Hopkins University Press. Borusyak, K., Jaravel, X. and Spiess, J. (2024). Revisiting event study designs: Robust and efficient estimation. The Review of Economic Studies 91: 3253–3285. Chernozhukov, V., Chetverikov, D., Demirer, M., Duflo, E., Hansen, C., Newey, W. and Robins, J. (2018). Double/debiased machine learning for treatment and structural parameters. The Econometrics Journal 21: C1–C68. Chernozhukov, V., Chetverikov, D. and Kato, K. (2014). Gaussian approximation of suprema of empirical processes. The Annals of Statistics 42: 1564–1597. Choi, H. and Reimherr, M. (2018). A geometric approach to confidence regions and bands for func-tional parameters. Journal of the Royal Statistical Society: Series B (Statistical Methodology) 80: 239–260. Degras, D. (2017). Simultaneous confidence bands for the mean of functional data. Wiley Interdisciplinary Reviews: Computational Statistics 9: e1397. Degras, D. A. (2011). Simultaneous confidence bands for nonparametric regression with functional data. Statistica Sinica 21: 1735–1765. Ecker, K., Luna, X. de and Schelin, L. (2024). Causal inference with a functional outcome. Journal of the Royal Statistical Society: Series C (Applied Statistics) 73: 221–240. Fang, C. and Liebl, D. (2025). Making event study plots honest: A functional data approach to causal inference. Gregg, D. J., Tompkins, J., Cordell, R. L., Brown, A. S., Smallbone, K. L., Vande Hey, J. D., Wyche, K. P. and Monks, P. S. (2025). The impacts of the Ultra Low Emission Zone (ULEZ) and COVID-19 restrictions on air quality in Central London–evidence for an increase in small particles. Atmospheric Environment : 121668. Hahn, J. (1998). On the role of the propensity score in efficient semiparametric estimation of average treatment effects. Econometrica 66: 315–331. Hern´ an, M. A. and Robins, J. M. (2020). Causal Inference: What If. Boca Raton: Chapman & Hall/CRC. Horv´ ath, L. and Kokoszka, P. (2012). Inference for Functional Data with Applications. New York: Springer. Hsing, T. and Eubank, R. (2015). Theoretical Foundations of Functional Data Analysis, with an Introduction to Linear Operators. Wiley. Imbens, G. W. and Rubin, D. B. (2015). Causal Inference for Statistics, Social, and Biomedical Sciences: An Introduction. Cambridge: Cambridge University Press. Liebl, D. and Reimherr, M. (2023). Fast and fair simultaneous confidence bands for functional parameters. Journal of the Royal Statistical Society: Series B (Statistical Methodology) 85: 842–868. 30 Pini, A. and Vantini, S. (2016). The interval testing procedure: A general framework for inference in functional data analysis. Biometrics 72: 835–845. Pini, A. and Vantini, S. (2017). Interval-wise testing for functional data. Journal of Nonparametric Statistics 29: 407–424. Ramsay, J. O. and Silverman, B. W. (2005). Functional Data Analysis. New York: Springer, 2nd ed. Robins, J. M., Rotnitzky, A. and Zhao, L. P. (1994). Estimation of regression coefficients when some regressors are not always observed. Journal of the American Statistical Association 89: 846–866. Rosenbaum, P. R. and Rubin, D. B. (1983). The central role of the propensity score in observational studies for causal effects. Biometrika 70: 41–55. Rubin, D. B. (1974). Estimating causal effects of treatments in randomized and nonrandomized studies. Journal of Educational Psychology 66: 688–701. Sant’Anna, P. H. C. and Zhao, J. (2020). Doubly robust difference-in-differences estimators. Journal of Econometrics 219: 101–122. Sparkes, S., Garcia, E. and Zhang, L. (2024). The functional average treatment effect. Journal of Causal Inference 12: 1–30. Tsiatis, A. A. (2006). Semiparametric Theory and Missing Data. New York: Springer. Vaart, A. W. van der and Wellner, J. A. (1996). Weak Convergence and Empirical Processes: With Applications to Statistics. New York: Springer. Wang, J.-L., Chiou, J.-M. and M¨ uller, H.-G. (2016). Functional data analysis. Annual Review of Statistics and Its Application 3: 257–295. Yao, F., M¨ uller, H.-G. and Wang, J.-L. (2005). Functional data analysis for sparse longitudinal data. Journal of the American Statistical Association 100: 577–590. 31 Appendix 
+
+Throughout, let P denote the true law of W = (∆ Y, D, X ) and Pn the empirical measure. For a measurable H-valued map h(W ) ∈ H , write P h = E{h(W )} and Pnh = n−1 Pni=1 h(Wi). For fold 
+
+k, let Ik be the index set, nk = |I k|, and Pn,k be the empirical measure over Ik. We use ∥ · ∥ H for the L2(T ) norm. 
+
+Proof of Proposition 1 
+
+Proof. It is enough to verify the pathwise derivative after scalarizing the functional parameter. Fix any f ∈ H and define the scalar outcome 
+
+Zf = ⟨f, ∆Y ⟩, μa,f (X) = E(Zf | X, D = a) = ⟨f, μ a(X)⟩, θf = ⟨f, τ 0⟩.
+
+By the identified ATT representation (3)–(4), 
+
+θf = E{μ1,f (X) − μ0,f (X) | D = 1 }.
+
+For the scalar observed-data problem with outcome Zf , group indicator D, and covariates X, write 
+
+ν1,f = E(Zf | D = 1) , ν0,f = E{μ0,f (X) | D = 1 }, θf = ν1,f − ν0,f .
+
+The treated mean ν1,f = E(DZ f )/p 0 has influence function 
+
+Dp0
+
+(Zf − ν1,f ).
+
+The counterfactual treated mean ν0,f = E{Dμ 0,f (X)}/p 0 has influence function 
+
+Dp0
+
+{μ0,f (X) − ν0,f } + (1 − D)π0(X)
+
+p0{1 − π0(X)} {Zf − μ0,f (X)}.
+
+The second term is the contribution from perturbing the control conditional mean μ0,f (X) = E(Zf |
+
+X, D = 0), transported to the treated covariate distribution by the odds weight π0(X)/{1−π0(X)}.Subtracting the influence function for ν0,f from that for ν1,f gives 
+
+ϕf (W ) = Dp0
+
+{Zf − μ1,f (X)} − (1 − D)π0(X)
+
+p0{1 − π0(X)} {Zf − μ0,f (X)} + Dp0
+
+{μ1,f (X) − μ0,f (X) − θf }.
+
+Equivalently, after cancellation of μ1,f this is 
+
+ϕf (W ) = Dp0
+
+{Zf − μ0,f (X) − θf } − (1 − D)π0(X)
+
+p0{1 − π0(X)} {Zf − μ0,f (X)}.
+
+Thus, along any regular submodel with score S, differentiating the treated-group ratio and the control conditional mean components yields 
+
+ddϵ θf,ϵ 
+
+> ϵ=0
+
+= E{ϕf (W )S(W )}.
+
+Using the definitions of Zf , μa,f , and θf , the displayed scalar influence function is exactly the scalar projection of (5): 
+
+ϕf (W ) = ⟨f, ϕ (W ; η0)⟩.
+
+32 Therefore, for every f ∈ H ,
+
+ddϵ ⟨f, τ (Pϵ)⟩ ϵ=0 
+
+= E{⟨ f, ϕ (W ; η0)⟩S(W )} = ⟨f, E{ϕ(W ; η0)S(W )}⟩ .
+
+Since H is separable and the equality holds for all f ∈ H , this proves the derivative identity in 
+
+H. In the nonparametric observed-data model the tangent space is the full mean-zero subspace of 
+
+L20(P ), so the gradient is already the canonical gradient. Hence ϕ(W ; η0) is the efficient influence function. 
+
+Auxiliary lemmas 
+
+Lemma 1 (Score simplification) . Fix any p ∈ (0 , 1) and let the AIPW display (6) use (π, μ 0, μ 1)
+
+with denominator p. Then for every t ∈ T ,
+
+ψp(W ; η)( t) = Dp {∆Y (t) − μ0(X)( t)} − (1 − D)π(X)
+
+p{1 − π(X)} {∆Y (t) − μ0(X)( t)}.
+
+In particular, for fixed p, the proposed score depends only on η = ( π, μ 0).Proof. Fix t ∈ T and suppress the argument t to simplify notation. From (6), 
+
+ψp(W ; η) = Dp {∆Y − μ1(X)} − (1 − D)π(X)
+
+p{1 − π(X)} {∆Y − μ0(X)} + Dp {μ1(X) − μ0(X)}.
+
+The two treated-group terms have the same multiplier D/p , and their bracketed expressions add to 
+
+{∆Y − μ1(X)} + {μ1(X) − μ0(X)} = ∆ Y − μ0(X).
+
+Therefore Dp {∆Y − μ1(X)} + Dp {μ1(X) − μ0(X)} = Dp {∆Y − μ0(X)}.
+
+Substituting this identity back into the display for ψp(W ; η) gives the asserted simplified score. Since μ1(X) appears only in the two treated-group terms that cancel algebraically, the resulting score is independent of μ1 and can be indexed by η = ( π, μ 0). 
+
+Lemma 2 (Neyman orthogonality of the moment map) . Define the moment map with the treated probability fixed at its population value, Ψ( η) = P ψ p0 (·; η) ∈ H , where η = ( π, μ 0). Under overlap (0 < c ≤ π0(X) ≤ 1 − c a.s.) and square integrability, Ψ( η) is Gateaux-differentiable at η0 =(π0, μ 0) and its first-order derivative vanishes: for any directions hπ and h0 with P h 2 
+
+> π
+
+< ∞ and 
+
+P ∥h0∥2 
+
+> H
+
+< ∞,
+
+ddϵ Ψ( π0 + ϵh π, μ 0 + ϵh 0) ϵ=0 
+
+= 0 in H.
+
+Proof. By Lemma 1, it suffices to treat η = ( π, μ 0) because ψp0 does not depend on μ1. For notational clarity write the simplified score as 
+
+ψp0 (W ; π, μ )( t) = Dp0
+
+{∆Y (t) − μ(X)( t)} − (1 − D)π(X)
+
+p0{1 − π(X)} {∆Y (t) − μ(X)( t)},
+
+where the denominator is fixed at p0 for the moment map. Consider a path μϵ = μ0 + ϵh 0. For every t,
+
+ddϵ P ψ p0 (π0, μ ϵ)( t) ϵ=0 
+
+= P
+
+hn 
+
+− Dp0
+
++ (1 − D)π0(X)
+
+p0{1 − π0(X)}
+
+o
+
+h0(X)( t)
+
+i
+
+.
+
+33 The expectation is zero as an element of H. Indeed, for any square-integrable H-valued function 
+
+g(X), 
+
+P {Dg (X)} = P {E(D | X)g(X)} = P {π0(X)g(X)},
+
+while 
+
+P
+
+ (1 − D)π0(X)1 − π0(X) g(X)
+
+
+
+= P
+
+
+
+E
+
+ (1 − D)π0(X)1 − π0(X) g(X) X
+
+ 
+
+= P {π0(X)g(X)}.
+
+Taking g = h0 proves that the directional derivative in the μ0 direction vanishes. Now consider a path πϵ = π0 + ϵh π. The derivative of the treated part is zero because it does not contain π. For the control-weight term, using 
+
+ddϵ π0(X) + ϵh π(X)1 − π0(X) − ϵh π(X) ϵ=0 
+
+= hπ(X)
+
+{1 − π0(X)}2 ,
+
+we obtain ddϵ P ψ p0 (πϵ, μ 0) ϵ=0 
+
+= −P
+
+h
+
+(1 − D) hπ(X)
+
+p0{1 − π0(X)}2 {∆Y − μ0(X)}
+
+i
+
+.
+
+Conditioning on ( X, D ) gives 
+
+E{∆Y − μ0(X) | X, D = 0 } = 0 by the definition μ0(X) = E{∆Y | X, D = 0 }. Thus the derivative in the π direction is also zero in 
+
+H. Since both directional derivatives vanish, the Gateaux derivative of Ψ at η0 is the zero map. 
+
+Lemma 3 (Ratio expansion for estimating p0). Let bp = PnD and assume p0 ∈ (0 , 1) and ψp(W ; η0)
+
+denote the score (7) evaluated at the true nuisances but with p in the denominator. Under overlap and P ∥∆Y ∥2 
+
+> H
+
+< ∞,
+
+Pnψbp(·; η0) − τ0 = ( Pn − P )
+
+
+
+ψp0 (·; η0) − Dp0
+
+τ0
+
+
+
++ op(n−1/2) in H.
+
+Proof. Because p enters only as a common denominator, ψbp = ( p0/bp)ψp0 . The empirical treated fraction satisfies 
+
+bp − p0 = ( Pn − P )D = Op(n−1/2),
+
+and therefore, by a Taylor expansion of p 7 → p0/p around p0,
+
+p0
+
+bp = 1 − bp − p0
+
+p0
+
++ Op{(bp − p0)2} = 1 − bp − p0
+
+p0
+
++ Op(n−1).
+
+Also P ψ p0 (·; η0) = τ0 and, by the Hilbert-space law of large numbers and CLT under the stated moment condition, Pnψp0 (·; η0) = τ0 + Op(n−1/2) in H. Multiplying the two expansions gives 
+
+Pnψbp(·; η0) = Pnψp0 (·; η0) − bp − p0
+
+p0
+
+τ0 + op(n−1/2).
+
+The product of bp − p0 and Pnψp0 (·; η0) − τ0 is Op(n−1), and the quadratic remainder in p is also 
+
+Op(n−1), so both are absorbed into op(n−1/2). Subtracting τ0 = P ψ p0 (·; η0) and using bp − p0 =(Pn − P )D gives the stated expansion. 34 Proof of Theorem 1 
+
+Proof. Let 
+
+eτ =
+
+> K
+
+X
+
+> k=1
+
+nk
+
+n Pn,k ψp0 (·; bη(−k)), τ0 = P ψ p0 (·; η0),
+
+where eτ is the infeasible version of the estimator using the population denominator p0. Adding and subtracting P
+
+> k
+
+(nk/n )Pn,k ψp0 (·; η0) = Pnψp0 (·; η0) gives 
+
+eτ − τ0 = ( Pn − P )ψp0 (·; η0) + Rn, 1 + Rn, 2, (13) where 
+
+Rn, 1 =
+
+> K
+
+X
+
+> k=1
+
+nk
+
+n (Pn,k − P )∆ k, Rn, 2 =
+
+> K
+
+X
+
+> k=1
+
+nk
+
+n P ∆k,
+
+and ∆ k = ψp0 (·; bη(−k)) − ψp0 (·; η0). The empirical fluctuation term Rn, 1 is controlled conditionally on the training folds. By cross-fitting, bη(−k) is measurable with respect to the training sample and is independent of the evaluation fold {Wi : i ∈ I k}. Conditional on the training sample, 
+
+E ∥(Pn,k − P )∆ k∥2 
+
+> H
+
+bη(−k) ≤ 1
+
+nk
+
+E ∥∆k(W )∥2 
+
+> H
+
+bη(−k).
+
+The score is Lipschitz in ( π, μ 0) on any clipped overlap neighborhood. More explicitly, Lemma 1 gives ∆k(W ) = Dp0
+
+{μ0(X) − bμ(−k)0 (X)}− 1 − Dp0
+
+"bπ(−k)(X)1 − bπ(−k)(X) {∆Y − bμ(−k)0 (X)} − π0(X)1 − π0(X) {∆Y − μ0(X)}
+
+#
+
+,
+
+where all function-valued quantities are evaluated as elements of H. To make the Lipschitz control explicit, write a(u) = u/ (1 − u) and add and subtract a{bπ(−k)(X)}{ ∆Y − μ0(X)} inside the control bracket. Then 
+
+∥∆k(W )∥H ≤ C∥bμ(−k)0 (X) − μ0(X)∥H
+
++ C|bπ(−k)(X) − π0(X)| ∥ ∆Y − μ0(X)∥H
+
++ C|bπ(−k)(X) − π0(X)| ∥ bμ(−k)0 (X) − μ0(X)∥H,
+
+where the constant C depends only on p0 and the overlap/clipping bound. The residual moment condition in Assumption 1, Cauchy–Schwarz, and the L2 stability of the nuisance regressions imply 
+
+∥∆k∥L2(P ;H) ≲ ∥bμ(−k)0 − μ0∥2 + ∥bπ(−k) − π0∥2{1 + ∥bμ(−k)0 − μ0∥2} = op(1) .
+
+Consequently ∥(Pn,k − P )∆ k∥H = op(n−1/2 
+
+> k
+
+) uniformly over a fixed number of folds, and ∥Rn, 1∥H =
+
+op(n−1/2). The bias term Rn, 2 is smaller because the first-order derivative of the moment map vanishes. Using the simplified score and conditioning on X, one obtains the exact identity 
+
+P ∆k = 1
+
+p0
+
+P
+
+"
+
+{1 − D}
+
+(
+
+π0(X)1 − π0(X) − bπ(−k)(X)1 − bπ(−k)(X)
+
+)
+
+{μ0(X) − bμ(−k)0 (X)}
+
+#
+
+.
+
+35 Indeed, all terms that are linear only in bμ(−k)0 − μ0 cancel by the balancing identity in Lemma 2, and all terms that are linear only in bπ(−k) − π0 multiply the control residual ∆ Y − μ0(X), whose conditional mean is zero given ( X, D = 0). Since the map u 7 → u/ (1 − u) is Lipschitz on the clipped interval [ c, 1 − c], 
+
+∥P ∆k∥H ≲ ∥bπ(−k) − π0∥2 ∥bμ(−k)0 − μ0∥2,
+
+and Assumption 3 gives ∥Rn, 2∥H = op(n−1/2). It remains to account for replacing p0 by bp = PnD. Because p enters the score only as a common denominator, 
+
+bτ = p0
+
+bp eτ = eτ − bp − p0
+
+p0
+
+τ0 + op(n−1/2),
+
+where eτ = τ0 + Op(n−1/2) follows from the preceding bounds and the Hilbert-space variance bound for ( Pn − P )ψp0 (·; η0). Thus the leading empirical term is (Pn − P )ψp0 (·; η0) − τ0
+
+p0
+
+(Pn − P )D = ( Pn − P )ϕ(·; η0).
+
+When curves are reconstructed, ∆ Yi is replaced by d∆Y i. By Assumption 4, max i ∥d∆Y i − ∆Yi∥H =
+
+op(n−1/2). Since the score is Lipschitz in ∆ Y with bounded weights under overlap, we have 
+
+1
+
+n
+
+> n
+
+X
+
+> i=1
+
+ψ(d∆Y i, D i, X i; bη(−k)) − ψ(∆ Yi, D i, X i; bη(−k)) H ≲ max  
+
+> i
+
+∥d∆Y i − ∆Yi∥H = op(n−1/2),
+
+so reconstruction affects only higher-order terms in the H expansion. Combining the preceding bounds with (13), multiplying by √n, and using ( Pn − P )ϕ(·; η0) = 
+
+n−1 Pni=1 ϕ(Wi; η0) proves the stated expansion with ∥rn∥H = op(1). 
+
+Proof of Theorem 2 
+
+Proof. By Theorem 1, 
+
+√n(bτ − τ0) = 1
+
+√n
+
+> n
+
+X
+
+> i=1
+
+ϕ(Wi; η0) + rn, ∥rn∥H = op(1) .
+
+Assumption 1 implies E∥ϕ(W ; η0)∥2 
+
+> H
+
+< ∞ and E{ϕ(W ; η0)} = 0 in H. Since H = L2(T ) is separable for the compact interval T equipped with Lebesgue measure, the i.i.d. CLT for Hilbert-valued random elements yields 1
+
+√n
+
+> n
+
+X
+
+> i=1
+
+ϕ(Wi; η0) ⇒ G in H,
+
+where G is Gaussian with covariance operator Σ given by ⟨f, Σg⟩ = Cov( ⟨f, ϕ ⟩, ⟨g, ϕ ⟩) for f, g ∈ H .Slutsky’s theorem then implies the claim. 
+
+Proof of Theorem 3 
+
+Proof. Assumption 5 states that the influence-function class Fϕ = {ϕt : t ∈ T } is P -Donsker with a square-integrable envelope. Therefore the empirical process indexed by t satisfies 
+
+n−1/2
+
+> n
+
+X
+
+> i=1
+
+ϕ(Wi; η0)( ·) ⇒ Z in ℓ∞(T ),
+
+36 where Z is a tight, mean-zero Gaussian process with covariance kernel C and uniformly continuous sample paths. It remains to verify that replacing the unknown nuisances and reconstructed curves in the estimator changes the process only by op(1) after multiplication by √n in sup norm. The same decomposition used in the proof of Theorem 1 applies with ∥ · ∥ H replaced by ∥ · ∥ ∞. For the empirical fluctuation term, cross-fitting makes bη(−k) conditionally independent of the evaluation fold. Conditional on the training sample, 
+
+E
+
+h
+
+∥(Pn,k − P ){ψp0 (·; bη(−k)) − ψp0 (·; η0)}∥ 2 
+
+> ∞
+
+bη(−k)i
+
+≲ 1
+
+nk
+
+∥ψp0 (·; bη(−k)) − ψp0 (·; η0)∥22,∞.
+
+The sup-norm nuisance consistency in Assumption 5 and the same Lipschitz calculation as in the proof of Theorem 1 make the right-hand side op(n−1 
+
+> k
+
+), so the empirical fluctuation term is op(n−1/2)uniformly over the fixed number of folds. For the bias term, the same orthogonality calculation as Lemma 2, now measured in sup norm, yields the second-order bound 
+
+∥P {ψp0 (·; bη(−k)) − ψp0 (·; η0)}∥ ∞ ≲ ∥bπ(−k) − π0∥2∥bμ(−k)0 − μ0∥2,∞ = op(n−1/2).
+
+The ratio expansion for bp is unchanged because p enters the score as a common denominator, and the stronger reconstruction bound in Assumption 5 controls replacement of ∆ Y by d∆Y uniformly over t. Consequently, 
+
+√n(bτ − τ0) = 1
+
+√n
+
+> n
+
+X
+
+> i=1
+
+ϕ(Wi; η0) + r∞ 
+
+> n
+
+in ℓ∞(T ), ∥r∞ 
+
+> n
+
+∥∞ = op(1) .
+
+Combining this expansion with the Donsker convergence of the leading empirical process and ap-plying Slutsky’s theorem proves the claim. 
+
+Proof of Theorem 4 
+
+Proof. Let 
+
+bTn = sup 
+
+> t∈T
+
+√n{bτ (t) − τ0(t)}
+
+bσ(t) , Tn = sup 
+
+> t∈T
+
+√n{bτ (t) − τ0(t)}
+
+σ(t) , T = sup 
+
+> t∈T
+
+Z(t)
+
+σ(t) .
+
+By Theorem 3, inf t σ(t) > 0, and the continuous mapping theorem, Tn ⇒ T . Moreover, uniform consistency of bσ implies sup 
+
+> t∈T
+
+σ(t)
+
+bσ(t) − 1 = op(1) ,
+
+and Theorem 3 implies Tn = Op(1). Thus | bTn − Tn| = op(1) and bTn ⇒ T .Let TM = {t1, . . . , t M } be the evaluation grid and define 
+
+bTn,M = max 
+
+> t∈T M
+
+√n{bτ (t) − τ0(t)}
+
+bσ(t) , TM = max 
+
+> t∈T M
+
+Z(t)
+
+σ(t) .
+
+The grid approximation assumption gives | bTn,M − bTn| = op(1). Because the limiting studentized Gaussian process has uniformly continuous paths, TM → T as the mesh size tends to zero. Let bc1−α denote the conditional (1 − α) quantile of the bootstrap maximum 
+
+T ∗ 
+
+> M
+
+= max 
+
+> t∈T M
+
+|G∗(t)/bσ(t)|,
+
+37 constructed from (10). By the assumed bootstrap consistency, the conditional distribution of T ∗
+
+> M
+
+given the data converges (in probability) to that of TM . The continuity of the distribution function of T at its (1 − α) quantile, together with TM → T , implies quantile consistency: 
+
+bc1−α →p c1−α,
+
+where c1−α is the (1 − α) quantile of T .Using the convergence of bTn and the quantile consistency, 
+
+P   bTn ≤ bc1−α
+
+ = P  T ≤ c1−α
+
+ + o(1) = 1 − α + o(1) .
+
+Finally, note that bTn ≤ bc1−α is equivalent to τ0(t) ∈ [bτ (t) ± bc1−αbσ(t)/√n] for all t ∈ T . The grid approximation assumption justifies using the grid-based bootstrap quantile for this continuous-domain event. This proves the stated uniform coverage. 38

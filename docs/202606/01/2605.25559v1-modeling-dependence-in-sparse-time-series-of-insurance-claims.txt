@@ -1,0 +1,2720 @@
+Title: Modeling dependence in sparse time series of Insurance Claims
+
+URL Source: https://arxiv.org/pdf/2605.25559v1
+
+Published Time: Tue, 26 May 2026 02:26:43 GMT
+
+Number of Pages: 38
+
+Markdown Content:
+# Modeling dependence in sparse time series of Insurance Claims 
+
+## Roberto Baviera 1, Pietro Manzoni 2, & Michele Domenico Massaria 1
+
+## May 26, 2026  
+
+> 1
+
+Politecnico di Milano, Department of Mathematics, Italy  
+
+> 2
+
+University of Edinburgh, Business School, United Kingdom 
+
+Abstract 
+
+Modeling the dependence between multiple risk types is a central challenge in contemporary insurance risk management. The standard approaches, L´ evy copulas and zero-mixed models, often face practical difficulties in simulation and parameter calibration. In this paper, we introduce the Comb-Bernoulli model, a novel framework for capturing dependence between sparse time series of insurance risks, bridging the benefits of the two standard approaches. The (traditional) copula structure of the proposed model enables tractable: i) simulation, 
+
+ii) likelihood evaluation, and iii) estimation of dependence parameters. We present the general properties of the model and analyze in detail the Gaussian copula case with lognormal marginals. Moreover, we illustrate an application using the Danish fire insurance dataset, highlighting both the modeling strengths and numerical efficiency of our approach in real-world risk management. 
+
+Keywords : Copula, Comb-Bernoulli, simulation, cascade estimation, operational risk. 
+
+Address for correspondence: Roberto Baviera 
+
+Department of Mathematics Politecnico di Milano 32 p.zza Leonardo da Vinci I-20133 Milano, Italy Tel. +39-02-2399 4575 roberto.baviera@polimi.it 1
+
+> arXiv:2605.25559v1 [q-fin.RM] 25 May 2026
+
+# 1 Introduction 
+
+Accurate modeling of dependence in claims time series is crucial for insurance risk management. Dependence affects both occurrence (claim frequency) and severity (claim amount), directly im-pacting pricing decisions, reserve calculations, and regulatory capital requirements under frame-works such as Solvency II (see, e.g., Embrechts 2002, McNeil et al. 2005). In the insurance sector, claims data are time series often characterized by long stretches of zero values – periods without observed claims – interspersed with infrequent but significant non-zero events. The main challenge in modeling such time series is to simultaneously capture both the intermittent nature of claims and the dependencies across different risks, all in a single multivariate model that can accommodate both zero and non-zero values. It is well known and documented that the presence of probability atoms in financial time series may produce non-obvious behaviors already in the one-dimensional case (see, e.g., Bandi et al. 2020, Kolokolov and Ren` o 2024). In the literature, the standard modeling approach for such data is a copula-based mixed distri-bution model with a probability mass at zero (hereinafter zero-mixed model ), which i) represents each marginal distribution as a combination of an atom at zero and a continuous distribution for positive values, and ii) couples only the positive marginals using a (traditional) copula. This technique is common in domains such as hydrology and meteorology, where measurements (e.g. daily rainfall) are frequently zero. It was introduced in the seminal paper of Shimizu (1993), who first employed it to capture joint behaviors in sparse meteorological time series, and has been considered by other researchers in the same field (see, e.g., Herr and Krzysztofowicz 2005, Zhang and Singh 2007, Serinaldi 2009). In this framework, events can occur in two different locations at the same time, and the dependence between their magnitudes is modeled via a copula. Crucially, the dependence applies exclusively to simultaneous non-zero events. 1
+
+Overall, the zero-mixed approach offers two key advantages. First, its simplicity allows for di-rect modelling of claims time series, effectively distinguishing between zero and non-zero regimes. Second, due to its flexibility, the model provides detailed and separate specifications for the de-pendence structures in both the occurrence and the size of events. The main limitation lies in the estimation of model parameters, even for two-dimensional time series. In many relevant cases, co-events are rare, making it difficult to calibrate the dependence accurately. Additionally, the zero-mixed model becomes increasingly parameter-intensive, with the number of parameters growing exponentially with the dimensionality; for instance, a four-dimensional time series requires specifying sixteen probabilities (to account for events shared across two, three, or all four classes), six bivariate copulas, four trivariate copulas, one quadrivariate copula, and four jump size distributions, as already observed by Avanzi et al. (2011). Finally,  
+
+> 1The continuous-time generalization of the zero-mixed model is known in the insurance sector as common shock model, where a dependence structure is introduced between multiple compound Poisson processes that describe different classes of risk (see, e.g., Lindskog and McNeil 2003). In practice, these classes share ‘common shocks’ – claims occurring exactly at the same time in two or more classes according to an identical arrival process.
+
+2simulation of the zero-mixed model must proceed in two stages – first determining the type of event, then simulating the sizes – which limits scalability beyond two dimensions. A continuous-time alternative to the zero-mixed approach is the L´ evy copula, a method where dependence is introduced via a multivariate function – the L´ evy copula – that couples the marginal tail integrals of the univariate L´ evy measures. It was introduced in the seminal paper of Tankov (2003) for spectrally positive multidimensional L´ evy processes, and is thoroughly discussed in reference textbooks (see, e.g., Cont and Tankov 2003). In the insurance sector, this technique was first applied by Bregman and Kl¨ uppelberg (2005) to a bivariate compound Poisson process to estimate ruin probabilities for an insurance company with two classes of risks coupled via a L´ evy copula. A similar approach has been used to model operational losses by B¨ ocker and Kl¨ uppelberg (2008, 2010) and Biagini and Ulmer (2009). Avanzi et al. (2011) discuss the application of a generic L´ evy copula. Esmaeili and Kl¨ uppelberg (2010) derive the explicit form of the bivariate likelihood – in particular for the Clayton L´ evy copula in the compound Poisson case – enabling a numerical maximum likelihood estimation of the L´ evy copula parameters. The main advantage of this model lies in the parsimony of L´ evy copulas. Although typically applied to two risk classes in the literature, they can be scaled to multiple risk classes without causing exponential growth in the number of parameters. Unfortunately, simulating d risks cou-pled via a L´ evy copula remains challenging, as shown by Esmaeili and Kl¨ uppelberg (2010): the algorithm requires first simulating 2 d − 1 independent Poisson processes, followed by generating the corresponding jump sizes associated with each process. In this paper, we introduce the Comb-Bernoulli, a model that offers a parsimonious description of dependence in discrete time series, and bridges the benefits of the zero-mixed model (that offers simplicity, operates in discrete-time, and is well-suited to observed claim time series) and the L´ evy copula approach (known for parsimony and scalability in higher dimensions). The proposed model is based on (traditional) copulas, which jointly capture the dependence in both claim occurrence and magnitude: this leads to a tractable structure that significantly simplifies both model estimation and simulation. Model estimation is facilitated by an explicit likelihood function, which can be efficiently maximized using the Inference Functions for Margins (IFM) approach (Godambe 1991, Joe 1997), yielding asymptotic confidence intervals (CIs) for the estimated parameters. Moreover, as we demonstrate, the simulation of a time series involving 
+
+d classes requires generating only d processes linked via a copula; this approach overcomes the scalability limitations of zero-mixed models and avoids the exponential growth in d of L´ evy copula models (see, e.g., Esmaeili and Kl¨ uppelberg 2010). There are three main contributions of this paper. First, we propose a new parsimonious model to describe the dependence of sparse time series that allows for both a straightforward estimation and a simple simulation. Second, we provide a detailed specification of the proposed model within the Gaussian copula framework – the most widely used dependence structure in the insurance 3literature. Finally, we illustrate the performance and the effectiveness of our approach using a well-known time series of insurance claims. The remainder of the paper is organized as follows. In Section 2, we introduce our new modeling framework, together with all details required for its practical implementation. In Section 3, we establish the main properties of the model under the Gaussian copula specification. In Section 4, we present the results of the estimation of our model using the Danish fire insurance dataset. In Section 5, we provide concluding remarks. 
+
+# 2 The Model 
+
+In this Section, we introduce the Comb-Bernoulli, 2 our novel multivariate model for insurance claims data. We first present the model formulation, then derive the corresponding likelihood function, develop an algorithm for efficient simulation, and finally discuss parameter estimation. 
+
+## 2.1 Model Description 
+
+Let X = [ X1, . . . , X d]⊤ denote the vector of total claims across d distinct risk classes over the period of interest. As standard in the actuarial literature (see, e.g. Klugman et al. 2012), we consider claims as non-negative quantities (i.e. as claims to the insurance company) taking value zero when no claim occurs, or strictly positive values otherwise. As described in Section 1, the Comb-Bernoulli features two main elements: i) mixed discrete-continuous marginal distributions for each risk class – combining a point mass at zero with a distribution supported on the positive real line; ii) a copula function that captures the dependence structure among risk classes. To account for the inherent sparsity of insurance claims, each component Xi (with i = 1 , . . . , d )of the claim vector X is modeled as a random variable (hereinafter rv) that equals zero with prob-ability 1 − pi, and follows a continuous severity distribution over positive values with probability 
+
+pi. The cumulative distribution function (cdf) Fi( • ; pi) and the probability density function (pdf) 
+
+fi( • ; pi) of the rv Xi read 
+
+
+
+Fi(x; pi) = (1 − pi) 1{x≥0} + pi Ψi(x; θi) 1{x> 0} ,fi(x; pi) = (1 − pi) δ0(x) + pi ψi(x; θi) 1{x> 0} ,
+
+(1) where pi ∈ (0 , 1] is the probability of a positive claim for the i-th component, δ0 is the Dirac delta at zero, ψi( • ; θi) is a continuous pdf defined on (0 , ∞) governing the claim severity, Ψ i( • ; θi) is 
+
+> 2To clarify the name of the model, we draw an analogy with functional analysis: a sequence of discrete jumps in time can be represented as a sum of step functions, whose continuous-time derivative is the Dirac comb (i.e., a sum of Dirac delta functions). In the discrete setting, an analogous “comb” is obtained, describing instantaneous changes occurring at predetermined times.
+
+4the corresponding cdf, and θi is the vector of parameters for the severity distributions. A natural example for the severity is the lognormal distribution, commonly used in the liter-ature to model insurance claims (see, e.g., McNeil et al. 2005, Poudyal 2021). In this case, the distributional parameters are θi = [ μi, σ i]⊤ and, for x > 0, we have 
+
+
+
+ψi(x; θi) = φ
+
+ln x − μi
+
+σi
+
+ 1
+
+xσ i
+
+,
+
+Ψi(x; θi) = Φ 
+
+ln x − μi
+
+σi
+
+
+
+,
+
+(2) with φ( • ) and Φ( • ) denoting the pdf and cdf of the standard normal (st.n.) distribution. To combine flexible marginal distributions with a tractable dependence structure, we construct the joint distribution of the claim vector X = [ X1, . . . , X d]⊤ through a traditional copula. Let 
+
+C( • ; ϱ) : [0 , 1] d → [0 , 1] denote a d-dimensional copula function, absolutely continuous w.r.t. the Lebesgue measure on [0 , 1] d and parametrized by a dependence vector ϱ; moreover, let c( • ; ϱ)denote its density. 3 The joint distribution of X is defined via Sklar’s Theorem (see, e.g., McNeil 
+
+et al. 2005, Th.5.3, p.186): 
+
+P(X1 ≤ x1, . . . , X d ≤ xd) = C F1(x1; p1), . . . , F d(xd; pd); ϱ. (3) Similarly, the joint survival function is given by the survival copula C:
+
+P(X1 > x 1, . . . , X d > x d) = C F 1(x1; p1), . . . , F d(xd; pd); ϱ, (4) where F i( • ; pi) := 1 − Fi( • ; pi) denotes the survival function of the i-th marginal. The Comb-Bernoulli model is thus characterized by three distinct sets of parameters, each governing a specific aspect of the multivariate claim distribution: the occurrence probabilities 
+
+p := [ p1, . . . , p d]⊤, which determine the frequency of claim events in each risk class; the severity parameters Θ := [ θ1, . . . , θd], which shape the marginal distributions for positive claims in each risk class; and the dependence parameter ϱ, which controls the correlation structure between marginal distributions through the copula function. This explicit decomposition into occurrence, severity, and dependence components constitutes the core analytical strength of the proposed framework. As we discuss in the following sections, this modularity offers several advantages: it enhances interpretability in risk assessment by al-lowing practitioners to isolate the contribution of each component; it enables rapid and efficient simulation of multivariate claim scenarios due to the separable structure; and it naturally sup-ports a sequential, multi-stage estimation of the parameters, improving numerical stability and           
+
+> 3For notational convenience, we shall use interchangeably C(u1, . . . , u d;ϱ) and C(u;ϱ), with u:= [ u1, . . . , u d]⊤.The same convention applies to the copula density c(•;ϱ).
+
+5computational efficiency. 
+
+## 2.2 Likelihood function 
+
+Due to the discrete-continuous nature of the marginals, the likelihood for any observation x =[x1, . . . , x d]⊤ must explicitly account for the atoms at zero. It is therefore useful to define the 
+
+active set S(x) for an observation x as the indices of components with positive claims: 
+
+S(x) := { i ∈ { 1, . . . , d } : xi > 0 } ⊆ S ,
+
+where S := {1, . . . , d }. We denote its cardinality by s(x) := |S (x)|.An example can help illustrate this notation. If claims arise from five different risk classes (i.e. d = 5) and the observed claim vector is x = [0 , 12 .5, 4.6, 0, 7] ⊤, then the active set is 
+
+S(x) = {2, 3, 5} and its cardinality is s(x) = 3. The active set partitions the components of each observation into two groups: those in S(x)contribute to the likelihood through a continuous density term, while those not in S(x) contribute only via the discrete probability mass at zero. The resulting log-likelihood Lp for a time series of 
+
+N multivariate observations can then be stated as follows. 4
+
+Proposition 2.1. Let X := {x(t)}Nt=1 be a d-dimensional Comb-Bernoulli time series. The log-likelihood of the model is given by 
+
+Lp (Θ, ϱ | X ) = X
+
+> x∈X
+
+(
+
+ln 
+
+"
+
+∂ s(x)C(u1, . . . , u d; ϱ)
+
+Q 
+
+> i∈S (x)
+
+∂u i
+
+#
+
+> ui=Fi(xi;pi)
+
++ X
+
+> i∈S (x)
+
+ln   piψi(xi; θi) )
+
+. (5) 
+
+Proof. See Appendix C For example, a fully zero observation x = 0 (i.e. such that S(x) = ∅) yields a particularly simple contribution to the log-likelihood. Indeed, the marginal sum P
+
+> i∈S (x)
+
+ln( piψi) is empty, and the partial derivative term reduces to the copula itself: 
+
+"
+
+∂ s(x)C(u1, . . . , u d; ϱ)
+
+Q 
+
+> i∈S (x)
+
+∂u i
+
+#
+
+> ui=Fi(xi;pi)
+
+= C( 1 − p1, . . . , 1 − pd; ϱ ) .
+
+The availability of a simple likelihood expression is one of the great advantages of the Comb-Bernoulli model, since it allows straightforward estimation of the dependence parameters ϱ via the IFM approach (see, e.g., Joe 1997, Ch.10), as we discuss in Section 2.4.       
+
+> 4The subscript pin Lpemphasizes that, unlike standard copula models with continuous marginals, the Comb-Bernoulli model features atomic probabilities at zero, controlled by the parameters p:= [ p1, . . . , p d]⊤.
+
+6The bivariate ( d = 2) and trivariate ( d = 3) Comb-Bernoulli models provide the simplest illustrations of the proposed framework. Explicit log-likelihoods for these cases are presented in Appendices A and B. 
+
+2.2.1 Likelihood in the continuous-time limit 
+
+The Comb-Bernoulli model introduced in Section 2.1 operates in discrete-time, with claims ob-served at N monitoring times, equally spaced over the period (0 , T ]; the time interval between two successive observations is ∆ t := T /N . At each monitoring time, the probability that the observed loss vector has I ⊆ S as active set, denoted as p⊥ 
+
+> I
+
+, is given by the following Lemma. 
+
+Lemma 2.2. For any I ⊆ S, the probability of observing positive losses exactly in the components indexed by I is 
+
+p⊥ 
+
+> I
+
+:= P {Xi > 0 ∀i ∈ I} ∩ { Xj = 0 ∀j / ∈ I} = X
+
+> J⊇I
+
+(−1) |J|−| I| CJ
+
+  {pi}i∈J
+
+ , (6) 
+
+where the sum is taken over all index sets J ⊆ S containing I, and CJ denotes the survival copula restricted to the index set J of cardinality |J|.5
+
+Proof. See Appendix C As an example, in the bivariate case, the probability of observing a positive claim exclusively in the first risk class (i.e. with active set I = {1}) is given by 
+
+p⊥{1} = C{1}(p1) − C{1,2}(p1, p 2) = p1 − C(p1, p 2; ϱ),
+
+which naturally translates to the difference P(X1 > 0) − P(X1 > 0, X 2 > 0). Similarly, the prob-ability of a simultaneous co-jump in both classes (i.e. I = {1, 2}) reduces to p⊥{1,2} = C(p1, p 2; ϱ). In this Section, we show that the Comb-Bernoulli admits a natural continuous-time extension. We consider the limit model obtained by increasing the monitoring frequency (i.e. by letting ∆t → 0+), while applying a Poisson scaling to the probabilities p⊥ 
+
+> I
+
+:
+
+p⊥ 
+
+> I
+
+= λ⊥ 
+
+> I
+
+∆t ∀ I̸ = ∅ . (7) This scaling ensures that, as the sampling time-step ∆ t decreases, the expected number of claims with I as active set over the period (0 , T ] remains constant, equal to λ⊥ 
+
+> I
+
+T .                        
+
+> 5As standard in the literature (see, e.g., Cherubini et al. 2004), for any nonempty index set J⊆S, we define the restriction of the survival copula Cto the coordinates in Jas
+> CJ({uj}j∈J) := C {uj}j∈J,{1}j∈J∁;ϱ,
+> i.e. as the survival copula obtained by setting all components not in Jas equal to 1.
+
+7In this continuous-time setting, claims can occur at any instant within the interval (0 , T ], rather than only at the discrete monitoring times. Interarrival times follow exponential distributions characteristic of Poisson processes, and the intensities {λ⊥ 
+
+> I
+
+}I⊆S govern the occurrence of events with active set I. The dependence across risk classes is captured by a multivariate L´ evy copula, connecting to the bivariate construction of Esmaeili and Kl¨ uppelberg (2010). The following Proposition presents the likelihood of this continuous-time representation. 
+
+Proposition 2.3. Let X := {x(t)}t denote a collection of observed claim events over (0 , T ], where 
+
+t represents the arrival time and each x(t) the associated d-variate loss vector. In the continuous-time limit, the log-likelihood of the d-dimensional Comb-Bernoulli is given by 
+
+Lλ (Θ, ϱ | X ) = X 
+
+> I̸=∅
+
+ X  
+
+> x∈X :S(x)= I
+
+ln ζ x + X
+
+> i∈I
+
+ln  λiψi
+
+ xi; θi
+
+ !
+
+− T λ ⊥
+
+> I
+
+ . (8) 
+
+Here, λi denotes the intensity of component i, defined as λi := P  
+
+> I⊆S:I∋i
+
+λ⊥ 
+
+> I
+
+, and the function ζ is 
+
+ζ(x) := X
+
+> J⊇S (x)
+
+(−1) |J|
+
+"
+
+∂ s( x)
+
+Q 
+
+> i∈S (x)
+
+∂u i
+
+CJ ({ui}i∈J )
+
+#
+
+> ui=λiΨi(xi)
+
+,
+
+where CJ denotes the L´ evy copula restricted to the index set J, i.e. 
+
+CJ
+
+ {ui}i∈J
+
+ := lim 
+
+> ∆t→0
+
+CJ
+
+ {∆t u i}i∈J
+
+
+
+∆t .
+
+Proof. See Appendix C This result establishes that the discrete-time Comb-Bernoulli model converges to a L´ evy copula model in continuous-time. Notably, the obtained likelihood expression (8) recovers the likelihood of the bivariate L´ evy copula model by Esmaeili and Kl¨ uppelberg (2010, Th. 4.1, p. 227) as a special case, while providing a straightforward generalization to arbitrary dimension d.Proposition 2.3 thus formalizes a theoretical bridge between discrete- and continuous-time de-pendence modeling: the Comb-Bernoulli represents a tractable discrete-time analog of L´ evy copula models, and its elementary structure offers substantial computational advantages in both likeli-hood evaluation and model simulation. The latter aspect is the focus of the next section. 
+
+## 2.3 Simulation 
+
+The Comb-Bernoulli model can be simulated efficiently using a straightforward two-step procedure. Algorithm 1 presents the complete simulation scheme for generating a time series of length N .8Algorithm 1. Comb-Bernoulli Simulation 
+
+Require: N (number of simulations)  
+
+> 1:
+
+for t = 1 , . . . , N  
+
+> 2:
+
+Draw u(t) := u(t)1 , . . . , u (t)
+
+> d
+
+⊤ from C(u(t); ϱ) ▷ Step 1: simulate copula  
+
+> 3:
+
+for i = 1 , . . . , d ▷ Step 2: compute claims  
+
+> 4:
+
+if u(t) 
+
+> i
+
+≤ 1 − pi 
+
+> 5:
+
+Update x(t) 
+
+> i
+
+← 0 
+
+> 6:
+
+else  
+
+> 7:
+
+Update x(t) 
+
+> i
+
+← Ψ−1
+
+> i
+
+ u(t) 
+
+> i
+
+− (1 − pi)
+
+pi
+
+; θi
+
+
+
+Through Step 1, we sample a d-dimensional vector u(t) from the copula C( • ; ϱ) with dependence parameter ϱ (see Figure 1a for the bivariate case). Step 2 then applies the key transformation of our model: the i-th component incurs a loss if and only if u(t) 
+
+> i
+
+exceeds the threshold 1 − pi ;otherwise, it is set to zero. This threshold mechanism translates the copula structure into claim occurrence and severity, forming the cornerstone of the Comb-Bernoulli framework. In the bivariate case, for example, Step 2 gives rise to four distinct cases, corresponding to the four regions in Figure 1b: both claims are positive ( upper-right ); a positive claim on x1, zero on 
+
+x2 (lower-right ); a positive claim on x2, zero on x1 (upper-left ); both claims are zero ( lower-left ). Algorithm 1 offers three main advantages compared to the simulation algorithm of L´ evy copulas: 
+
+i) it can be easily vectorized, ii) it requires the inversion only of univariate cdfs, iii) it scales linearly in the number of risk classes d. L´ evy copula simulation (cf. Tankov 2006, Esmaeili and Kl¨ uppelberg 2010), in contrast, does not present the same advantages. In particular, it scales exponentially in the number of risk classes, as it requires the simulation of 2 d − 1 separate processes, as well as the inversion of multivariate cdfs. For instance, in the trivariate case, one must invert three bivariate cdfs and a trivariate cdf – a task that is computationally onerous in most cases. A detailed quantitative assessment of these computational gains is provided in Section 4. 
+
+## 2.4 Parameter estimation 
+
+This section develops the estimation methodology for the parameters of the Comb-Bernoulli model, with particular focus on the copula dependence ϱ. We first present a technique to obtain point estimates of the model parameters, based on the IFM method, then we discuss two methodologies for the construction of the confidence intervals. 
+
+2.4.1 Point estimation 
+
+The IFM method is a two-stage estimation procedure widely used in the copula literature (see, e.g., Cherubini et al. 2004, Cesari and Valerio 2019, and references therein). In finance, this method is 9•
+
+•
+
+•
+
+•
+
+•
+
+•
+
+•
+
+• •
+
+•
+
+•
+
+•
+
+•
+
+• •
+
+•
+
+•
+
+•
+
+•
+
+•
+
+•
+
+• •
+
+• •
+
+•
+
+•
+
+•
+
+•
+
+•
+
+•
+
+•
+
+•
+
+••
+
+• ••
+
+•
+
+•
+
+••
+
+• •
+
+• •
+
+•
+
+•
+
+•
+
+•
+
+•
+
+•
+
+•
+
+•
+
+u1
+
+u2
+
+1
+
+1
+
+(a) 
+
+u1
+
+u2
+
+1
+
+1
+
+1 − p1
+
+1 − p2
+
+(b)   
+
+> Figure 1: Simulation of a two-dimensional Comb-Bernoulli. First, a pair ( u1, u 2) is sampled from a two-dimensional copula ( left ), following Step 1 of Algorithm 1. Next, the claims are generated by applying Step 2: four cases are possible, corresponding to the four depicted regions ( right ). We indicate the co-jump region in grey, the no-jump region in white, and the region with only a non-zero claim ( x1or x2)with a hatch pattern.
+
+an example of cascade estimation, where the parameters related to model parts requiring greater accuracy (e.g., more liquid financial products) are calibrated first, with the remaining parameters estimated subsequently (see, e.g. Brigo and Morini 2005, Baviera and Massaria 2026). In the context of the Comb-Bernoulli model, the procedure is the following. First, for each of the d marginal distributions, one estimates the parameters pi and θi using the univariate maximum likelihood estimators (MLEs) of the marginal density in (1). It is straight-forward to show that, for the i-th marginal, the univariate MLE for pi is the fraction of positive observations in the i-th component, while the estimator for θi is the MLE restricted to the positive observations – effectively fitting ψi to the non-zero losses only. This yields closed-form estimators for the marginal parameters in all relevant cases, rendering the calibration extremely efficient and accurate. We denote the obtained first-stage estimates as bp and bΘ.Then, one estimates the copula dependence ϱ via the IFM estimator bϱp, defined as 
+
+bϱp := arg max 
+
+ϱ Lbp
+
+ bΘ, ϱ | X 
+
+
+
+, (9) namely as the maximizer of the log-likelihood (5) once the marginal parameters have been fixed at their first-stage estimates bp and bΘ.The maximization problem in (9) can be solved numerically to compute the estimate bϱp for the copula parameter. While in practice this estimation can be performed by applying the first-order conditions (see, e.g., Joe 1997), the well-posedness of the estimator is valid under much broader assumptions. Specifically, by framing the proposed estimator bϱp within the broad class of 10 extremum estimators, its consistency and asymptotic normality can be established for a general parametric copula, relying on the topological properties of the parameter space and the interiority of the true parameter, following the theoretical framework outlined in Newey and McFadden (1994). 
+
+2.4.2 Confidence Intervals 
+
+A point estimate alone is of limited use in insurance applications, as risk assessment requires reli-able quantification of the associated uncertainty. In what follows, we describe two main approaches to construct CIs for the Comb-Bernoulli parameters: a parametric bootstrap and a method based on the estimating functions theory. The parametric bootstrap (see, e.g., Efron and Hastie 2021, Ch.10) is a powerful numerical technique for construction of CIs. In the Comb-Bernoulli case, its implementation is elementary thanks to the availability of the efficient simulation algorithm developed in Section 2.3. The parametric bootstrap procedure involves three steps: 1. Simulate B replicas of the original time series of claims, using Algorithm 1 with the estimated parameters bp, bΘ, and bϱp;2. For each replica, re-estimate the parameters of interest via IFM to obtain B estimates; 3. Construct the CIs from the empirical quantiles at levels α/ 2 and 1 −α/ 2 of the bootstrapped estimates (e.g., α = 0 .05 for a 95% CI). If multiple parameters are of interest, the Bonferroni correction (see, e.g., Dunn 1958) replaces α with α/m , where m is the number of parameters. For example, if we only aim to infer the dependence parameters ϱ – here assumed to be an 
+
+m-dimensional vector ϱ = [ ϱ1, . . . , ϱ m]⊤ – the bootstrapped α-CI for each element ϱj is 
+
+bϱj, α/ (2 m), bϱj, 1−α/ (2 m)
+
+ ,
+
+where bϱj, q denotes the empirical q-quantile of the bootstrapped estimates for ϱj .As an alternative to the parametric bootstrap, asymptotic CIs for the Comb-Bernoulli parame-ters can be constructed using the estimating functions theory. Based on the results in Joe (1997) and Newey and McFadden (1994), the distribution of the IFM estimates is asymptotically normal with covariance matrix given by the inverse of the Godambe information matrix – a generalization of the Fisher information matrix that can be computed numerically (see, e.g., Joe 2005, p. 405, eq. (2.6)). Individual CIs for the parameters of interest are then obtained either by projecting the joint (elliptical) confidence region onto the coordinate axes, or directly from the diagonal elements of the covariance matrix, applying a Bonferroni correction if needed. 11 3 The Gaussian copula case 
+
+The Gaussian copula is widely used in the financial industry. Its popularity stems from several key advantages: considerable flexibility in specifying correlation parameters, straightforward im-plementation, and well-established theoretical properties (see, e.g., Embrechts 2002, Guegan and Jouad 2012, Zhang and Dukic 2013). The Gaussian copula has found extensive applications in the banking sector. The cornerstone of credit risk capital requirements in banks’ internal models – Gordy (2003) – is a Gaussian copula model with a separable correlation matrix. This specification forms the basis of the Basel II Internal Ratings-Based (IRB) framework (BCBS II 2005) and its subsequent modifications (see, e.g, BCBS III 2010, Hull 2012). This approach generalizes earlier seminal Gaussian copula credit models (Vasicek 1987, Li 2000). In insurance modeling, the Gaussian copula is used in determining solvency capital requirements, economic capital allocation, and diversification benefits, and in pricing certain multi-risk products. It can be readily scaled to the number of risk factors typically involved in Solvency II internal models (IM) and relies on relatively elementary formulas. Moreover, in integrated enterprise-wide risk management, the Gaussian copula can play an important role within insurance companies. As emphasized by Rosenberg and Schuermann (2006, p.570), “the goal of integrated risk management is to both measure and manage risk and capital across a diverse range of risks in the insurance sector.” Such an approach requires aggregating different types of risk (market, actuarial, and operational), whose underlying characteristics may vary considerably. In their seminal paper, Ward and Lee (2002) were the first to derive the total loss distribution for a diversified insurer, using a normal copula to aggregate a heterogeneous set of risks. The Gaussian copula framework allows for the incorporation of realistic marginal distributions that capture key empirical features, while also providing a flexible dependence structure across risks. On this respect, Wang et al. (1998, p.892) emphasizes that “the normal copula is very flexible as it allows any (symmetric, positive definite) matrix of rank correlation coefficients (. . . ) In many practical situations, we only have partial information about correlation parameters without knowing the exact underlying multivariate distribution. In such cases, a normal copula provides a simple method for simulating correlated variables”. The Gaussian copula therefore satisfies two key requirements for integrated risk management: i) it allows for a rich dependence structure across risks, and ii) it remains applicable even when information about inter-risk dependencies is limited (e.g., when only correlations are available). A Solvency II internal model may involve a large number of risk factors – around 20 when considering a single risk class (e.g., operational risk), and up to 100 in a fully integrated model. Such high dimensionality poses challenges for the existing modeling approaches, as noted in Section 1. Addressing this issue in the context of modeling dependence in sparse time series is a key objective of this work. In this setting, the Gaussian copula provides a natural and practical choice for both fitting and simulation in internal models. 12 Finally, it can be useful to emphasize that the results we present in this section can be extended to any elliptical copula. The Gaussian case remains a relevant benchmark, noting that, as high-lighted by Rosenberg and Schuermann (2006, p.571), the choice of elliptical copula (e.g., normal versus Student-t), which determines the degree of tail dependence (for continuous marginals), often has a relatively modest impact on total risk. In this Section, we present the main properties of the Comb-Bernoulli model when the depen-dence structure is specified by a Gaussian copula. First, we derive a closed-form expression for the log-likelihood, and then we analyze the asymptotic behavior of the model as the probability masses at zero vanish, demonstrating consistency with classical copula theory. 
+
+## 3.1 Elementary closed-form likelihood expression 
+
+In the Gaussian copula, the dependence is fully encoded by a correlation matrix R ∈ Rd×d. The generic copula parameter ϱ in (3) is therefore identified with this matrix, with the understanding that ϱ is a vector consisting of the d(d − 1) /2 unique off-diagonal entries of R. Moreover, we denote with Kd ⊂ Rd×d the set of d × d correlation matrices. 6
+
+The Gaussian copula function and its density are defined in terms of the standard multivariate normal distribution. For a vector u = [ u1, . . . , u d]⊤ ∈ [0 , 1] d, the copula function is given by: 
+
+C(u1, . . . , u d; R) = Φ d(Φ −1(u1), . . . , Φ−1(ud); R) , (10) where Φ d( • ; R) is the cdf of the centered d-variate Gaussian distribution with covariance matrix 
+
+R (see, e.g., Cherubini et al. 2004, Sec.4.8, p.147). The corresponding copula density is given by: 
+
+c(u1, . . . , u d; R) = φd(Φ −1(u1), . . . , Φ−1(ud); R)
+
+φd(Φ −1(u1), . . . , Φ−1(ud); Id) , (11) where φd( • ; R) is the pdf of the centered d-variate Gaussian distribution with covariance matrix 
+
+R, and Id is the d × d identity matrix. To establish notation for subsequent results, we introduce the following conventions. For any index set S ⊆ S with cardinality s := |S| , we define its complement as T := S ∁ = {1, . . . , d } \ S .Moreover, we define the vector z := [Φ −1(u1), . . . , Φ−1(ud)] ⊤, and partition it into the sub-vectors: 
+
+zS := [Φ −1(ui)] i∈S and zT := [Φ −1(ui)] i∈T . (12)         
+
+> 6Throughout this section, we will use ϱas the parameter in likelihood-based inference, and we will write Ras shorthand for R(ϱ) when working with matrix operations. This slight abuse of notation simplifies the exposition and is justified by the one-to-one correspondence ϱ↔R.
+
+13 The correlation matrix R is partitioned conformably as: 
+
+R =
+
+"
+
+RSS RST 
+
+RT S RT T 
+
+#
+
+, (13) where, for example, RSS is the s × s correlation sub-matrix for the components in S. 7
+
+The following Lemma provides a closed form-expression of the mixed partial derivative of the Gaussian copula. This result is fundamental for computing the model log-likelihood, as it provides the key copula term appearing in (5), leading to a closed-form expression for the log-likelihood. 
+
+Lemma 3.1. Let C(u1, . . . , u d; R) be a d-dimensional Gaussian copula. The mixed partial deriva-tive of C w.r.t. the arguments in the index set S, as it appears in (5) , is given by 
+
+∂ sC(u1, . . . , u d; R)
+
+Q 
+
+> i∈S
+
+∂u i
+
+= φs (zS ; RSS )
+
+φs (zS ; Is) Φd−s
+
+ zT − RT S R−1 
+
+> SS
+
+zS ; RT T − RT S R−1 
+
+> SS
+
+RST 
+
+ . (14) 
+
+Proof. See Appendix C Notably, the right-hand-side of (14) can be interpreted as the product of two distinct factors: the first term, φs (zS ; RSS ) / φ s (zS ; Is), is the copula density restricted only to the components in S;the second term is the conditional cdf of the sub-vector ZT given that ZS = zS , i.e. 
+
+P (ZT ≤ zT | ZS = zS ) = Φ d−s
+
+ zT − RT S R−1 
+
+> SS
+
+zS ; RT T − RT S R−1 
+
+> SS
+
+RST 
+
+ .
+
+Lemma 3.1, together with (5), provides an analytic expression for the log-likelihood in the Gaus-sian copula Comb-Bernoulli model. The formula relies exclusively on the multivariate Gaussian cdf and pdf; hence, the numerical evaluation of the likelihood is highly efficient, as these functions are standard and optimized in all major mathematical software libraries. 
+
+## 3.2 Asymptotic behavior and consistency with classical theory 
+
+Having established the closed-form likelihood of the Gaussian Comb-Bernoulli model, we now turn to a fundamental theoretical question: how does the model behave when the probability masses at zero become negligible? This aspect is crucial for understanding the connection between the Comb-Bernoulli framework and standard copula models with continuous marginals. We address this question by analyzing the limiting behavior of the log-likelihood as p → 1.     
+
+> 7It is well known from linear algebra that, if Ris positive definite, then its principal submatrices RSS and RT T
+> are also positive definite, and hence invertible.
+
+14 Proposition 3.2. For p → 1, the log-likelihood Lp(Θ, ϱ | X ) in (5) converges to the function 
+
+L (Θ, ϱ | X ) := X
+
+> x∈X
+
+ln c (Ψ 1(x1; θ1), . . . , Ψd(xd; θd); ϱ) + X
+
+> i∈S (x)
+
+ln  ψi(xi; θi) , (15) 
+
+almost surely for any ϱ ∈ K d, where c( • ; ϱ) is the Gaussian copula density in (11) .Proof. See Appendix C The limiting log-likelihood L coincides with the standard log-likelihood for a Gaussian copula with continuous marginals. This convergence extends to the estimators themselves, as proved in the following theorem. 
+
+Theorem 3.3. As p → 1, the IFM estimator bϱp (9) of the Gaussian copula correlation converges almost surely to bϱ, defined as 
+
+bϱ := arg max 
+
+> ϱ∈K d
+
+L
+
+ bΘ, ϱ | X 
+
+
+
+, (16) 
+
+where L is defined in (15) and bΘ := 
+
+hbθ1, . . . , bθd
+
+i
+
+are the marginal MLEs. Proof. See Appendix C Theorem 3.3 is a major result of this paper: it establishes that the Comb-Bernoulli framework is a genuine generalization of the standard Gaussian copula with continuous marginals. When probability masses at zero vanish, our methodology recovers classical copula theory, ensuring consistency and compatibility with existing methods. Finally, the connection to the classical setting also allows us to benchmark the IFM estimator against another well-known dependence measure: Spearman’s rank correlation. In the classical setting, Spearman’s correlation provides an elegant and computational efficient route to estimating the entries of the copula matrix R, as detailed in the following Proposition. 
+
+Proposition 3.4. Let X1, . . . , X d be random variables with continuous marginal distribution func-tions Ψi(·; θi) and suppose their dependence structure is governed by a Gaussian copula with cor-relation matrix R ∈ K d. Then both the IFM estimator bϱ (16) and the estimator 
+
+bRij := 2 sin 
+
+π
+
+6 bρij 
+
+
+
+, i, j = 1 , . . . , d, 
+
+where bρij denotes the sample Spearman correlation, are consistent for the entries of R.Proof. See Appendix C. It is worth observing that this result does not extend to the Comb-Bernoulli framework: the presence of probability masses at zero leads to the occurrence of tied observations, affecting the 15 ranking used in Spearman’s ρ (see, e.g., Baviera et al. 2026). This renders it unsuitable when dealing with sparse financial time series and, consequently, for the estimation of the Gaussian Comb-Bernoulli parameters. The IFM procedure described in Section 2.4 therefore emerges as the natural estimation route for the correlation in the Gaussian Comb-Bernoulli model; its advantages over Spearman are demonstrated empirically in the next section. 
+
+# 4 Results 
+
+In this section, we present an application of the Comb-Bernoulli model to one of the best-known insurance dataset, comparing its performance against standard benchmarks. After describing the dataset employed in our analysis, we discuss the results of parameter estimation, and finally assess the computational efficiency of our approach. 
+
+## 4.1 Dataset 
+
+We consider the well-known Danish fire insurance dataset, which comprises claims (in Danish Krone, DKK) recorded between 1980 and 1990, gathered from the Copenhagen Reinsurance Com-pany. These claims are provided on a daily basis (a total of 4018 days) and divided into three categories: “Building”, “Contents”, and “Profit” claims. In Table 1, we report descriptive statis-tics for the dataset; we refer the reader interested in a more detailed description of the dataset to the textbook of McNeil et al. (2005). 
+
+Observations Mean Min Max Building 1541 (38%) 2.56 Mln DKK 60 .85 K DKK 158 .93 Mln DKK 
+
+Contents 1363 (34%) 2.10 Mln DKK 10 .47 K DKK 132 .01 Mln DKK 
+
+Profits 561 (14%) 0.94 Mln DKK 4.08 K DKK 61 .93 Mln DKK   
+
+> Table 1: Descriptive statistics for the three risk categories: number of non-zero observations (with percentage out of 4018 days), along with mean, minimum, and maximum claim sizes.
+
+Table 2 reports, for each bivariate time series, the number of no-jumps (both series equal to zero) and co-jumps (both series strictly positive). Table 3 shows the corresponding counts for the trivariate series. Interestingly, the number of no-jumps in the trivariate series matches the number of no-jumps in the bivariate series “Building”–“Contents”. This indicates that whenever both the “Building” and “Contents” series record a zero claim simultaneously, the “Profits” series also records a zero claim. 16 # No-jumps # Co-jumps Building Contents Profits Building Contents Profits Building 2373 2435 1259 519 
+
+Contents 2650 556 
+
+Profits 
+
+> Table 2: Number of no-jumps and co-jumps in each bivariate time series.
+
+# No-jumps # Co-jumps 
+
+2373 514 
+
+> Table 3: Number of no-jumps and co-jumps in the trivariate time series.
+
+## 4.2 Parameters’ estimation 
+
+We consider a trivariate Comb-Bernoulli model with lognormal marginals (2) and Gaussian copula (see Section 3). Below, we present the estimated parameters and their confidence intervals obtained via parametric bootstrap. Model calibration is performed using the IFM approach in Section 2: we first fit the three marginal distributions, then the copula. For the explicit log-likelihood formulas, we refer the reader to Appendix B. Table 4 collects the estimated marginal parameters: the jump probabilities bp, and the two parameters of the lognormal distribution, the vector of means bμ and the standard deviations bσ,for the three marginal distributions. 
+
+Parameter estimates Category bp bμ bσ
+
+Building 0.38 0.55 0.81 
+
+Contents 0.34 −0.21 1.30 
+
+Profits 0.14 −1.19 1.43   
+
+> Table 4: Estimated parameters of the Comb-Bernoulli marginal models: jump probabilities ( bp), and lognormal means ( bμ) and standard deviations ( bσ).
+
+Once fitted the marginals, we estimate the correlation matrix of the Gaussian copula for the complete trivariate time series. Table 5 shows the point estimates of the dependence parameters along with their 95% CIs. These intervals are obtained via a parametric bootstrap with B = 10 3
+
+replicas, using Algorithm 1. The estimated correlation values indicate a strong positive depen-dence across all risk pairs, ranging from 0 .667 to 0 .789. Notably, the 95% CIs for the correlation 17 parameters are relatively narrow: these tight bounds suggest that the correlation estimates pro-vided by the Comb-Bernoulli model are statistically precise and highly reliable, despite the high sparsity of the dataset. 
+
+Correlation estimates Confidence Intervals Building Contents Profits Building Contents Profits Building 0.761 0.667 [0 .739; 0 .783] [0 .629; 0 .699] 
+
+Contents 0.789 [0 .757; 0 .813] 
+
+Profits   
+
+> Table 5: Gaussian copula correlation estimates (ˆ ϱp) and corresponding 95% confidence intervals for the Comb-Bernoulli model. The confidence intervals are calculated via a parametric bootstrap with B= 10 3
+> replicas.
+
+4.2.1 Comparison with benchmarks 
+
+To evaluate the effectiveness of the Comb-Bernoulli model, we compare our results against two key benchmarks: the zero-mixed model and Spearman’s correlation. We focus in particular on the estimate of the dependence structure First, we calibrate the dependence structure using the zero-mixed model. The calibration results, presented in Table 6, explicitly highlight the severe limitations of this approach in higher dimensions. From a parsimony perspective, the zero-mixed model is highly parameter-intensive; in a simple trivariate case ( d = 3), it requires estimating 14 distinct parameters only to describe the occurrence and dependence structures. Furthermore, estimating these parameters accurately is difficult due to data sparsity. Because co-events in sparse time series are rare, calibration relies on very few data points, thereby severely destabilizing the estimation process. This sparsity also manifests in the precision of the estimates: the 95% confidence intervals for the zero-mixed model are remarkably wide (see, e.g., ˆ ϱ(2) 13 in Table 6). As a second benchmark, we consider the correlation estimator obtained from Spearman’s rank correlation. As discussed in Section 3 (cf. Proposition 3.4), when the marginals are strictly contin-uous, the Gaussian copula correlation can be estimated via the transformation bRi,j = 2 sin  π 
+
+> 6
+
+bρi,j 
+
+,where bρi,j is the sample Spearman’s correlation. One might be tempted to use this transformed estimator because computing Spearman’s correlation is straightforward and readily available in standard statistical libraries. Exact minimum and maximum equivalent estimates of Spearman’s correlation can be obtained via elementary algorithms (cf. Baviera et al. 2026). By applying the continuous monotonic trans-formation 2 sin  π 
+
+> 6
+
+bρi,j 
+
+ from Proposition 3.4 to these bounds, we can directly obtain the corre-sponding minimum and maximum equivalent estimations for the Gaussian copula correlation bRi,j .In Table 7, we show these minimum-maximum equivalent estimations for the transformed Spear-man’s correlations; we observe that in some cases the range is almost 1 .5, quite close to 2, the 18 Active Set S Description Prob. ˆpS (95% CI) Correlation (95% CI) 
+
+Zero and Univariate Jumps (No dependence structure) 
+
+∅ No jumps 0.591 [0 .568; 0 .613] –
+
+{1} Building 0.069 [0 .057; 0 .081] –
+
+{2} Contents 0.015 [0 .010; 0 .021] –
+
+{3} Profits 0.000 [0 .000; 1 .000] –
+
+Bivariate Co-jumps 
+
+{1, 2} Building & Contents 0.185 [0 .168; 0 .203] ˆϱ(2) 12 = 0 .259 [0 .157; 0 .356] 
+
+{1, 3} Building & Profits 0.001 [0 .000; 0 .003] ˆϱ(2) 13 = −0.376 [ −0.985; 0 .931] 
+
+{2, 3} Contents & Profits 0.011 [0 .006; 0 .015] ˆϱ(2) 23 = 0 .599 [0 .221; 0 .820] 
+
+Trivariate Co-jumps 
+
+{1, 2, 3} All three classes 0.128 [0 .113; 0 .143] ˆϱ(3) 12 = 0 .329 [0 .210; 0 .439] ˆϱ(3) 13 = 0 .289 [0 .167; 0 .402] ˆϱ(3) 23 = 0 .639 [0 .556; 0 .709] 
+
+Table 6: Calibration results for the 3-dimensional zero-mixed model. For each possible active set S (i.e., the set of classes presenting a claim), we report the estimated probability ˆ pS . For sets with |S| ≥ 2, we also report the corresponding Gaussian copula correlation parameters, distinguished by superscript (2) for bivariate copulas and (3) for the trivariate copula, alongside their 95% confidence intervals. This explicitly highlights the parameter-intensive nature of the zero-mixed approach, requiring 14 parameters just for the occurrence and dependence structure in d = 3, and demonstrates the high uncertainty in estimation—reflected in the exceptionally wide confidence intervals—caused by data sparsity. 
+
+maximum allowed range for a correlation. Let us underline that this fact is observed in one of the most studied datasets in the insurance sector. 
+
+Building Contents Profits Building [0 .169; 0 .942] [−0.496; 0 .968] 
+
+Contents [−0.411; 0 .985] 
+
+Profits 
+
+Table 7: Minimum and maximum equivalent estimations for the Gaussian copula correlation parameter 
+
+bRi,j . The bounds are derived by applying the monotonic transformation bRi,j = 2 sin   π 
+
+> 6
+
+bρi,j 
+
+ to the exact lower and upper bounds of Spearman’s rank correlation. 
+
+Furthermore, the observed narrowness in Comb-Bernoulli CIs is a remarkable result, especially if these CIs are compared to the interval between the minimum and maximum possible values of the Spearman-based correlation, presented in Table 7. 19 4.2.2 Additional comments on the bivariate case 
+
+As a further comparison, we also estimate the three bivariate ( d = 2) time series separately to investigate whether the results align with those of the complete trivariate model ( d = 3). Table 8 presents both the point estimates and the corresponding 95% confidence intervals for the Gaussian copula correlations, calibrated for each pair of time series separately. 
+
+Correlation estimates Confidence Intervals Building Contents Profits Building Contents Profits Building 0.763 0.634 [0 .740; 0 .786] [0 .592; 0 .675] 
+
+Contents 0.783 [0 .754; 0 .811] 
+
+Profits  
+
+> Table 8: Gaussian copula correlation estimates (ˆ ϱp) and corresponding 95% confidence intervals for the bivariate Comb-Bernoulli models. The estimation is performed by calibrating the three bivariate time series separately. Both point estimates and confidence intervals are consistent with those obtained from the complete trivariate model.
+
+Both point estimations and CIs are statistically equivalent in the two considered cases: the complete model ( d = 3, see Table 5) and 3 separate two-dimensional models, considering a couple of time series at a time. In extensive numerical experiments, we have observed that the estimation of the correlation parameters achieves similar results. It can be useful to state a conjecture: estimating the complete Gaussian copula model or several low-dimensional models leads to similar results. This fact can have relevant practical consequences because the fit of a low-dimensional Gaussian copula can be fast and elementary in most cases. This result is very relevant in practice and deserves a comment. 
+
+## 4.3 Simulation 
+
+In practical applications, it is crucial to be able to simulate replicas of the original time series according to a given model, i.e. generating synthetic time series data with the same parameters as the original one according to a given model. The parametric bootstrap presented in Section 2.4 is only an example of the broad use of simulation methods. In Table 9, we compare the simulation times of the Comb-Bernoulli and the L´ evy copula mod-els. 8 Simulation time for the Comb-Bernoulli is dramatically faster than the L´ evy copula model, particularly as the dimensionality d increases. As shown in Table 9, for d = 2 the Comb-Bernoulli simulation time is similar to that of the L´ evy copula model, but it becomes more than twenty times faster when simulating trivariate time series ( d = 3). This result substantiates the claim that the Comb-Bernoulli process offers a straightforward simulation algorithm that overcomes the 
+
+> 8Computations were performed using Python 3.9 on a Windows 10 system with an Intel Core i5-9600K CPU (3.70 GHz) and 16 GB RAM.
+
+20 scalability limitations of the L´ evy copula approach, which requires simulating 2 d − 1 processes. The model achieves its goal of providing a parsimonious and computationally efficient tool for modelling dependent sparse time series. 
+
+d = 2 d = 3 d = 20 d = 100 Comb-Bernoulli 2.27 3.33 20 .37 110 .51 
+
+L´ evy copula 2.32 76 .30 - -         
+
+> Table 9: Comparison of average simulation times (in seconds) for B= 10 3replicas of the Comb-Bernoulli and L´ evy copula models across different dimensions ( d= 2, 3, 20, 100). The simulations are performed using Student-t copulas, with model parameters randomly drawn for each run. The reported times represent the average over 100 independent experiments. Missing values for the L´ evy copula at d= 20 and d= 100 indicate that the simulation becomes computationally unfeasible due to the exponential scaling of the algorithm.
+
+This result is of extreme importance in the insurance sector. As an example, consider an internal model in Solvency II for capital requirements. Generally, the dependence between a large number of different risk classes should be taken into account; thus, a fast simulation scheme as that of the Comb-Bernoulli model can be very useful. For the proposed model, even for a large number of risk classes, the simulation time remains negligible. Indeed, considering d = 20 and d = 100 risk classes, the average times for the simulation of B = 10 3 replicas of the Comb-Bernoulli are respectively 20 .37 and 110 .51 seconds, which confirms the linear growth of computational time with the dimension d.
+
+# 5 Conclusions 
+
+This paper introduces the Comb-Bernoulli model , a novel multivariate framework designed to model sparse time series with mixed discrete-continuous marginals – a common feature in insur-ance claims data where periods without claims (zeros) alternate with occasional positive claims. The model effectively bridges the gap between two established approaches: the flexible but parameter-intensive zero-mixed models, common in discrete-time settings, and the parsimonious but simulation-challenging L´ evy copula models used in continuous-time. The Comb-Bernoulli model is constructed by specifying each marginal as a mixture of a point mass at zero (with probability 1 − pi) and a continuous severity distribution for positive claims (with probability pi). The dependence structure across different risk classes is then introduced via a traditional copula function applied to these mixed marginal distributions. There are three main contributions of this paper. Firstly, we formally define the Comb-Bernoulli model and derive its closed-form likelihood function, enabling efficient parameter estimation via the IFM method. 21 Secondly, we provide a detailed analysis of the Gaussian copula specification. We prove that the IFM estimator of the correlation matrix converges almost surely to a well-defined limit as occurrence probabilities approach one. Lastly, we validate the model empirically using the Danish fire insurance dataset. The results show not only that the model provides an accurate correlation estimate with tight confidence intervals, but also exceptional computational advantages. While the simulation algorithm for L´ evy copula models scales exponentially – rendering simulations completely unfeasible for high dimensions such as d = 20 or d = 100 – the Comb-Bernoulli model scales linearly. For instance, simulating 10 3 replicas for a 20-dimensional portfolio (typical of Solvency II operational risk fac-tors) takes only about 20 seconds. This makes the Comb-Bernoulli model a highly practical, scalable, and computationally efficient tool for pricing and risk management in the insurance sector. 
+
+# References 
+
+Avanzi, B., Cassar, L.C., and Wong, B., 2011. Modelling dependence in insurance claims processes with L´ evy copulas, ASTIN Bulletin: The Journal of the IAA , 41 (2), 575–609. Bandi, F.M., Kolokolov, A., Pirino, D., and Ren` o, R., 2020. Zeros, Management Science , 66 (8), 3466–3479. Basel Committee on Banking Supervision (BCBS II), 2005. An Explanatory Note on the Basel II IRB Risk Weight Functions, Available at: https://www.bis.org/bcbs/irbriskweight.pdf .Basel Committee on Banking Supervision (BCBS III), 2010. Basel III: A Global Regulatory Frame-work for More Resilient Banks and Banking Systems, December 2010 and Revised July 2011, Available at: https://www.bis.org/publ/bcbs189.pdf .Baviera, R., Manzoni, P., and Mazzoleni, G., 2026. Can we rely on Spearman’s ρ for sparse financial time series?, In preparation .Baviera, R. and Massaria, M.D., 2026. The additive Bachelier model with an application to the oil option market in the Covid period, Journal of Computational and Applied Mathematics , 487, 117741. Biagini, F. and Ulmer, S., 2009. Asymptotics for operational risk quantified with expected shortfall, 
+
+ASTIN Bulletin: The Journal of the IAA , 39 (2), 735–752. B¨ ocker, K. and Kl¨ uppelberg, C., 2008. Modelling and measuring multivariate operational risk with L´ evy copulas, J. Operational Risk , 3 (2), 3–27. 22 B¨ ocker, K. and Kl¨ uppelberg, C., 2010. Multivariate models for operational risk, Quantitative Finance , 10 (8), 855–869. Bregman, Y. and Kl¨ uppelberg, C., 2005. Ruin estimation in multivariate models with Clayton dependence structure, Scandinavian Actuarial Journal , 2005 (6), 462–480. Brigo, D. and Morini, M., 2005. An empirically efficient analytical cascade calibration of the LIBOR Market Model based only on directly quoted swaptions data, Available at SSRN 552581 .Cesari, R. and Valerio, A., 2019. Risk management e imprese di assicurazione , Aracne. Cherubini, U., Luciano, E., and Vecchiato, W., 2004. Copula methods in finance , Wiley. Cont, R. and Tankov, P., 2003. Financial Modelling with jump processes , CRC Press. Deheuvels, P., 1979. The empirical dependence function and its properties. A non-parametric test of independence., Bulletins de l’Acad´ emie Royale de Belgique , 65 (1), 274–292. Dunn, O.J., 1958. Estimation of the means of dependent variables, The Annals of Mathematical Statistics , 1095–1111. Efron, B. and Hastie, T., 2021. Computer age statistical inference: algorithms, evidence, and data science , vol. 6, Cambridge University Press. Embrechts, P., 2002. Correlation and dependence in risk management: Properties and pitfalls, 
+
+Risk Management: Value at Risk and Beyond/Cambridge University Press .Esmaeili, H. and Kl¨ uppelberg, C., 2010. Parameter estimation of a bivariate compound Poisson process, Insurance: Mathematics and Economics , 47 (2), 224–233. Feller, W., 1991. An introduction to probability theory and its applications, Volume 1 , John Wiley & Sons. Godambe, V.P., 1991. Estimating functions , Oxford University Press. Gordy, M.B., 2003. A risk-factor model foundation for ratings-based bank capital rules, Journal of financial intermediation , 12 (3), 199–232. Guegan, D. and Jouad, F., 2012. Aggregation of Market Risks using Pair-Copulas, Documents de Travail du Centre d’Economie de la Sorbonne .Herr, H.D. and Krzysztofowicz, R., 2005. Generic probability distribution of rainfall in space: The bivariate model, Journal of Hydrology , 306 (1-4), 234–263. Hull, J., 2012. Risk management and financial institutions , vol. 733, John Wiley & Sons. 23 Joe, H., 1997. Multivariate models and multivariate dependence concepts , CRC Press. Joe, H., 2005. Asymptotic efficiency of the two-stage estimation method for copula-based models, 
+
+Journal of Multivariate Analysis , 94 (2), 401–419. Kallenberg, O., 2002. Foundations of Modern Probability , Probability and its Applications, New York, NY, USA: Springer-Verlag, 2nd ed. Klugman, S.A., Panjer, H.H., and Willmot, G.E., 2012. Loss models: from data to decisions , vol. 715, John Wiley & Sons. Kolokolov, A. and Ren` o, R., 2024. Jumps or staleness?, Journal of Business & Economic Statistics ,42 (2), 516–532. Li, D.X., 2000. On Default Correlation: A Copula Function Approach, The Journal of Fixed Income , 9 (4), 43–54. Lindskog, F. and McNeil, A.J., 2003. Common Poisson shock models: applications to insurance and credit risk modelling, ASTIN Bulletin: The Journal of the IAA , 33 (2), 209–238. McNeil, A.J., Frey, R., and Embrechts, P., 2005. Quantitative risk management: concepts, tech-niques and tools , Princeton University Press. Newey, W.K. and McFadden, D., 1994. Large sample estimation and hypothesis testing, Handbook of econometrics , 4, 2111–2245. Poudyal, C., 2021. Robust estimation of loss models for lognormal insurance payment severity data, ASTIN Bulletin: The Journal of the IAA , 51 (2), 475–507. Rosenberg, J.V. and Schuermann, T., 2006. A general approach to integrated risk management with skewed, fat-tailed risks, Journal of Financial economics , 79 (3), 569–614. Rudin, W., 1987. Real and complex analysis, 3rd ed. , USA: McGraw-Hill, Inc. Serinaldi, F., 2009. Copula-based mixed models for bivariate rainfall data: an empirical study in regression perspective, Stochastic environmental research and risk assessment , 23, 677–693. Shimizu, K., 1993. A bivariate mixed lognormal distribution with an analysis of rainfall data, 
+
+Journal of Applied Meteorology , 161–171. Tankov, P., 2003. Dependence structure of spectrally positive multidimensional L´ evy processes, 
+
+Unpublished manuscript .Tankov, P., 2006. Simulation and option pricing in L´ evy copula models, Mathematical Modelling of Financial Derivatives, IMA Volumes in Mathematics and Applications, Springer .24 Vasicek, O.A., 1987. Probability of loss on loan portfolio , KMV. Wang, S. et al. , 1998. Aggregation of correlated risk portfolios: models and algorithms, in: Pro-ceedings of the Casualty Actuarial society , Citeseer Arlington, vol. 85, 848–939. Ward, L.S. and Lee, D.H., 2002. Practical application of the risk-adjusted return on capital frame-work, in: CAS Forum summer , 79–126. Zhang, L. and Singh, V.P., 2007. Bivariate rainfall frequency distributions using Archimedean copulas, Journal of Hydrology , 332 (1-2), 93–109. Zhang, Y. and Dukic, V., 2013. Predicting multivariate insurance loss payments under the Bayesian copula framework, Journal of Risk and Insurance , 80 (4), 891–919. 
+
+# Acknowledgements 
+
+We would like to thank all participants to the 1st ASTIN Bulletin Conference (Zurich), and Workshop in Economics and Financial Mathematics (Verona), in particular Eric Andr´ e, Giuseppe Buccheri, Corrado De Vecchi and Lorenzo Frattarolo for helpful suggestions. 
+
+# Appendices 
+
+The following appendices provide proofs and supporting material for the results presented in the paper. Appendices A and B illustrate, respectively, the formulas for the Comb-Bernoulli model in the bivariate and the trivariate case, while Appendix C contains the proofs. 
+
+# A Comb-Bernoulli in the bivariate case 
+
+The bivariate case ( d = 2) provides the simplest illustration of the Comb-Bernoulli framework. The following result, a direct corollary of Proposition 2.1, presents the specific form of the likelihood for this special case. 25 Corollary A.1. In the bivariate case, the per-observation log-likelihood is given by: 
+
+ln ℓp(Θ, ϱ | x1, x 2) = ln C(1 − p1, 1 − p2; ϱ)1{x1=0 , x 2=0 } ++ ln 
+
+∂C (u1, 1 − p2; ϱ)
+
+∂u 1
+
+ 
+
+> u1=F1(x1;p1)
+
+1{x1>0, x 2=0 } ++ ln 
+
+∂C (1 − p1, u 2; ϱ)
+
+∂u 2
+
+ 
+
+> u2=F2(x2;p2)
+
+1{x1=0 , x 2>0} ++ ln c (F1(x1; p1), F 2(x2; p2); ϱ) 1{x1>0, x 2>0} ++ ln [ p1ψ1 (x1; θ1)] 1{x1>0} + ln [ p2ψ2 (x2; θ2)] 1{x2>0} ,
+
+(A.1) 
+
+where F1( • ; p1) and F2( • ; p2) are the unidimensional cdfs for the claims, as described in (1) , and 
+
+ψ1( • ; θ1) and ψ2( • ; θ2) are the marginal pdfs for the non-null claim sizes. 
+
+In the Gaussian copula case, all the formulas above can be written explicitly. We recall that in the bidimensional Gaussian Comb-Bernoulli, the dependence is encoded in the correlation matrix 
+
+R := 
+
+"
+
+1 ϱϱ 1
+
+#
+
+.
+
+The following Corollary provides the per-observation log-likelihood formula in the bidimensional Gaussian Comb-Bernoulli. 
+
+Corollary A.2. In the bivariate Gaussian Comb-Bernoulli, the per-observation log-likelihood is given by: 
+
+ln ℓp(Θ, ϱ | x1, x 2) = ln Φ 2(Φ −1(1 − p1), Φ−1(1 − p2); R)1{x1=0 , x 2=0 } ++ ln Φ Φ−1(1 − p2) − ϱ Φ−1(F1(x1; p1)) 
+
+p1 − ϱ2
+
+!
+
+1{x1>0, x 2=0 } ++ ln Φ Φ−1(1 − p1) − ϱ Φ−1(F2(x2; p2)) 
+
+p1 − ϱ2
+
+!
+
+1{x1=0 , x 2>0} −− 12
+
+
+
+ln  1 − ϱ2 + ϱ2(Φ −1(F1(x1; p1)) 2 + Φ −1(F2(x2; p2)) 2)(1 − ϱ2)
+
+
+
+1{x1>0, x 2>0} ++ ϱ Φ−1(F1(x1; p1)) Φ −1(F2(x2; p2)) (1 − ϱ2) 1{x1>0, x 2>0} ++ ln [ p1ψ1 (x1; θ1)] 1{x1>0} + ln [ p2ψ2 (x2; θ2)] 1{x2>0} .
+
+26 B Comb-Bernoulli in the trivariate case 
+
+In this Appendix, we illustrate the formulas in the three-dimensional case, noting that they do not become significantly more involved compared with the bivariate case. The following result, a direct corollary of Proposition 2.1, presents the specific form of the likelihood for this case. 
+
+Corollary B.1. In the trivariate case, the per-observation log-likelihood is given by: 
+
+ln ℓp(Θ, ϱ | x1, x 2, x 3) = ln C(1 − p1, 1 − p2, 1 − p3; ϱ)1{x1=0 , x 2=0 , x 3=0 } ++ ln 
+
+∂C (u1, 1 − p2, 1 − p3; ϱ)
+
+∂u 1
+
+ 
+
+> u1=F1(x1;p1)
+
+1{x1>0, x 2=0 , x 3=0 } ++ ln 
+
+∂C (1 − p1, u 2, 1 − p3; ϱ)
+
+∂u 2
+
+ 
+
+> u2=F2(x2;p2)
+
+1{x1=0 , x 2>0, x 3=0 } ++ ln 
+
+∂C (1 − p1, 1 − p2, u 3; ϱ)
+
+∂u 3
+
+ 
+
+> u3=F3(x3;p3)
+
+1{x1=0 , x 2=0 , x 3>0} ++ ln 
+
+∂2C(u1, u 2, 1 − p3; ϱ)
+
+∂u 1∂u 2
+
+  
+
+> u1=F1(x1;p1), u 2=F2(x2;p2)
+
+1{x1>0, x 2>0, x 3=0 } ++ ln 
+
+∂2C(u1, 1 − p2, u 3; ϱ)
+
+∂u 1∂u 3
+
+  
+
+> u1=F1(x1;p1), u 3=F3(x3;p3)
+
+1{x1>0, x 2=0 , x 3>0} ++ ln 
+
+∂2C(1 − p1, u 2, u 3; ϱ)
+
+∂u 2∂u 3
+
+  
+
+> u2=F2(x2;p2), u 3=F3(x3;p3)
+
+1{x1=0 , x 2>0, x 3>0} ++ ln c (F1(x1; p1), F 2(x2; p2), F 3(x3; p3); ϱ) 1{x1>0, x 2>0, x 3>0} ++
+
+> 3
+
+X
+
+> i=1
+
+ln [ piψi (xi; θi)] 1{xi>0} ,
+
+(B.2) 
+
+where F1( • ; p1), F2( • ; p2) and F3( • ; p3) are the unidimensional cdfs for the claims, as described in 
+
+(1) , and ψ1( • ; θ1), ψ2( • ; θ2) and ψ3( • ; θ3) are the marginal pdfs for the non-null claim sizes. 
+
+As in the bidimensional Gaussian Comb-Bernoulli case, it is possible to write explicitly all the formulas above also for the tridimensional Gaussian Comb-Bernoulli. We recall that, in a three-dimensional Gaussian copula, the dependence is encoded in the correlation matrix 
+
+R := 
+
+
+
+1 ϱ12 ϱ13 
+
+ϱ12 1 ϱ23 
+
+ϱ13 ϱ23 1
+
+ .
+
+The following Corollary provides the per-observation log-likelihood formula in the tridimensional Gaussian Comb-Bernoulli. 27 Corollary B.2. In the trivariate Gaussian Comb-Bernoulli, the per-observation log-likelihood is: 
+
+ln ℓp(Θ, ϱ | x1, x 2, x 3) = ln Φ 3(Φ −1(1 − p1), Φ−1(1 − p2), Φ−1(1 − p3); R)1{x1=0 , x 2=0 , x 3=0 } ++ ln Φ 2
+
+"
+
+Φ−1(1 − p2) − ϱ12 Φ−1(F1(x1; p1)) Φ−1(1 − p3) − ϱ13 Φ−1(F1(x1; p1)) 
+
+#
+
+;
+
+"
+
+1 − ϱ212 ϱ23 − ϱ12 ϱ13 
+
+ϱ23 − ϱ12 ϱ13 1 − ϱ213 
+
+#! 
+
+1{x1>0, x 2=0 , x 3=0 } ++ ln Φ 2
+
+"
+
+Φ−1(1 − p1) − ϱ12 Φ−1(F2(x2; p2)) Φ−1(1 − p3) − ϱ23 Φ−1(F2(x2; p2)) 
+
+#
+
+;
+
+"
+
+1 − ϱ212 ϱ13 − ϱ12 ϱ23 
+
+ϱ13 − ϱ12 ϱ23 1 − ϱ223 
+
+#! 
+
+1{x1=0 , x 2>0, x 3=0 } ++ ln Φ 2
+
+"
+
+Φ−1(1 − p1) − ϱ13 Φ−1(F3(x3; p3)) Φ−1(1 − p2) − ϱ23 Φ−1(F3(x3; p3)) 
+
+#
+
+;
+
+"
+
+1 − ϱ213 ϱ12 − ϱ13 ϱ23 
+
+ϱ12 − ϱ13 ϱ23 1 − ϱ223 
+
+#! 
+
+1{x1=0 , x 2=0 , x 3>0} ++ ln c2
+
+"
+
+Φ−1(F1(x1; p1)) Φ−1(F2(x2; p2)) 
+
+#
+
+; R{1,2},{1,2}
+
+!
+
+1{x1>0, x 2>0, x 3=0 } ++ ln Φ 
+
+
+
+Φ−1(1 − p3) − R{3},{1,2}R−1
+
+> {1,2},{1,2}
+
+"
+
+Φ−1(F1(x1; p1)) Φ−1(F2(x2; p2)) 
+
+#q
+
+1 − R{3},{1,2}R−1
+
+> {1,2},{1,2}
+
+R{1,2},{3}
+
+ 1{x1>0, x 2>0, x 3=0 } ++ ln c2
+
+"
+
+Φ−1(F1(x1; p1)) Φ−1(F3(x3; p3)) 
+
+#
+
+; R{1,3},{1,3}
+
+!
+
+1{x1>0, x 2=0 , x 3>0} ++ ln Φ 
+
+
+
+Φ−1(1 − p2) − R{2},{1,3}R−1
+
+> {1,3},{1,3}
+
+"
+
+Φ−1(F1(x1; p1)) Φ−1(F3(x3; p3)) 
+
+#q
+
+1 − R{2},{1,3}R−1
+
+> {1,3},{1,3}
+
+R{1,3},{2}
+
+ 1{x1>0, x 2=0 , x 3>0} ++ ln c2
+
+"
+
+Φ−1(F2(x2; p2)) Φ−1(F3(x3; p3)) 
+
+#
+
+; R{2,3},{2,3}
+
+!
+
+1{x1=0 , x 2>0, x 3>0} ++ ln Φ 
+
+
+
+Φ−1(1 − p1) − R{1},{2,3}R−1
+
+> {2,3},{2,3}
+
+"
+
+Φ−1(F2(x2; p2)) Φ−1(F3(x3; p3)) 
+
+#q
+
+1 − R{1},{2,3}R−1
+
+> {2,3},{2,3}
+
+R{2,3},{1}
+
+ 1{x1=0 , x 2>0, x 3>0} ++ ln c3
+
+ Φ−1(F1(x1; p1)) , Φ−1(F2(x2; p2)) , Φ−1(F3(x3; p3)); R 1{x1>0, x 2>0, x 3>0} ++
+
+> 3
+
+X
+
+> i=1
+
+ln [ piψi (xi; θi)] 1{xi>0} ,
+
+where cd denotes the d-variate normal copula density, and RI,J denotes to the sub-matrix of R
+
+formed by the rows indexed by I and the columns indexed by J.9
+
+> 9
+
+For example, R{1,2},{1,2} is the square sub-matrix composed of the first two rows and columns of R, while 
+
+R{3},{1,2} is the row vector comprising the elements in the first two columns of the third row. 
+
+28 C Proofs 
+
+Proof of Proposition 2.1. Let x be an observation of the Comb-Bernoulli random vector X,and let ℓp(Θ, ϱ | x) denote its contribution to the log-likelihood. Due to the structure of the model, each component of the random vector X has a mixed discrete–continuous distribution. By the Lebesgue decomposition theorem, the joint law can be split into atomic and absolutely continuous parts along each component (cf., e.g., Rudin 1987, Thm. 6.10, p. 121). Consequently, for any observation x ∈ [0 , ∞)d with active set S(x), the likelihood is obtained by differentiating the joint cdf w.r.t. the continuous coordinates and evaluating the remaining coordinates at the atom 0 (cf., e.g., Kallenberg 2002, Thm. A1.4, p. 456). Thus, the log-likelihood reads 
+
+ℓp(Θ, ϱ | x) = ln ∂ |S (x)|
+
+Q 
+
+> i∈S (x)
+
+∂x i
+
+P
+
+
+
+{Xi ≤ xi ∀i ∈ S (x) } ∩ { Xj = 0 ∀j ∈ S (x)∁ }
+
+ !
+
+.
+
+In the Comb-Bernoulli model, the joint cdf is given by the copula representation (3): 
+
+P(X ≤ x) = C F1(x1; p1), . . . , F d(xd; pd); ϱ,
+
+where Fi( • ; pi) = 1 − pi + piΨi( • ), with Ψ i( • ) absolutely continuous with density ψi( • ). Hence, by applying the chain rule of derivatives, the per-observation log-likelihood becomes 
+
+ℓp(Θ, ϱ | x) = ln 
+
+"
+
+∂ |S (x)|
+
+Q 
+
+> i∈S (x)
+
+∂u i
+
+C(u1, . . . , u d; ϱ)
+
+#
+
+> ui=Fi(xi;pi)
+
+ + X
+
+> i∈S (x)
+
+ln ( pi ψi(xi; θi)) .
+
+The log-likelihood Lp (Θ, ϱ | X ) is obtained by summing all contributions in the time series. □
+
+Proof of Lemma 2.2. For any active set I ⊆ S, define A := T 
+
+> i∈I
+
+{Xi > 0} and Bj := {Xj > 0} .Then, the event of interest reads 
+
+E := 
+
+ \ 
+
+> i∈I
+
+{Xi > 0}
+
+
+
+∩
+
+ \ 
+
+> j∈I∁
+
+{Xj = 0 }
+
+
+
+= A ∩ \
+
+> j∈I∁
+
+B ∁ 
+
+> j
+
+= A ∩
+
+ [ 
+
+> j∈I∁
+
+Bj
+
+∁
+
+= A \ A ∩ [
+
+> j∈I∁
+
+Bj
+
+!
+
+.
+
+By the inclusion–exclusion principle (see, e.g., Feller 1991, p. 99), 
+
+P
+
+
+
+A ∩ [
+
+> j∈I∁
+
+Bj
+
+
+
+= P
+
+ [ 
+
+> j∈I∁
+
+ A ∩ Bj
+
+
+
+== X 
+
+> J⊆I∁
+> J̸=∅
+
+(−1) |J|+1 P \
+
+> j∈J
+
+(A ∩ Bj )
+
+!
+
+= X 
+
+> J⊆I∁
+> J̸=∅
+
+(−1) |J|+1 P
+
+
+
+A ∩ \
+
+> j∈J
+
+Bj
+
+
+
+.
+
+29 Therefore, using the identity P(E) = P(A) − P A ∩ S 
+
+> j∈I∁
+
+Bj
+
+, we obtain 
+
+P(E) = X
+
+> J⊆I∁
+
+(−1) |J| P
+
+
+
+A ∩ \
+
+> j∈J
+
+Bj
+
+
+
+= X
+
+> J⊇I
+
+(−1) |J|−| I| P
+
+ \ 
+
+> j∈J
+
+Bj
+
+
+
+.
+
+Finally, under the copula representation of the joint distribution of X, each probability satisfies 
+
+P
+
+ \ 
+
+> j∈J
+
+Bj
+
+
+
+= CJ
+
+
+
+{F j (0) }j∈J
+
+
+
+= CJ
+
+
+
+{pj }j∈J
+
+
+
+where CJ denotes the restriction of the survival copula C to the coordinates in J. □
+
+Proof of Proposition 2.3. Given a time series X , we rearrange the total likelihood, defined as Lp (Θ, ϱ | X ) := exp {L p (Θ, ϱ | X )} ,
+
+by grouping the observations according to their active set S(x). Taking the exponential of equation (5) for the discrete likelihood L p, we can rewrite it as: Lp(Θ, ϱ | X ) = ( p⊥ 
+
+> ∅
+
+)n⊥
+
+> ∅
+
+Y 
+
+> I̸=∅
+
+"
+
+(p⊥ 
+
+> I
+
+)n⊥
+
+> I
+> N
+
+Y
+
+> t=1
+
+ψ⊥ 
+
+> I
+
+(x(t))I{S (x(t))= I}
+
+!# 
+
+, (C.3) where, thanks to the inclusion-exclusion principle, 
+
+ψ⊥ 
+
+> I
+
+(x) := 1
+
+p⊥
+
+> I
+
+X
+
+> J⊇I
+
+(−1) |J| ∂ |I|
+
+Q 
+
+> i∈I
+
+∂x i
+
+CJ
+
+F i(xi) i∈J
+
+
+
+.
+
+Since P 
+
+> I⊆S
+
+p⊥ 
+
+> I
+
+= 1 and the total number of observations is P 
+
+> I⊆S
+
+n⊥ 
+
+> I
+
+= N , the likelihood can be separated into three main factors: Lp(Θ, ϱ | X ) = 1 − X 
+
+> I̸=∅
+
+p⊥
+
+> I
+
+!N Y 
+
+> I̸=∅
+
+p⊥
+
+> I
+
+1 − P  
+
+> I̸=∅
+
+p⊥
+
+> I
+
+!n⊥
+
+> I
+
+"Y 
+
+> I̸=∅
+> N
+
+Y
+
+> t=1
+
+ψ⊥
+
+> I
+
+ x(t) I{S (x(t))= I}
+
+!# 
+
+.
+
+(C.4) We set p⊥ 
+
+> I
+
+= λ⊥ 
+
+> I
+
+∆t for every non-empty active set I̸ = ∅, and we define λi := P 
+
+> I⊆S:i∈I
+
+λ⊥ 
+
+> I
+
+. We then consider the three terms in (C.4) separately as ∆ t → 0. For the first term, it holds that 
+
+1 − X 
+
+> I̸=∅
+
+p⊥
+
+> I
+
+!N
+
+= 1 − ∆t X 
+
+> I̸=∅
+
+λ⊥
+
+> I
+
+! T
+
+> ∆t
+
+= exp 
+
+(
+
+−T X 
+
+> I̸=∅
+
+λ⊥
+
+> I
+
+)
+
++ o(1) ,
+
+30 while, for the second term, we have 
+
+Y 
+
+> I̸=∅
+
+p⊥
+
+> I
+
+1 − P  
+
+> I̸=∅
+
+p⊥
+
+> I
+
+!n⊥
+
+> I
+
+= Y 
+
+> I̸=∅
+
+∆tλ ⊥
+
+> I
+
+1 − ∆t P  
+
+> I̸=∅
+
+λ⊥
+
+> I
+
+!n⊥
+
+> I
+
+= Y 
+
+> I̸=∅
+
+(∆ tλ ⊥ 
+
+> I
+
+)n⊥
+
+> I
+
+!
+
+(1 + o(1)) .
+
+For the last term, we consider the expression for ψ⊥ 
+
+> I
+
+(x), and knowing that the survival function can be written as F i(xi) = ∆ t λ i Ψi(xi), we express the limit through the L´ evy copula CJ as 
+
+ψ⊥ 
+
+> I
+
+(x) = 1
+
+λ⊥
+
+> I
+
+Y
+
+> i∈I
+
+λiψi(xi)
+
+! X
+
+> J⊇I
+
+(−1) |I|+|J|
+
+ ∂|I|
+
+Q 
+
+> i∈I
+
+∂u i
+
+CJ ({ui}i∈J )
+
+
+
+> ui=λiΨi(xi)
+
+Substituting these three limits back into equation (C.4) yields the expansion 
+
+Y 
+
+> I̸=∅
+
+e−T λ ⊥
+
+> I
+
+Y
+
+> i∈I
+
+λi
+
+!n⊥ 
+
+> In⊥
+> I
+
+Y
+
+> t=1
+
+ζI
+
+ x(t) Y 
+
+> i∈I
+
+ψi
+
+
+
+x(t)
+
+> i
+
+! (∆ t)P   
+
+> I̸=∅n⊥
+> I
+
++ o(1) . (C.5) When passing to continuous-time, the density of the process obtained is exactly the component within the square brackets in (C.5), verifying the equation: Lλ(Θ, ϱ | X ) = Y 
+
+> I̸=∅
+
+ e−T λ ⊥
+
+> I
+
+Y
+
+> i∈I
+
+λi
+
+!n⊥ 
+
+> In⊥
+> I
+
+Y
+
+> t=1
+
+ζI (x(t)) Y
+
+> i∈I
+
+ψi
+
+
+
+x(t)
+
+> i
+
+! .
+
+Finally, by taking the logarithm, we get the log-likelihood Lλ in equation (8). □
+
+Proof of Lemma 3.1. By the definition of the Gaussian copula, 
+
+C(u1, . . . , u d; R) = P(Z1 ≤ Φ−1(u1), . . . , Z d ≤ Φ−1(ud)) ,
+
+where Z = [ Z1, . . . , Z d]⊤ is a d-dimensional st.n. random vector with correlation matrix R.For any i = 1 , . . . , d , let zi := Φ −1(ui); the derivative of this transformation is ∂z i/∂u i = 1 /φ (zi). Applying the chain rule for the partial derivative w.r.t. the variables ui for i ∈ S yields: 
+
+∂ sC(u1, . . . , u d; R)
+
+Q 
+
+> i∈S
+
+∂u i
+
+= 1
+
+Q 
+
+> i∈S
+
+φ(zi)
+
+∂ s P(Z1 ≤ zi, . . . , Z d ≤ zd)
+
+Q 
+
+> i∈S
+
+∂z i
+
+. (C.6) We partition the index set {1, . . . , d } into the set S and its complement T , and correspondingly partition the random vector and the correlation matrix as in (12) and (13): 
+
+Z =
+
+"
+
+ZS
+
+ZT
+
+#
+
+and R =
+
+"
+
+RSS RST 
+
+RT S RT T 
+
+#
+
+.
+
+31 By the fundamental theorem of calculus, the joint derivative in (C.6) can be expressed as the joint density of ZS times the conditional probability of ZT = zT , i.e., as 
+
+∂ P(ZS ≤ zS , ZT ≤ zT )
+
+∂zS
+
+= φ s(zS ; RSS ) P(ZT ≤ zT | ZS = zS ) .
+
+Moreover, the conditional distribution of ZT given ZS = zS satisfies the well-known formula 
+
+ZT | ZS = zS ∼ Nd−s
+
+ RT S R−1 
+
+> SS
+
+zS , RT T − RT S R−1 
+
+> SS
+
+RST 
+
+ ,
+
+and therefore 
+
+P(ZT ≤ zT | ZS = zS ) = Φ d−s
+
+ zT − RT S R−1 
+
+> SS
+
+zS ; RT T − RT S R−1 
+
+> SS
+
+RST 
+
+ . (C.7) By combining (C.6) and (C.7), we obtain the stated expression. □
+
+Proof of Proposition 3.2 Since, by Proposition C.1 below, the log-likelihood Lp (Θ, ϱ | X )converges locally uniformly almost surely to L (Θ, ϱ | X ), then it also converges almost surely for all ϱ ∈ K d. □
+
+Proof of Proposition 3.3 It is straightforward to prove that lim 
+
+> ϱ→∂Kd
+
+Lp
+
+ bΘ, ϱ | X 
+
+
+
+= −∞ , lim 
+
+> ϱ→∂Kd
+
+L
+
+ bΘ, ϱ | X 
+
+
+
+= −∞ ,
+
+and that Lp( bΘ, ϱ | X ), L( bΘ, ϱ | X ) > −∞ ∀ ϱ ∈ K d, thus, ∀ M , the sets 
+
+Kp,M := 
+
+n
+
+ϱ ∈ K d | L p
+
+ bΘ, ϱ | X 
+
+
+
+≥ M
+
+o
+
+, KM := 
+
+n
+
+ϱ ∈ K d | L 
+
+ bΘ, ϱ | X 
+
+
+
+≥ M
+
+o
+
+are compact subsets of Kd. Thanks to Proposition C.1 below, ∃ K ∈ K d, p such that bϱp ∈ K for 
+
+p such that pi ≥ pi for all i = 1 , . . . , d . Since, for p close to 1, the sequence {bϱp}p is contained in the compact set K, then every subsequence {bϱpm }m converges to a ˜ ϱ ∈ K. By definition of the arg max, 
+
+Lpm
+
+ bΘ, bϱpm | X 
+
+
+
+= max  
+
+> ϱ∈K
+
+Lpm
+
+ bΘ, ϱ | X 
+
+
+
+≥ L p
+
+ bΘ, bϱ | X 
+
+
+
+.
+
+Passing to the limit using locally uniform convergence on compacts, we obtain 
+
+L
+
+ bΘ, ˜ϱ | X 
+
+
+
+≥ L 
+
+ bΘ, bϱ | X 
+
+
+
+,
+
+and uniqueness of the maximum implies ˜ ϱ = bϱ. Since every subsequence converges to the same 
+
+bϱ, the full sequence converges almost surely to bϱ:
+
+ϱp
+
+> a.s.
+
+−→ bϱ as p → 1 . □
+
+32 Proof of Proposition 3.4 The consistency of bϱ comes from the properties of IFM estimators (see, e.g. Joe 1997, Sec.10.1) and of extemum estimators (see, e.g., Newey and McFadden 1994, when the estimator bϱ does not satisfy the first order conditions). To prove the consistency of bρij ∀ i, j = 1 , . . . , d i ̸ = j, let us introduce the empirical copula (Deheuvels 1979) 
+
+CN,ij (ui, u j ) := 1
+
+N
+
+> N
+
+X
+
+> t=1
+
+1( Rank [x(t) 
+
+> i
+
+]    
+
+> N+1 ≤ui;Rank
+
+[x(t) 
+
+> j
+
+]   
+
+> N+1 ≤uj
+> )
+
+,
+
+where the rank is defined as 
+
+Rank 
+
+h
+
+x(t)
+
+> i
+
+i
+
+=
+
+> N
+
+X
+
+> k=1
+
+1n  
+
+> x(k)
+> i≤x(t)
+> i
+> o
+
+.
+
+It’s straightforward to prove that 
+
+bρij = N + 1 
+
+N − 1
+
+
+
+12 
+
+Z 10
+
+Z 10
+
+CN,ij (ui, u j )d uiduj − 3
+
+
+
+.
+
+Thanks to Theorem 3.1 from Deheuvels (1979) sup  
+
+> ui,u j∈[0 ,1]
+
+|CN,ij (ui, u j ) − Cij (ui, u j ; ϱij )| a.s 
+
+= 0 ,
+
+where Cij ( • ; ϱij ) denotes the copula between the rvs Xi and Xj .Thus, considering the definition of Spearman’s ρ (cf., Cherubini et al. 2004, Def.3.3, p.100), the Spearman correlation estimator ρij is consistent, i.e., 
+
+bρij 
+
+> a.s.
+
+−→ ρij = 12 
+
+Z 10
+
+Z 10
+
+Cij (ui, u j ; ϱij )d uiduj − 3 ,
+
+thus, thanks to Proposition C.2 below 
+
+bRi,j = 2 sin 
+
+π
+
+6 bρi,j 
+
+ a.s. 
+
+−→ 2 sin 
+
+π
+
+6 ρi,j 
+
+
+
+= R i,j . □
+
+# Auxiliary results 
+
+In the following, we report two auxiliary results needed for the proofs in this Appendix. 
+
+Proposition C.1. The log-likelihood Lp(Θ, ϱ | X ) converges locally uniformly almost surely to 
+
+L(Θ, ϱ | X ), i.e., 
+
+∀ K ⊂ K d, K compact sup 
+
+> ϱ∈K
+
+|L (Θ, ϱ | X ) − L p(Θ, ϱ | X )| a.s. 
+
+−→ 0 as p → 1 .
+
+33 Proof. For all x ∈ X , we can write the per-observation log-likelihood as 
+
+ℓp(Θ, ϱ | x) = X
+
+> I⊆S
+
+1{I=S(x)}
+
+X
+
+> i∈I
+
+ln [ piψi(xi; θi)] + ln 
+
+∂ |I| C(u1, . . . , u d; ϱ)
+
+Q 
+
+> i∈I
+
+∂u i
+
+
+
+> ui=Fi(xi;pi)
+
+!
+
+.
+
+Thus, for a sample X , we can write sup 
+
+> ϱ∈K
+
+|L (Θ, ϱ | x) − L p(Θ, ϱ | x)| ≤ X
+
+> x∈X
+
+sup 
+
+> ϱ∈K
+
+|ℓ(Θ, ϱ | x) − ℓp(Θ, ϱ | x)| ≤ ≤ X
+
+> x∈X
+
+sup 
+
+> ϱ∈K
+
+ℓ(Θ, ϱ | x) − 1{S=S(x)}ℓS
+
+> p
+
+(Θ, ϱ | x) + X
+
+> x∈X
+
+sup 
+
+> ϱ∈K
+
+X
+
+> I⊂S
+
+1{I=S(x)}ℓI
+
+> p
+
+(Θ, ϱ | x) ,
+
+(C.8) where 
+
+ℓI
+
+> p
+
+(Θ, ϱ | x) := X
+
+> i∈I
+
+ln [ piψi(xi; θi)] + ln 
+
+∂ |I| C(u1, . . . , u d; ϱ)
+
+Q 
+
+> i∈I
+
+∂u i
+
+
+
+> ui=Fi(xi;pi)
+
+.
+
+The first addend in the last inequality in (C.8) goes to 0, indeed 
+
+X
+
+> x∈X
+
+sup 
+
+> ϱ∈K
+
+X
+
+> I⊂S
+
+1{I=S(x)}ℓI
+
+> p
+
+(Θ, ϱ | x) ≤ X
+
+> x∈X
+
+X
+
+> I⊂S
+
+sup 
+
+> ϱ∈K
+
+1{I=S(x)}ℓI
+
+> p
+
+(Θ, ϱ | x) == X
+
+> x∈X
+
+X
+
+> I⊂S
+
+sup 
+
+> ϱ∈K
+
+1{I=S(x)}
+
+p⊥
+
+> I
+
+p⊥ 
+
+> I
+
+ℓI
+
+> p
+
+(Θ, ϱ | x) ≤ X
+
+> x∈X
+
+X
+
+> I⊂S
+
+sup 
+
+> ϱ∈K
+
+1{I=S(x)}
+
+p⊥
+
+> I
+
+sup 
+
+> ϱ∈K
+
+p⊥ 
+
+> I
+
+sup 
+
+> ϱ∈K
+
+ℓI
+
+> p
+
+(Θ, ϱ | x) ,
+
+It’s straightforward to prove that 
+
+p⊥ 
+
+> I
+
+≤ 1 − pi ∀ i ∈ I ∀ ϱ ∈ K , 
+
+thus, sup 
+
+> ϱ∈K
+
+p⊥ 
+
+> I
+
+≤ 1 − pi ∀ i ∈ I , 
+
+this implies that 
+
+X
+
+> x∈X
+
+X
+
+> I⊂S
+
+sup 
+
+> ϱ∈K
+
+1{I=S(x)}
+
+p⊥
+
+> I
+
+sup 
+
+> ϱ∈K
+
+p⊥ 
+
+> I
+
+sup 
+
+> ϱ∈K
+
+ℓI
+
+> p
+
+(Θ, ϱ | x) a.s. 
+
+−→ 0 (C.9) for p → 1, since 
+
+1{I=S(x)}
+
+p⊥
+
+> I
+
+and ℓI
+
+> p
+
+(Θ, ϱ | x) ,
+
+are bounded functions of ϱ ∈ K.10 
+
+> 10
+
+The functions 1 /p ⊥ 
+
+> I
+
+and ℓI
+
+> p
+
+(Θ, ϱ | x) are continuous functions of ϱ ∈ K, thus, for the Weierstrass Theorem, they assume a (finite) maximum over the compact set K ⊂ K d almost surely. The function 1{I=S(x)} is surely bounded. 
+
+34 Let us now prove that the first addend in (C.8) goes a.s. to 0 as p → 1, indeed sup 
+
+> ϱ∈K
+
+ℓ(Θ, ϱ | x) − 1{S=S(x)}ℓS
+
+> p
+
+(Θ, ϱ | x) ≤ sup 
+
+> ϱ∈K
+
+ℓ(Θ, ϱ | x)(1 − 1{S=S(x)}) ++ sup 
+
+> ϱ∈K
+
+1{S =S(x)}(ℓ(Θ, ϱ | x) − ℓS
+
+> p
+
+(Θ, ϱ | x)) .
+
+First, we observe that sup 
+
+> ϱ∈K
+
+ℓ(Θ, ϱ | x)(1 − 1{S=S(x)}) ≤ sup 
+
+> ϱ∈K
+
+|ℓ(Θ, ϱ | x)| sup 
+
+> ϱ∈K
+
+(1 − 1{S=S(x)}) ,
+
+and, similarly to (C.9) sup 
+
+> ϱ∈K
+
+1 − 1{S=S(x)} = sup 
+
+> ϱ∈K
+
+X
+
+> I⊂S
+
+1{I=S(x)} ≤ X
+
+> I⊂S
+
+sup 
+
+> ϱ∈K
+
+1{I=S(x)}
+
+p⊥
+
+> I
+
+sup 
+
+> ϱ∈K
+
+p⊥
+
+> I
+> a.s.
+
+−→ 0uniformly in ϱ ∈ K, for p → 1. Moreover, sup 
+
+> ϱ∈K
+
+1{S=S(x)}(ℓ(Θ, ϱ | x) − ℓS
+
+> p
+
+(Θ, ϱ | x)) ≤ sup 
+
+> ϱ∈K
+
+1{S=S(x)} sup 
+
+> ϱ∈K
+
+ℓ(Θ, ϱ | x) − ℓS
+
+> p
+
+(Θ, ϱ | x) ,
+
+and this last term goes to 0 a.s., indeed, sup 
+
+> ϱ∈K
+
+ℓ(Θ, ϱ | x) − ℓS
+
+> p
+
+(Θ, ϱ | x) ≤ sup 
+
+> ϱ∈K
+
+ λmax 
+
+ R−1 + 1  Φ−1(Ψ( x); θ) − Φ−1(F (x; p)) 2 ×× Φ−1(Ψ( x); θ) + Φ −1(F (x; p)) 2a.s. 
+
+−→ 0 ,
+
+because 
+
+Φ−1(Ψ( x); θ) − Φ−1(F (x; p)) 2a.s. 
+
+−→ 0and 
+
+P
+
+
+
+lim  
+
+> p→1
+
+Φ−1(Ψ( x); θ) + Φ −1(F (x; p)) 2 < +∞
+
+
+
+= 1 moreover, the map R 7 → (λmax (R−1) + 1) is a continuous map, thus, for the Weierstrass Theorem, 
+
+∃ Λ > 0 and finite such that 
+
+λmax 
+
+ R−1 + 1 ≤ Λ ∀ R ∈ K compact 
+
+Proposition C.2. Let X1, . . . , X d be r.v.s with continuous marginals Ψi( • ; θi), and suppose their dependence structure is given by a Gaussian copula with correlation matrix R. Then, for each pair Xi and Xj , the Spearman rank correlation ρij satisfies 
+
+ρij = 6
+
+π arcsin 
+
+Ri,j 
+
+2
+
+
+
+∀ i, j = 1 , . . . , d . 
+
+35 Proof. From the definition of Spearman’s ρij (cf., Cherubini et al. 2004, Def.3.3, p.100) 
+
+ρij := 12 
+
+Z Z 
+
+> [0 ,1] 2
+
+uiuj ci,j (ui, u j ; R i,j )d uiduj − 3 , (C.10) where cij ( • ; R i,j ) denotes the copula density between the rvs Xi and Xj .With the change of variables vi = Φ −1(ui), vj = Φ −1(uj ), equation (C.10) becomes 
+
+ρij := 12 
+
+Z Z 
+
+> [0 ,1] 2
+
+Φ( vi)Φ( vj )φ2(vi, v j ; R i,j )d uiduj − 3 = 12 I(R i,j ) − 3 ,
+
+with the following definition of I(Ri,j ), 
+
+I(R i,j ) := 
+
+Z Z 
+
+> [0 ,1] 2
+
+Φ( vi)Φ( vj )φ2(vi, v j ; R i,j )d uiduj .
+
+If we take the derivative of I(R i,j ) w.r.t. R i,j we get that d I(R i,j )d R i,j 
+
+= 12π
+
+q
+
+4 − R2
+
+> i,j
+
+. (C.11) By integrating (C.11) w.r.t. R i,j , and imposing that ρi,j = 0 if R i,j = 0, we get the thesis. 36 Notation and shorthands 
+
+Symbol Description 
+
+Xi marginal rv in Comb-Bernoulli 
+
+X vector [ X1, . . . , X d]⊤
+
+x realization of X
+
+d dimension of Comb-Bernoulli model 
+
+S set of indices {1, . . . , d }
+
+pi probability of the event {Xi > 0}
+
+p vector of probabilities pi
+
+λi frequency in continuous-time model 
+
+λ vector of intensities λi
+
+fi( • ; pi), F i( • ; pi) pdf and cdf of Xi
+
+θi set of parameters of the distribution of Xi|Xi > 0
+
+Θ matrix [ θ1, . . . , θd] of parameters for the marginal severity distributions 
+
+ψ( • ; θi), Ψ( • ; θi) generic pdf and cdf of the marginal distribution of Xi|Xi > 0
+
+C( • ; ϱ) copula with dependence parameters ϱ
+
+c( • ; ϱ) copula density 
+
+C( • ; ϱ) survival copula 
+
+C L´ evy copula 
+
+CI L´ evy copula restricted to set of indices I ⊆ S
+
+S(x) active set of x, {i ∈ { 1, . . . , d } : xi > 0}
+
+s(x) cardinality of the active set S(x)
+
+ℓp(Θ, ϱ | x) per-observation Comb-Bernoulli likelihood Lp(Θ, ϱ | X ) Comb-Bernoulli likelihood 
+
+Lp(Θ, ϱ | X ) Comb-Bernoulli log-likelihood Lλ(Θ, ϱ | X ) L´ evy copula model likelihood 
+
+Lλ(Θ, ϱ | X ) L´ evy copula model log-likelihood 
+
+L(Θ, ϱ | X ) Comb-Bernoulli log-likelihood in the full time series limit ( p → 1)
+
+ℓ(Θ, ϱ | x) per-observation Comb-Bernoulli log-likelihood in the full time series limit 
+
+X time series [ x(t)]Nt=1 
+
+N time series length 
+
+t time series index 
+
+ni number of positive realizations of the rv Xi
+
+n⊥ 
+
+> I
+
+number of realizations of the event {Xi > 0 ∀ i ∈ I} ∩ { Xj = 0 ∀ j / ∈ I}
+
+p⊥ 
+
+> I
+
+probability of the event {Xi > 0 ∀ i ∈ I} ∩ { Xj = 0 ∀ j / ∈ I}Kd set of d × d correlation matrices 
+
+φ( • ), Φ( • ) pdf and cdf of a standard normal rv 
+
+ϱ copula dependence parameters 37 Symbol Description 
+
+φd( • ; Σ), Φd( • ; Σ) pdf and cdf of a d-variate st.n. distribution with covariance matrix Σ
+
+Y ∼ Φ( μ, Σ) vector of rvs Y distributed as a normal with mean μ and covariance Σ
+
+bϱp dependence parameter estimator from the log-likelihood Lp(Θ, ϱ | X )
+
+bϱλ dependence parameter estimator from the log-likelihood Lλ(Θ, ϱ | X )
+
+bϱ dependence parameter estimator from the log-likelihood L(Θ, ϱ | X )
+
+R Gaussian copula correlation 
+
+ρ Spearman’s correlation 
+
+bρ Spearman’s correlation estimator 
+
+1 indicator function 
+
+|A| determinant of a matrix A
+
+|I| cardinality of a set I
+
+∇ϱ gradient w.r.t. the components of ϱ
+
+> a.s.
+
+−−→ almost surely convergence 
+
+P multinomial distribution 
+
+δ0(x) Dirac delta function, centred in 0 
+
+Shorthand Description 
+
+a.s. almost surely cdf cumulative distribution function CI Confidence Interval IFM Inference Functions for Margins method ML Maximum Likelihood pdf probability density function rv random variable st.n. standard normal (random variable) w.r.t. with respect to 38

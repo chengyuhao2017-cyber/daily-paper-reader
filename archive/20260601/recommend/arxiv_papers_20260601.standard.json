@@ -1,0 +1,1161 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-01T23:09:26.876670+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 5,
+    "deep_divecandidates": 25,
+    "deep_cap": 10,
+    "deep_selected": 10,
+    "quick_candidates": 46,
+    "quick_skim_target": 15,
+    "quick_selected": 15
+  },
+  "deep_dive": [
+    {
+      "id": "2605.24833v1",
+      "source": "arxiv",
+      "title": "Default Contagion, Matrix Approximation, and Control in Sparse Financial Networks",
+      "abstract": "We study systemic default contagion in sparse financial networks and develop a framework for deciding when aggregate exposure matrices are reliable and when node-level network information changes tail risk and control design. The first contribution is a multi-population McKean-Vlasov foundation for distance-to-default dynamics with common noise, bounded state-dependent killing, loss feedback, sparse weighted exposures, and regulatory intervention, including quantitative convergence, propagation of chaos, stability in contagion matrices, controlled well-posedness, a two-population HJB characterization, and a steep-killing bridge to absorbing-boundary contagion. The second contribution is a set of computable matrix-approximation diagnostics: finite-grid bounds driven by row-exposure dispersion and square-edge spread, constructive tail-loss gaps for networks sharing the same aggregate matrix, and a spectral-radius criterion for local cascade onset. The third contribution is an information-value theory for control, showing that node-level graph pressure has strictly positive value when within-type pressure variation interacts with nonsaturated marginal killing reduction. Matched sparse-graph and matrix experiments, common-noise tests, HJB feedback diagnostics, fixed-budget control comparisons, and EBA/Pillar 3-calibrated synthetic networks validate the framework. The main conclusion is that finite-type matrices are effective in regular-mixing regimes, whereas concentrated sparse exposures generate tail-risk and intervention effects that require local-pressure diagnostics and network-aware control.",
+      "authors": [
+        "Aoxin Zhang",
+        "Yingzhe Wang"
+      ],
+      "primary_category": "math.OC",
+      "categories": [
+        "math.OC",
+        "q-fin.RM"
+      ],
+      "published": "2026-05-24T02:57:47+00:00",
+      "link": "https://arxiv.org/pdf/2605.24833v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "systemic default contagion and tail risk in financial networks",
+      "llm_evidence_cn": "金融网络中的系统性违约传染与尾部风险",
+      "llm_evidence": "金融网络中的系统性违约传染与尾部风险",
+      "canonical_evidence": "金融网络中的系统性违约传染与尾部风险",
+      "llm_tldr_en": "This paper studies systemic default contagion in sparse financial networks, developing a framework for matrix approximation and control, with McKean-Vlasov foundation for distance-to-default dynamics, showing how node-level information affects tail risk.",
+      "llm_tldr_cn": "本文研究稀疏金融网络中的系统性违约传染问题，提出一个基于矩阵近似与控制的框架。核心方法包括多群体McKean-Vlasov距离违约动态模型，考虑共同噪声、状态依赖杀灭、损失反馈和监管干预。理论贡献包括量化收敛、传播混沌、传染矩阵稳定性等。该框架揭示了节点级网络信息如何改变尾部风险，为监管干预设计提供了新工具。",
+      "llm_tldr": "本文研究稀疏金融网络中的系统性违约传染问题，提出一个基于矩阵近似与控制的框架。核心方法包括多群体McKean-Vlasov距离违约动态模型，考虑共同噪声、状态依赖杀灭、损失反馈和监管干预。理论贡献包括量化收敛、传播混沌、传染矩阵稳定性等。该框架揭示了节点级网络信息如何改变尾部风险，为监管干预设计提供了新工具。",
+      "llm_tags": [
+        "query:etr"
+      ],
+      "matched_query_tag": "query:etr",
+      "matched_query_text": "systemic risk and financial stability assessment",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2605.25392v1",
+      "source": "arxiv",
+      "title": "One Currency, Two Forward Prices: The Onshore-Offshore Renminbi Puzzle",
+      "abstract": "Partially convertible economies face a market-design problem: trade integration, cross-border investment, and domestic balance-sheet exposure increase the demand for currency hedging before full financial integration is complete. China adopted a distinctive architecture for this problem by fostering a deliverable offshore Renminbi market (CNH) alongside the segmented onshore market (CNY), rather than relying only on non-deliverable forwards. This creates two venues for closely related claims on the same currency. Spot prices are tightly linked, yet CNY and CNH forwards display a persistent and economically large discrepancy. We study that discrepancy in a joint equilibrium model for spot and forward trading with transaction costs and segmented supply. In the benchmark case with common constant supply and deterministic costs, spot parity implies a forward differential with the wrong sign relative to the data. Random offshore stress, modeled as a jump in trading costs, overturns this benchmark while preserving tight spot parity. The model yields a semi-explicit representation in the CNY/CNH application and a calibration of the observed forward discrepancy in terms of the market-implied likelihood and severity of offshore liquidity stress.",
+      "authors": [
+        "Samuel Drapeau",
+        "Peng Luo",
+        "Xuan Tao",
+        "Tan Wang"
+      ],
+      "primary_category": "q-fin.MF",
+      "categories": [
+        "q-fin.MF"
+      ],
+      "published": "2026-05-25T03:37:16+00:00",
+      "link": "https://arxiv.org/pdf/2605.25392v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "onshore-offshore Renminbi forward price discrepancy, directly related to interest rate dynamics and monetary policy instruments",
+      "llm_evidence_cn": "在岸-离岸人民币远期价差，直接关联利率动态与货币政策工具",
+      "llm_evidence": "在岸-离岸人民币远期价差，直接关联利率动态与货币政策工具",
+      "canonical_evidence": "在岸-离岸人民币远期价差，直接关联利率动态与货币政策工具",
+      "llm_tldr_en": "Models the persistent discrepancy between onshore CNY and offshore CNH forward prices as a joint equilibrium with transaction costs and segmented supply, providing insights into monetary policy instruments and capital controls.",
+      "llm_tldr_cn": "该论文研究部分可兑换经济体中在岸人民币（CNY）与离岸人民币（CNH）远期价格之间的持久且巨大的差异。通过建立包含交易成本和分割供给的联合均衡模型，解释了两市场远期定价的差异来源。研究发现，尽管即期价格紧密联动，但远期价格差异来自交易成本和供给分割。这一机制直接反映了货币政策工具和资本账户管理对利率动态的影响。",
+      "llm_tldr": "该论文研究部分可兑换经济体中在岸人民币（CNY）与离岸人民币（CNH）远期价格之间的持久且巨大的差异。通过建立包含交易成本和分割供给的联合均衡模型，解释了两市场远期定价的差异来源。研究发现，尽管即期价格紧密联动，但远期价格差异来自交易成本和供给分割。这一机制直接反映了货币政策工具和资本账户管理对利率动态的影响。",
+      "llm_tags": [
+        "query:mp"
+      ],
+      "matched_query_tag": "query:mp",
+      "matched_query_text": "interest rate dynamics and monetary policy instruments",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2605.25483v1",
+      "source": "arxiv",
+      "title": "Partial Identification of Causal Effects that Vary by Setting",
+      "abstract": "The estimation of causal effects using quasiexperiments often relies on the use of unusual or serendipitous sources of exogenous variation. When the goal is estimating the same causal effects across many different settings, the same unusual exogenous variation often does not exist in all settings, and the only available form of identification is selection-on-observables, which relies on a conditional indepdendence assumption. Partial identification is especially valuable in this context, as it allows conditional independence to not hold perfectly. This paper proposes a method that sharpens the jointly identified set of causal effects across many settings by making use of unobserved relationships between omitted variable biases across settings.",
+      "authors": [
+        "Nick Huntington-Klein"
+      ],
+      "primary_category": "econ.EM",
+      "categories": [
+        "econ.EM"
+      ],
+      "published": "2026-05-25T06:39:08+00:00",
+      "link": "https://arxiv.org/pdf/2605.25483v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Partial identification of causal effects across settings for policy evaluation",
+      "llm_evidence_cn": "跨设定因果效应的部分识别方法用于政策评估",
+      "llm_evidence": "跨设定因果效应的部分识别方法用于政策评估",
+      "canonical_evidence": "跨设定因果效应的部分识别方法用于政策评估",
+      "llm_tldr_en": "Proposes a partial identification method that leverages unobserved relationships between omitted variable biases across settings to sharpen the jointly identified set of causal effects, enabling credible policy evaluation when exogenous variation is unavailable.",
+      "llm_tldr_cn": "该论文针对不同设定下缺乏外生变异导致因果效应难以估计的问题，提出一种利用遗漏变量偏差之间未观测关系的部分识别方法。该方法通过跨设定信息收紧因果效应的联合识别集，无需条件独立性假设完全成立。模拟实验表明新方法能显著缩小效应识别范围、提升估计精度，为无法获得外生工具变量的政策评估场景提供了稳健的推断框架。",
+      "llm_tldr": "该论文针对不同设定下缺乏外生变异导致因果效应难以估计的问题，提出一种利用遗漏变量偏差之间未观测关系的部分识别方法。该方法通过跨设定信息收紧因果效应的联合识别集，无需条件独立性假设完全成立。模拟实验表明新方法能显著缩小效应识别范围、提升估计精度，为无法获得外生工具变量的政策评估场景提供了稳健的推断框架。",
+      "llm_tags": [
+        "query:pe"
+      ],
+      "matched_query_tag": "query:pe",
+      "matched_query_text": "causal inference and policy evaluation methods",
+      "matched_requirement_id": "req-28",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2605.25766v1",
+      "source": "arxiv",
+      "title": "Measuring multivariate maximal tail dependence",
+      "abstract": "The classical tail dependence coefficient (TDC) may fail to capture non-exchangeable features of bivariate tail dependence since it evaluates the underlying copula only along the diagonal. To address this limitation, several measures of strongest manifestation of tail dependence have been proposed in the bivariate case, including a measure based on the tail copula of the underlying bivariate copula. This paper introduces and investigates the multivariate maximal tail concordance measure (MTCM) which extends the bivariate measure to the multivariate case. The MTCM quantifies the largest tail mass over lower hyperrectangles of common unit volume, while the associated maximizer identifies the direction of maximal tail probability. We establish fundamental properties of the MTCM in the multivariate case, including existence of an optimal direction. We also derive analytical representations for several important model classes. Closed-form expressions are further obtained for survival Marshall-Olkin copulas, Archimax and nested Archimedean copulas with regularly varying Archimedean generators. An application to trivariate annual sea-level maxima in England shows that the MTCM can reveal off-diagonal stress directions and substantial differences in the underlying extremal dependence not detected by likelihood- or TDC-based comparisons.",
+      "authors": [
+        "Takaaki Koike",
+        "Marius Hofert",
+        "Haruki Tsunekawa"
+      ],
+      "primary_category": "math.ST",
+      "categories": [
+        "math.ST",
+        "q-fin.RM"
+      ],
+      "published": "2026-05-25T12:19:02+00:00",
+      "link": "https://arxiv.org/pdf/2605.25766v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Multivariate maximal tail concordance measure for extreme dependence, directly relevant to tail risk measurement",
+      "llm_evidence_cn": "多元最大尾部一致性度量，直接用于极端尾部依赖的量化",
+      "llm_evidence": "多元最大尾部一致性度量，直接用于极端尾部依赖的量化",
+      "canonical_evidence": "多元最大尾部一致性度量，直接用于极端尾部依赖的量化",
+      "llm_tldr_en": "Introduces a multivariate maximal tail concordance measure (MTCM) that captures the strongest tail mass direction, extending bivariate tail dependence measures to higher dimensions.",
+      "llm_tldr_cn": "针对传统尾部相关系数仅能捕捉对角方向依赖性、无法刻画非对称尾部特征的局限，提出多元最大尾部一致性度量（MTCM）及其方向识别方法。MTCM量化单位体积超矩形上的最大尾部概率，可发现极端事件的最可能共同发生方向。该度量在金融系统性风险和宏观经济尾部分析中具有重要应用价值。",
+      "llm_tldr": "针对传统尾部相关系数仅能捕捉对角方向依赖性、无法刻画非对称尾部特征的局限，提出多元最大尾部一致性度量（MTCM）及其方向识别方法。MTCM量化单位体积超矩形上的最大尾部概率，可发现极端事件的最可能共同发生方向。该度量在金融系统性风险和宏观经济尾部分析中具有重要应用价值。",
+      "llm_tags": [
+        "query:etr:composite"
+      ],
+      "matched_query_tag": "query:etr:composite",
+      "matched_query_text": "Papers central to 经济尾部风险, especially work that connects or combines: economic tail risk measurement and modeling; extreme economic events and financial crises; growth-at-risk framework and downside risk to GDP; systemic risk and financial stability assessment; value at risk and expected shortfall in macroeconomics; downside risk to economic growth and recession probability; methods for measuring and predicting economic tail risks; relationship between financial conditions and tail risk; how monetary policy affects economic tail risk distribution.",
+      "matched_requirement_id": "req-composite-etr",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2605.26964v1",
+      "source": "arxiv",
+      "title": "Semiparametric Inference for Causal Effects on Functional Outcomes",
+      "abstract": "Difference-in-differences (DiD) is a cornerstone of causal inference, yet extending it to functional outcomes is not a routine scalar generalization; rather, it entails three fundamental challenges in identification, inference, and observation. This paper develops a comprehensive semiparametric inference framework for functional DiD with discretely observed data. First, we define the functional average treatment effect under parallel trends and derive its efficient influence function (EIF), thereby establishing the semiparametric efficiency bound. Second, leveraging Neyman orthogonality and cross-fitting, we construct a debiased estimator that effectively mitigates regularization bias arising from nonparametric reconstruction. Third, we establish weak convergence of the estimator and propose an asymptotically valid uniform confidence band, enabling a rigorous transition from pointwise to curve-level inference. Finally, we demonstrate that reconstruction error under discrete sampling is asymptotically negligible for semiparametric inference, ensuring practical feasibility. Simulations and empirical applications confirm that the proposed method achieves superior coverage and testing power in finite samples, providing a theoretically grounded and computationally tractable foundation for causal evaluation with functional data.",
+      "authors": [
+        "Junzhu Nie",
+        "Chengxiu Ling",
+        "Mengfei Ran"
+      ],
+      "primary_category": "stat.ME",
+      "categories": [
+        "stat.ME",
+        "stat.AP"
+      ],
+      "published": "2026-05-26T12:52:11+00:00",
+      "link": "https://arxiv.org/pdf/2605.26964v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "extends difference-in-differences to functional outcomes, providing semiparametric inference framework for causal policy evaluation",
+      "llm_evidence_cn": "将差分中的差分方法扩展到功能结果，提供因果政策评估的半参数推断框架",
+      "llm_evidence": "将差分中的差分方法扩展到功能结果，提供因果政策评估的半参数推断框架",
+      "canonical_evidence": "将差分中的差分方法扩展到功能结果，提供因果政策评估的半参数推断框架",
+      "llm_tldr_en": "Extends difference-in-differences to functional outcomes, developing a semiparametric inference framework with debiased estimator via Neyman orthogonality and cross-fitting, establishing efficiency bound. Directly applicable to evaluating causal effects of policies on functional outcomes.",
+      "llm_tldr_cn": "将差分中的差分（DiD）因果推断方法从标量结果扩展到功能型结果，面临识别、推断和观测三大挑战。论文发展了一套完整的半参数推断框架，定义了功能平均处理效应，推导出高效影响函数，并利用Neyman正交性和交叉拟合构建去偏估计器。为政策评估提供了更强大的因果推断工具。",
+      "llm_tldr": "将差分中的差分（DiD）因果推断方法从标量结果扩展到功能型结果，面临识别、推断和观测三大挑战。论文发展了一套完整的半参数推断框架，定义了功能平均处理效应，推导出高效影响函数，并利用Neyman正交性和交叉拟合构建去偏估计器。为政策评估提供了更强大的因果推断工具。",
+      "llm_tags": [
+        "query:pe"
+      ],
+      "matched_query_tag": "query:pe",
+      "matched_query_text": "causal inference and policy evaluation methods",
+      "matched_requirement_id": "req-28",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2605.27474v2",
+      "source": "arxiv",
+      "title": "Stop Suppressing the Tail: Causal Inference for Extreme Events",
+      "abstract": "Estimating how an outcome responds to a continuous treatment (the Average Dose-Response Function, or ADRF) is a core causal-inference primitive. However, when outcomes possess heavy tails, standard robust double machine learning (DML) deliberately suppresses these extremes to stabilize the bulk average. In high-stakes settings, such as financial returns or climate losses, this omitted 1-in-1000 extreme event is the actual target quantity. Furthermore, current methods that read the tail from a model's residuals suffer from circular dependence, causing tail shape inferences to shift drastically based solely on whether the core estimator is switched between Huber and Welsch. The research proposes an ADRF estimator that emits a structured tail-shape output alongside the standard point estimate. Its tail diagnostic (PDHTE+JK) evaluates the per-treatment tail shape from the outcome centered by a pilot median, successfully breaking the circular dependence and rendering the diagnostic invariant to the choice of core method. The output encompasses four treatment-conditional quantities: tail shape $\\hatξ(t)$, deep-tail return levels $\\hat{Q}_α(t)$, conditional shortfalls $\\hat{S}_α(t)$, the recovered mean ADRF, and an explicit refusal mechanism that declines extrapolation when extreme-value modeling is unsupported by the data. Compared to kernel-weighted quantile regression (QR), the proposed estimator reduces deep-tail ($α=0.001$) return-level MAE by 11% and conditional-shortfall MAE by 25.5% across a heavy-tailed panel. It also achieves a 20-29% MAE reduction in sample-scarce regimes ($n\\le2000$). On freMTPL2 motor-insurance claims, it successfully triggered an explicit extrapolation refusal on the log-claim scale, which neither QR nor loss-only DML can produce.",
+      "authors": [
+        "Eichi Uehara"
+      ],
+      "primary_category": "stat.ML",
+      "categories": [
+        "stat.ML",
+        "cs.LG"
+      ],
+      "published": "2026-05-26T11:38:12+00:00",
+      "link": "https://arxiv.org/pdf/2605.27474v2",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "causal inference for extreme events, ADRF estimator for tails",
+      "llm_evidence_cn": "极端事件的因果推断，尾部平均剂量反应函数估计",
+      "llm_evidence": "极端事件的因果推断，尾部平均剂量反应函数估计",
+      "canonical_evidence": "极端事件的因果推断，尾部平均剂量反应函数估计",
+      "llm_tldr_en": "Proposes an ADRF estimator for heavy-tailed outcomes that avoids tail suppression, enabling reliable causal inference for extreme events.",
+      "llm_tldr_cn": "标准双机器学习在重尾情况下会抑制极端值，导致尾部因果效应估计失效。该论文提出一种不压抑尾部的ADRF估计器，输出结构化尾部形状，确保在金融收益或气候损失等极端事件中因果推断的可靠性。实验表明新方法在尾部估计上显著优于传统DML。",
+      "llm_tldr": "标准双机器学习在重尾情况下会抑制极端值，导致尾部因果效应估计失效。该论文提出一种不压抑尾部的ADRF估计器，输出结构化尾部形状，确保在金融收益或气候损失等极端事件中因果推断的可靠性。实验表明新方法在尾部估计上显著优于传统DML。",
+      "llm_tags": [
+        "query:etr"
+      ],
+      "matched_query_tag": "query:etr",
+      "matched_query_text": "methods for measuring and predicting economic tail risks",
+      "matched_requirement_id": "req-16",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2605.27694v1",
+      "source": "arxiv",
+      "title": "Likelihood-Free Inference for Multivariate Generalized Pareto Models",
+      "abstract": "Likelihood-based inference for multivariate extreme-value models is often unreliable or infeasible when likelihoods are intractable or supports are discrete. This challenge is particularly acute for multivariate discrete generalized Pareto models, where both marginal tail behavior and dependence must be inferred from sparse exceedance samples. We propose a two-stage likelihood-free inference procedure, termed AW--NBE (Adaptive Wasserstein Neural Bayes Estimator), that combines neural Bayes estimation with a targeted optimal transport refinement step based on the Sinkhorn discrepancy. In the first stage, a neural Bayes estimator trained on simulated data provides fast and stable initial parameter estimates. In the second stage, these estimates are locally refined by minimizing the Sinkhorn divergence between the empirical distributions of observed and simulated exceedances. This refinement reduces the Sinkhorn discrepancy between the empirical distributions of observed and simulated exceedances, while preserving dependence features learned by the neural estimator. Model adequacy is assessed using new optimal transport based multivariate Q--Q and potential diagnostics. Applications to financial log-returns and Swiss dry spell exceedances suggest that AW--NBE can improve parameter inferences compared to estimation using solely, either the Sinkhorn discrepancy, or the standard neural Bayes estimators and censored likelihood estimation.",
+      "authors": [
+        "Samira Aka",
+        "Marie Kratz",
+        "Philippe Naveau"
+      ],
+      "primary_category": "stat.AP",
+      "categories": [
+        "stat.AP"
+      ],
+      "published": "2026-05-26T21:13:50+00:00",
+      "link": "https://arxiv.org/pdf/2605.27694v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Likelihood-free inference for multivariate generalized Pareto models, directly applicable to economic tail risk estimation",
+      "llm_evidence_cn": "针对多元广义帕累托模型的似然自由推断方法，可直接用于经济尾部风险估计",
+      "llm_evidence": "针对多元广义帕累托模型的似然自由推断方法，可直接用于经济尾部风险估计",
+      "canonical_evidence": "针对多元广义帕累托模型的似然自由推断方法，可直接用于经济尾部风险估计",
+      "llm_tldr_en": "Proposes a two-stage neural Bayes estimator for multivariate generalized Pareto models, enabling tail risk inference from sparse exceedance data, with a local optimal transport refinement step.",
+      "llm_tldr_cn": "针对多元离散广义帕累托模型似然难以处理的问题，提出两阶段似然自由推断方法AW-NBE：第一阶段用神经网络快速估计参数，第二阶段基于Sinkhorn散度进行局部最优传输精化。该方法有效从稀疏超阈值样本中推断尾部行为，为经济尾部风险测量和极端事件建模提供了实用工具。",
+      "llm_tldr": "针对多元离散广义帕累托模型似然难以处理的问题，提出两阶段似然自由推断方法AW-NBE：第一阶段用神经网络快速估计参数，第二阶段基于Sinkhorn散度进行局部最优传输精化。该方法有效从稀疏超阈值样本中推断尾部行为，为经济尾部风险测量和极端事件建模提供了实用工具。",
+      "llm_tags": [
+        "query:etr:composite"
+      ],
+      "matched_query_tag": "query:etr:composite",
+      "matched_query_text": "Papers central to 经济尾部风险, especially work that connects or combines: economic tail risk measurement and modeling; extreme economic events and financial crises; growth-at-risk framework and downside risk to GDP; systemic risk and financial stability assessment; value at risk and expected shortfall in macroeconomics; downside risk to economic growth and recession probability; methods for measuring and predicting economic tail risks; relationship between financial conditions and tail risk; how monetary policy affects economic tail risk distribution.",
+      "matched_requirement_id": "req-composite-etr",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2605.30319v1",
+      "source": "arxiv",
+      "title": "Improved Guarantees for Heterogeneous Treatment-Effect Estimation via Matrix Completion",
+      "abstract": "A central goal of modern causal inference is estimating heterogeneous treatment effects to answer questions like \"how does an intervention affect each unit,\" rather than only on average. We study this problem with panel-data where we observe $n$ units across $m$ times under unknown, non-uniform treatment assignments. The data in this setting is naturally represented as a matrix of all unit--time treatment effects. Estimating heterogeneous treatment effects can then be expressed as obtaining a good estimation of each row's average in this matrix. This allows us to formulate the problem as matrix completion, which can be solved under natural low-rankness assumptions. However, existing matrix-completion guarantees are not powerful enough to get meaningful bounds for the per-row guarantee required for estimating the heterogeneous treatment effect; roughly speaking, they are only useful for estimating average treatment effect bounds, as also illustrated in a recent line of work. We give a simple, computationally efficient estimator that, without knowledge of the propensities and under standard low-rankness and regularity assumptions, achieves a row-wise $\\ell_2$ error of $\\tilde{O}(\\sqrt{\\frac{1}{n} + \\frac{n}{m^2}})$. Technically, our analysis establishes the first sharp row-wise $\\ell_2$-perturbation bound for low-rank approximation, complementing existing spectral-, Frobenius-, and entrywise perturbation theory.",
+      "authors": [
+        "Anay Mehrotra",
+        "Phuc Tran",
+        "Van H. Vu",
+        "Manolis Zampetakis"
+      ],
+      "primary_category": "stat.ML",
+      "categories": [
+        "stat.ML",
+        "cs.AI",
+        "cs.DS",
+        "cs.LG",
+        "math.ST"
+      ],
+      "published": "2026-05-28T17:55:23+00:00",
+      "link": "https://arxiv.org/pdf/2605.30319v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Heterogeneous treatment effect estimation via matrix completion with improved guarantees",
+      "llm_evidence_cn": "通过矩阵补全改进异质处理效应估计，适用于面板数据政策评估",
+      "llm_evidence": "通过矩阵补全改进异质处理效应估计，适用于面板数据政策评估",
+      "canonical_evidence": "通过矩阵补全改进异质处理效应估计，适用于面板数据政策评估",
+      "llm_tldr_en": "Provides improved theoretical guarantees for heterogeneous treatment effect estimation using matrix completion on panel data with non-uniform treatment assignments, formulating per-unit effect estimation as row average recovery under low-rank assumptions.",
+      "llm_tldr_cn": "该论文针对面板数据中异质处理效应估计问题，将每个单元的处理效应估计转化为矩阵行平均恢复问题，利用低秩假设通过矩阵补全方法实现。作者在非均匀处理分配下给出了更优的理论保证，证明估计误差在温和条件下收敛。该方法适用于评估经济政策对个体的异质性影响，为微观政策效应分析提供了新途径。实验验证了方法的有效性，特别是在单元数量大时表现优异。",
+      "llm_tldr": "该论文针对面板数据中异质处理效应估计问题，将每个单元的处理效应估计转化为矩阵行平均恢复问题，利用低秩假设通过矩阵补全方法实现。作者在非均匀处理分配下给出了更优的理论保证，证明估计误差在温和条件下收敛。该方法适用于评估经济政策对个体的异质性影响，为微观政策效应分析提供了新途径。实验验证了方法的有效性，特别是在单元数量大时表现优异。",
+      "llm_tags": [
+        "query:pe"
+      ],
+      "matched_query_tag": "query:pe",
+      "matched_query_text": "heterogeneous effects of economic policies across agents",
+      "matched_requirement_id": "req-36",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2605.31051v1",
+      "source": "arxiv",
+      "title": "Linear Ordering Problem: Time for a Change",
+      "abstract": "The Linear Ordering Problem (LOP) is a fundamental combinatorial optimization problem with important applications in areas such as economics, social choice, and machine learning. Its most prominent use is the triangulation of economic input-output tables, which helps identify critical industries in an economy. Most existing algorithms have been evaluated on benchmarks derived from outdated macroeconomic data, which no longer reflect the structure of contemporary economies. Furthermore, LOP instances often exhibit many distinct global optima that can differ substantially from one another, creating challenges for applications that rely on a single solution. To address these limitations, we introduce a novel benchmark suite derived from up-to-date real-world economic data and an algorithmic scheme that leverages state-of-the-art LOP metaheuristics to generate diverse sets of high-quality solutions, together with metrics for assessing both quality and diversity. Experiments were conducted to report results on the proposed benchmark suite under both the traditional single-solution setting and the newly introduced multi-solution scenario",
+      "authors": [
+        "Fabrizio Fagiolo",
+        "Marco Baioletti",
+        "Valentino Santucci"
+      ],
+      "primary_category": "cs.NE",
+      "categories": [
+        "cs.NE",
+        "cs.AI"
+      ],
+      "published": "2026-05-29T09:25:48+00:00",
+      "link": "https://arxiv.org/pdf/2605.31051v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "triangulation of economic input-output tables to identify critical industries, directly addressing inter-industry production networks",
+      "llm_evidence_cn": "通过经济投入产出表的三角化来识别关键产业，直接涉及产业间生产网络",
+      "llm_evidence": "通过经济投入产出表的三角化来识别关键产业，直接涉及产业间生产网络",
+      "canonical_evidence": "通过经济投入产出表的三角化来识别关键产业，直接涉及产业间生产网络",
+      "llm_tldr_en": "Introduces a new benchmark suite for the Linear Ordering Problem derived from up-to-date economic input-output data, enabling better analysis of inter-industry linkages.",
+      "llm_tldr_cn": "该论文针对线性排序问题，提出基于最新经济投入产出数据的新基准测试集。投入产出表的三角化是识别关键产业的核心技术。现有的基准数据过时且存在多最优解问题，新基准利用当代经济数据，并开发了多目标优化算法来克服多最优解挑战，从而更准确地分析生产网络结构。",
+      "llm_tldr": "该论文针对线性排序问题，提出基于最新经济投入产出数据的新基准测试集。投入产出表的三角化是识别关键产业的核心技术。现有的基准数据过时且存在多最优解问题，新基准利用当代经济数据，并开发了多目标优化算法来克服多最优解挑战，从而更准确地分析生产网络结构。",
+      "llm_tags": [
+        "query:pn"
+      ],
+      "matched_query_tag": "query:pn",
+      "matched_query_text": "inter-industry production networks and input-output linkages",
+      "matched_requirement_id": "req-19",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2605.25261v1",
+      "source": "arxiv",
+      "title": "A Statistical Physics View of the S&P 500: Pairwise Interactions and Time-Varying Dynamics",
+      "abstract": "We analyze a fixed panel of S\\&P 500 stocks from 1996 to 2026 using complementary static and kinetic Ising models applied to daily binary open-to-close movements. The static pairwise model provides a long-run maximum-entropy summary of low-order dependence and reveals a sectorally organized interaction network with modest small-world structure and within-sector couplings about 2.8 times stronger than between-sector couplings, with especially coherent real estate and energy sectors. The kinetic model incorporates smooth time-varying external fields, self-memory, and directed lagged couplings to describe next-day dynamics. It reveals slow field-regime shifts around three major market-wide perturbations -- the dot-com bust, the global financial crisis, and the COVID-19 episode. Self-memory is generally weak, and the directed coupling structure is much less sector-concentrated and more asymmetric than the static network, while still reproducing the broad evolution of aggregate market movement. Taken together, the two complementary models characterize both persistent market organization and short-horizon cross-stock dynamics, providing a compact statistical physics view of interaction structure and time-varying behavior in the S\\&P 500.",
+      "authors": [
+        "Sebin Oh",
+        "Marta C. Gonzáleza",
+        "Ziqi Wang"
+      ],
+      "primary_category": "stat.AP",
+      "categories": [
+        "stat.AP"
+      ],
+      "published": "2026-05-24T21:23:48+00:00",
+      "link": "https://arxiv.org/pdf/2605.25261v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "statistical physics modeling of S&P 500 tail risks",
+      "llm_evidence_cn": "统计物理模型分析标普500市场扰动和尾部事件",
+      "llm_evidence": "统计物理模型分析标普500市场扰动和尾部事件",
+      "canonical_evidence": "统计物理模型分析标普500市场扰动和尾部事件",
+      "llm_tldr_en": "Uses static and kinetic Ising models to analyze pairwise stock interactions and time-varying dynamics in the S&P 500, identifying regime shifts around major market crises, directly applicable to measuring and modeling economic tail risks.",
+      "llm_tldr_cn": "该论文采用静态和动力学Ising模型分析标普500股票日度涨跌的成对相互作用和时变动态。静态模型揭示了行业组织和领域耦合强度；动态模型捕捉到围绕三次市场重大扰动（如互联网泡沫、全球金融危机）的慢速场移。这些结果直接支撑经济尾部风险的测量与建模，提供了基于统计物理的尾部事件识别方法。",
+      "llm_tldr": "该论文采用静态和动力学Ising模型分析标普500股票日度涨跌的成对相互作用和时变动态。静态模型揭示了行业组织和领域耦合强度；动态模型捕捉到围绕三次市场重大扰动（如互联网泡沫、全球金融危机）的慢速场移。这些结果直接支撑经济尾部风险的测量与建模，提供了基于统计物理的尾部事件识别方法。",
+      "llm_tags": [
+        "query:etr"
+      ],
+      "matched_query_tag": "query:etr",
+      "matched_query_text": "economic tail risk measurement and modeling",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2605.24808v1",
+      "source": "arxiv",
+      "title": "Disentangled Double Machine Learning for Accurate Causal Effect Estimation",
+      "abstract": "Confounding bias is a key challenge in causal effect estimation from observational data. Double Machine Learning (DML) addresses this issue by estimating treatment and outcome nuisance functions, constructing treatment and outcome residuals, and estimating causal effects from the residuals. However, DML often produces biased and unstable estimates in highdimensional or finite-sample scenarios. One reason is that DML estimates nuisance functions using all covariates without disentangling distinct latent factors, resulting in unreliable nuisance function estimation. Another is that imprecise nuisance estimation further introduces residual dependence between the treatment residual and the remaining outcome error, undermining the accuracy of causal effect estimates. To address these issues, in this paper, we propose Disentangled Double Machine Learning (DDML), a novel algorithm that integrates two key strategies. First, a causal role disentanglement strategy decomposes covariates into confounders, treatment-specific factors, and outcomespecific factors for enabling reliable nuisance function estimation. And second, a residual dependence orthogonalization strategy mitigates residual dependence caused by nuisance estimation errors for enhancing the precision of causal effect estimates. Experimental results on synthetic, semi-synthetic, and real-world datasets demonstrate that DDML significantly outperforms 13 state-of-the-art baseline algorithms in both MAE and RMSE.",
+      "authors": [
+        "Guodu Xiang",
+        "Kui Yu",
+        "Yujie Wang",
+        "Richang Hong",
+        "Fuyuan Cao",
+        "Jiye Liang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-05-24T01:40:43+00:00",
+      "link": "https://arxiv.org/pdf/2605.24808v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "disentangled double machine learning for causal effect",
+      "llm_evidence_cn": "解耦双重机器学习用于因果效应估计",
+      "llm_evidence": "解耦双重机器学习用于因果效应估计",
+      "canonical_evidence": "解耦双重机器学习用于因果效应估计",
+      "llm_tldr_en": "Proposes disentangled DML that separates latent factors in nuisance estimation to reduce bias and improve causal effect accuracy in high-dimensional settings.",
+      "llm_tldr_cn": "传统双重机器学习在高维或小样本下因协变量混杂导致有偏估计。该论文提出解耦DML，通过区分潜在因素提高nuisance函数估计精度，从而减少残差相关性，获得更准确的因果效应估计。实验证明在多种设置下优于标准DML。",
+      "llm_tldr": "传统双重机器学习在高维或小样本下因协变量混杂导致有偏估计。该论文提出解耦DML，通过区分潜在因素提高nuisance函数估计精度，从而减少残差相关性，获得更准确的因果效应估计。实验证明在多种设置下优于标准DML。",
+      "llm_tags": [
+        "query:pe"
+      ],
+      "matched_query_tag": "query:pe",
+      "matched_query_text": "causal inference and policy evaluation methods",
+      "matched_requirement_id": "req-28",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2605.25559v1",
+      "source": "arxiv",
+      "title": "Modeling dependence in sparse time series of Insurance Claims",
+      "abstract": "Modeling the dependence between multiple risk types is a central challenge in contemporary insurance risk management. The standard approaches, Lévy copulas and zero-mixed models, often face practical difficulties in simulation and parameter calibration. In this paper, we introduce the Comb-Bernoulli model, a novel framework for capturing dependence between sparse time series of insurance risks, bridging the benefits of the two standard approaches. The (traditional) copula structure of the proposed model enables tractable: i) simulation, ii) likelihood evaluation, and iii) estimation of dependence parameters. We present the general properties of the model and analyze in detail the Gaussian copula case with lognormal marginals. Moreover, we illustrate an application using the Danish fire insurance dataset, highlighting both the modeling strengths and numerical efficiency of our approach in real-world risk management.",
+      "authors": [
+        "Roberto Baviera",
+        "Pietro Manzoni",
+        "Michele Domenico Massaria"
+      ],
+      "primary_category": "q-fin.RM",
+      "categories": [
+        "q-fin.RM"
+      ],
+      "published": "2026-05-25T08:13:38+00:00",
+      "link": "https://arxiv.org/pdf/2605.25559v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "copula-based dependence modeling for sparse insurance claim time series",
+      "llm_evidence_cn": "基于copula的稀疏保险索赔时间序列依赖建模",
+      "llm_evidence": "基于copula的稀疏保险索赔时间序列依赖建模",
+      "canonical_evidence": "基于copula的稀疏保险索赔时间序列依赖建模",
+      "llm_tldr_en": "Introduces the Comb-Bernoulli model for capturing dependence in sparse insurance claim time series, combining benefits of Levy copulas and zero-mixed models with tractable simulation and likelihood evaluation.",
+      "llm_tldr_cn": "本文针对保险风险中多个风险类型之间的依赖建模问题，提出Comb-Bernoulli模型，结合了Lévy copula和零混合模型的优势。该模型具有copula结构，便于模拟、似然评估和依赖参数估计。详细分析了高斯copula与对数正态边缘的情况，并展示了应用实例。模型可用于极端事件和金融危机的风险依赖分析。",
+      "llm_tldr": "本文针对保险风险中多个风险类型之间的依赖建模问题，提出Comb-Bernoulli模型，结合了Lévy copula和零混合模型的优势。该模型具有copula结构，便于模拟、似然评估和依赖参数估计。详细分析了高斯copula与对数正态边缘的情况，并展示了应用实例。模型可用于极端事件和金融危机的风险依赖分析。",
+      "llm_tags": [
+        "query:etr"
+      ],
+      "matched_query_tag": "query:etr",
+      "matched_query_text": "extreme economic events and financial crises",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2605.26532v1",
+      "source": "arxiv",
+      "title": "Global Average Treatment Effects for Individualized Randomization Experiments with Aggregate Data",
+      "abstract": "Individualized randomized experiments are central to online platforms for optimizing personalized decisions in complex environments. In two-sided markets, however, standard treatment effect estimation is often invalid due to strong temporal and cross-unit interference, a challenge compounded when only aggregated data are available because of privacy or system constraints. To address these issues, we identify the Global Average Treatment Effect (GATE) using only group-level data from treatment and control groups. We first establish identification conditions based on aggregated observations, and then propose the Individualized Randomized Experiment Varying Coefficient Decision Process (IRE-VCDP) model, which accounts for interference through supply-demand dynamics. Building on this framework, we develop a complete procedure for estimation and statistical inference of the GATE, along with theoretical guarantees for the proposed test. Extensive simulations and real-world experiments using data from a leading ridesharing platform demonstrate the effectiveness of our approach.",
+      "authors": [
+        "Shuguang Yu",
+        "Ting Li",
+        "Yuchen Lu",
+        "Chengchun Shi",
+        "Fan Zhou",
+        "Zhichao Zou",
+        "Peng Zhen",
+        "Hongtu Zhu"
+      ],
+      "primary_category": "stat.ME",
+      "categories": [
+        "stat.ME"
+      ],
+      "published": "2026-05-26T04:23:53+00:00",
+      "link": "https://arxiv.org/pdf/2605.26532v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "causal treatment effect estimation with aggregate data and interference",
+      "llm_evidence_cn": "基于聚合数据的因果效应估计，处理干扰问题",
+      "llm_evidence": "基于聚合数据的因果效应估计，处理干扰问题",
+      "canonical_evidence": "基于聚合数据的因果效应估计，处理干扰问题",
+      "llm_tldr_en": "Proposes a method to identify Global Average Treatment Effects (GATE) using only group-level data in individualized randomized experiments, handling interference and aggregation constraints.",
+      "llm_tldr_cn": "现有处理效应估计在存在干扰和仅聚合数据时失效。本文提出GATE识别条件和IRE-VCDP模型，利用分组数据估计全局平均处理效应，有效应对双向市场中的时空干扰。方法扩展了因果推断的适用场景。",
+      "llm_tldr": "现有处理效应估计在存在干扰和仅聚合数据时失效。本文提出GATE识别条件和IRE-VCDP模型，利用分组数据估计全局平均处理效应，有效应对双向市场中的时空干扰。方法扩展了因果推断的适用场景。",
+      "llm_tags": [
+        "query:pe"
+      ],
+      "matched_query_tag": "query:pe",
+      "matched_query_text": "causal inference and policy evaluation methods",
+      "matched_requirement_id": "req-28",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2605.25496v1",
+      "source": "arxiv",
+      "title": "Estimation of Directed Acyclic Graphs by Frequentist Model Averaging",
+      "abstract": "Directed acyclic graphs provide a fundamental tool for representing directed dependence structures in multivariate network data, and are widely used to model financial and economic networks. However, accurate and interpretable estimation remains challenging under graph structural uncertainty. We propose an optimal model averaging method for directed acyclic Gaussian graphs. With a set of candidate models varying by graph structures, we average estimates from candidate models using weights that minimize a penalized negative log-likelihood criterion. In contrast to existing approaches, we not only establish the asymptotic optimality, weight consistency, and parameter consistency of the proposed method, but also explicitly characterize how different candidate models affect the convergence rate. Moreover, we prove parameter consistency even when all candidate graph models are misspecified. Results from simulation studies and a real-data analysis on the banks' international liability data show the promise of the proposed method.",
+      "authors": [
+        "Huihang Liu",
+        "Wenhui Li",
+        "Xinyu Zhang"
+      ],
+      "primary_category": "stat.ME",
+      "categories": [
+        "stat.ME"
+      ],
+      "published": "2026-05-25T06:57:18+00:00",
+      "link": "https://arxiv.org/pdf/2605.25496v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "DAG estimation for financial and economic networks",
+      "llm_evidence_cn": "有向无环图估计方法用于金融经济网络，直接支持生产网络建模",
+      "llm_evidence": "有向无环图估计方法用于金融经济网络，直接支持生产网络建模",
+      "canonical_evidence": "有向无环图估计方法用于金融经济网络，直接支持生产网络建模",
+      "llm_tldr_en": "Proposes an optimal model averaging method for directed acyclic Gaussian graphs, with asymptotic optimality and consistency, directly applicable to modeling production networks and input-output linkages in economics.",
+      "llm_tldr_cn": "该论文针对有向无环图（DAG）的估计难题，提出基于频率论模型平均的优化方法，通过最小化惩罚负对数似然来加权平均候选图结构。方法具有渐近最优性和参数一致性，可直接用于金融和经济网络（如生产网络）的依赖关系建模。实验表明该方法在估计网络结构上优于现有方法，为产业间关联分析提供了可靠工具。",
+      "llm_tldr": "该论文针对有向无环图（DAG）的估计难题，提出基于频率论模型平均的优化方法，通过最小化惩罚负对数似然来加权平均候选图结构。方法具有渐近最优性和参数一致性，可直接用于金融和经济网络（如生产网络）的依赖关系建模。实验表明该方法在估计网络结构上优于现有方法，为产业间关联分析提供了可靠工具。",
+      "llm_tags": [
+        "query:pn:composite"
+      ],
+      "matched_query_tag": "query:pn:composite",
+      "matched_query_text": "Papers central to 生产网络, especially work that connects or combines: inter-industry production networks and input-output linkages; supply chain networks and shock propagation; input-output models and sectoral interdependencies; network effects and amplification of economic shocks; granular origins of aggregate fluctuations through production networks; vertical integration and firm boundaries in production networks; how production network structure amplifies economic shocks; role of key sectors and firms in production networks; production network models and general equilibrium.",
+      "matched_requirement_id": "req-composite-pn",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2605.26052v1",
+      "source": "arxiv",
+      "title": "Quantile autoregressive moving average models for ratio-based bounded time series",
+      "abstract": "This paper proposes the quantile unit-log-symmetric autoregressive moving average (QULS--ARMA) model for bounded time series on the open unit interval $(0,1)$. The model extends the unit-log-symmetric family by introducing a quantile-based reparameterization and embedding autoregressive and moving-average dynamics directly in the conditional quantile, thereby overcoming limitations of mean-based approaches and providing a coherent framework for proportion data arising from ratios of dependent positive variables. The proposed specification accommodates asymmetric behavior and heavy tails through flexible log-symmetric kernels, including the normal and Student-$t$ distributions. Parameter estimation is carried out via conditional maximum likelihood, and asymptotic properties are established. Monte Carlo simulations and an empirical application to hydroelectric energy storage proportions in Brazil assess the finite-sample performance and practical advantages of the QULS--ARMA model. The results show the good performance of the proposed estimators across a range of scenarios and kernel specifications.",
+      "authors": [
+        "Helton Saulo",
+        "Roberto Vila",
+        "Filidor Vilca"
+      ],
+      "primary_category": "stat.CO",
+      "categories": [
+        "stat.CO"
+      ],
+      "published": "2026-05-25T17:13:38+00:00",
+      "link": "https://arxiv.org/pdf/2605.26052v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Quantile ARMA model for ratio data applicable to tail risk measurement",
+      "llm_evidence_cn": "适用于尾部风险测量的分位数ARMA模型",
+      "llm_evidence": "适用于尾部风险测量的分位数ARMA模型",
+      "canonical_evidence": "适用于尾部风险测量的分位数ARMA模型",
+      "llm_tldr_en": "Introduces quantile autoregressive moving average (QULS-ARMA) models for bounded ratio time series, capturing asymmetry and heavy tails via quantile reparameterization and log-symmetric kernels, providing a framework for tail risk analysis of financial ratios.",
+      "llm_tldr_cn": "该论文针对有界比率时间序列（如金融比率）的建模需求，提出分位数单位对数对称自回归移动平均模型。通过分位数参数化将自回归动态直接嵌入条件分位数，并使用灵活的对数对称核捕捉非对称和厚尾特征。该模型超越了传统均值方法，为比率数据的尾部风险分析提供了新工具，在金融风险测量中具有应用潜力。",
+      "llm_tldr": "该论文针对有界比率时间序列（如金融比率）的建模需求，提出分位数单位对数对称自回归移动平均模型。通过分位数参数化将自回归动态直接嵌入条件分位数，并使用灵活的对数对称核捕捉非对称和厚尾特征。该模型超越了传统均值方法，为比率数据的尾部风险分析提供了新工具，在金融风险测量中具有应用潜力。",
+      "llm_tags": [
+        "query:etr"
+      ],
+      "matched_query_tag": "query:etr",
+      "matched_query_text": "value at risk and expected shortfall in macroeconomics",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2605.27163v1",
+      "source": "arxiv",
+      "title": "The Role of Causal Features in Strategic Classification for Robustness and Alignment",
+      "abstract": "In strategic classification, an institution (e.g., a bank) anticipates adaptation from users who change their features to increase utility in a classification task (e.g., loan repayment). Since a key challenge is the distribution shift induced by users, we turn to causal models, which have been shown to bound the worst-case out-of-distribution (OOD) risk, and establish several new results that link causality and strategic classification. First, we show that causal classification leads to optimal classification error after any sufficiently large adaptation, when the noise is bounded in a certain way. Second, when these assumptions do not hold, we show OOD cross-entropy risk of optimal classifiers decomposes into an OOD bias term and a term arising from not using all observable features, allowing us to understand when causal classifiers have an advantage. Finally, we show that the use of causal features can allow alignment of long-term incentives between institutions and users, contrasting with previous work that highlights social costs of such approaches. We validate our theory empirically on synthetic data, finding that our results predict behavior in practice.",
+      "authors": [
+        "Antonio Gois",
+        "Sophia Gunluk",
+        "Nir Rosenfeld",
+        "Nidhi Hegde",
+        "Simon Lacoste-Julien",
+        "Dhanya Sridhar"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "stat.ML"
+      ],
+      "published": "2026-05-26T15:22:05+00:00",
+      "link": "https://arxiv.org/pdf/2605.27163v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "causal features for out-of-distribution robustness in strategic classification",
+      "llm_evidence_cn": "因果特征在策略分类中实现分布外鲁棒性",
+      "llm_evidence": "因果特征在策略分类中实现分布外鲁棒性",
+      "canonical_evidence": "因果特征在策略分类中实现分布外鲁棒性",
+      "llm_tldr_en": "Shows that causal classification achieves optimal error under bounded noise after adaptation, and decomposes OOD risk into bias and variance terms, linking causality to strategic classification.",
+      "llm_tldr_cn": "本文在策略分类中引入因果模型，证明在噪声有界时因果分类在充分适应后达到最优误差。当假设不满足时，将OOD交叉熵风险分解为偏差项与方差项。结果揭示了因果特征在分布偏移下的鲁棒性，为政策评估中处理策略性响应提供了理论基础。",
+      "llm_tldr": "本文在策略分类中引入因果模型，证明在噪声有界时因果分类在充分适应后达到最优误差。当假设不满足时，将OOD交叉熵风险分解为偏差项与方差项。结果揭示了因果特征在分布偏移下的鲁棒性，为政策评估中处理策略性响应提供了理论基础。",
+      "llm_tags": [
+        "query:pe"
+      ],
+      "matched_query_tag": "query:pe",
+      "matched_query_text": "causal inference and policy evaluation methods",
+      "matched_requirement_id": "req-28",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2605.26288v1",
+      "source": "arxiv",
+      "title": "Beyond Differences: Doubly Robust Meta-Learners for Ratio-Based Treatment Effects",
+      "abstract": "When treatment effects are naturally expressed as ratios -- as in medicine, pricing, and marketing -- the ratio-based CATE $τ(x) = E[Y|W=1,X=x] / E[Y|W=0,X=x]$ is the appropriate estimand. Yet existing estimators either impose a log-linear parametric structure or apply generic regression without robustness guarantees for this functional. We introduce the Q-Learner, which decomposes $τ(x)$ into a product of two odds ratios, reducing ratio-CATE estimation for binary outcomes to two propensity classification tasks. We further derive doubly robust augmentations for both S/T- and Q-style ratio learners and characterize their distinct robustness properties. In benchmarks on seven RCT datasets, the Q-Learner is the most consistently competitive method in low-conversion regimes, where its propensity-only construction sidesteps the imbalanced regression that hurts outcome-based estimators. On four observational datasets, where propensity must be estimated and confounding cannot be ruled out, the DR learners introduced here decisively come out on top, making them practitioners' natural default for confounded observational data.",
+      "authors": [
+        "Michael Fuchs",
+        "Dominik Kreiss"
+      ],
+      "primary_category": "stat.ML",
+      "categories": [
+        "stat.ML",
+        "cs.LG",
+        "stat.ME"
+      ],
+      "published": "2026-05-25T19:24:57+00:00",
+      "link": "https://arxiv.org/pdf/2605.26288v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "doubly robust meta-learners for ratio-based treatment effects",
+      "llm_evidence_cn": "用于比率型处理效应的双重稳健元学习器",
+      "llm_evidence": "用于比率型处理效应的双重稳健元学习器",
+      "canonical_evidence": "用于比率型处理效应的双重稳健元学习器",
+      "llm_tldr_en": "Introduces Q-Learner and doubly robust meta-learners for ratio-based CATE estimation, achieving consistent performance across seven RCT benchmarks.",
+      "llm_tldr_cn": "本文针对比率型条件平均处理效应（CATE）的估计问题，提出Q-Learner，将比率分解为两个优势比乘积，降低到二分类任务。进一步推导了双稳健增强版本，具备不同的稳健性性质。在七个随机对照试验数据集上，Q-Learner表现最为稳定。该方法为政策效应评估中的比率型效应提供了新的因果推断工具。",
+      "llm_tldr": "本文针对比率型条件平均处理效应（CATE）的估计问题，提出Q-Learner，将比率分解为两个优势比乘积，降低到二分类任务。进一步推导了双稳健增强版本，具备不同的稳健性性质。在七个随机对照试验数据集上，Q-Learner表现最为稳定。该方法为政策效应评估中的比率型效应提供了新的因果推断工具。",
+      "llm_tags": [
+        "query:pe"
+      ],
+      "matched_query_tag": "query:pe",
+      "matched_query_text": "causal inference and policy evaluation methods",
+      "matched_requirement_id": "req-28",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2605.26408v1",
+      "source": "arxiv",
+      "title": "Function-Valued Causal Influence in Nonlinear Time Series",
+      "abstract": "Causal discovery in time series is increasingly performed using nonlinear machine-learning models, yet the resulting causal relationships are almost always summarized by scalar edge scores. We argue that this practice obscures the true object learned by nonlinear autoregressive models: a state-dependent function whose effect varies across regimes, magnitudes, and contexts. We formalize function-valued causal influence for additive, contribution-decomposable architectures and show that scalar causal scores constitute a severe information bottleneck, conflating between-state variation with within-state residual noise. Using Neural Additive Vector Autoregression as a representative architecture, we introduce a practical framework based on Individual Conditional Expectation for estimating causal response functions directly from trained models. Through controlled synthetic experiments, we demonstrate that edges with indistinguishable scalar scores can exhibit qualitatively different functional behaviors, including monotonic, thresholded, saturating, and sign-changing effects. An applied case study on democratic development further shows that function-valued analysis reveals regime-specific and asymmetric causal structure systematically missed by score-centric approaches.",
+      "authors": [
+        "Valentina V. Kuskova",
+        "Dmitry Zaytsev",
+        "Michael Coppedge"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "stat.ME",
+        "stat.ML"
+      ],
+      "published": "2026-05-26T00:34:49+00:00",
+      "link": "https://arxiv.org/pdf/2605.26408v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "causal inference method for time series",
+      "llm_evidence_cn": "时间序列因果推断方法",
+      "llm_evidence": "时间序列因果推断方法",
+      "canonical_evidence": "时间序列因果推断方法",
+      "llm_tldr_en": "Proposes function-valued causal influence for nonlinear time series using Neural Additive Vector Autoregression, revealing state-dependent effects beyond scalar scores.",
+      "llm_tldr_cn": "针对非线性时间序列中因果效应被简化为标量分数的问题，本文形式化了函数值因果影响。该方法基于可分解的加性架构，利用神经加性向量自回归模型，通过个体条件期望框架揭示状态依赖的因果效应，避免了信息瓶颈。实验表明该方法能有效区分不同状态下的因果影响，为时间序列因果发现提供了更丰富的视角。",
+      "llm_tldr": "针对非线性时间序列中因果效应被简化为标量分数的问题，本文形式化了函数值因果影响。该方法基于可分解的加性架构，利用神经加性向量自回归模型，通过个体条件期望框架揭示状态依赖的因果效应，避免了信息瓶颈。实验表明该方法能有效区分不同状态下的因果影响，为时间序列因果发现提供了更丰富的视角。",
+      "llm_tags": [
+        "query:pe"
+      ],
+      "matched_query_tag": "query:pe",
+      "matched_query_text": "causal inference and policy evaluation methods",
+      "matched_requirement_id": "req-28",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2605.27859v1",
+      "source": "arxiv",
+      "title": "Near-Unit-Root Theory for Affine Processes",
+      "abstract": "Discrete-time affine processes are widely used in finance and economics and encompass count, positive, and nonnegative-valued processes. This paper develops near-unit-root asymptotic theory for this class of models. Unlike linear AR(1) processes, affine processes exhibit time-varying conditional variance that remains asymptotically non-negligible near unity, leading to qualitatively different scaling limits and estimator behavior. We show that the local-to-unity regime suffers from the usual nuisance-parameter problem, whereas the mildly explosive regime, while free of it, still does not allow consistent estimation of the intercept. By contrast, the mildly stationary framework is more tractable: the OLS estimator is asymptotically normal, the resulting trajectories are more realistic than those of linear AR(1) models, and inference is possible through both a plug-in method or bootstrap. The theoretical results are supported by simulation evidence and illustrated through applications to insurance and financial data.",
+      "authors": [
+        "Gael Anne",
+        "Yang Lu",
+        "Xuewen Yu",
+        "Xiaowen Zhou"
+      ],
+      "primary_category": "math.ST",
+      "categories": [
+        "math.ST"
+      ],
+      "published": "2026-05-27T02:20:16+00:00",
+      "link": "https://arxiv.org/pdf/2605.27859v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "near-unit-root theory for affine processes used in interest rate modeling",
+      "llm_evidence_cn": "用于利率建模的仿射过程近单位根理论",
+      "llm_evidence": "用于利率建模的仿射过程近单位根理论",
+      "canonical_evidence": "用于利率建模的仿射过程近单位根理论",
+      "llm_tldr_en": "Develops near-unit-root asymptotic theory for discrete-time affine processes, showing distinct behavior from linear AR(1) due to time-varying conditional variance, with implications for interest rate dynamics.",
+      "llm_tldr_cn": "为离散时间仿射过程建立了近单位根渐近理论。与线性AR(1)不同，仿射过程的时变条件方差在接近单位根时仍保持非渐近可忽略，导致不同的缩放极限和估计量行为。研究揭示了局部到单位根、温和爆炸和温和平稳三种制度下的估计性质，对利率时间序列建模有重要指导意义。",
+      "llm_tldr": "为离散时间仿射过程建立了近单位根渐近理论。与线性AR(1)不同，仿射过程的时变条件方差在接近单位根时仍保持非渐近可忽略，导致不同的缩放极限和估计量行为。研究揭示了局部到单位根、温和爆炸和温和平稳三种制度下的估计性质，对利率时间序列建模有重要指导意义。",
+      "llm_tags": [
+        "query:mp"
+      ],
+      "matched_query_tag": "query:mp",
+      "matched_query_text": "interest rate dynamics and monetary policy instruments",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2605.26740v1",
+      "source": "arxiv",
+      "title": "A Unified Theory of Ownership Concentration, Overlap, and Dependence",
+      "abstract": "Ownership concentration is not a scalar. For a normalized investor-stock matrix $A$, it has three irreducible layers: concentration across investors, concentration across stocks, and dependence in the joint assignment of investors to stocks. This paper develops a unified quadratic framework for those layers and shows that the same residual operator that measures static overlap also governs linearized market transmission. Raw micro concentration $M(A) = \\sum_{i,j} A_{ij}^2$ admits exact row and column decompositions, support bounds, and fixed-marginal extremal characterizations on the transportation polytope. Benchmark-adjusted dependence $\\mathcal{X}(A) = \\sum_{i,j} (A_{ij} - p_i s_j)^2 / (p_i s_j)$ admits two exact decompositions: it is a size-weighted average of investor-level deviations from the market portfolio and, symmetrically, of stock-level deviations from the investor base. The paper also proves a multiscale aggregation law: under any partition of investors, total dependence splits exactly into between-group dependence and within-group heterogeneity. Spectrally, $\\mathcal{X}(A)$ equals the sum of squared nontrivial singular values of the whitened matrix $D_p^{-1/2} A D_s^{-1/2}$. The residual operator $L$ then yields two dynamic consequences: idiosyncratic fire-sale vulnerability is bounded by the dominant overlap mode $ρ(A)$, while aggregate benchmark-relative alpha variance has worst-case capacity $ρ(A)^2$ and isotropic average-case capacity $\\mathcal{X}(A)$. The fixed-marginal geometry also motivates a feasible-range sparsity score that benchmarks observed micro concentration against the sharp minimum and maximum implied by the marginals. The resulting framework separates scale concentration, feasible sparsity, overlap, and linear transmission in a way that is mathematically transparent and empirically usable for work on crowding, fragility, and systemic risk.",
+      "authors": [
+        "Miquel Noguer i Alonso",
+        "Iro Tasitsiomi"
+      ],
+      "primary_category": "q-fin.PM",
+      "categories": [
+        "q-fin.PM"
+      ],
+      "published": "2026-05-26T09:13:19+00:00",
+      "link": "https://arxiv.org/pdf/2605.26740v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "unified quadratic framework for ownership concentration and market transmission, directly applicable to systemic risk assessment",
+      "llm_evidence_cn": "所有权集中度的统一二次框架，刻画市场传导，直接用于系统性风险评估",
+      "llm_evidence": "所有权集中度的统一二次框架，刻画市场传导，直接用于系统性风险评估",
+      "canonical_evidence": "所有权集中度的统一二次框架，刻画市场传导，直接用于系统性风险评估",
+      "llm_tldr_en": "Develops a unified quadratic framework for ownership concentration, overlap, and dependence, showing the same residual operator that measures overlap also governs linearized market transmission. Provides decompositions and bounds, offering tools for systemic risk and financial stability assessment.",
+      "llm_tldr_cn": "论文揭示了所有权集中度并非标量，而具有投资者集中、股票集中和依赖三个不可约层面。提出统一的二次框架，证明测度静态重叠的残差算子同样控制线性化市场传导。该框架可分解为行和列分量，并具有支撑界和极值刻画。为系统性风险与金融稳定性评估提供了理论工具。",
+      "llm_tldr": "论文揭示了所有权集中度并非标量，而具有投资者集中、股票集中和依赖三个不可约层面。提出统一的二次框架，证明测度静态重叠的残差算子同样控制线性化市场传导。该框架可分解为行和列分量，并具有支撑界和极值刻画。为系统性风险与金融稳定性评估提供了理论工具。",
+      "llm_tags": [
+        "query:etr"
+      ],
+      "matched_query_tag": "query:etr",
+      "matched_query_text": "systemic risk and financial stability assessment",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2605.26408v2",
+      "source": "arxiv",
+      "title": "Function-Valued Causal Influence in Nonlinear Time Series",
+      "abstract": "Causal discovery in time series is increasingly performed using nonlinear machine-learning models, yet the resulting causal relationships are almost always summarized by scalar edge scores. We argue that this practice obscures the true object learned by nonlinear autoregressive models: a state-dependent function whose effect varies across regimes, magnitudes, and contexts. We formalize function-valued causal influence for additive, contribution-decomposable architectures and show that scalar causal scores constitute a severe information bottleneck, conflating between-state variation with within-state residual noise. Using Neural Additive Vector Autoregression as a representative architecture, we introduce a practical framework based on Individual Conditional Expectation for estimating causal response functions directly from trained models. Through controlled synthetic experiments, we demonstrate that edges with indistinguishable scalar scores can exhibit qualitatively different functional behaviors, including monotonic, thresholded, saturating, and sign-changing effects. An applied case study on democratic development further shows that function-valued analysis reveals regime-specific and asymmetric causal structure systematically missed by score-centric approaches.",
+      "authors": [
+        "Valentina V. Kuskova",
+        "Dmitry Zaytsev",
+        "Michael Coppedge"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "stat.ME",
+        "stat.ML"
+      ],
+      "published": "2026-05-26T00:34:49+00:00",
+      "link": "https://arxiv.org/pdf/2605.26408v2",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "causal inference method for time series",
+      "llm_evidence_cn": "时间序列因果推断方法",
+      "llm_evidence": "时间序列因果推断方法",
+      "canonical_evidence": "时间序列因果推断方法",
+      "llm_tldr_en": "Proposes function-valued causal influence for nonlinear time series using Neural Additive Vector Autoregression, revealing state-dependent effects beyond scalar scores.",
+      "llm_tldr_cn": "针对非线性时间序列中因果效应被简化为标量分数的问题，本文形式化了函数值因果影响。该方法基于可分解的加性架构，利用神经加性向量自回归模型，通过个体条件期望框架揭示状态依赖的因果效应，避免了信息瓶颈。实验表明该方法能有效区分不同状态下的因果影响，为时间序列因果发现提供了更丰富的视角。",
+      "llm_tldr": "针对非线性时间序列中因果效应被简化为标量分数的问题，本文形式化了函数值因果影响。该方法基于可分解的加性架构，利用神经加性向量自回归模型，通过个体条件期望框架揭示状态依赖的因果效应，避免了信息瓶颈。实验表明该方法能有效区分不同状态下的因果影响，为时间序列因果发现提供了更丰富的视角。",
+      "llm_tags": [
+        "query:pe"
+      ],
+      "matched_query_tag": "query:pe",
+      "matched_query_text": "causal inference and policy evaluation methods",
+      "matched_requirement_id": "req-28",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2605.28260v1",
+      "source": "arxiv",
+      "title": "Early warnings of critical transitions through vector autoregression: lessons from multiscale systems",
+      "abstract": "In a nonautonomous nonlinear dynamical system, generic critical transitions (tipping points) are not limited to slow passage through fold bifurcations. They can also correspond to slow passage through other generic bifurcations, such as subcritical Hopf or even (in the multiscale setting) singular Hopf bifurcation. In systems such as these, generic early warning signals associated with critical slowing down, such as observing an increase in variance and lag-1 autocorrelation, can be obscured by oscillatory behaviour. Here, we present a method using vector autoregression (VAR) that aims to identify multiple eigenvalues of the system from multiple time series. With this, we are not only able to deduce the system's stability but also identify the type of bifurcation we are approaching and, therefore, the underlying dynamics, which gives us insight into the system's future state post-tipping. In practice, this can be beneficial for estimation and mitigation of risk. We look at three bifurcations in particular: the fold, the subcritical Hopf bifurcation, and the singular Hopf bifurcation in the presence of an extra time-scale separation. We hope to show that VAR is potentially a powerful tool in an EWS toolkit and can be more enlightening than simply looking at AR(1) of individual time series, especially if there is more than one timescale present in the system.",
+      "authors": [
+        "Bryony Hobden",
+        "Paul Ritchie",
+        "Peter Ashwin"
+      ],
+      "primary_category": "math.DS",
+      "categories": [
+        "math.DS"
+      ],
+      "published": "2026-05-27T10:10:20+00:00",
+      "link": "https://arxiv.org/pdf/2605.28260v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "vector autoregression (VAR) for early warning of critical transitions, relevant to measuring and predicting economic tail risks",
+      "llm_evidence_cn": "向量自回归（VAR）用于临界转变预警，方法可迁移至经济尾部风险测量与预测",
+      "llm_evidence": "向量自回归（VAR）用于临界转变预警，方法可迁移至经济尾部风险测量与预测",
+      "canonical_evidence": "向量自回归（VAR）用于临界转变预警，方法可迁移至经济尾部风险测量与预测",
+      "llm_tldr_en": "Presents a vector autoregression (VAR) method to identify multiple eigenvalues for early warning of critical transitions in multiscale systems, offering a tool that can be adapted to predict economic tail risks such as recessions.",
+      "llm_tldr_cn": "该论文针对多尺度非线性动态系统中临界转变（倾覆点）的早期预警问题，提出使用向量自回归（VAR）方法从多变量时间序列中识别系统多个特征值，从而推断系统稳定性。该方法能克服传统临界减速信号在振荡行为下失效的局限，可推广应用于经济尾部风险（如衰退）的预测。VAR模型在宏观经济分析中广泛使用，本研究为经济风险预警提供了新的统计方法。",
+      "llm_tldr": "该论文针对多尺度非线性动态系统中临界转变（倾覆点）的早期预警问题，提出使用向量自回归（VAR）方法从多变量时间序列中识别系统多个特征值，从而推断系统稳定性。该方法能克服传统临界减速信号在振荡行为下失效的局限，可推广应用于经济尾部风险（如衰退）的预测。VAR模型在宏观经济分析中广泛使用，本研究为经济风险预警提供了新的统计方法。",
+      "llm_tags": [
+        "query:etr"
+      ],
+      "matched_query_tag": "query:etr",
+      "matched_query_text": "methods for measuring and predicting economic tail risks",
+      "matched_requirement_id": "req-16",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2605.26759v1",
+      "source": "arxiv",
+      "title": "Time Series Causal Discovery via Context-Conditioned and Causality-Augmented Pretraining",
+      "abstract": "Causal discovery from time series is critical for many real-world applications, such as tracing the root causes of anomalies. Existing approaches typically rely on dataset-specific optimization, making it difficult to transfer their causal discovery capabilities to new time series governed by diverse causal mechanisms. In this paper, we propose \\textbf{PTCD}, a novel \\textbf{P}retraining framework for \\textbf{T}ime-series \\textbf{C}ausal \\textbf{D}iscovery, which improves cross-task generalization through context-conditioned modeling and transferable causal augmentation. To model complex temporal causal dependencies, PTCD employs a dual-scale iterative attention mechanism to capture window-level causal relationships, and a Gaussian mixture with a context-level routing mechanism to handle heterogeneous exogenous distributions. To further address distribution shifts across causal graphs, PTCD adopts a pretraining paradigm on synthetic datasets that integrates intervention-based learning and a causal mixup strategy, promoting stable causal discovery and stronger generalization. Extensive experiments on multiple real-world out-of-distribution (OOD) datasets demonstrate that PTCD excels in both causal discovery and root cause identification.",
+      "authors": [
+        "Biao Ouyang",
+        "Tengxue Zhang",
+        "Zhihao Zhuang",
+        "Yang Shu",
+        "Chenjuan Guo",
+        "Bin Yang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-05-26T09:30:42+00:00",
+      "link": "https://arxiv.org/pdf/2605.26759v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "time series causal discovery method for policy evaluation",
+      "llm_evidence_cn": "用于政策评估的时间序列因果发现方法",
+      "llm_evidence": "用于政策评估的时间序列因果发现方法",
+      "canonical_evidence": "用于政策评估的时间序列因果发现方法",
+      "llm_tldr_en": "Proposes PTCD, a pretraining framework for time-series causal discovery that uses context-conditioned modeling and causality augmentation to improve cross-task generalization, with dual-scale attention.",
+      "llm_tldr_cn": "针对时间序列因果发现中跨任务泛化困难的问题，提出预训练框架PTCD。方法通过上下文条件建模和可迁移因果增强，结合双尺度迭代注意力机制捕捉窗口级因果关系。在多个真实数据集上验证了其优于现有方法，为宏观经济政策因果分析提供了可迁移工具。",
+      "llm_tldr": "针对时间序列因果发现中跨任务泛化困难的问题，提出预训练框架PTCD。方法通过上下文条件建模和可迁移因果增强，结合双尺度迭代注意力机制捕捉窗口级因果关系。在多个真实数据集上验证了其优于现有方法，为宏观经济政策因果分析提供了可迁移工具。",
+      "llm_tags": [
+        "query:pe"
+      ],
+      "matched_query_tag": "query:pe",
+      "matched_query_text": "causal inference and policy evaluation methods",
+      "matched_requirement_id": "req-28",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2605.26515v1",
+      "source": "arxiv",
+      "title": "Learning a directed acyclic graph with additive heteroscedastic errors",
+      "abstract": "This paper studies causal discovery for a directed acyclic graph under a structural equation model with additive heteroscedastic errors. We first establish new identifiability results for location-scale noise models, showing that heteroscedasticity can be leveraged to recover causal directions. Based on these insights, we propose a novel iterative procedure, Residual Simultaneous Quantile Estimation (RESQUE), where each iteration consists of a residual-construction stage and a composite quantile regression stage, enabling recursive identification of sink nodes via the invariance of conditional scale coefficients across quantiles. We then establish its theoretical guarantees for recovering topological order and graph structure, even when the number of variables diverges with the sample size. Simulation studies and application to benchmark datasets show that RESQUE performs favorably compared with existing methods, especially when causal information is partly encoded in the variance component. These results highlight exploiting structured variance signals for causal discovery and provide a principled framework for multivariate causal discovery beyond mean-based modeling.",
+      "authors": [
+        "Xintao Xia",
+        "Li Chen",
+        "Yue Hu",
+        "Chunlin Li"
+      ],
+      "primary_category": "stat.ME",
+      "categories": [
+        "stat.ME"
+      ],
+      "published": "2026-05-26T03:57:58+00:00",
+      "link": "https://arxiv.org/pdf/2605.26515v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "causal discovery with heteroscedastic errors using quantile regression",
+      "llm_evidence_cn": "利用异方差误差和分位数回归的因果发现",
+      "llm_evidence": "利用异方差误差和分位数回归的因果发现",
+      "canonical_evidence": "利用异方差误差和分位数回归的因果发现",
+      "llm_tldr_en": "Proposes RESQUE, an iterative procedure combining residual construction and composite quantile regression for causal discovery in additive heteroscedastic noise models, with theoretical guarantees.",
+      "llm_tldr_cn": "本文研究带加法异方差误差的结构方程模型下的因果发现，建立基于位置尺度噪声模型的可识别性结果。提出RESQUE算法，迭代进行残差构建与复合分位数回归，通过条件尺度系数在不同分位数下的不变性递归识别汇节点。证明了该算法在变量数较多时仍能恢复拓扑顺序和图结构，为宏观政策因果推断提供了新方法。",
+      "llm_tldr": "本文研究带加法异方差误差的结构方程模型下的因果发现，建立基于位置尺度噪声模型的可识别性结果。提出RESQUE算法，迭代进行残差构建与复合分位数回归，通过条件尺度系数在不同分位数下的不变性递归识别汇节点。证明了该算法在变量数较多时仍能恢复拓扑顺序和图结构，为宏观政策因果推断提供了新方法。",
+      "llm_tags": [
+        "query:pe"
+      ],
+      "matched_query_tag": "query:pe",
+      "matched_query_text": "causal inference and policy evaluation methods",
+      "matched_requirement_id": "req-28",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2605.28327v1",
+      "source": "arxiv",
+      "title": "Insurance Pricing Optimization via Off-Policy Evaluation",
+      "abstract": "Traditional insurance pricing relies on risk-based principles that ensure actuarial fairness and solvency but do not explicitly account for policyholders' price sensitivity. We formulate insurance pricing as a decision-making problem and study it using tools from off-policy evaluation and stochastic control. We propose a kernelized inverse propensity score estimator that exploits local structure in the action space and yields variance reduction compared to the classical inverse propensity score estimator. Building on these value estimates, we investigate policy optimization and present two practical approaches for computing optimal pricing rules: an interpretable data-shared Lasso formulation and a flexible policy parameterization based on neural networks. Using a controlled synthetic travel insurance environment, we empirically confirm the theoretical results and show that neural networks outperform existing techniques for policy optimization.",
+      "authors": [
+        "Sascha Günther",
+        "Dimitri Semenovich",
+        "Mario V. Wüthrich"
+      ],
+      "primary_category": "stat.ML",
+      "categories": [
+        "stat.ML",
+        "cs.LG",
+        "q-fin.RM",
+        "stat.AP"
+      ],
+      "published": "2026-05-27T11:27:32+00:00",
+      "link": "https://arxiv.org/pdf/2605.28327v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "off-policy evaluation for policy optimization",
+      "llm_evidence_cn": "离线策略评估用于策略优化",
+      "llm_evidence": "离线策略评估用于策略优化",
+      "canonical_evidence": "离线策略评估用于策略优化",
+      "llm_tldr_en": "Formulates insurance pricing as decision-making problem and uses off-policy evaluation to optimize pricing rules, with kernelized IPS estimator.",
+      "llm_tldr_cn": "传统保险定价未考虑客户价格敏感度，本文将其建模为决策问题，利用离线策略评估和随机控制工具优化定价规则。提出核化逆倾向得分估计器以降低方差，并给出Lasso和神经网络两种最优定价策略求解方法。为保单定价提供了因果推断视角。",
+      "llm_tldr": "传统保险定价未考虑客户价格敏感度，本文将其建模为决策问题，利用离线策略评估和随机控制工具优化定价规则。提出核化逆倾向得分估计器以降低方差，并给出Lasso和神经网络两种最优定价策略求解方法。为保单定价提供了因果推断视角。",
+      "llm_tags": [
+        "query:pe"
+      ],
+      "matched_query_tag": "query:pe",
+      "matched_query_text": "causal inference and policy evaluation methods",
+      "matched_requirement_id": "req-28",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

@@ -1,0 +1,622 @@
+Title: Early warnings of critical transitions through vector autoregression: lessons from multiscale systems
+
+URL Source: https://arxiv.org/pdf/2605.28260v1
+
+Published Time: Thu, 28 May 2026 01:28:59 GMT
+
+Number of Pages: 33
+
+Markdown Content:
+# Early warnings of critical transitions through vector autoregression: lessons from multiscale systems 
+
+# Bryony Hobden Paul Ritchie Peter Ashwin March 2026 
+
+Abstract 
+
+In a nonautonomous nonlinear dynamical system, generic critical tran-sitions (tipping points) are not limited to slow passage through fold bifur-cations. They can also correspond to slow passage through other generic bifurcations, such as subcritical Hopf or even (in the multiscale setting) singular Hopf bifurcation. In systems such as these, generic early warning signals associated with critical slowing down, such as observing an increase in variance and lag-1 autocorrelation, can be obscured by oscillatory be-haviour. Here, we present a method using vector autoregression (VAR) that aims to identify multiple eigenvalues of the system from multiple time se-ries. With this, we are not only able to deduce the system’s stability but also identify the type of bifurcation we are approaching and, therefore, the underlying dynamics, which gives us insight into the system’s future state post-tipping. In practice, this can be beneficial for estimation and mitigation of risk. We look at three bifurcations in particular: the fold, the subcritical Hopf bifurcation, and the singular Hopf bifurcation in the presence of an extra time-scale separation. We hope to show that VAR is potentially a powerful tool in an EWS toolkit and can be more enlightening than simply looking at AR(1) of individual time series, especially if there is more than one timescale present in the system. 
+
+1
+
+> arXiv:2605.28260v1 [math.DS] 27 May 2026
+
+# Contents 
+
+1 Introduction 32 Generic instabilities in nonlinear systems 5
+
+2.1 Instabilities of stable equilibria in nonlinear systems . . . . . . . . . 52.2 Instabilities of stable equilibria in multiple timescale systems . . . . 6
+
+3 Estimation of eigenvalues using VAR 8
+
+3.1 Estimating equilibrium stability using VAR . . . . . . . . . . . . . 83.2 Uncertainty estimation of eigenvalues . . . . . . . . . . . . . . . . . 10 
+
+4 Examples of multiscale instabilities 13 
+
+4.1 Fold on slow manifold . . . . . . . . . . . . . . . . . . . . . . . . . 13 4.2 Subcritical Hopf . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 13 4.3 Singular Hopf . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 14 
+
+5 A VAR approach to early warnings of tipping 16 
+
+5.1 VAR for fold on slow manifold . . . . . . . . . . . . . . . . . . . . . 18 5.2 VAR for subcritical Hopf . . . . . . . . . . . . . . . . . . . . . . . . 19 5.3 VAR for singular Hopf . . . . . . . . . . . . . . . . . . . . . . . . . 20 
+
+6 Discussion 21 A Delta method for propagating standard errors 29 
+
+21 Introduction 
+
+Critical transitions or tipping points of nonlinear forced systems can be induced by slow passage through bifurcation points where an attracting equilibrium loses sta-bility at some critical value of the forcing [35]. Such bifurcation-induced transitions (B-tipping) can be distinguished from noise-induced (N-tipping) and rate-induced (R-tipping) [5]. In this paper, we focus on generic mechanisms of bifurcation induced tipping for systems that may be multiscale. In the presence of noise, early warnings of loss of stability can be associated with the phenomenon of “critical slowing down” (CSD) (e.g. [10, 11]), where an increase in variance and autocorrelation of a typical observable correlates to a slowly changing system approaching a bifurcation point. This is typically assumed to be a fold (saddle-node) bifurcation, although other bifurcations can lead to critical transitions [23, 39, 7, 20]. One can think of CSD as a way to estimate the leading (i.e. least stable) eigenvalue of the Jacobian at a nearby equilibrium. This method has been widely applied to try and identify indicators of imminent B-tipping in a slowly changing system, to warn whether a system may or may not tip into a different state. It has been observed that, in some circumstances, the warning may be missing [18, 30, 4]. Evaluating the skill of trends in CSD as early warnings of critical transitions can be challenging to extrapolate even in cases where CSD is applicable [27, 4], or may be misinterpreted in cases where there is N-tipping [13]. Note that early warning signals can be useful, even if the result is negative: the important factor is that they are skilful so that false positives and false negatives can be avoided. There is no unique way to find an early warning signal from a time series, even when assumptions about timescale separation and noise are satisfied. One may need to detrend, choose a sampling rate and window size that has enough points to give a good estimation of stability while still remaining approximately stationarity, though note that fitting a nonlinear model can help avoid detrending [12, 26]. For rapidly forced slow systems, CSD typically does not work, but other approaches may be possible [20, 9, 32]. In most studies of bifurcation-induced tipping, only fold bifurcations have been considered. This occurs where a stable and unstable equilibrium collide and anni-hilate each other. This is often represented in diagrams showing 1D systems that can be written in terms of a gradient potential. However, at codimension 1 there are two generic bifurcations: fold (saddle-node) and Hopf bifurcations, and only the fold has such a gradient potential. In Section 2 we discuss which of these are considered “safe” and “dangerous” bifurcations in regards to tipping behaviour. It is very rare that Hopf bifurcations are considered for critical transitions, and very few studies consider early warnings for such bifurcations. One study [7] looks at deep learning for early warning signals in a range of 3bifurcations including Hopf. The paper highlights that normal forms of systems can reveal information about how the system will behave past the bifurcation or tipping point, i.e. if it will shoot off and go to an alternative stable state or oscillate. However, generic early warning signals extracted from a time series will not reveal this type of information. Hence a deep learning algorithm is able to identify normal forms in a range of applications. The paper [39] considers using vector autoregression (VAR) to obtain indicators for the approach to various types of bifurcation, in particular periodic attractors approaching homoclinic and Hopf bifurcations. For the homoclinic there are no signs of traditional critical slowing down, but a decreasing frequency which can be used as an indicator of approaching bifurcation. For the Hopf however, there is no significant frequency change but significant early warning with respect to the increasing real part of the eigenvalue. We build on [39] and we go one step further to consider Hopf bifurcation in a multiple time scale system, which can be a Singular Hopf bifurcation if the instability involves both fast and slow modes. To our knowledge, no study has proposed an early warning for a system ex-hibiting a singular Hopf bifurcation. However, fairly simple models in climate applications such as climate can certainly demonstrate Hopf instabilities (e.g. [1] in a 5-box model of Atlantic Meridional Overturning Circulation AMOC). More-over, the singular Hopf bifurcation is already present in simple models (e.g. [33] for a model of ENSO). In previous work, [19] show that a regularization of the conceptual model [6] for Dansgaard-Oeschger (DO) events occurs via passage through a supercritical singular Hopf bifurcation at the onset of a DO event. The study [19] highlights that because of the singular Hopf instability, the predictability of tipping in the model using generic EWS is limited from the leading eigenvalue. In this paper, we focus on understanding and quantifying generic instabili-ties (using vector autoregressive processes) that may be associated with B-tipping from an attracting equilibrium in a multiscale system. Section 2 reviews some ba-sic considerations from one-parameter bifurcation theory before highlighting that in multiple timescale systems, this needs interpretation due to the presence of eigenvalues with differing timescales. This means we can identify three distinct generic mechanisms where an equilibrium can lose stability. Section 3 recalls the VAR( k, p ) process and how VAR( k, 1) can be used to estimate stability for an equilibrium in a k dimensional system with noise. We consider not only the estimators but also the propagation of uncertainty through to the eigenvalues. Section 4 introduces a comparative example of each of the mechanisms discussed in Section 2 before applying the method of Section 3 to stochastic versions of these examples in Section 5. We finish with a brief discussion in Section 6. 42 Generic instabilities in nonlinear systems 
+
+> sec:generic
+
+We discuss the connection between codimension-one bifurcations [3, 25] of stable equilibria and tipping points in generic nonlinear systems in which a stable equi-librium loses stability. After highlighting that the only generic cases are fold and subcritical Hopf bifurcations, we recall that Hopf bifurcations occur in regular and singular forms in multiple-timescale systems. 
+
+# 2.1 Instabilities of stable equilibria in nonlinear systems 
+
+Consider a nonlinear system x ∈ Rn
+
+˙x = f (x, λ ) (1) eq:ode 
+
+with a single parameter λ ∈ R but possibly many ( n ≥ 1) state variables, where 
+
+f is assumed smooth in both arguments. We say X is an equilibrium for λ of 
+
+f (X, λ ) = 0 and X is linearly stable if all eigenvalues of the Jacobian matrix 
+
+J = Df (X, λ ) have negative real parts. Suppose we have a family of linearly stable equilibria X(λ) defined for λ ∈ I
+
+and I some open interval. The Implicit Function Theorem gives that this “branch” of equilibria continues smoothly on changing λ [25], while the Hartman-Grobman Theorem [25] gives that the equilibrium is locally stable (orbit equivalent to the linearized system) sufficiently close to the X(λ). Moreover, the eigenvalues of the Jacobian matrix Df (X(λ), λ ) will change continuously with λ.If λ∗ ∈ ∂I and 
+
+x∗ = lim  
+
+> λ→λ∗
+
+X(λ)then Df (x∗, λ ∗) will necessarily have at least one “critical” eigenvalue with real part zero and we say the equilibrium x∗ is at bifurcation [25]. We say a bifurcation is dangerous [38] if there is a neighbourhood N containing x∗ such that in any neighbourhood of λ∗ there are λ with no attractors contained within N . Note that irreversibility is usually associated with the existence of a dangerous bifurcation, as it will be an exceptional case for any other attractor to become unstable exactly the same time as the branch ending at x∗ destabilizes. For a system of the form (1) but with a slowly drifting parameter, slow passage through a dangerous bifurcation gives rise to B-tipping as the system adjusts rapidly to a new family of attractors on loss of stability of the branch that was being tracked [5]. Since it is a generic condition that a system with a critical eigenvalue has only one such eigenvalue, there are only two cases we need to consider when varying one parameter in a typical system of the form (1). These are: 5• Single real zero eigenvalue 
+
+In this case, x∗, λ ∗ locally undergoes a steady bifurcation. The centre man-ifold theorem can be applied to show that in some neighbourhood of the bifurcation, the dynamics can be described by a centre manifold that, in this case, is one-dimensional and locally attracting. Typically, the next highest order terms will be non-zero meaning the only generic case is a fold (saddle-node) bifurcation [25], which is always dangerous and is the typical case considered for B-tipping. 
+
+• Single imaginary pair of eigenvalues In this case, x∗, λ ∗ undergoes a Hopf bifurcation and the centre manifold theorem implies there is a locally attracting two dimensional invariant manifold on which (locally) either (i) a stable limit cycle emerges after the bifurcation (supercritical Hopf), or (ii) an unstable limit cycle that forms the boundary of the basin of attraction of the equilibrium in the centre manifold shrinks to the equilibrium at the bifurcation leaving only an unstable equilibrium afterwards (subcritical bi-furcation). Clearly, the Hopf bifurcation is dangerous only if it is subcritical [22]. In summary, the dangerous bifurcations we need to consider as potentially causing B-tipping from a stable equilibrium, on varying one parameter (dangerous codi-mension one bifurcations), are typically only fold or subcritical Hopf bifurcations. Note that if two or more parameters are varied, then other cases can appear robustly - with k parameters, one can find bifurcations of codimension up to k
+
+at isolated points. Similarly, if there are extra constraints such as symmetries, other bifurcations are possible [25]. Nonetheless, if we choose a particular path through a high-dimensional parameter space, then we are still effectively at the one-parameter case. 
+
+# 2.2 Instabilities of stable equilibria in multiple timescale systems 
+
+> einstabilities
+
+Many models of physical systems, even in cases that can be described using low-dimensional dynamical models, involve interactions of several variables as in (1), but moreover the processes, and hence the variables, may evolve on vastly differing timescales. We concentrate on an idealized setting where the dynamics are described by only two timescales, and the variables evolve on one of these two timescales. We say x ∈ Rnf are fast variables and y ∈ Rns are slow variables so ( x, y ) ∈ Rn with 6n = nf + ns and instead of (1) we consider 
+
+ϵ ˙x = f (x, y, λ )˙y = g(x, y, λ ). (2) eq:odefastslow 
+
+The scalar quantity ϵ represents a ratio of timescales. We assume that 0 < ϵ ≪ 1and as before a single parameter λ ∈ R. There is an established theory of multiscale dynamics (see, e.g., [24, 22]), and these additional timescales can give rise to new phenomena and transitions by understanding the system as perturbed from the 
+
+singular case with timescale ratio ϵ = 0. The critical manifold 
+
+C = {(x, y ) : f (x, y ) = 0 }
+
+will be invariant in the limit ϵ = 0, and normally hyperbolic stable or unstable parts of this persist as invariant manifolds for sufficiently small ϵ: we call the persisting stable part the “slow manifold”, by Fenichel’s theorem [14, 15]. The Jacobian of (2) will have eigenvalues that are in two groups, a group of 
+
+nf eigenvalues that are O(ϵ−1) associated with the fast variables, and one group of ns eigenvalues that are O(1) associated with the slow variables. On the slow manifold, all these eigenvalues have negative real parts. This means that for 0 < ϵ ≪ 1, generic codimension one instabilities of linearly stable equilibria of (2) can be of various types (and up to two dimensions, these are the only cases). 
+
+• Regular fold (on slow manifold) where a single slow eigenvalue passes through zero on changing λ, any others are stable, and all fast eigenvalues remain strongly negative and of order O(ϵ−1) [3, 25]. 
+
+• Regular subcritical Hopf (on slow manifold) where a single imaginary pair of slow eigenvalues pass through zero on changing λ, any others are stable and all fast eigenvalues remain strongly negative and of order O(ϵ−1)[3] [25]. 
+
+• Singular Hopf this is the case where a single real fast eigenvalue passes through zero, combines with a single real slow eigenvalue to form a complex pair and passes through the imaginary axis. This is (confusingly) on the fold of the slow manifold, but is only associated with a fold of the fast subsystem, not the full system. This case is analysed in detail in [21]; see for example [24, 17]. A particular feature of this last bifurcation is that the complex pair appears for |λ − λ∗| = O(ϵ) and the associated oscillatory motion only appears in a neighbourhood of x∗ of size O(ϵ). We illustrate examples of each of these instabilities in Section 4. 73 Estimation of eigenvalues using VAR 
+
+> sec:estimators
+
+Assuming slow variation of a stable equilibrium driven by noise, one can estimate the stability of the system, and any trends, based on past and current information. A k-dimensional vector autoregressive process with lag p, written as VAR( k, p ), [29] is a stochastic process {Xn ∈ Rk} satisfying 
+
+Xn+1 = c + A1Xn + A2Xn−1 + · · · + ApXn−p+1 + ξn (3) eq:VARkp 
+
+for each n, where c ∈ Rk are constants, Ai for i = 1 , . . . , p are k×k real matrices and 
+
+ξn ∈ Rk are independent Gaussian random vectors with zero mean and variance Σ. In the examples that follow, we concentrate on the case p = 1 so that (3) reduces to the VAR( k, 1) process 
+
+Xn+1 = c + AX n + ξn (4) eq:VARk1 
+
+where Xn ∈ Rk and A is a k × k matrix. This method includes the scalar AR(1) approach as the special case VAR(1 , 1) but as we see (and highlighted in [39]) holds additional information about the instability that is missing from AR(1) estimations. 
+
+# 3.1 Estimating equilibrium stability using VAR 
+
+Suppose we have a nonautonomous SDE on x ∈ Rk with state- and time-dependent noise, of the form 
+
+dx = f (x, t )dt + g(x, t )dw (t) (5) eq:SDEnonaut 
+
+where f : Rk × R → Rk and g : Rk × R → Rk×k is smooth and w(t) is a vector of Gaussian white noise (Wiener) process with zero mean and covariance Ik.If the system is autonomous, and the noise is additive and stationary, then we can write 
+
+dx = f (x)dt + dw (t) (6) eq:SDE 
+
+where w(t) is a vector of Gaussian white noise (Wiener) process with zero mean and covariance Σ. Assume that f (x, t ) is slowly varying, so (6) is value and the state is close to an equilibrium x∗ ∈ Rk. Assume the noise is additive and small. Then as long as the sample path remains close to x∗ the solutions of (6) will be well-approximated by the linearization. Hence the fluctuations around the equilibrium are well-approximated by the Ornstein-Uhlenbeck process for x ∈ Rk
+
+dx = [ Df (x∗)( x − x∗)] dt + dw (7) eq:SDElinear 
+
+where Df (x∗) is the Jacobian of f evaluated at x∗ and we assume Df (x∗) is stable (all eigenvalues real part less than zero) so that there is a stationary measure for (7). 8Note that the linear SDE (7) can be explicitly solved to give 
+
+Xn+1 = exp[ Df (x∗)∆ t]Xn + Vn (8) where 
+
+Vn =
+
+Z 0
+
+> s=−∆t
+
+exp[ Df (x∗)s]W (( n + 1)∆ t + s) ds 
+
+This means that A = exp[ Df (x∗)∆ t] and so 
+
+Df (x∗) = 1∆t ln A (9) eq:DffromAln 
+
+where ln( A) is the matrix logarithm. For ∆ t small enough, this will be the principal value and so well defined. Note in particular that if B = A−Ik is such that ∥B∥ < 1(which can be assured by taking ∆ t small enough), where Ik is the k × k identity, then 
+
+Df (x∗) = 1∆t
+
+
+
+B − B2
+
+2 + B3
+
+3 − · · · 
+
+
+
+(10) eq:DffromB 
+
+Alternatively, if we time-discretise (7) using an Euler- Maruyama method [16] with timestep ∆ t then the fluctuations of the solution can be approximated (for small ∆ t > 0) by {Xn ∈ Rk} where Xn = x(n∆t) − x∗ and 
+
+Xn+1 = Xn + Df (x∗)Xn∆t + √∆tW n (11) eq:EMSDElinear 
+
+where Wn are independent increments of w(t + ∆ t) − w(t) and so are zero mean Gaussian with covariance Σ. Let us write 
+
+A = Ik + Df (x∗)∆ t ≈ exp( Df (x∗)∆ t) (12) eq:AfromDf 
+
+and 
+
+ξn = √∆tW n
+
+is a Gaussian process with zero mean and covariance Σ∆ t. Note that (11) corre-sponds to the VAR( k, 1) process in (4). Note that we can invert (12) to give the approximation 
+
+Df (x∗) = A − Ik
+
+∆t (13) eq:DffromA 
+
+which corresponds to the linear truncation of (10). Hence, if we have an estimator ˜A of A from fitting the fluctuations to (4) then we have an estimator ˜J = ˜A − Ik
+
+∆t
+
+9for Df (x∗). Consequently, the eigenvalues { ˜μi} of ˜J can be seen as estimators for the eigen-values {μi} of Df (x∗). However, these estimators are typically biased (because of the nonlinearity of the expressions for the eigenvalues) and there will be several sources of uncertainty in this estimation. Even in the stationary case (6) sources of uncertainty include the following: truncation error in (7), discretization error in (11), and estimation error from ˜A.Truncation error can be minimized by ensuring that the sample path is close to the equilibrium such that a linearization is a good enough approximation and that higher order terms can be neglected. Using a small enough time step of the simulation ∆ t will reduce error in the discretization step. Finally, estimation error of ˜A can be reduced by using a large number of time series data points in an observation window over which A is estimated. Section 5 briefly discusses sources of uncertainty in the non-autonomous case and ways in which these errors can be reduced. For the remainder of this paper, we focus on the specific case of eigenvalue estimation and uncertainty quantification for multiscale systems with two coupled dynamical variables, i.e. k = 2. 
+
+# 3.2 Uncertainty estimation of eigenvalues 
+
+We present two methods for calculating the standard error on the eigenvalues of the estimator ˜A for the case k = 2. Since the relationship between the VAR parameters and eigenvalues is nonlinear, the standard errors of the parameter estimates cannot be directly translated into eigenvalue uncertainties. Suppose we are given standard errors for an estimator ˜A of A such that ˜A =
+
+˜a ˜b
+
+˜c ˜d
+
+
+
+, SE ( ˜A) = 
+
+SE ˜a SE ˜b
+
+SE ˜c SE ˜d
+
+
+
+. (14) eqn:AtildeSEti 
+
+We wish to understand how this uncertainty propagates through to the estimators for the Jacobian, ˜J, and for the eigenvalues of the Jacobian, μi. Note that (9) gives ˜J = 1∆t ln( ˜A) =: 
+
+a bc d
+
+
+
+. (15) eqn:jac 
+
+If the estimator ˜A is close to the identity, then to first order approximation the standard error on the entries of the Jacobian matrix is given by 
+
+SE ( ˜J) = SE ( ˜A)/∆t =: 
+
+SE a SE b
+
+SE c SE d
+
+
+
+. (16) 10 To find the eigenvalues μi of the estimator ˜J, we solve the characteristic equa-tion given by det( ˜J − μI) = 0 (17) for eigenvalues μ1, μ 2 and the identity matrix I, where we assume ℜ(μ1) ≥ ℜ (μ2). Hence 
+
+μ2 − (a + d)μ + ( ad − bc ) = 0 (18) which is equivalent to 
+
+μ2 − tr( ˜J)λ + det( ˜J) = 0 . (19) The solution to the equation is given by the quadratic equation, such that the eigenvalues are a function of the variables a, b, c and d.
+
+ℜ(μ1,2) = F1,2(a, b, c, d ) = 
+
+( (a+d)±
+
+√(a+d)2−4( ad −bc )2 Case I 
+
+> (a+d)2
+
+Case II (20) eqn:fabcd 
+
+where Case I corresponds to the real case with ( a+d)2 −4( ad −bc ) > 0 (subscripts 1, 2 correspond to taking + and − respectively) and Case II corresponds to the complex case with ( a + d)2 − 4( ad − bc ) ≤ 0 (and subscripts 1 , 2 are the same quantity), as 
+
+μ1,2 = tr( ˜J) ±
+
+q
+
+(tr( ˜J)) 2 − 4 det( ˜J)2 . (21) We want to know 
+
+SE (ℜ(μ1,2)) = 
+
+q
+
+Var( ℜ(μ1,2)) = 
+
+q
+
+Var( F1,2(a, b, c, d )) (22) One way to approach this problem is the “delta” method based on a first-order Taylor series approximation [8, Section 5.5.4], [37, Chapter 3]. The delta method approximates the standard errors of transformations of random variables using the first-order Taylor approximation: see Appendix A. Since ˜J is an estimator, the entries of the matrix ˜J are random variables. In this case we can apply this to the function F1,2(a, b, c, d ) as in equation (20) by computing the first-order partial derivatives (writing ∂a = ∂∂a etc) which in Case I gives 
+
+∂aF1,2 = 12 ± a − d
+
+2 (a2 + d2 − 2ad + 4 bc )−1/2
+
+∂bF1,2 = ±c(a2 + d2 − 2ad + 4 bc )−1/2
+
+∂cF1,2 = ±b(a2 + d2 − 2ad + 4 bc )−1/2
+
+∂dF1,2 = 12 ∓ a − d
+
+2 (a2 + d2 − 2ad + 4 bc )−1/2
+
+
+
+(23) 11 and in Case II gives 
+
+∂aF1,2 = 12
+
+∂bF1,2 = 0 
+
+∂cF1,2 = 0 
+
+∂dF1,2 = 12
+
+
+
+(24) This means we can find the standard error on the eigenvalues μ1 and μ2, which can be written to first order as 
+
+SE (μ1,2) = SE (F1,2(a, b, c, d )) =
+
+q
+
+(∂aF1,2SE a)2 + ( ∂bF1,2SE b)2 + ( ∂cF1,2SE c)2 + ( ∂dF1,2SE d)2, (25) If the SE terms are not small then second- and higher- order terms can be included: a higher-order delta method and a multivariate delta method are presented in [8]. The second method we present, and arguably a much simpler way to propagate the standard error on the entries of matrix ˜A through to eigenvalues of ˜J, is via a Monte Carlo simulation. This is the method used to calculate the standard errors for eigenvalues shown in Section 5. Assume the entries of matrix ˜A to be independent random variables and that each element can be distributed according to a normal distribution with mean equal to the corresponding element of the given estimator matrix, ˜A, and a standard deviation equal to the corresponding element of the standard error matrix, SE ( ˜A)(for example, we choose the first component distributed as N (˜ a, SE 2˜a ) with ˜ a and 
+
+SE ˜a as in equation (14)). We sample from these distributions to produce a new realisation of the estimator ˜A. The Jacobian is calculated as before using equation 15, and the eigenvalues of the Jacobian can then be obtained. If entries of the matrix ˜A are sampled a large number of times, then one can produce a large sample of eigenvalues from which a sample mean and sample standard deviation can be calculated. For a sufficiently large sample size, the standard error on the real parts of the eigenvalues calculated by Monte Carlo simulation will be approximately equal to that calculated using the first-order delta method. In Section 5, the standard errors shown in the figures are computed using Monte Carlo simulation with 1,000 samples. Given the large number of simulations, these estimates closely approximate those obtained from the first-order delta method. We therefore report the Monte Carlo standard error estimates, though this choice is largely arbitrary. 12 4 Examples of multiscale instabilities 
+
+> sec:examples
+
+We now present examples of the three generic scenarios for instability outlined in Section 2.2. In Section 5 we assume that the forcing λ(t) changes slowly with time. In Figures 1, 2 and 3, we fix λ and so the systems are autonomous. This allows us to analyse the equilibrium structure of each system for varying values of λ.
+
+# 4.1 Fold on slow manifold 
+
+An example of a multiscale system with a fold bifurcation on a (stable) slow manifold is given by the following set of equations: 
+
+ϵ ˙x = y2(1 + y) − x
+
+˙y = λ − x, (26) eq:fold_xy 
+
+where ϵ ≪ 1 is the timescale separation between the (fast) x and (slow) y variables. Note, we choose r ≪ 1 ≪ ϵ−1 so that the forcing timescale is much slower than both the x- and y-dynamics. Figure 1 shows phase portraits for various fixed values of λ such that we see qualitatively different behaviour in the system. For small but positive values of λ, there are two stable equilibria separated by an unstable saddle point on the slow manifold. At the bifurcation point, λ = 0, a stable equilibrium and the unstable saddle point collide with each other and annihilate to produce a non-hyperbolic point at ( x, y ) = (0 , 0), so that only one stable equilibrium remains. For negative values of λ, the stable equilibria travel further in the negative x-direction along the slow manifold. 
+
+# 4.2 Subcritical Hopf 
+
+A system containing a subcritical Hopf bifurcation but nonetheless bounded dy-namics is given by considering a path through a Bautin bifurcation normal form ˙z = ( −λ + iω )z + |z|2z − | z|4z. (27) eq:hopfz 
+
+In three or more dimensions, such a bifurcation may occur on a stable slow manifold where all transverse directions are fast and stable. We consider here only the simplest case where the slow manifold is the whole space. Writing equation (27) in polar coordinates gives ˙ρ = −λρ + ρ3 − ρ5,
+
+˙θ = ω
+
+13 (a) λ = 0 .1 (b) λ = 0 (c) λ = −0.1
+
+Figure 1: Phase portrait diagrams for a fold bifurcation for the system of equations (26) for time scale separation ϵ = 0 .1. The fast-slow system undergoes a fold bifurcation at ( x, y ) = (0 , 0) for λ = 0. The thick black line is the critical manifold corresponding to ˙ x = 0, where single black arrows show the direction of travel along the critical manifold. Vertical magenta lines correspond to the nullcline for ˙y = 0. Blue lines represent sample trajectories of the system, and blue points show the respective initial conditions. Arrows indicate the relative speeds of the trajectories. fig:Fold 
+
+which has explicit expressions for limit cycles at 
+
+ρ0 = 0 , ρ± =
+
+s
+
+1 ± √1 − 4λ
+
+2 . (28) For λ > 1/4, there are no real values of ρ for the square root, and hence there is a single stable equilibrium at ρ = ρ0 = 0. At λ = 1 /4, there is a single non-zero value for ρ, and here is where the saddle node bifurcation for periodic orbits occurs. The subcritical Hopf bifurcation (the switch of stability of the equilibrium point at the origin from stable to unstable) hence occurs at λ = 0. For 0 < λ < 1/4, the system is bistable, with a stable node at the origin and a large amplitude stable limit cycle ρ = ρ+, separated by a small amplitude unstable limit cycle ρ = ρ−.In the ramping scenario, as the parameter λ decreases, the system undergoes a dangerous bifurcation: the stability of the equilibrium at the origin is lost, and the system jumps to large-amplitude oscillations. This scenario of changing λ is illustrated in phase portraits in Figure 2. 
+
+# 4.3 Singular Hopf 
+
+Consider the following set of ordinary differential equations that, for a certain value of λ, will undergo a singular Hopf bifurcation given by 
+
+ϵ ˙x = y − x2(1 + x)˙y = λ − x. (29) eq:singHopfxyf 
+
+14 fig:Hopfsubfiga        
+
+> (a) λ= 0 .4
+> fig:Hopfsubfigb
+> (b) λ= 0 .15
+> fig:Hopfsubfigc
+> (c) λ=−0.25
+
+Figure 2: Phase portrait diagrams for the subcritical Hopf bifurcation for the system in equation (27). Blue lines represent sample trajectories of the system, and blue points show the respective initial conditions. In sub-figures (2b) and (2c), the green line indicates a stable limit cycle, and in sub-figure (2b), the dashed red line indicates an unstable limit cycle. Green and red points represent stable and unstable nodes, respectively. For this system, the subcritical Hopf bifurcation occurs for λ = 0. Here, the equilibrium at the origin becomes unstable, and the large amplitude limit cycle becomes the only local attractor. A saddle node bifurcation of periodic orbits occurs for λ = 0 .25. fig:Hopf 
+
+It is clear that 29 has an equilibrium point at ( x∗, y ∗) = ( λ, λ 2(1 + λ)) with a Hopf bifurcation occurring at λ = 0. The Jacobian of the system is given by 
+
+J =
+
+−2x−3x2
+
+> ϵ
+> 1
+> ϵ
+
+−1 0
+
+
+
+. (30) At the Hopf bifurcation ( λ = 0) the eigenvalues of the Jacobian J are μ1,2 = ±i
+
+q1
+
+> ϵ
+
+and μ1,2 will tend to infinity as the timescale separation parameter ϵ → 0. If we look at the system in terms of the fast time scale, i.e. τ = t/ϵ such that x′ = dx dτ ,we have the following system of equations 
+
+x′ = y − x2(1 + x)
+
+y′ = ϵ(λ − x). (31) eq:singHopfxys 
+
+Looking at the system from the perspective of the fast timescale, the lineari-sation now produces eigenvalues μ1,2 = ±i√ϵ, for which μ1,2 → as ϵ → 0. In each case, for both timescales, the eigenvalues at the Hopf bifurcation are singular, and this is how we can define a singular Hopf bifurcation. A more generic normal form of the Singular Hopf bifurcation in R2 is given in [24, p. 205], but here we focus on a reduced form given in 31. 15 For ϵ = 1, the system undergoes a supercritical Hopf bifurcation. In this sec-tion, we specifically look at the case 0 < ϵ ≪ 1, which produces a singular Hopf bifurcation. Note that, unlike a Hopf bifurcation without timescale separation, it does not matter whether the singular Hopf bifurcation is subcritical or supercriti-cal. Due to the large timescale separation in the singular Hopf case, and therefore to rapid movement away from the original stable state toward a large-amplitude periodic cycle, this can still be considered tipping behaviour. 
+
+# 5 A VAR approach to early warnings of tipping 
+
+> timateexamples
+
+For each of our examples, we now assume that the forcing λ(t) changes slowly with time, and is given by 
+
+λ(t) = λ0 − rt, (32) eq:ramp 
+
+where λ0 is some initial value and r is a constant ramping rate with 0 < r ≪ 1. We use the method outlined in Section 3 to give estimates of the eigenvalues for stochastic versions of the examples considered in Section 4 for the three bifurcation types. The parameters are chosen as in Table 1 using the following considerations for each system: 
+
+• The rate parameter r is chosen small enough to ensure slow ramping of the parameter, namely so that the system tracks the stable equilibrium up to the bifurcation point. 
+
+• The noise on x and y variables is set to be independent, identical and suffi-ciently small, αx = αy ≪ 1 that a noise-induced transition is not seen before passing the bifurcation point. 
+
+• The time series is subsampled to ensure stability of the method. 
+
+• The block (window) size is chosen as a trade-off between (a) having enough data points to give an estimator with reasonably low standard error and (b) not having so many points that the nonstationarity within the window is minimized. Table 1 summarises the parameter values used in the numerical simulations and for the VAR analysis, including subsampling and block size. We solve the system of stochastic differential equations using the Improved Euler method (Heun) [36, p. 328]. Alternative approaches, such as Strang splitting for higher-order stochastic systems, have been proposed in the literature [31]. 16 Parameter Meaning Fold Subcritical Hopf Singular Hopf 
+
+ϵ Time scale sepa-ration 0.1 (1) 0.01 
+
+r Ramping rate 0.001 0.01 0.005 ∆t Simulation time step 0.002 0.01 0.001 
+
+λ0 Initial value of λ 0.3 3.0 0.4 
+
+αx Noise amplitude on the x variable 0.01 0.05 0.005 
+
+αy Noise amplitude on the y variable 0.01 0.05 0.005 
+
+ω Rotational fre-quency - 0.3 -Tspan Length of simu-lation 350 350 90 Sub Sampling rate 10 10 5Block Size Number of points in obser-vation window 1250 250 1000 Table 1: Table of parameters used for the stochastic simulation of the fold, sub-critical Hopf and singular Hopf systems as illustrated in Figures 4, 5 and 6. tab:params 
+
+17 5.1 VAR for fold on slow manifold 
+
+To evaluate the stability of the nonautonomous fold system (26) using VAR tech-niques, we consider the following Itˆ o SDE with additive noise: 
+
+ϵdx =  y2(1 + y) − xdt + αxdW x
+
+dy = ( λ − x)dt + αydW y
+
+dλ = −rdt 
+
+(33) eq:fold_dxdy 
+
+where dW x and dW y represent independent Wiener (white noise) processes with amplitudes αx and αy chosen sufficiently small such that transitions in the system are primarily due to the bifurcation and not a noise-induced transition. For the system (33), we simulate using the parameters in Table 1. This example features three timescales as r ≪ 1 ≪ ϵ−1. Note that tipping occurs quickly in y relative to the forcing, despite y being considered the ‘slow variable’. As t increases, y
+
+decreases gradually before abruptly dropping when bifurcation-induced tipping occurs at y = 0. Our study compares vector autoregression (VAR) with standard early warning signals, specifically lag-1 autocorrelation (AR(1)) for a univariate series. Figure 4(B) shows how the real parts of the eigenvalues ( R(μ1, μ 2)) change as the system nears tipping. The Jacobian is calculated at each time t at the end of the observed window. We determine the system’s analytical eigenvalues and compare them with the VAR estimates. The analytical eigenvalues are plotted in purple and yellow for the leading and non-leading eigenvalues. This provides a clear visual comparison to assess whether the VAR model produces reasonable eigenvalues. The leading eigenvalue of the Jacobian Df (x∗) is the least stable, identified by having the smallest negative real part, denoted −α for α > 0. The parameter 
+
+α measures the return rate: crossing zero signals a loss of stability. For the fold bifurcation, the VAR estimate for the leading eigenvalue is shown in blue. Over the series, the VAR estimate of the real part of the leading eigenvalue increases gradually as the system approaches the fold bifurcation, indicating a gradual loss of stability. The real part of the eigenvalue in red reflects the stable attraction to the slow manifold along the x-direction (Figure 4B). Both the VAR estimate and the analytical value for the non-leading eigenvalue decrease very gradually over the time series, suggesting a slight increase in stability as the system approaches the fold bifurcation, as verified by examining the eigenvalue structure, given by 
+
+μ1,2 = −1 ± p1 − 4ϵ(2 y + 3 y2)2ϵ . (34) where, without loss of generality, we assume ℜ(μ1) ≥ ℜ (μ2). 18 Increasing the timescale separation (making ϵ smaller) between x and y would further decrease the real part of the non-leading eigenvalue, indicating greater at-traction to the slow manifold in the fast direction. At the bifurcation point, the real part of the leading eigenvalue crosses zero. In each system we show, VAR esti-mation ends just before the tipping point, beyond this point the behaviour becomes nonlinear, which means the linear approximations are no longer informative. Figure 4(C) shows the lag-1 autocorrelation for the x and y time series. In AR(1) estimated from y shows a non-monotonic rise appears, while the AR(1) estimated from x does not show a trend indicating an approaching tipping point. Figure 4(D) directly compares the VAR estimate for the leading eigenvalue with a function of the lag-1 autocorrelation on y. In the presented two-dimensional fold bifurcation example with changes in the slow subsystem, the leading eigenvalue most accurately reflects future stability. Although the lag-1 autocorrelation on y
+
+has a similar trend to the VAR’s leading eigenvalue estimate, this similarity means one might argue that VAR provides no additional insight over AR(1) in this case. The comparison thus highlights that effective early warning with AR(1) depends on selecting the right observable; here, it is the y variable. 
+
+# 5.2 VAR for subcritical Hopf 
+
+Analogously to the previous case, we consider the system in equation (27) in Cartesian coordinate form as an SDE with additive noise: 
+
+dx =  − λx − ωy + x3 + xy 2 − x5 − 2x3y2 − xy 4dt + αxdW x
+
+dy =  − λy + ωx + y3 + x2y − x4y − y5 − 2x2y3dt + αydW y
+
+dλ = −rdt 
+
+(35) eq:hopf_dxdy 
+
+The numerical simulation of the subcritical Hopf bifurcation uses the parame-ters in Table 1. In this example, both x and y evolve on similar timescales. The time series in Figure 5(A) shows both variables initially remain close to a stable equilibrium, with fluctuations around the origin increasing as the bifurcation is approached. Eventually, the system transitions to large-amplitude oscillations as the origin loses stability. Figure 5(B) presents the real parts of the VAR-estimated and analytical eigen-values for the subcritical Hopf system. The VAR process typically estimates eigen-values with equal real parts, reflecting a stable spiral equilibrium. At t = 75, the VAR cannot resolve the imaginary component and instead produces two similar but distinct real parts. As time progresses and larger oscillations appear, the VAR model more reliably captures the imaginary component. When a complex conjugate pair is present, both eigenvalues are considered leading. The ability to resolve the imaginary component improves when larger blocks and more frequent sampling are used, but at the expense of a longer time series. As 19 λ decreases, the system loses stability as the real part of the eigenvalue approaches zero when approaching the Hopf bifurcation at t = 300. Once the system enters the regime of large-amplitude oscillations, the real part of the eigenvalue approaches zero, marking the transition to purely imaginary eigenvalues. The AR(1) fit for both x and y in Figure 5(C) also provides a clear indication of the loss of stability. This likely results from the block size used for AR(1) and VAR calculations being much larger than the oscillation period of the time series. For smaller block sizes, the imaginary component would be harder to resolve, and the increase in AR(1) would be less pronounced. Figure 5(D) compares the real part of the leading eigenvalue (either could be chosen in this case) with a function of the maximum AR(1). This panel makes clear that both methods consistently indicate a loss of stability as the subcritical Hopf bifurcation is approached. 
+
+# 5.3 VAR for singular Hopf 
+
+For the system (31) with added noise, we consider the system of SDEs given by 
+
+ϵdx = y − x2(1 + x)dt + αxdW x,dy = λ − xdt + αydW y,dλ = −rdt. 
+
+(36) eq:singhopf_dx 
+
+The implementation of the Singular Hopf bifurcation system uses parameter values given in Table 1 and we choose ϵ = 0 .01 such that r ≪ 1 ≪ ϵ−1 and so the fast dynamics and tipping are observed in the x direction. Figure 6(A) illustrates a gradual decline in the x value before a tipping point is reached, followed by a transition to an alternative state, specifically a relaxation oscillation. Similar behaviour is observed in the y variable, but lesser in amplitude. For this specific set of parameters, the system visibly tips after the bifurcation point for λ = 0 and 
+
+t = 80, indicated by the dashed black line. Figure 6(B) presents both the estimated and analytical eigenvalues for the sin-gular Hopf system. The real part of the leading eigenvalue remains negative but steadily decreases in absolute value over the time series. A more apparent de-crease is observed from approximately t = 40 onward, which misleadingly suggests increasing stability, contrary to the actual decrease in stability as the singular Hopf bifurcation is approached. Due to the significant timescale separation, the non-leading eigenvalue initially has a substantially negative real part and steadily increases, eventually converging with the leading eigenvalue. The convergence of the real parts of the two eigenvalues marks the onset of oscillatory behaviour, resulting in a complex conjugate eigenvalue pair. This real part increases slowly 20 until it crosses zero at the tipping point, which occurs after the singular Hopf bifurcation is reached. Figure 6(C) shows AR(1) for x and y variables. AR(1) for y decreases over the time series, while AR(1) for x increases non-monotonically. Figure 6(D) compares the leading eigenvalue with a function of the maximum AR(1). On this scale, both decreasing AR(1) and the VAR estimate of the real part of the leading eigenvalue suggest increasing stability, failing to indicate the approaching bifurcation. For the singular Hopf bifurcation, it is the non-leading eigenvalue (red in Figure 6(B)) that provides insight into the system’s future stability. Examining only the AR(1) of the univariate x time series—despite x being the ’tipping’ variable—does not reveal the clearest trend. This example demonstrates the value of looking beyond AR(1) and univariate time series. Although the non-leading eigenvalue does not evolve linearly, one can apply linear regression to its real part to estimate the tipping time. Once the real parts of the eigenvalues have converged, the rate at which their real parts increase slows, so applying linear regression before this point will likely predict a tipping time that precedes the actual event. Nevertheless, this approach is still valuable as a starting point for prediction in a system with a large timescale separation. 
+
+# 6 Discussion 
+
+> sec:discuss
+
+For a slowly changing system with low-amplitude stochastic forcing, we can aim to extract indicators of stability by fitting to various autoregressive models such as vector autoregressive VAR( k, 1) models considered here or, for example, au-toregressive moving average (ARIMA) models [34]. The simplest option AR(1) (corresponding to VAR(1 , 1)) assumes one-dimensional dynamics and so, while useful for fold bifurcations, is not able to distinguish between the different types of transition we discuss here. We suggest that examining VAR( k, 1) will be in-formative for this, especially if we have access to k independent time series from the system we wish to understand. Even if this is not the case and we have only one time series, it should be possible to extract additional eigenvalues by fitting to VAR(1 , k ) for k > 1, which is presumably equivalent to performing a Takens embedding and the VAR( k, 1) on this. In this study, we have highlighted three distinct types of generic codimension-1 instabilities with multiple timescales: a fold bifurcation on the slow manifold, a subcritical Hopf bifurcation, and a singular Hopf bifurcation. Many studies of early warnings of bifurcation-induced tipping points limit themselves to fold bifurcations. This means they miss the possibility that the bifurcation associated with the tipping point may be of Hopf type. Moreover, in a multiscale system, a singular Hopf bifurcation may occur generically. We have chosen these in particular 21 because they are common mechanisms for critical transitions and are therefore important in tipping point theory. We have shown that, for slowly ramped systems with a small-amplitude additive noise, it is possible to identify the leading and nonleading eigenvalues of the underlying system using a VAR model. For the fold bifurcation on the slow manifold, the leading eigenvalue is the best indicator of when the system will cross the instability threshold. In this case, the VAR estimate of the leading eigenvalue exhibits a very similar trend to the univariate AR(1) model for y. For the subcritical Hopf bifurcation, we demon-strated the behaviour of the eigenvalues that would appear in a system with a timescale separation, the only difference being that there would be an additional eigenvalue on the order of O(ϵ−1), that would be consistently negative, similar to the fold case. The VAR estimation identifies two eigenvalues with the same real component and therefore resolves the imaginary component associated with oscil-latory behaviour near the equilibrium preceding the subcritical Hopf bifurcation. Because the block size is much larger than the period of oscillation, the AR(1) strongly indicates a loss of stability as the system approaches the bifurcation. The usefulness of VAR is most clearly demonstrated in the singular Hopf bifurcation example. The leading eigenvalue is only useful as an indicator of tipping very close to the bifurcation. From far away, the nonleading eigenvalue indicates decreasing stability. The AR(1) applied to the x and y time series in this case would not provide a strong indication of tipping if this were the only method we used. Since a VAR model generalises an AR(1) model to multiple variables, it relies on analogous assumptions, extended to the multivariate setting, in order to detect early warning signals. These include and are not limited to: requirement for the system to be in steady state, changes in the system are due to a slowly varying parameter and that the parameter can be considered stationary with respect to the other timescales of the system dynamics, noise amplitide is small, that the system can be modelled by an ODE for the deterministic part and a Gaussian noise process for the remainder, and that chnages in the system are attributable to a bifurcation rather than noise induced tipping for example [39]. In addition, estimating the linearization using VAR should help avoid problems such as those outlined in [30], where “internal noise interference” can mask AR(1) trends for some observables. The VAR( k, 1) method faces many of the same challenges as AR(1), in par-ticular, choice of detrending method, sampling times and length of the sliding window. Although sensitivity analyses can help assess the impact of these factors on observed early warning signals, issues such as subsampling, sparse data sets, and insufficiently long time series remain significant hurdles. The method requires a long time series, so it may be ineffective for tipping in systems with short time horizons. Moreover, as VAR estimates more parameters from the same dataset, a 22 greater amount of data is needed to achieve comparable levels of uncertainty for each estimate, further increasing the demand for data. One challenge is that VAR( k, 1) and AR(1) may interpret slow changes in the system as additional stable eigenvalues. Hence, it is important to provide an estimate of the uncertainty in the eigenvalues. Other approaches to estimate eigen-values include, for example, Koopman/transfer operator/response theory methods (eg [28, 40]) though in many cases it is not easy to estimate the uncertainty in the spectrum. We suggest that the estimated eigenvectors will give further valuable information near instability, though we do not explore this further here. Transforming the estimated eigenvalues into an early warning signal requires further steps, firstly to estimate a trend (with uncertainty) and then to extrapolate this to a crossing of the instability threshold. If we know the system is in a regime where a bifurcation normal form is valid and the forcing is approximately linear, the extrapolated trend can yield a skilful classifier for tipping within some time horizon. This is considered in [4] for the fold bifurcation and should be possible for subcritical Hopf, and may be possible for the singular Hopf: as noted in [19], the leading eigenvalue is not informative, but we surmise that fitting to a slow-fast normal form may be informative. There is one additional generic case in multiscale systems that we do not con-sider here. This is a Fast Hopf bifurcation with an additional dimension with stable slow dynamics. This occurs in at least three dimensions when a complex pair of fast eigenvalues crosses the imaginary axis at a subcritical Hopf bifurcation. This case is interesting because the complex pair of eigenvalues only becomes leading very close to the bifurcation. Put another way, similar to the singular Hopf, the leading eigenvalue is not informative of the trend except very near the transition. We do not consider bifurcations of periodic or chaotic attractors, but note that in these cases the instantaneous Jacobian is not necessarily informative for the stability - longer term averages will need to be integrated over trajectories for this. For more complex attractors, other transitions can occur but we do not consider these here [1, 2]. In summary, any application of this method to provide skilful early warnings of tipping points for time series “in the wild” will face many challenges. These include choosing high signal-to-noise observations, estimating eigenvalues tightly enough to measure trends with good reliability, and understanding when and if these trends can be extrapolated. However, most of these challenges are already faced by AR(1) approaches, while VAR( k, 1) methods can potentially overcome some of the structural limitations of AR(1). 23 Data availability statement 
+
+The code required to create the figures in this paper is downloadable from https: //github.com/Bryony-Hobden/VAR_EWS .
+
+# Acknowledgements 
+
+We thank Mark Williamson and George Datseris for interesting conversations and useful feedback. BH thanks the Faculty of Environment, Science and Economy of the University of Exeter for support via a PhD studentship. PA and PR thank ClimTip and AdvanTip for funding support/. The ClimTip project has received funding from the European Union’s Horizon Europe research and innovation pro-gramme under grant agreement No. 101137601: Funded by the European Union. Views and opinions expressed are however those of the author(s) only and do not necessarily reflect those of the European Union or the European Climate, In-frastructure and Environment Executive Agency (CINEA). Neither the European Union nor the granting authority can be held responsible for them. The Advanced Research and Invention Agency (ARIA) fund the AdvanTip project (grant no. SCOP-PR01-P003). For the purpose of open access, we have applied a Creative Commons Attri-bution (CC BY) license to any Author Accepted Manuscript version arising from this submission. 
+
+# References 
+
+[1] Hassan Alkhayuon, Peter Ashwin, Laura C. Jackson, Courtney Quinn, and Richard A. Wood. Basin bifurcations, oscillatory instability and rate-induced thresholds for Atlantic meridional overturning circulation in a global oceanic box model. Proceedings of the Royal Society A: Mathematical, Physical and Engineering Sciences , 475(2225):20190051, 2019. [2] Hassan Alkhayuon, Rebecca C Tyson, and Sebastian Wieczorek. Phase tip-ping: How cyclic ecosystems respond to contemporary climate. Proceedings of the Royal Society B: Biological Sciences , 477, 10 2021. [3] V. I. Arnol’d. Bifurcations of Equilibria , pages 10–38. Springer Berlin Hei-delberg, Berlin, Heidelberg, 1994. [4] Peter Ashwin, Robbin Bastiaansen, Anna S. von der Heydt, and Paul D.L. Ritchie. Early warning skill, extrapolation and tipping for accelerating cas-cades. Proceedings of the Royal Society A: Mathematical, Physical and Engi-neering Sciences , 481, 9 2025. 24 [5] Peter Ashwin, Sebastian Wieczorek, Renato Vitolo, and Peter Cox. Tipping points in open systems: bifurcation, noise-induced and rate-dependent exam-ples in the climate system. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences , 370(1962):1166–1184, 2012. [6] Niklas Boers, Michael Ghil, and Denis-Didier Rousseau. Ocean circulation, ice shelf, and sea ice interactions explain dansgaard–oeschger cycles. Proceedings of the National Academy of Sciences , 115(47):E11005–E11014, 2018. [7] Thomas M. Bury, R. I. Sujith, Induja Pavithran, Marten Scheffer, Timothy M Lenton, Madhur Anand, and Chris T. Bauch. Deep learning for early warning signals of tipping points. Proceedings of the National Academy of Sciences ,118(39):e2106140118, 2021. [8] George Casella and Roger L. Berger. Statistical Inference . CRC Press, Taylor & Francis Group, 2024. [9] Ruth R. Chapman, Peter Ashwin, and Richard A. Wood. Quantifying tipping behavior: Geometric early warnings and quasipotentials for a box model of amoc. Chaos: An Interdisciplinary Journal of Nonlinear Science , 35(2), 2025. [10] Vasilis Dakos and Jordi Bascompte. Critical slowing down as early warning for the onset of collapse in mutualistic communities. Proceedings of the National Academy of Sciences , 111(49):17546–17551, 2014. [11] Vasilis Dakos, Marten Scheffer, Egbert H. van Nes, Victor Brovkin, Vladimir Petoukhov, and Hermann Held. Slowing down as an early warning signal for abrupt climate change. Proceedings of the National Academy of Sciences ,105(38):14308–14312, 2008. [12] Peter Ditlevsen and Susanne Ditlevsen. Warning of a forthcoming collapse of the Atlantic meridional overturning circulation. Nature Communications ,14(1), 2023. [13] Peter D. Ditlevsen and Sigfus J. Johnsen. Tipping points: Early warning and wishful thinking. Geophysical Research Letters , 37, 10 2010. [14] Neil Fenichel. Persistence and smoothness of invariant manifolds for flows. 
+
+Indiana University Mathematics Journal , 21(3):193–226, 1971. [15] Neil Fenichel. Geometric singular perturbation theory for ordinary differential equations. Journal of Differential Equations , 31(1):53–98, 1979. 25 [16] Crispin W. Gardiner. Handbook of stochastic methods , volume 3. springer Berlin, 2004. [17] John Guckenheimer and Philipp Meerkamp. Unfoldings of singular hopf bi-furcation. SIAM Journal on Applied Dynamical Systems , 11(4):1325–1359, 2012. [18] Alan Hastings and Derin B. Wysham. Regime shifts in ecological systems can occur with no warning. Ecology Letters , 13(4):464–472, 2010. [19] Bryony Hobden, Peter Ashwin, and Paul D.L. Ritchie. Regularization of a conceptual model for dansgaard–oeschger events. Chaos: An Interdisciplinary Journal of Nonlinear Science , 35(8), 2025. [20] Yu Huang, Sebastian Bathiany, Peter Ashwin, and Niklas Boers. Deep learning for predicting rate-induced tipping. Nature Machine Intelligence ,6(12):1556–1565, 2024. [21] Martin Krupa and Peter Szmolyan. Relaxation oscillation and canard explo-sion. Journal of Differential Equations , 174(2):312–368, 2001. [22] Christian Kuehn. A mathematical framework for critical transitions: Bifur-cations, fast–slow systems and stochastic dynamics. Physica D: Nonlinear Phenomena , 240(12):1020–1035, 2011. [23] Christian Kuehn. A mathematical framework for critical transitions: Normal forms, variance and applications. Journal of Nonlinear Science , 23(3):457– 510, June 2013. [24] Christian Kuehn. Multiple Time Scale Dynamics . Applied Mathematical Sciences. Springer, 2015. [25] Yuri A. Kuznetsov. Elements of Applied Bifurcation Theory . Springer, Ger-many, 4th edition, 2023. [26] Frank Kwasniok. Semiparametric maximum likelihood reconstruction of stochastic differential equations driven by white and correlated noise. Chaos: An Interdisciplinary Journal of Nonlinear Science , 34(10), 2024. [27] Klaus Lehnertz. Time-series-analysis-based detection of critical transitions in real-world non-autonomous systems. Chaos: An Interdisciplinary Journal of Nonlinear Science , 34(7), 2024. 26 [28] Valerio Lucarini, Manuel Santos Guti´ errez, John Moroney, and Niccol` o Zagli. A general framework for linking free and forced fluctuations via koopmanism. 
+
+Chaos, Solitons & Fractals , 202:117540, 2026. [29] Helmut L¨ utkepohl. Introduction to multiple time series analysis . Springer Science & Business Media, 2013. [30] Andreas Morr, Niklas Boers, and Peter Ashwin. Internal noise interference to warnings of tipping points in generic multidimensional dynamical systems. 
+
+SIAM Journal on Applied Dynamical Systems , 23(4):2793–2806, 2024. [31] Predrag Pilipovic, Adeline Samson, and Susanne Ditlevsen. Strang split-ting for parametric inference in second-order stochastic differential equations. 
+
+Stochastic Processes and their Applications , 187:104650, 2025. [32] Paul D.L. Ritchie, Sneha Kachhara, and Peter Ashwin. Evaluating the skill of a geometric early warning for tipping in a rapidly forced nonlinear system, 2026. Preprint. [33] Andrew Roberts, John Guckenheimer, Esther Widiasih, Axel Timmermann, and Christopher K. R. T. Jones. Mixed-mode oscillations of el ni˜ no–southern oscillation. Journal of the Atmospheric Sciences , 73(4):1755 – 1766, 2016. [34] Marie Rodal, Sebastian Krumscheid, Gaurav Madan, Joseph Henry LaCasce, and Nikki Vercauteren. Dynamical stability indicator based on autoregres-sive moving-average models: Critical transitions and the Atlantic meridional overturning circulation. Chaos: An Interdisciplinary Journal of Nonlinear Science , 32(11):113139, 11 2022. [35] Marten Scheffer, Steve Carpenter, Jonathan A Foley, Carl Folke, and Brian Walker. Catastrophic shifts in ecosystems. Nature , 413(6856):591–596, 2001. [36] Endre S¨ uli and David F. Mayers. An Introduction to Numerical Analysis .Cambridge University Press, 2003. [37] John R. (John Robert) Taylor. An introduction to error analysis : the study of uncertainties in physical measurements . University Science Books, New York, third edition. edition, 2022. [38] J. M. T. Thompson and Jan Sieber. Climate tipping as a noisy bifurcation: a predictive technique. IMA Journal of Applied Mathematics , pages 1–21, 2005. [39] Mark S. Williamson and Timothy M. Lenton. Detection of bifurcations in noisy coupled systems from multiple time series. Chaos: An Interdisciplinary Journal of Nonlinear Science , 25(3):036407, 02 2015. 27 [40] Niccol` o Zagli, Matthew J Colbrook, Valerio Lucarini, Igor Mezi´ c, and John Moroney. Bridging the gap between koopmanism and response theory: Us-ing natural variability to predict forced response. SIAM Journal on Applied Dynamical Systems , 25(1):196–229, 2026. 28 A Delta method for propagating standard errors 
+
+app:delta 
+
+We briefly outline the “delta” or first-order error approximation from [8, Section 5.5.4]. Let X be a vector of random variables X = ( X1, . . . X n) with mean X∗ =(X∗ 
+
+> 1
+
+, . . . , X ∗
+
+> n
+
+). Suppose there is a differentiable function F (X) for which we want to estimate mean and variance. Let 
+
+F ′ 
+
+> i
+
+(X∗) = ∂∂X i
+
+F |X=X∗ . (37) The first-order Taylor expansion of F around X∗ is 
+
+F (X) = F (X∗) + 
+
+> n
+
+X
+
+> i=1
+
+F ′ 
+
+> i
+
+(X∗)( Xi − X∗ 
+
+> i
+
+) + O(|X − X∗|2) (38) If we assume higher-order terms to be less significant, we have the approximation 
+
+F (X) ≈ F (X∗) + 
+
+> n
+
+X
+
+> i=1
+
+F ′ 
+
+> i
+
+(X∗)( Xi − X∗ 
+
+> i
+
+). (39) eqn:DeltaTaylo 
+
+This means that the mean of F (X) is simply F (X∗). We can estimate the variance of F (X) using equation 39 by Var( F (X)) ≈ E [F (X) − F (X∗)] 2 (40) eqn:Varf 
+
+≈ E
+
+ nX
+
+> i=1
+
+F ′ 
+
+> i
+
+(X∗)( Xi − X∗ 
+
+> i
+
+)
+
+
+
+(41) =
+
+> n
+
+X
+
+> i=1
+
+(F ′ 
+
+> i
+
+(X∗)) 2Var( X) + 2 X
+
+> i>j
+
+F ′ 
+
+> i
+
+(X∗)F ′ 
+
+> j
+
+(X∗)Cov( Xi, X j ). (42) In order for the delta method to give a good estimate, the function F must be smooth and differentiable near the mean. Additionally, the variables should be independent (no covariance) or the covariance structure must be known. In our case, we assume there is no covariance and so equation 40 simplifies to Var( F (X)) ≈
+
+> n
+
+X
+
+> i=1
+
+(F ′ 
+
+> i
+
+(X∗)) 2Var( X) (43) 
+
+≈
+
+> n
+
+X
+
+> i=1
+
+(F ′ 
+
+> i
+
+(X∗)) 2SE (X2). (44) 29 fig:singhopfppa             
+
+> (a) λ= 0 .2
+> fig:singhopfppb
+> (b) λ= 0 .05
+> fig:singhopfppc
+> (c) λ= 0
+> fig:singhopfppd
+> (d) λ=−0.05
+> fig:singhopfppe
+> (e) λ=−0.2
+
+Figure 3: Phase portrait diagrams for a singular Hopf bifurcation for the system (31) for time scale separation ϵ = 0 .01. The fast-slow system undergoes a singular Hopf bifurcation as the parameter λ moves from right to left along the x-axis. As the time-scale separation parameter ϵ decreases, the region where the system exhibits oscillatory behaviour shrinks (shaded in blue), scaling with √ϵ. The thick black line is the critical manifold corresponding to ˙ x = 0, where single black arrows show the direction of travel along the critical manifold. Vertical magenta lines correspond to the nullcline for ˙ y = 0. Blue lines represent sample trajectories of the system, and blue points show the respective initial conditions. Arrows indicate the relative speeds of the trajectories. Insets show a zoomed-in panel around the equilibrium point for each λ. Subfigures 3b and 3d, the box around the region of interest is not shown due to scale. A stable limit cycle is shown in green in subfigures 3d and 3e. fig:SingHopf 
+
+30 Figure 4: Simulation for the fold system in (33) with parameters from Table 1. In each plot, the black vertical line indicates the fold bifurcation point ( λ = 0). (A) Time series of x (blue) and y (magenta). (B) Real parts of VAR-estimated eigenvalues: thick blue and red lines show the leading and non-leading eigenval-ues, with shaded regions indicating standard errors from Monte Carlo simulations. Stars denote analytical eigenvalues from the system Jacobian. (C) Lag-1 autocor-relation of x and y. The same window length is used for both AR(1) and VAR calculations. (D) real part of the leading eigenvalue calculated using VAR, and AR(1) on y.fig:foldevs 
+
+31 Figure 5: Simulation for the subcritical Hopf system in (35) with parameters from Table 1. In each plot, the black vertical line indicates the subcritical Hopf bifurcation point ( λ = 0). (A) Time series of x (blue) and y (magenta). (B) Real parts of VAR-estimated eigenvalues: thick blue and red lines show the leading and non-leading eigenvalues, with shaded regions indicating standard errors from Monte Carlo simulations. Stars denote analytical eigenvalues from the system Jacobian. (C) Lag-1 autocorrelation of x and y. The same window length is used for both AR(1) and VAR calculations. (D) real part of the leading eigenvalue calculated using VAR, and AR(1) on x.fig:hopfevs 
+
+32 Figure 6: Simulation for the singular Hopf system in (36) with parameters from Table 1. In each plot, the black vertical line indicates the singular Hopf bifurcation point ( λ = 0). (A) Time series of x (blue) and y (magenta). (B) Real parts of VAR-estimated eigenvalues: thick blue and red lines show the leading and non-leading eigenvalues, with shaded regions indicating standard errors from Monte Carlo simulations. Stars denote analytical eigenvalues from the system Jacobian. (C) Lag-1 autocorrelation of x and y. The same window length is used for both AR(1) and VAR calculations. (D) Comparison of the real part of the leading eigenvalue calculated using VAR, and AR(1) on x.ig:singhopfevs 
+
+33

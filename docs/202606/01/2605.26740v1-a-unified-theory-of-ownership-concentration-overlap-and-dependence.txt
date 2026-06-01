@@ -1,0 +1,2156 @@
+Title: A Unified Theory of Ownership Concentration, Overlap, and Dependence
+
+URL Source: https://arxiv.org/pdf/2605.26740v1
+
+Published Time: Wed, 27 May 2026 01:01:35 GMT
+
+Number of Pages: 24
+
+Markdown Content:
+# A Unified Theory of Ownership Concentration, Overlap, and Dependence 
+
+Margins, Cells, Spectral Structure, and Linear Transmission Miquel Noguer i Alonso Iro Tasitsiomi May 27, 2026 
+
+Abstract 
+
+Ownership concentration is not a scalar. For a normalized investor–stock matrix A, it has three irreducible layers: concentration across investors, concentration across stocks, and dependence in the joint assignment of investors to stocks. This paper develops a unified quadratic framework for those layers and shows that the same residual operator that measures static overlap also governs linearized market transmission. Raw micro concentration M (A) = P 
+
+> i,j
+
+A2
+
+> ij
+
+admits exact row and column decompositions, support bounds, and fixed-marginal extremal characterizations on the transportation polytope. Benchmark-adjusted dependence 
+
+X (A) = X
+
+> i,j
+
+(Aij − pisj )2
+
+pisj
+
+admits two exact decompositions: it is a size-weighted average of investor-level deviations from the market portfolio and, symmetrically, of stock-level deviations from the investor base. The paper also proves a multiscale aggregation law: under any partition of investors, total dependence splits exactly into between-group dependence and within-group heterogeneity. Spectrally, X (A)
+
+equals the sum of squared nontrivial singular values of the whitened matrix D−1/2 
+
+> p
+
+AD −1/2 
+
+> s
+
+. The residual operator L then yields two dynamic consequences: idiosyncratic fire-sale vulnerability is bounded by the dominant overlap mode ρ(A), while aggregate benchmark-relative alpha variance has worst-case capacity ρ(A)2 and isotropic average-case capacity X (A). The fixed-marginal geometry also motivates a feasible-range sparsity score that benchmarks observed micro concentration against the sharp minimum and maximum implied by the marginals. The resulting framework separates scale concentration, feasible sparsity, overlap, and linear transmission in a way that is mathematically transparent and empirically usable for work on crowding, fragility, and systemic risk. 
+
+# 1 Introduction 
+
+Diversification has been central to modern portfolio theory since Markowitz [1952]. At the same time, Herfindahl–Hirschman concentration measures remain the standard way to summarize how economic mass is distributed across firms, sectors, or agents [Herfindahl, 1950, Hirschman, 1945]. In ownership data, however, concentration is inherently two-sided: there is a distribution across investors and a distribution across stocks. A market can be concentrated on one margin and diffuse on the other. Once that is recognized, the natural primitive is no longer a vector, but a nonnegative matrix. That shift matters economically as well as mathematically. Research on stock fragility shows that concentrated ownership and common ownership shocks are distinct channels of vulnerability 1
+
+> arXiv:2605.26740v1 [q-fin.PM] 26 May 2026
+
+[Greenwood and Thesmar, 2011]. Related work on overlapping portfolios emphasizes that common asset holdings create indirect network linkages that can amplify stress [Greenwood et al., 2015, Gualdi et al., 2016, Poledna et al., 2021]. Recent evidence from bond mutual funds points in the same direction: ownership concentration is associated with higher asset-price volatility [Huang et al., 2024]. Yet many empirical summaries still collapse ownership to one side of the system, losing the joint structure of who owns what .This paper develops a compact mathematical theory of that joint structure. The central claim is that ownership concentration has three distinct layers: 1. investor concentration , captured by the Herfindahl index of row marginals; 2. stock concentration , captured by the Herfindahl index of column marginals; 3. ownership dependence , captured by departures of the full matrix from the proportional benchmark 
+
+ps ⊤.Raw cell concentration M (A) = P 
+
+> i,j
+
+A2 
+
+> ij
+
+is informative, but by itself it mixes marginal scale and assignment structure. The paper separates those components explicitly. The contribution of this study sits at the intersection of several established findings. Fixed-margin ownership sets are transportation polytopes and contingency-table spaces [Klee and Witzgall, 1968, Diaconis and Gangolli, 1995, De Loera and Kim, 2014]. The normalized spectral representation is the correspondence-analysis decomposition of a contingency table [Greenacre, 1984, 2007]. Those ingredients are classical in their own domains. The contribution here is to combine them into an ownership calculus, and to push that calculus one step further through new aggregation, comparative-static, and transmission results natural to the ownership setting. The main contributions are as follows. 1. The paper defines a three-layer measurement architecture for ownership systems: investor concentration, stock concentration, and benchmark-adjusted dependence. 2. It proves exact decompositions of raw micro concentration M (A) into size-weighted within-investor and within-stock concentration measures. 3. It proves exact decompositions of benchmark-adjusted dependence X (A) into investor-level and stock-level χ2 deviations from the market benchmark. 4. It proves a multiscale aggregation theorem: any investor partition yields an exact between-group/within-group decomposition of X (A), with investor mergers as a sharp corollary. 5. It studies the fixed-marginal geometry of ownership matrices as a transportation polytope, characterizing the minimizers and maximizers of M (A) and introducing a feasible-range sparsity score. 6. It shows that the entire nontrivial dependence structure is encoded in the singular spectrum of the whitened ownership matrix. 7. It proves a dynamic bridge from static overlap to linear transmission: ρ(A) is the sharp worst-case coefficient for idiosyncratic fire-sale propagation, while X (A) is the isotropic average-case capacity for benchmark-relative active variance. 2Three features are especially important for originality. First, the paper does not simply import correspondence analysis into finance; it identifies the ownership meaning of the nontrivial singular modes and places them alongside separate marginal concentration measures. Second, the aggregation law for X (A) reveals a genuinely multiscale structure: coarse ownership data retain the between-group component exactly while discarding a precisely quantified within-group heterogeneity term. Third, the same residual operator L governs linear transmission in two dual directions: idiosyncratic investor liquidation shocks pass through L⊤, while centered stock-return dispersion passes through 
+
+L. This turns a static overlap index into a dynamic capacity theory. The broader lesson is simple but important. Ownership concentration is not a single number. It is a layered property of a bipartite system, and any serious analysis of crowding or fragility should keep those layers distinct. 
+
+# 2 Setup: the ownership matrix and its marginals 
+
+Consider n investors and m stocks. Let 
+
+Y = ( Yij ) ∈ Rn×m
+
+> +
+
+denote the raw holdings matrix, where Yij ≥ 0 is the dollar amount or exposure of investor i to stock 
+
+j. Let total represented wealth be 
+
+T =
+
+> n
+
+X
+
+> i=1
+> m
+
+X
+
+> j=1
+
+Yij > 0,
+
+and define the normalized matrix 
+
+Aij = Yij 
+
+T ,
+
+> n
+
+X
+
+> i=1
+> m
+
+X
+
+> j=1
+
+Aij = 1 .
+
+Thus A is a probability matrix on investor–stock pairs. Define the row and column marginals by 
+
+pi =
+
+> m
+
+X
+
+> j=1
+
+Aij , sj =
+
+> n
+
+X
+
+> i=1
+
+Aij .
+
+Then p is the investor-size distribution and s is the stock-size distribution. 
+
+Definition 2.1 (Marginal concentration) . The investor concentration and stock concentration are 
+
+HI =
+
+> n
+
+X
+
+> i=1
+
+p2 
+
+> i
+
+, HS =
+
+> m
+
+X
+
+> j=1
+
+s2 
+
+> j
+
+.
+
+Their inverses 
+
+NI = 1
+
+HI
+
+, NS = 1
+
+HS
+
+are the corresponding effective numbers of investors and stocks. If wealth is equally split across q investors, then HI = 1 /q and NI = q. If capitalization is equally split across r stocks, then HS = 1 /r and NS = r.3Definition 2.2 (Raw micro concentration) . The raw micro concentration of the ownership matrix is 
+
+M (A) = 
+
+> n
+
+X
+
+> i=1
+> m
+
+X
+
+> j=1
+
+A2 
+
+> ij
+
+= ∥A∥2 
+
+> F
+
+= Tr( A⊤A).
+
+Its inverse 
+
+NM = 1
+
+M (A)
+
+is the quadratic effective number of occupied investor–stock cells. 
+
+Remark 2.3 (Collision probabilities) . If two ownership dollars are drawn independently from A, then 
+
+HI = P(same investor ), HS = P(same stock ), M (A) = P(same investor and same stock ).
+
+Thus HI and HS are marginal collision probabilities, while M (A) is the joint collision probability. 
+
+# 3 Raw micro concentration: exact decompositions and support bounds 
+
+For every investor with pi > 0, define the within-investor portfolio weights 
+
+qij = Aij 
+
+pi
+
+,
+
+> m
+
+X
+
+> j=1
+
+qij = 1 ,
+
+and let 
+
+ci =
+
+> m
+
+X
+
+> j=1
+
+q2
+
+> ij
+
+denote investor i’s within-portfolio concentration. For every stock with sj > 0, define the within-stock owner shares 
+
+rij = Aij 
+
+sj
+
+,
+
+> n
+
+X
+
+> i=1
+
+rij = 1 ,
+
+and let 
+
+dj =
+
+> n
+
+X
+
+> i=1
+
+r2
+
+> ij
+
+denote stock j’s within-owner concentration. 
+
+Proposition 3.1 (Two exact decompositions) . The raw micro concentration satisfies 
+
+M (A) = X
+
+> i:pi>0
+
+p2 
+
+> i
+
+ci = X 
+
+> j:sj>0
+
+s2 
+
+> j
+
+dj .
+
+Proof. By substitution, 
+
+X
+
+> i:pi>0
+
+p2 
+
+> i
+
+ci = X
+
+> i:pi>0
+
+p2
+
+> im
+
+X
+
+> j=1
+
+ Aij 
+
+pi
+
+2
+
+= X
+
+> i,j
+
+A2 
+
+> ij
+
+= M (A).
+
+The stock-side identity follows analogously. 4Proposition 3.1 is the first key identity of the paper. It shows that raw cell concentration is both a size-weighted average of investor specialization and a size-weighted average of stock-owner concentration. Let 
+
+ki = # {j : Aij > 0}, ℓj = # {i : Aij > 0}
+
+denote the row and column support sizes. 
+
+Lemma 3.2 (Local support bounds) . For every investor with pi > 0,
+
+1
+
+ki
+
+≤ ci ≤ 1,
+
+and for every stock with sj > 0,
+
+1
+
+ℓj
+
+≤ dj ≤ 1.
+
+Proof. The vector (qij )j:Aij >0 is a probability vector of length ki. Its squared norm is minimized by the uniform allocation and maximized by a point mass. The same reasoning applies to (rij )i:Aij >0.
+
+Theorem 3.3 (Global bounds) . The raw micro concentration satisfies 
+
+X
+
+> i:pi>0
+
+p2
+
+> i
+
+ki
+
+≤ M (A) ≤ HI , X 
+
+> j:sj>0
+
+s2
+
+> j
+
+ℓj
+
+≤ M (A) ≤ HS .
+
+Consequently, 
+
+max 
+
+ HI
+
+m , HS
+
+n
+
+
+
+≤ M (A) ≤ min {HI , H S }.
+
+Proof. Apply Proposition 3.1 together with the local bounds on ci and dj . The coarse bounds follow from ki ≤ m and ℓj ≤ n.
+
+Corollary 3.4 (Uniform support caps) . If each investor holds at most K stocks and each stock is held by at most L investors, then 
+
+HI
+
+K ≤ M (A) ≤ HI , HS
+
+L ≤ M (A) ≤ HS .
+
+Equivalently, 
+
+NI ≤ NM ≤ KN I , NS ≤ NM ≤ LN S .
+
+The point is already clear at this stage. The raw matrix quantity M (A) is not redundant relative to HI and HS , but it is not a pure dependence measure either. It blends marginal size and assignment structure. The next section isolates the dependence component. 
+
+# 4 Benchmark-adjusted ownership dependence 
+
+A natural benchmark is proportional ownership : every investor holds the market portfolio and differs only in scale. In matrix form, 
+
+A = ps ⊤, Aij = pisj .
+
+5Under this benchmark, 
+
+M (ps ⊤) = X
+
+> i
+
+p2
+
+> i
+
+! X
+
+> j
+
+s2
+
+> j
+
+ = HI HS .
+
+Example 5.7 below shows, however, that ps ⊤ is not generally the fixed-marginal minimizer of M (A).It is a no-dependence benchmark rather than a universal minimum-concentration benchmark. 
+
+Definition 4.1 (Ownership dependence index) . Assume from now on that the active rows and columns satisfy pi > 0 and sj > 0. Define 
+
+X (A) = 
+
+> n
+
+X
+
+> i=1
+> m
+
+X
+
+> j=1
+
+(Aij − pisj )2
+
+pisj
+
+.
+
+Remark 4.2 . The index X (A) is the Pearson χ2-divergence between the joint law A and the product law p ⊗ s [Pearson, 1900]. It vanishes exactly when every investor is a scaled copy of the market portfolio. 
+
+Definition 4.3 (Investor and stock profile divergences) . For any probability vectors u and v on the same active support, define 
+
+χ2(u∥v) = X
+
+> k
+
+(uk − vk)2
+
+vk
+
+.
+
+For investor i, the row profile is qi = ( qi1, . . . , q im ), and for stock j, the owner profile is rj =(r1j , . . . , r nj ).
+
+Proposition 4.4 (Equivalent forms and profile decompositions) . The dependence index satisfies 
+
+X (A) = X
+
+> i,j
+
+A2
+
+> ij
+
+pisj
+
+− 1.
+
+Equivalently, if 
+
+Rij = Aij 
+
+pisj
+
+,
+
+then 
+
+X (A) = X
+
+> i,j
+
+pisj (Rij − 1) 2.
+
+Most importantly, 
+
+X (A) = 
+
+> n
+
+X
+
+> i=1
+
+pi χ2(qi∥s) = 
+
+> m
+
+X
+
+> j=1
+
+sj χ2(rj ∥p).
+
+Proof. Expanding the square yields 
+
+X (A) = X
+
+> i,j
+
+A2
+
+> ij
+
+pisj
+
+− 2 X
+
+> i,j
+
+Aij + X
+
+> i,j
+
+pisj = X
+
+> i,j
+
+A2
+
+> ij
+
+pisj
+
+− 1.
+
+The likelihood-ratio form follows immediately from Aij = pisj Rij .For the row decomposition, write Aij = piqij :
+
+X (A) = X
+
+> i,j
+
+(piqij − pisj )2
+
+pisj
+
+= X
+
+> i
+
+pi
+
+X
+
+> j
+
+(qij − sj )2
+
+sj
+
+= X
+
+> i
+
+piχ2(qi∥s).
+
+The column formula follows analogously. 6Proposition 4.4 is the dependence analogue of Proposition 3.1. It shows that X (A) is a size-weighted average of investor deviations from the market portfolio and also a size-weighted average of stock deviations from the market investor base. 
+
+Remark 4.5 (Benchmark-adjusted, not margin-free) . The index X (A) adjusts for the proportional benchmark ps ⊤, but it is not literally margin-free. The weights 1/(pisj ) are part of the geometry. A better description is therefore benchmark-adjusted dependence : X (A) removes the rank-one market-weight component while respecting the observed marginals. 
+
+4.1 A multiscale aggregation law 
+
+The dependence index admits an exact hierarchical decomposition under investor aggregation. 
+
+Theorem 4.6 (Multiscale aggregation of dependence) . Let Π = {G1, . . . , G g} be a partition of the investor set {1, . . . , n }. For each group Ga, define 
+
+Pa = X
+
+> i∈Ga
+
+pi, ¯qa = 1
+
+Pa
+
+X
+
+> i∈Ga
+
+piqi.
+
+Then 
+
+X (A) = 
+
+> g
+
+X
+
+> a=1
+
+Pa χ2(¯ qa∥s)
+
+| {z }
+
+> between-group dependence
+
++
+
+> g
+
+X
+
+> a=1
+
+X
+
+> i∈Ga
+
+pimX
+
+> j=1
+
+(qij − ¯qaj )2
+
+sj
+
+| {z }
+
+> within-group heterogeneity
+
+.
+
+In particular, investor aggregation can only decrease benchmark-adjusted dependence. Proof. For vectors over stocks, define the weighted inner product 
+
+⟨x, y ⟩s−1 := 
+
+> m
+
+X
+
+> j=1
+
+xj yj
+
+sj
+
+, ∥x∥2 
+
+> s−1
+
+:= ⟨x, x ⟩s−1 .
+
+By Proposition 4.4, 
+
+X (A) = 
+
+> g
+
+X
+
+> a=1
+
+X
+
+> i∈Ga
+
+pi ∥qi − s∥2 
+
+> s−1
+
+.
+
+For each i ∈ Ga, decompose 
+
+qi − s = ( qi − ¯qa) + (¯ qa − s).
+
+Hence 
+
+∥qi − s∥2 
+
+> s−1
+
+= ∥qi − ¯qa∥2 
+
+> s−1
+
++ 2 ⟨qi − ¯qa, ¯qa − s⟩s−1 + ∥¯qa − s∥2 
+
+> s−1
+
+.
+
+After weighting by pi and summing over i ∈ Ga, the cross term vanishes because 
+
+X
+
+> i∈Ga
+
+pi(qi − ¯qa) = 0 .
+
+Therefore X
+
+> i∈Ga
+
+pi ∥qi − s∥2 
+
+> s−1
+
+= X
+
+> i∈Ga
+
+pi ∥qi − ¯qa∥2 
+
+> s−1
+
++ Pa ∥¯qa − s∥2 
+
+> s−1
+
+.
+
+Summing over a yields the claimed identity. 7Theorem 4.6 is the paper’s central structural result on dependence. It shows that benchmark-adjusted ownership dependence is an exact multiscale object. Coarser ownership data do not merely 
+
+approximate fine-level dependence: they retain the between-group component while discarding a precisely quantified within-group heterogeneity term. 
+
+Corollary 4.7 (Exact merger law for dependence) . Suppose investors a and b merge into a single entity. Let ˜A denote the merged ownership matrix, and let 
+
+˜q = paqa + pbqb
+
+pa + pb
+
+be the merged portfolio profile. Then 
+
+X (A) − X ( ˜A) = papb
+
+pa + pbmX
+
+> j=1
+
+(qaj − qbj )2
+
+sj
+
+≥ 0.
+
+Equality holds if and only if the two investors have identical portfolio weights: qa = qb.Proof. Apply Theorem 4.6 to the partition whose only nontrivial block is {a, b }. The within-block term becomes 
+
+pa ∥qa − ˜q∥2 
+
+> s−1
+
++ pb ∥qb − ˜q∥2 
+
+> s−1
+
+= papb
+
+pa + pb
+
+∥qa − qb∥2 
+
+> s−1
+
+.
+
+This is exactly the dependence lost under the merger. Corollary 4.7 already shows that raw concentration and benchmark-adjusted dependence respond differently to consolidation. Merging investors averages row profiles and thereby weakly reduces dependence, even though it weakly increases the raw concentration of ownership. Section 8 makes this contrast explicit. 
+
+# 5 Fixed marginals and transportation-polytope geometry 
+
+Fix probability vectors p ∈ Rn 
+
+> +
+
+and s ∈ Rm 
+
+> +
+
+with the same total mass. The fixed-marginal ownership set is 
+
+T (p, s ) = {A ∈ Rn×m 
+
+> +
+
+: A1 = p, A ⊤1 = s}.
+
+This is the classical transportation polytope associated with (p, s ) [Klee and Witzgall, 1968, Diaconis and Gangolli, 1995, Brualdi, 2006, De Loera and Kim, 2014]. 
+
+Theorem 5.1 (Optimization of raw micro concentration on fixed marginals) . For fixed marginals 
+
+(p, s ):
+
+(i) the problem min A∈T (p,s ) M (A) has a unique solution; 
+
+(ii) the problem max A∈T (p,s ) M (A) admits a solution at an extreme point of T (p, s ).Proof. The set T (p, s ) is compact and convex. The map A 7 → M (A) = ∥A∥2 
+
+> F
+
+is continuous and strictly convex, so the minimum exists and is unique. Since M is convex, a maximizer can be chosen at an extreme point: if a maximizer were a nontrivial convex combination of two feasible matrices, then at least one endpoint would also be a maximizer. 8Remark 5.2 (KKT characterization of the minimizer) . The unique minimizer is the Euclidean projection of the zero matrix onto T (p, s ). The KKT conditions imply the existence of multipliers 
+
+(λi) and (μj ) such that 
+
+A⋆ij = max 
+
+
+
+0, λi + μj
+
+2
+
+
+
+,
+
+with the row and column constraints determining the multipliers. Thus the minimum-concentration solution has an additive-threshold structure. To characterize the maximizers more sharply, consider the support graph G(A): a bipartite graph with investor vertices {1, . . . , n }, stock vertices {1, . . . , m }, and an edge (i, j ) whenever Aij > 0.
+
+Theorem 5.3 (Extreme points are exactly the acyclic supports) . Assume the active rows and columns satisfy pi > 0 and sj > 0. Then A ∈ T (p, s ) is an extreme point if and only if its support graph G(A) is a forest. Consequently, 
+
+# supp( A) ≤ n + m − 1
+
+for every extreme point. Therefore, some maximizer of M (A) over T (p, s ) has at most n + m − 1
+
+positive cells. Proof. If G(A) contains a cycle, assign alternating signs ±1 around the cycle and let B be the matrix supported on those edges with the corresponding signs. Every row and column sum of B is zero. For sufficiently small ε > 0, both A + εB and A − εB remain nonnegative and belong to T (p, s ), and 
+
+A = 12 (A + εB ) + 12 (A − εB )
+
+is a nontrivial convex decomposition. Hence A is not extreme. Conversely, suppose G(A) is a forest. Let A = λB + (1 − λ)C with 0 < λ < 1 and B, C ∈ T (p, s ).Set E = B − C. Then every row and column sum of E is zero. Moreover, if Aij = 0 , nonnegativity of B and C forces Bij = Cij = 0 , so supp (E) ⊆ supp (A). Because G(A) is a forest, it has a leaf vertex. The unique edge incident to that leaf must carry zero E-mass because the corresponding row or column sum of E is zero. Remove that edge and continue inductively through the forest. All entries of E vanish, so B = C = A. Thus A is extreme. The support-size bound follows because a forest on n+m vertices has at most n+m−1 edges. 
+
+Definition 5.4 (Feasible-range sparsity score) . For fixed marginals (p, s ) with Mmin (p, s ) <Mmax (p, s ), define 
+
+Ψ( A | p, s ) = M (A) − Mmin (p, s )
+
+Mmax (p, s ) − Mmin (p, s ) , A ∈ T (p, s ).
+
+Proposition 5.5. For every A ∈ T (p, s ),
+
+0 ≤ Ψ( A | p, s ) ≤ 1.
+
+Moreover, Ψ( A | p, s ) = 0 if and only if A is the unique fixed-marginal minimizer of M , whereas 
+
+Ψ( A | p, s ) = 1 if and only if A is a fixed-marginal maximizer of M .Proof. This follows immediately from the definition and Theorem 5.1. 9The score Ψ( A | p, s ) answers a different question from X (A). The quantity X (A) asks how far is the ownership matrix from proportional ownership? In contrast, Ψ( A | p, s ) asks how sparse or concentrated is the ownership matrix relative to the sharp feasible range allowed by the marginals? 
+
+The two objects are complementary, not interchangeable. 
+
+Proposition 5.6 (The 2 × 2 transport family) . Let p = ( a, 1 − a) and s = ( b, 1 − b) with a, b ∈ (0 , 1) .Every matrix in T (p, s ) has the form 
+
+A(x) = x a − xb − x 1 − a − b + x
+
+!
+
+, x ∈ Ia,b := max {0, a + b − 1}, min {a, b }.
+
+Moreover, 
+
+M (A(x)) = x2 + ( a − x)2 + ( b − x)2 + (1 − a − b + x)2,
+
+so the unconstrained minimizer is 
+
+x⋆ = a + b
+
+2 − 14 ,
+
+and the constrained minimizer is obtained by projecting x⋆ onto Ia,b .Proof. The row and column constraints imply the stated form. Substituting into M (A) yields the quadratic expression. Differentiation gives 
+
+ddx M (A(x)) = 8 x − 4a − 4b + 2 ,
+
+whose unique zero is x⋆ = ( a + b)/2 − 1/4. Since the second derivative equals 8, the constrained minimum is obtained by projection onto the feasible interval. 
+
+Example 5.7 (Proportional ownership is not generally the fixed-marginal minimum) . Under the proportional benchmark, the 2×2 family in Proposition 5.6 has x = ab . This equals the fixed-marginal minimizer only when 
+
+ab = a + b
+
+2 − 14 ⇐⇒ (2 a − 1)(2 b − 1) = 0 .
+
+Thus proportional ownership is not generally the fixed-marginal minimum of M (A).For instance, if a = b = 0 .9, then 
+
+Aprod =
+
+0.81 0.09 0.09 0.01 
+
+
+
+, M (Aprod ) = 0 .6724 ,
+
+whereas the true minimizer over T (p, s ) is 
+
+Amin =
+
+0.80 0.10 0.10 0
+
+
+
+, M (Amin ) = 0 .66 .
+
+The benchmark ps ⊤ is therefore the natural no-dependence reference point, but not a universal minimum of raw micro concentration. 10 6 Spectral structure of ownership dependence 
+
+Assume from now on that active rows and columns satisfy pi > 0 and sj > 0. Define the diagonal matrices 
+
+Dp = diag( p1, . . . , p n), Ds = diag( s1, . . . , s m),
+
+and the whitened ownership matrix 
+
+K = D−1/2 
+
+> p
+
+AD −1/2 
+
+> s
+
+.
+
+Let 
+
+u = ( √p1, . . . , √pn)⊤, v = ( √s1, . . . , √sm)⊤.
+
+Then ∥u∥2 = ∥v∥2 = 1 .
+
+Remark 6.1 (Connection to correspondence analysis) . The centered matrix 
+
+L := D−1/2 
+
+> p
+
+(A − ps ⊤)D−1/2 
+
+> s
+
+= K − uv ⊤
+
+is exactly the standardized residual matrix of correspondence analysis [Greenacre, 1984, 2007]. The difference here is interpretive: in the present setting, the nontrivial singular modes of K represent ownership-overlap modes beyond the rank-one market benchmark. 
+
+Theorem 6.2 (Contractive normalization) . The matrix K satisfies 
+
+Kv = u, K⊤u = v. 
+
+Moreover, 
+
+∥K∥op ≤ 1,
+
+so its largest singular value is exactly 1.Proof. Using the row and column constraints, 
+
+Kv = D−1/2 
+
+> p
+
+AD −1/2 
+
+> s
+
+v = D−1/2 
+
+> p
+
+A1 = D−1/2 
+
+> p
+
+p = u, 
+
+and similarly K⊤u = v.For the norm bound, let y ∈ Rm and set zj = yj /√sj . Then 
+
+∥Ky ∥22 =
+
+> n
+
+X
+
+> i=1
+
+1
+
+pi
+
+
+
+> m
+
+X
+
+> j=1
+
+Aij zj
+
+
+
+> 2
+
+=
+
+> n
+
+X
+
+> i=1
+
+pi
+
+
+
+> m
+
+X
+
+> j=1
+
+qij zj
+
+
+
+> 2
+
+.
+
+By Jensen’s inequality, X
+
+> j
+
+qij zj
+
+
+
+> 2
+
+≤ X
+
+> j
+
+qij z2 
+
+> j
+
+.
+
+Therefore 
+
+∥Ky ∥22 ≤ X
+
+> i
+
+pi
+
+X
+
+> j
+
+qij z2 
+
+> j
+
+= X
+
+> j
+
+sj z2 
+
+> j
+
+= X
+
+> j
+
+y2 
+
+> j
+
+= ∥y∥22 .
+
+So ∥K∥op ≤ 1. Because Kv = u and both vectors have unit norm, equality is attained at the top singular value. 11 Theorem 6.3 (Spectral decomposition of benchmark-adjusted dependence) . Let 
+
+1 = σ1(K) ≥ σ2(K) ≥ · · · ≥ σr(K) > 0
+
+be the positive singular values of K. Then 
+
+X (A) = K − uv ⊤ 2 
+
+> F
+
+=
+
+> r
+
+X
+
+> k=2
+
+σk(K)2.
+
+Proof. By definition, 
+
+K − uv ⊤ 2 
+
+> F
+
+= X
+
+> i,j
+
+ Aij 
+
+√pisj
+
+− √pisj
+
+2
+
+= X
+
+> i,j
+
+(Aij − pisj )2
+
+pisj
+
+= X (A).
+
+Set L = K − uv ⊤. By Theorem 6.2, 
+
+Lv = 0 , L⊤u = 0 .
+
+Hence K decomposes orthogonally into the rank-one component uv ⊤ and the residual L, whose singular values are precisely σ2(K), . . . , σ r(K). Therefore 
+
+X (A) = ∥L∥2 
+
+> F
+
+=
+
+> r
+
+X
+
+> k=2
+
+σk(K)2.
+
+Corollary 6.4 (Dominant overlap mode) . Define 
+
+ρ(A) := σ2(K).
+
+Then 
+
+ρ(A) = 0 ⇐⇒ A = ps ⊤.
+
+Moreover, 
+
+ρ(A)2 ≤ X (A) ≤ (min {n, m } − 1) ρ(A)2.
+
+Proof. The first statement follows because all nontrivial singular values vanish if and only if K = uv ⊤,i.e. A = ps ⊤. The bounds follow from Theorem 6.3 and the ordering σ2(K) ≥ σ3(K) ≥ · · · .The spectral picture is therefore complete. The first singular value of K is fixed at one by the marginals. Everything nontrivial in ownership dependence lies in the remaining singular spectrum. 
+
+# 7 Dynamic implications of the spectral residual 
+
+The whitened residual 
+
+L = D−1/2 
+
+> p
+
+(A − ps ⊤)D−1/2 
+
+> s
+
+= K − uv ⊤
+
+is not merely a descriptive statistic. It is the operator that transmits nontrivial ownership structure into linearized market dynamics. The trivial rank-one mode uv ⊤ carries market-wide motion; the residual L carries the orthogonal, crowding-driven component. This section makes that statement exact in two directions: liquidation shocks propagate through L⊤, while cross-sectional stock-return dispersion propagates through L. These results give formal content to the fragility intuition of Greenwood and Thesmar [2011] and the overlapping-portfolio perspective of Poledna et al. [2021]. For vectors on the investor and stock sides, write 
+
+∥x∥2 
+
+> Dp
+
+:= x⊤Dpx, ∥z∥2 
+
+> Ds
+
+:= z⊤Dsz. 
+
+12 7.1 Spectral bound on fire-sale vulnerability 
+
+Let δ ∈ Rn denote the vector of investor-level liquidation rates, so that investor i sells the dollar amount δiAij of stock j. Define the Dp-orthogonal decomposition 
+
+δ∥ =
+
+> n
+
+X
+
+> i=1
+
+piδi
+
+!
+
+1, δ⊥ = δ − δ∥.
+
+Then δ∥ is the market-wide liquidation component, and δ⊥ is the idiosyncratic component with weighted mean zero. The aggregate sell pressure across stocks is 
+
+F = A⊤δ. 
+
+Under a linear-impact normalization in which relative price impact equals sell pressure divided by stock size, the impact vector is 
+
+∆P = D−1 
+
+> s
+
+F = D−1 
+
+> s
+
+A⊤δ. 
+
+We measure severity by the capitalization-weighted quadratic price impact ∥∆P ∥2 
+
+> Ds
+
+.
+
+Theorem 7.1 (Spectral bound on fire-sale vulnerability) . For every liquidation shock δ ∈ Rn,
+
+∥∆P ∥2 
+
+> Ds
+
+= δ∥ 
+
+> 2
+> Dp
+
++ L⊤D1/2 
+
+> p
+
+δ⊥ 
+
+> 22
+
+≤ δ∥ 
+
+> 2
+> Dp
+
++ ρ(A)2 ∥δ⊥∥2 
+
+> Dp
+
+.
+
+In particular, every purely idiosyncratic shock satisfies 
+
+∥∆P ∥Ds ≤ ρ(A) ∥δ∥Dp whenever 
+
+> n
+
+X
+
+> i=1
+
+piδi = 0 .
+
+Proof. Set 
+
+y = D1/2 
+
+> p
+
+δ ∈ Rn.
+
+Write y = αu + y⊥, where α = u⊤y and y⊥ ⊥ u. Since D1/2 
+
+> p
+
+1 = u, one has 
+
+αu = D1/2 
+
+> p
+
+δ∥, y⊥ = D1/2 
+
+> p
+
+δ⊥.
+
+Also, 
+
+∆P = D−1 
+
+> s
+
+A⊤δ = D−1/2 
+
+> s
+
+K⊤y. 
+
+Therefore 
+
+∥∆P ∥2 
+
+> Ds
+
+= K⊤y 22 .
+
+Using K⊤u = v and L⊤u = 0 , we obtain 
+
+K⊤y = K⊤(αu + y⊥) = αv + L⊤y⊥.
+
+The two terms are orthogonal because 
+
+v⊤L⊤y⊥ = ( Lv )⊤y⊥ = 0 .
+
+Hence 
+
+∥∆P ∥2 
+
+> Ds
+
+= α2 + L⊤y⊥ 
+
+> 22
+
+.
+
+Now α2 = δ∥ 
+
+> 2
+> Dp
+
+and ∥y⊥∥22 = ∥δ⊥∥2 
+
+> Dp
+
+. Since ∥L∥op = ρ(A) by Theorem 6.3, 
+
+L⊤y⊥ 2 ≤ ρ(A) ∥y⊥∥2 .
+
+Substituting yields the claimed identity and bound. 13 The theorem identifies ρ(A) as the sharp idiosyncratic transmission coefficient of the ownership network in the linearized fire-sale system. When A = ps ⊤, one has L = 0 , and every centered liquidation shock is annihilated after size normalization: only the market-wide component remains. 
+
+7.2 Benchmark-relative active-variance capacity 
+
+Let R ∈ Rm be a vector of realized excess returns, centered relative to market capitalization: 
+
+s⊤R =
+
+> m
+
+X
+
+> j=1
+
+sj Rj = 0 .
+
+Investor i’s benchmark-relative active return is 
+
+αi =
+
+> m
+
+X
+
+> j=1
+
+ Aij 
+
+pi
+
+− sj
+
+
+
+Rj .
+
+Equivalently, 
+
+α = D−1 
+
+> p
+
+(A − ps ⊤)R. 
+
+Define the aggregate active variance by 
+
+V (α) = ∥α∥2 
+
+> Dp
+
+=
+
+> n
+
+X
+
+> i=1
+
+piα2 
+
+> i
+
+.
+
+Let ˜R = D1/2 
+
+> s
+
+R. 
+
+Then ˜R ⊥ v because s⊤R = 0 .
+
+Theorem 7.2 (Active-variance capacity) . For every centered return vector R ∈ Rm,
+
+V (α) = L ˜R 22 ≤ ρ(A)2
+
+> m
+
+X
+
+> j=1
+
+sj R2 
+
+> j
+
+.
+
+More generally, if ˜R is a random centered return vector with covariance matrix 
+
+Σ = E[ ˜R ˜R⊤] satisfying Σv = 0 ,
+
+then 
+
+E[V (α)] = Tr( LΣL⊤).
+
+In particular, under isotropic centered return dispersion, 
+
+Σ = σ2(I − vv ⊤),
+
+one has 
+
+E[V (α)] = σ2X (A).
+
+Proof. Since 
+
+L ˜R = D−1/2 
+
+> p
+
+(A − ps ⊤)D−1/2 
+
+> s
+
+D1/2 
+
+> s
+
+R = D−1/2 
+
+> p
+
+(A − ps ⊤)R, 
+
+one gets 
+
+α = D−1/2 
+
+> p
+
+L ˜R. 
+
+14 Therefore 
+
+V (α) = D1/2 
+
+> p
+
+α 22 = L ˜R 22 .
+
+Because ˜R ⊥ v and the singular values of L are σ2(K), σ 3(K), . . . , one has ∥L∥op = ρ(A), so 
+
+V (α) ≤ ρ(A)2 ˜R 22 = ρ(A)2
+
+> m
+
+X
+
+> j=1
+
+sj R2 
+
+> j
+
+.
+
+For the covariance formula, 
+
+E[V (α)] = E[ ˜R⊤L⊤L ˜R] = Tr( L⊤LΣ) = Tr( LΣL⊤).
+
+If Σ = σ2(I − vv ⊤), then Lv = 0 implies 
+
+LΣL⊤ = σ2L(I − vv ⊤)L⊤ = σ2LL ⊤.
+
+Taking traces and using Theorem 6.3 yields 
+
+E[V (α)] = σ2 ∥L∥2 
+
+> F
+
+= σ2X (A).
+
+Theorem 7.2 gives a worst-case/average-case duality. The dominant mode ρ(A) controls the maximum benchmark-relative dispersion generated by any centered return realization of a given weighted size, whereas X (A) is the total quadratic capacity of the ownership system to generate benchmark-relative active variance under isotropic centered return dispersion. 
+
+Remark 7.3 (Scope of the linearization) . The fire-sale and active-variance results are first-order statements. They do not require that real markets obey permanent linear impact or isotropic centered return geometry in full generality. The point is structural: once one linearizes around the proportional benchmark, the same residual operator L necessarily governs the nontrivial transmission component. 
+
+# 8 Structural operations and comparative statics 
+
+This section records how the indices behave under canonical ownership operations. 
+
+8.1 Investor mergers 
+
+Suppose investors a and b merge into a single entity, and let ˜A be the new matrix obtained by summing rows a and b.
+
+Proposition 8.1 (Mergers raise raw concentration but reduce dependence) . Under an investor merger: 
+
+(i) investor concentration rises: ˜HI − HI = 2 papb ≥ 0; 
+
+(ii) stock concentration is unchanged: ˜HS = HS ;
+
+15 (iii) raw micro concentration rises: 
+
+M ( ˜A) − M (A) = 2 
+
+> m
+
+X
+
+> j=1
+
+Aaj Abj ≥ 0; 
+
+(iv) benchmark-adjusted dependence falls: 
+
+X (A) − X ( ˜A) = papb
+
+pa + pbmX
+
+> j=1
+
+(qaj − qbj )2
+
+sj
+
+≥ 0.
+
+Equality in (iii) holds if and only if the two investors hold disjoint sets of stocks, and equality in (iv) holds if and only if the two investors have identical portfolio weights. Proof. The identities for ˜HI and ˜HS are immediate from the new marginals. For M ,
+
+M ( ˜A) − M (A) = 
+
+> m
+
+X
+
+> j=1
+
+(Aaj + Abj )2 − A2 
+
+> aj
+
+− A2
+
+> bj
+
+ = 2 
+
+> m
+
+X
+
+> j=1
+
+Aaj Abj .
+
+Part (iv) follows from Corollary 4.7. Proposition 8.1 cleanly separates two notions that are often conflated. Consolidation increases raw concentration because mass is being combined, but it decreases benchmark-adjusted dependence because profile heterogeneity is being averaged out. The wedge between M and X is therefore economically meaningful. 
+
+8.2 Stock removal 
+
+Suppose stock j0 is removed and the remaining matrix is renormalized. Let 
+
+w = 1 − sj0 , ˆAij = Aij 
+
+w (j̸ = j0).
+
+Proposition 8.2 (Stock removal and renormalization) . After removing stock j0 and renormalizing: 
+
+(i) the new investor marginals are 
+
+ˆpi = pi − Aij 0
+
+w ,
+
+with investors of zero remaining wealth dropped from the active set; 
+
+(ii) the new raw micro concentration is 
+
+M ( ˆA) = 1
+
+w2 M (A) −
+
+> n
+
+X
+
+> i=1
+
+A2
+
+> ij 0
+
+!
+
+;
+
+(iii) writing ε = sj0 ,
+
+M ( ˆA) = M (A) + 2 ε M (A) + O(ε2) (ε → 0) .
+
+Proof. Only the last column is removed, and every remaining cell is divided by w. This yields (i) and (ii). For (iii), note that 
+
+X
+
+> i
+
+A2 
+
+> ij 0
+
+≤ X
+
+> i
+
+Aij 0
+
+!2
+
+= ε2
+
+and 
+
+(1 − ε)−2 = 1 + 2 ε + O(ε2).
+
+16 8.3 Proportional dilution 
+
+Now add a new investor of mass λ ∈ (0 , 1) who holds the market portfolio. Define the (n + 1) × m
+
+matrix 
+
+A(λ) 
+
+> i·
+
+= (1 − λ)Ai· (i ≤ n), A(λ) 
+
+> n+1 ,j
+
+= λs j .
+
+Proposition 8.3 (Dilution by a market-weight investor) . The ownership matrix A(λ) satisfies 
+
+HI (A(λ)) = (1 − λ)2HI (A) + λ2,HS (A(λ)) = HS (A),M (A(λ)) = (1 − λ)2M (A) + λ2HS (A),
+
+X (A(λ)) = (1 − λ) X (A).
+
+Proof. The new investor marginals are (1 − λ)p1, . . . , (1 − λ)pn, λ , while the stock marginals remain 
+
+s. This yields the formulas for HI and HS . The identity for M follows by squaring the original rows and the new market-weight row. For X , the first n rows are scaled by (1 − λ) relative to the new product benchmark, while the new row coincides exactly with that benchmark: 
+
+X (A(λ)) = 
+
+> n
+
+X
+
+> i=1
+> m
+
+X
+
+> j=1
+
+ (1 − λ)Aij − (1 − λ)pisj
+
+2
+
+(1 − λ)pisj
+
+= (1 − λ)X (A).
+
+Proposition 8.3 shows why X is the correct object for nonproportional overlap. Capital injected at exact market weights reduces benchmark-adjusted dependence linearly because it adds no new dependence of its own. 
+
+# 9 Non-identification from the marginals 
+
+The row and column marginals do not identify the ownership matrix. 
+
+Proposition 9.1 (A fixed-marginal family with variable micro concentration) . For t ∈ [0 , 1/2] ,define 
+
+A(t) = t 12 − t 
+
+> 12
+
+− t t
+
+!
+
+.
+
+Then, for every t,
+
+p = s = ( 12 , 12 ), HI = HS = 12 ,
+
+but 
+
+M (A(t)) = 14 + 4  t − 14
+
+2 , X (A(t)) = 16  t − 14
+
+2 .
+
+Proof. Every row and column sum equals 1/2, so the marginals, and hence HI and HS , are constant. Direct calculation gives 
+
+M (A(t)) = 2 t2 + 2   12 − t2 = 14 + 4  t − 14
+
+2 .
+
+Since pisj = 1 /4 for all cells, 
+
+X (A(t)) = 4 X
+
+> i,j
+
+ Aij (t) − 14
+
+2 = 16  t − 14
+
+2 .
+
+17 Corollary 9.2 (No scalar reconstruction from (HI , H S )). There is no universal function F such that M (A) = F (HI , H S ) for all ownership matrices A. Likewise, there is no universal function G
+
+such that X (A) = G(HI , H S ).Proof. In the family A(t), the pair (HI , H S ) is constant, while both M (A(t)) and X (A(t)) vary with 
+
+t.
+
+Remark 9.3 (Copula viewpoint) . The non-identification problem is a discrete version of the classical question of recovering a joint law from its marginals. In the continuous setting, Sklar’s theorem separates marginals from a copula, while Fréchet-type bounds constrain feasible joint laws [Sklar, 1959, Fréchet, 1951]. In the present framework, the matrix A is the joint law, and X (A) measures its departure from the product copula. 
+
+# 10 A worked example 
+
+Consider the normalized ownership matrix 
+
+A =
+
+
+
+0.30 0.10 0.05 0.25 0.15 0.15 
+
+ .
+
+Its entries sum to 1.
+
+Marginals. The investor marginals are 
+
+p = (0 .40 , 0.30 , 0.30) ,
+
+and the stock marginals are 
+
+s = (0 .50 , 0.50) .
+
+Hence 
+
+HI = 0 .40 2 + 0 .30 2 + 0 .30 2 = 0 .34 , HS = 0 .50 2 + 0 .50 2 = 0 .50 .
+
+The corresponding effective counts are NI ≈ 2.94 and NS = 2 .
+
+Raw micro concentration. 
+
+M (A) = 0 .30 2 + 0 .10 2 + 0 .05 2 + 0 .25 2 + 0 .15 2 + 0 .15 2 = 0 .21 ,
+
+so NM = 1 /0.21 ≈ 4.76 .
+
+Proportional benchmark and dependence. The proportional benchmark is 
+
+ps ⊤ =
+
+
+
+0.20 0.20 0.15 0.15 0.15 0.15 
+
+ , M (ps ⊤) = HI HS = 0 .17 .
+
+Thus the observed matrix is more concentrated at the cell level than the proportional benchmark. Using Proposition 4.4, 
+
+X (A) = X
+
+> i,j
+
+A2
+
+> ij
+
+pisj
+
+− 1 = 0.09 0.20 + 0.01 0.20 + 0.0025 0.15 + 0.0625 0.15 + 0.0225 0.15 + 0.0225 0.15 − 1 ≈ 0.2333 .
+
+18 Investor-level interpretation. The three investor profiles are 
+
+q1 = (0 .75 , 0.25) , q2 =
+
+ 16 , 56
+
+
+
+, q3 = (0 .50 , 0.50) .
+
+Their benchmark deviations from the market portfolio s = (0 .50 , 0.50) are 
+
+χ2(q1∥s) = 0 .25 , χ2(q2∥s) = 49 ≈ 0.4444 , χ2(q3∥s) = 0 .
+
+Therefore, 
+
+X (A) = 0 .40(0 .25) + 0 .30 
+
+ 49
+
+
+
++ 0 .30(0) = 0 .2333 .
+
+Investor 2 contributes the most to dependence because it is the most tilted away from market weights. 
+
+Fixed-marginal benchmarking. For these marginals, the fixed-marginal minimum and maximum of M are 
+
+Mmin = 0 .17 , Mmax = 0 .30 .
+
+Hence 
+
+Ψ( A | p, s ) = 0.21 − 0.17 0.30 − 0.17 ≈ 0.308 .
+
+Thus the observed matrix lies roughly one-third of the way from the fixed-marginal minimum to the fixed-marginal maximum of raw sparsity. 
+
+Spectral analysis. The whitened matrix is 
+
+K = D−1/2 
+
+> p
+
+AD −1/2 
+
+> s
+
+=
+
+
+
+0.6708 0.2236 0.1291 0.6455 0.3873 0.3873 
+
+ ,
+
+whose singular values are 
+
+σ1(K) = 1 , σ2(K) ≈ 0.4830 .
+
+Therefore, 
+
+ρ(A) = σ2(K) ≈ 0.4830 , ρ(A)2 ≈ 0.2333 = X (A),
+
+which is exactly what Theorem 6.3 predicts in a 3 × 2 system. 
+
+Summary. The matrix has moderate investor concentration ( HI = 0 .34 ), balanced stocks ( HS =0.50 ), moderately elevated raw cell concentration ( M = 0 .21 ), and nontrivial but not extreme benchmark-adjusted dependence ( X ≈ 0.23 , ρ ≈ 0.48 ). The diagnostics point to a single main source of specialization: investor 2’s strong tilt toward stock 2.
+
+# 11 Empirical implementation and research agenda 
+
+The paper suggests that empirical ownership analysis should not rely on a single concentration number. A practical dashboard is 
+
+(HI , H S , M, Ψ, X , ρ ).
+
+19 Each object answers a different question: 
+
+HI : How concentrated is aggregate wealth across investors? 
+
+HS : How concentrated is aggregate capitalization across stocks? 
+
+M : How concentrated are occupied investor–stock cells? 
+
+Ψ : How sparse is the matrix relative to the sharp fixed-marginal range? 
+
+X : How far is the matrix from proportional ownership? How much total active-variance capacity does that create? 
+
+ρ : What is the dominant nontrivial overlap mode? How strong is worst-case idiosyncratic transmission? A practical empirical workflow is straightforward. Normalize the holdings matrix to obtain A.Compute the marginals (p, s ) and the Herfindahl indices (HI , H S ). Then compute M (A), X (A), and the leading nontrivial singular value ρ(A) from the whitened matrix. If fixed-marginal benchmarking is substantively relevant, solve the convex program min B∈T (p,s ) M (B) and the companion maximization problem to obtain Ψ( A | p, s ).The dashboard should be read in layers. A large value of M (A) may reflect concentrated investors, concentrated stocks, or sparse assignment. A large value of X (A) can only come from nonproportional ownership profiles. A large value of Ψ( A | p, s ) means the matrix is concentrated relative to what the marginals permit, even if X (A) is modest. The three measures therefore diagnose distinct failure modes of diversification. Through Theorems 7.1 and 7.2, the same dashboard also acquires dynamic content. The quantity 
+
+ρ(A) is the sharp coefficient mapping weighted idiosyncratic liquidation shocks into weighted cross-sectional price pressure in the linearized fire-sale system. The quantity X (A) is the isotropic average-case capacity of the ownership system to transform centered stock-return dispersion into benchmark-relative investor dispersion. In that sense, the paper’s static overlap measures become dynamic transmission coefficients once a linear mechanism is specified. The framework also fits naturally with the systemic-risk literature. Concentrated ownership can make prices fragile when large holders face correlated liquidity shocks [Greenwood and Thesmar, 2011]. Overlapping portfolios create indirect network linkages that amplify fire-sale dynamics [Greenwood et al., 2015, Poledna et al., 2021]. Statistically validated portfolio-overlap networks extend the same idea to network inference [Gualdi et al., 2016]. The point of the present theory is not to replace those models, but to provide a measurement layer that isolates scale concentration, feasible sparsity, nonproportional overlap, and the leading linear transmission coefficients before one imposes a richer contagion mechanism. 
+
+Remark 11.1 (Computational cost) . For an n × m holdings matrix, computing (p, s ), (HI , H S ), M ,and X is O(nm ). The singular value decomposition of the whitened matrix costs O(nm min {n, m }),but in large sparse panels the dominant quantity ρ(A) is obtainable by truncated methods. The fixed-marginal minimization of M is a strictly convex quadratic program with nm variables and 
+
+n + m equality constraints; the maximization can be approached through extreme-point search or specialized transportation-polytope algorithms. 
+
+# 12 Conclusion 
+
+Ownership concentration is a layered property of a bipartite system. The first layer is investor concentration, measured by the row-marginal Herfindahl index. The second is stock concentration, 20 measured by the column-marginal Herfindahl index. The third is benchmark-adjusted dependence, measured by the deviation of the joint ownership matrix from the proportional benchmark. Raw micro concentration belongs in the story, but it is not a substitute for any one of those layers. The mathematical structure is sharp. Raw micro concentration admits exact row and column de-compositions. Benchmark-adjusted dependence admits exact profile decompositions and a multiscale aggregation law. For fixed marginals, minimum raw concentration is unique, whereas maximum raw concentration can be attained at a sparse extreme point whose support graph is a forest. Spectrally, the entire nontrivial dependence structure is encoded in the singular values of the whitened matrix after the trivial rank-one mode is removed. The framework also bridges static topology and dynamic transmission. In the linearized fire-sale system, the dominant nontrivial singular value ρ(A) is the exact worst-case coefficient for idiosyncratic shock propagation after size normalization. In the benchmark-relative return system, ρ(A)2 is the worst-case active-variance multiplier and X (A) is the isotropic average-case active-variance capacity. The same residual operator L therefore governs both liquidation spillovers and cross-sectional alpha dispersion. That duality is the paper’s strongest conceptual point: overlap is not merely a descriptive pattern in the holdings matrix; it is a transmission mechanism. The conceptual payoff is that several quantities that look superficially similar answer different questions. M (A) measures cell concentration. Ψ( A | p, s ) measures concentration relative to the sharp feasible range implied by the marginals. X (A) measures departure from proportional ownership and total quadratic active-variance capacity. ρ(A) identifies the strongest nontrivial overlap mode and the sharp idiosyncratic transmission coefficient. Treating these as interchangeable obscures both the geometry and the economics. 
+
+Signed ownership and leverage. A natural next step is to admit short positions. Write the raw exposure matrix as Y = Y + − Y − with Y ± ≥ 0 and Y + 
+
+> ij
+
+Y − 
+
+> ij
+
+= 0 , and normalize by gross exposure: 
+
+G = X
+
+> i,j
+
+(Y + 
+
+> ij
+
++ Y − 
+
+> ij
+
+) > 0, A± = Y ±
+
+G , A = A+ − A−.
+
+Then ∥A∥1 = 1 . Define the gross marginals 
+
+pg 
+
+> i
+
+= X
+
+> j
+
+(A+ 
+
+> ij
+
++ A− 
+
+> ij
+
+), sg 
+
+> j
+
+= X
+
+> i
+
+(A+ 
+
+> ij
+
++ A− 
+
+> ij
+
+),
+
+and the net marginals 
+
+pn 
+
+> i
+
+= X
+
+> j
+
+Aij , sn 
+
+> j
+
+= X
+
+> i
+
+Aij .
+
+The quadratic micro concentration ∥A∥2 
+
+> F
+
+remains well defined, but the raw signed fixed-net-marginal problem is unbounded unless gross exposure is fixed or leverage is capped. After gross normal-ization one obtains a bounded mixed-sign feasible set, but its geometry is no longer the standard transportation polytope. When the aggregate net exposure 
+
+η = X
+
+> i
+
+pn 
+
+> i
+
+= X
+
+> j
+
+sn
+
+> j
+
+is nonzero, the canonical rank-one net benchmark is 
+
+B = η−1pn(sn)⊤,
+
+21 which shares the net marginals of A. A gross-whitened signed dependence measure is then 
+
+Xsigned (A) = X
+
+> i,j
+
+(Aij − Bij )2
+
+pg 
+
+> i
+
+sg
+
+> j
+
+= (Dpg )−1/2(A − B)( Dsg )−1/2 2 
+
+> F
+
+.
+
+Market-neutral systems with η = 0 require a genuinely two-sided long/short benchmark rather than a single rank-one net benchmark. Developing the corresponding mixed-sign transport geometry is a substantial extension, but the gross-whitened formulation above provides the right quadratic starting point. The framework is deliberately first-order. It does not model endogenous liquidation choice, nonlinear price impact, control rights, derivatives, or equilibrium feedback. Its role is more basic: given a holdings matrix, it identifies what part of observed concentration comes from investor size, stock size, feasible sparsity, genuine dependence in ownership profiles, and the leading linear transmission channels. That decomposition is a prerequisite for a more granular empirical science of crowding, fragility, and ownership-based systemic risk. 
+
+# A Rényi sensitivity analysis 
+
+The main text focuses on the quadratic case because it uniquely supports the collision-probability, Frobenius-norm, and χ2-based spectral representations above. The broader Rényi family is neverthe-less useful as a robustness device. 
+
+Definition A.1 (Rényi concentrations) . For a probability vector w = ( w1, . . . , w d) and α > 0,
+
+α̸ = 1 , define 
+
+Cα(w) = 
+
+> d
+
+X
+
+> k=1
+
+wαk , N (α)(w) = Cα(w)1/(1 −α).
+
+For the ownership matrix, 
+
+H(α) 
+
+> I
+
+= Cα(p), H(α) 
+
+> S
+
+= Cα(s), M (α)(A) = X
+
+> i,j
+
+Aαij .
+
+Proposition A.2. Under proportional ownership A = ps ⊤,
+
+M (α)(A) = H(α) 
+
+> I
+
+H(α) 
+
+> S
+
+for every α > 0, α ̸ = 1 .
+
+Equivalently, 
+
+N (α) 
+
+> M
+
+= N (α) 
+
+> I
+
+N (α) 
+
+> S
+
+.
+
+Proof. If Aij = pisj , then 
+
+M (α)(A) = X
+
+> i,j
+
+(pisj )α = X
+
+> i
+
+pαi
+
+! X
+
+> j
+
+sαj
+
+ = H(α) 
+
+> I
+
+H(α) 
+
+> S
+
+.
+
+Remark A.3 (Why the quadratic case remains central) . The order α = 2 is distinguished for four reasons. First, it yields the Frobenius representation M (A) = ∥A∥2 
+
+> F
+
+, which connects directly to the singular values. Second, it is exactly the collision probability of two independent draws. Third, 22 the benchmark-adjusted dependence measure X (A) is a Pearson χ2 object, the natural normalized quadratic companion to M (A). Fourth, the dynamic transmission theorems of Section 7 are genuinely quadratic: fire-sale severity and aggregate active variance are both squared-norm objects generated by the same residual operator. The Rényi family is therefore best viewed as a sensitivity layer around this fundamentally quadratic core. 
+
+# References 
+
+Richard A. Brualdi. Combinatorial Matrix Classes . Cambridge University Press, Cambridge, 2006. Jesús A. De Loera and Edward D. Kim. Combinatorics and geometry of transportation polytopes: An update. In Discrete Geometry and Algebraic Combinatorics , volume 625 of Contemporary Mathematics , pages 37–76. American Mathematical Society, Providence, RI, 2014. doi: 10.1090/ conm/625/12491. Persi Diaconis and Anil Gangolli. Rectangular arrays with fixed margins. In David Aldous, Persi Diaconis, Joel Spencer, and J. Michael Steele, editors, Discrete Probability and Algorithms ,volume 72 of The IMA Volumes in Mathematics and its Applications , pages 15–41. Springer, New York, 1995. doi: 10.1007/978-1-4612-0801-3_3. Maurice Fréchet. Sur les tableaux de corrélation dont les marges sont données. Annales de l’Université de Lyon, Section A , 14:53–77, 1951. Michael Greenacre. Correspondence Analysis in Practice . Chapman & Hall/CRC, Boca Raton, FL, 2 edition, 2007. Michael J. Greenacre. Theory and Applications of Correspondence Analysis . Academic Press, London, 1984. Robin Greenwood and David Thesmar. Stock price fragility. Journal of Financial Economics , 102 (3):471–490, 2011. doi: 10.1016/j.jfineco.2011.06.003. Robin Greenwood, Augustin Landier, and David Thesmar. Vulnerable banks. Journal of Financial Economics , 115(3):471–485, 2015. doi: 10.1016/j.jfineco.2014.11.006. Stanislao Gualdi, Giulio Cimini, Kevin Primicerio, Riccardo Di Clemente, and Damien Challet. Statistically validated network of portfolio overlaps and systemic risk. Scientific Reports , 6:39467, 2016. doi: 10.1038/srep39467. Orris C. Herfindahl. Concentration in the U.S. Steel Industry . PhD thesis, Columbia University, New York, 1950. Albert O. Hirschman. National Power and the Structure of Foreign Trade . University of California Press, Berkeley, 1945. Jing-Zhi Huang, Yan Wang, and Ying Wang. Does ownership concentration affect corporate bond volatility? evidence from bond mutual funds. Journal of Banking & Finance , 165:107217, 2024. doi: 10.1016/j.jbankfin.2024.107217. Victor Klee and Christoph Witzgall. Facets and vertices of transportation polytopes. In George B. Dantzig and Jr. Veinott, Arthur F., editors, Mathematics of the Decision Sciences, Part I , pages 257–282. American Mathematical Society, Providence, RI, 1968. 23 Harry Markowitz. Portfolio selection. The Journal of Finance , 7(1):77–91, 1952. doi: 10.1111/j. 1540-6261.1952.tb01525.x. Karl Pearson. On the criterion that a given system of deviations from the probable in the case of a correlated system of variables is such that it can be reasonably supposed to have arisen from random sampling. The London, Edinburgh, and Dublin Philosophical Magazine and Journal of Science , 50(302):157–175, 1900. doi: 10.1080/14786440009463897. Sebastian Poledna, Serafín Martínez-Jaramillo, Fabio Caccioli, and Stefan Thurner. Quantification of systemic risk from overlapping portfolios in the financial system. Journal of Financial Stability ,52:100808, 2021. doi: 10.1016/j.jfs.2020.100808. Abe Sklar. Fonctions de répartition à n dimensions et leurs marges. In Publications de l’Institut de Statistique de l’Université de Paris , volume 8, pages 229–231, 1959. 24

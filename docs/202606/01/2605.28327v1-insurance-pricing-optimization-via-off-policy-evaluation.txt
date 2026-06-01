@@ -1,0 +1,1623 @@
+Title: Insurance Pricing Optimization via Off-Policy Evaluation
+
+URL Source: https://arxiv.org/pdf/2605.28327v1
+
+Published Time: Thu, 28 May 2026 01:07:48 GMT
+
+Number of Pages: 29
+
+Markdown Content:
+# Insurance Pricing Optimization via Off-Policy Evaluation 
+
+Sascha G¨ unther ∗ Dimitri Semenovich † Mario V. W¨ uthrich ‡
+
+May 28, 2026 
+
+Abstract 
+
+Traditional insurance pricing relies on risk-based principles that ensure actuarial fairness and solvency but do not explicitly account for policyholders’ price sensitivity. We formulate insurance pricing as a decision-making problem and study it using tools from off-policy evaluation and stochastic control. We propose a kernelized inverse propensity score estimator that exploits local structure in the action space and yields variance reduction compared to the classical inverse propensity score estimator. Building on these value estimates, we investigate policy optimization and present two practical approaches for computing optimal pricing rules: an interpretable data-shared Lasso formulation and a flexible policy parameterization based on neural networks. Using a controlled synthetic travel insurance environment, we empirically confirm the theoretical results and show that neural networks outperform existing techniques for policy optimization. 
+
+# 1 Introduction 
+
+Pricing is a central task in actuarial science. Traditionally, insurance prices are derived from ex-pected values of future claims and expenses, adjusted by risk loadings and profit margins. This approach is fully risk-based, i.e., it focuses on covering expected costs rather than explicitly mod-eling the policyholder’s willingness to pay. While this framework ensures solvency and fairness, it may overlook important behavioral aspects of demand and pricing strategy optimization. In recent years, dynamic and data-driven pricing approaches have gained attention in many in-dustries. Firms in e-commerce, transportation, and energy sectors increasingly use reinforcement learning and counterfactual inference to optimize pricing decisions under uncertainty. These methods allow for learning from historical data collected under previous, possibly suboptimal, pricing policies, and estimating the performance of new pricing strategies without requiring new experiments. In actuarial science, these ideas have so far received limited attention. The dominant thread remains risk-based ratemaking relying on GLMs, GAMs, and other statistical methods. However, some articles do consider optimal or dynamic pricing when demand reacts to price. Krikler et al. (2004) describe an optimal pricing procedure that aims to maximize revenue and relies on demand estimations. Emms and Haberman (2005) use optimal control with demand modeling and show how bang-bang strategies can arise unless the pricing rule is smoothed by contract accrual. Emms (2007) extends this to a stochastic market-average premium and solves 
+
+> ∗Department of Mathematics, ETH Zurich, sascha.guenther@math.ethz.ch
+> †dvsemenovich@gmail.com
+> ‡Department of Mathematics, ETH Zurich, mario.wuethrich@math.ethz.ch
+
+1
+
+> arXiv:2605.28327v1 [stat.ML] 27 May 2026
+
+the resulting Bellman equation to obtain dynamic premium strategies sensitive to loss-ratio dynamics. These papers explicitly integrate demand into the objective rather than only ap-plying risk loadings to expected claims. Earlier, Moriconi (1982) already argued that premium principles should account for market conditions, which is reflected in modern price-sensitive frameworks. On the industry side, Guven and McPhail (2013) popularized elasticity-based ad-justments in property and casualty pricing, documenting industry interest. Recent work frames insurance pricing as a contextual bandit or reinforcement learning problem. Krasheninnikova et al. (2019) use reinforcement learning techniques to maximize customer lifetime value. Tree-tanthiploet et al. (2023) optimize prices offered on price-comparison websites, while Young et al. (2024) use similar techniques to achieve a desired target portfolio in terms of a composition of risk factors such as age, location, and occupation. A widely used approach in contextual pricing first estimates a demand function from historical data and then uses this estimate to determine profit-maximizing prices (e.g., Ferreira et al., 2016; Baardman et al., 2023; Alley et al., 2023; Biggs et al., 2021; Chen et al., 2022). In this framework, demand is modeled as the probability that a customer purchases a product as a function of the offered price and customer or product characteristics. An estimator of expected revenue is then constructed as the product of the price and the estimated purchase probability. Prices are ultimately chosen to maximize this estimated revenue. Elmachtoub and Grigas (2022) refer to this approach as predict-then-optimize . The performance of this approach heavily depends on the accuracy of the estimated demand model. In practice, estimates are often biased due to model misspecification or selection effects induced by historical pricing policies (see Jagabathula and Rusmevichientong, 2017; Semenovich and Petterson, 2019). This bias can propagate through the optimization step, leading to systematically suboptimal pricing decisions and inflated estimates of revenue. To mitigate these issues, Ye et al. (2018) and Biggs (2022) replace the revenue objective with a tractable surrogate loss that directly targets pricing decisions. However, their approach is typically not based on unbiased estimates. Outside of actuarial science, policy evaluation from historical data has been studied extensively. This problem, known as off-policy evaluation, is central to reinforcement learning, where one seeks to estimate the expected reward of a policy π using data generated under a potentially different policy eπ. Early statistical approaches rely on inverse propensity weighting, tracing back to the estimator introduced by Horvitz and Thompson (1952), which provides unbiased but potentially high-variance estimates. Dud´ ık et al. (2014) propose a doubly robust estimator that combines direct reward modeling with importance weighting to improve variance and robustness. Subsequent work has refined these estimators to reduce the variance and to improve the finite-sample performance, for instance by employing a bias-variance tradeoff in Thomas and Brunskill (2016) or by extending it to sequential decision-making problems in Jiang and Li (2016). This article transfers these techniques by proposing a general framework for optimal insurance pricing as a stochastic control problem. Each pricing decision is viewed as an action A taken on a policyholder with characteristics X, leading to a reward R, for example, revenue or profit. The objective is to find a pricing policy π that maximizes the expected reward V (π). In doing so, we apply techniques from off-policy evaluation and policy optimization, which allow us to estimate and improve pricing policies from historical insurance data collected under past pricing schemes. This paper makes four main contributions. First, while reinforcement learning approaches to 2insurance pricing have recently been proposed in dynamic and online settings, we formulate demand-sensitive insurance pricing on historical data as an off-policy control problem. A key practical advantage of this offline approach is the strict separation it enables between data col-lection and decision-making. During an experimentation phase, the insurer collects data under a known randomised policy eπ. Once this data is gathered, off-policy estimators allow the insurer to evaluate an effectively unlimited number of candidate pricing strategies by reusing the same ex-perimental data, i.e., each counterfactual policy evaluation requires no additional data collection. This makes the framework particularly attractive in insurance settings where experimentation is costly or operationally constrained. Moreover, because the estimators are computed offline, the insurer can conduct detailed analysis, compare alternative strategies, and validate results before committing to a new pricing rule in production. Second, we introduce a kernelized in-verse propensity score estimator that exploits local structure in the action space. The estimator smooths information across neighboring actions and allows policies defined on new action spaces to be evaluated using historical data. Under a mild regression assumption in the action variable, we establish unbiasedness of the estimator and derive variance bounds relative to the classical inverse propensity score estimator. Third, we characterize the variance-optimal kernel matrix and show that this construction strictly improves upon the classical inverse propensity score estimator. We also propose a computationally efficient kernel construction that avoids estimat-ing conditional reward moments while achieving comparable empirical performance. Finally, we demonstrate how the proposed evaluation framework can be combined with both interpretable (data-shared Lasso) and flexible (neural network) policy parameterizations, and we compare these approaches to the classical predict-then-optimize method in a controlled synthetic insur-ance environment. In this setting, the kernelized inverse propensity score estimator substantially reduces variance compared to the classical inverse propensity score estimator, while the compu-tationally efficient kernel construction performs nearly as well as the variance-optimal variant. In the policy optimization task, flexible neural network policies can achieve higher policy values, though at the cost of increased variability across simulations. The remainder of the paper is structured as follows. In Section 2, we introduce the stochastic con-trol framework for insurance pricing and define the value of a pricing policy. Section 3 discusses classical off-policy evaluation methods, namely the direct method and the inverse propensity score estimator. In Section 4, we extend these ideas by introducing kernelized controls, and we analyze their statistical properties, including their bias and variance behavior under a local regression assumption in the action variable. We turn to the optimization problem in Section 5 and present two approaches for computing optimal pricing policies, based on data-shared Lasso and neural network parameterizations. Finally, Section 6 empirically verifies the theoretical re-sults, and illustrates the proposed optimization methods in a synthetic travel insurance pricing environment and compares them to the classical predict-then-optimize approach. 
+
+# 2 Problem formulation 
+
+Let X ∈ X ⊆ Rp denote the features of the insurance policyholders, A ∈ A the actions taken (insurance prices charged), and R the rewards (e.g., revenue) generated. We assume a finite action space A with d levels. 3A stochastic control (policy) is given by a mapping 
+
+π : A × X → [0 , 1] , (a, x) 7 → π(a | x) , (2.1) where π(· | x) is a probability distribution on the finite action space A for all x ∈ X . A selected policy π has a value (average expected reward) of 
+
+V (π) = Eπ [R] = E
+
+h
+
+Eπ [R | X]
+
+i
+
+= E
+
+" X
+
+> a∈A
+
+E [R | X, A = a] π(a | X)
+
+#
+
+. (2.2) In an insurance pricing context, V (π) represents the expected revenue obtained when applying the pricing rule π across the portfolio. The optimal controls are given by (subject to existence) 
+
+π∗ ∈ arg max 
+
+> π
+
+V (π) . (2.3) This leads to two tasks: (i) computation/estimation of the value V (π) under an arbitrary policy 
+
+π, and (ii) finding an optimal control π∗. In Sections 3 and 4, we will focus on the former before we turn to the latter in Section 5. 
+
+# 3 Estimation of value 
+
+To compute (or estimate) the optimal control (2.3), we need to be able to evaluate (or approxi-mate) the value V (π) for any possible policy π. A main issue in solving this problem is that, per policyholder, typically, there is only data available from very few or even only one single policy. Let there be a tuple of features, action, and reward ( Xi, A i, R i) generated under given policies 
+
+eπi for i ∈ { 1, . . . , n }. We assume that (i) the tuples ( Xi, A i, R i), 1 ≤ i ≤ n, are independent, (ii) the features of the policyholders Xi, 1 ≤ i ≤ n, are i.i.d., (iii) given the features Xi, the distribution of the action Ai is determined by the given policy 
+
+eπi, 1 ≤ i ≤ n,(iv) for any vector of features x ∈ X and any action a ∈ A , the conditional distribution of the reward Ri, given Xi = x and Ai = a, does not depend on the policyholder i, i.e., 
+
+Ri |Xi=x, A i=a d
+
+= Rj |Xj =x, A j =a for all i, j ∈ { 1, . . . , n } .
+
+We denote the collection of all (possibly different) past policies as eπ = ( eπi)ni=1 and let 
+
+Leπ = ( Xi, A i, R i)ni=1 , (3.1) be the observed learning sample. Note that the policy eπi used to generate the learning sample may change from policyholder to policyholder, and thus, we can combine information collected under different past policies. The dependence of the policy eπi on the policyholder i, 1 ≤ i ≤ n, can either be interpreted as a 4simultaneous test of different policies to different policyholders or as the policy changing over time. This way, different policies can be applied to policyholders with identical features. We present two different ways of off-policy learning to estimate V (π) for an arbitrary policy π;see Dud´ ık et al. (2014). We revisit these two methods. 
+
+(1) Direct method. We approximate the value (2.2) by its empirical version 
+
+bVn(π) = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+X
+
+> a∈A
+
+E [R | X = Xi, A = a] π(a | Xi) . (3.2) In order to evaluate this empirical value, we need to compute (or estimate) the conditional expected return. For this, we set up a regression model (x, a ) 7 → ϱ(x, a ) = E [R | X = x, A = a] , (3.3) and based on the learning sample Leπ, we can infer this regression model, resulting in an estimated regression function ( x, a ) 7 → bϱ(x, a ) for all x ∈ X and a ∈ A . In particular, this is justified by item (iv) of our assumptions above. The direct method (DM) yields the following estimator for the policy value (2.2): 
+
+bVDM (π) = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+X
+
+> a∈A
+
+bϱ (Xi, a ) π (a | Xi) . (3.4) Note that the past policies eπi, the observed rewards Ri and the actions Ai, 1 ≤ i ≤ n, do not directly enter equation (3.4), only implicitly via the sample Leπ that was used to fit the regression model. A disadvantage of the direct method is that it requires specifying an explicit regression model class for (3.3) to solve the estimation problem. 
+
+(2) Inverse propensity score method. The second method uses inverse propensity scores, which go back to Horvitz and Thompson (1952); in statistics and Bayesian modeling, this technique is also known as importance weighting . For a generic policy eπ, we rewrite the value defined in (2.2) as follows 
+
+V (π) = E
+
+" X
+
+> a∈A
+
+E [R | X, A = a] π(a | X)
+
+eπ(a | X) eπ(a | X)
+
+#
+
+= E
+
+
+
+Eeπ
+
+
+
+R π(A | X)
+
+eπ(A | X) X
+
+ 
+
+= Eeπ
+
+
+
+R π(A | X)
+
+eπ(A | X)
+
+
+
+. (3.5) The latter quantity is an expected value under an observed policy eπ. Thus, we can use the learning sample Leπ to estimate it empirically by the inverse propensity score (IPS) estimate 
+
+bVIPS (π) = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+Ri
+
+π(Ai | Xi)
+
+eπi(Ai | Xi) . (3.6) The advantage of the IPS estimate is that it is model-free, i.e., we do not need any model assumptions beyond having a learning sample Leπ. The disadvantage is that this estimator can have a high uncertainty through the variance of the importance weights π(Ai | Xi)/eπi(Ai | Xi). In the transformation (3.5) and the estimation in (3.6), we implicitly assume sufficient overlap 5between the policies eπi and π, meaning that eπi(a | x) > 0 whenever π(a | x) > 0, a ∈ A , x ∈ X ,so that the importance weights are well-defined. The above has been formulated for a stochastic control (2.1). In the following we turn our attention to deterministic controls π : X → A with a = π(x) ∈ A . That is, by a slight abuse of notation, we assume that π maps every policyholder’s characteristics x (deterministically) to an action a = π(x) ∈ A .For a deterministic policy π, the IPS estimate is given by 
+
+bVIPS (π) = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+Ri
+
+1{Ai=π(Xi)}
+
+eπi(Ai | Xi) = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+Ri
+
+⟨eAi , eπ(Xi)⟩
+
+eπi(Ai | Xi) , (3.7) with a one-hot encoded vector 
+
+e : A = {a(1) , . . . , a (d)} → {0, 1}d
+
+a 7 → ea = e(a) = 
+
+
+
+1{a=a(1) }, . . . , 1{a=a(d)}
+
+⊤
+
+.
+
+Proposition 3.1 The IPS estimator (3.7) is unbiased for the value V (π).  
+
+> Proof. This immediately follows from (3.5). 2
+
+# 4 Kernelized controls 
+
+The above derivations were based on the assumption that both the observed policies eπ (used to collect the learning sample Leπ) and the new policy π of interest act on the same action space 
+
+A. In addition, the IPS estimator (3.7) relies only on observations for which the realized action matches the action prescribed by the new policy. In practice, this can lead to high variance in the estimator, since much of the available data is discarded. The following two considerations motivate extending this framework. First, when considering pricing policies for future insurance contracts, the set of admissible prices may differ from those used historically. In that case, the new policy may act on a different action space ¯A = {¯a(1) , . . . , ¯a(m)} with m levels. Therefore, evaluating such policies requires a mechanism to translate information from the historical action space A to the new action space ¯A. This situation arises naturally when insurers wish to evaluate pricing adjustments that were not previously observed in the data, see Section 6.4. Second, even when the action spaces coincide, it is desirable to exploit the structure of the action variable. In many pricing settings, expected rewards vary smoothly with the price adjustment. Using this structure allows us to aggregate information across nearby actions and thereby reduce the variability of IPS estimates. To address both issues simultaneously, we introduce kernel matrices K(x) ∈ Rd×m that map between the two action spaces and smooth over nearby actions. Moreover, denote by ¯ e¯a ∈ { 0, 1}m
+
+the one-hot encoding vector corresponding to an action ¯ a ∈ ¯A.We now exploit a deterministic policy ¯ π : X → ¯A on this new action space ¯A, and we set for the kernelized functional ¯πK(a | x) = ea, K(x) ¯ e¯π(x) =
+
+D
+
+K(x)⊤ea, ¯e¯π(x)
+
+E
+
+∈ R .
+
+6This can be interpreted as connecting the new actions ¯ a ∈ ¯A to the old action space A, e.g., action ¯ a(k), 1 ≤ k ≤ m, provides a kernelized version on the original action space A
+
+K(x)e¯a(k) = ( K1,k (x), . . . , Kd,k (x)) ⊤ ∈ Rd .
+
+This structure is quite similar to the stochastic control (2.1). In particular, for our choice in Section 4.1, the column sums of K(x) will aggregate to one, see Corollary 4.3, below. However, our choice of K(x) will not provide a probability tensor because the entries of K(x) will not necessarily be positive. The kernelized inverse propensity score estimate can then be defined by 
+
+bVK(¯ π) = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+Ri
+
+eAi , Ki(Xi) ¯ e¯π(Xi)
+
+eπi(Ai | Xi) = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+Ri
+
+¯πKi (Ai | Xi)
+
+eπi(Ai | Xi) , (4.1) where Ki may depend on the observed policy eπi, 1 ≤ i ≤ n used to generate observation i in the learning sample Leπ. We will justify this choice and return to this formula in (4.7) below. 
+
+4.1 Kernel construction 
+
+Remark that the kernelized IPS estimate (4.1) is model-free. However, in the next step, we introduce a model to construct the kernel matrix K(x), for a given observed policy eπ. Let us recall the regression function (3.3), regressing the rewards R from features x ∈ X and actions 
+
+a ∈ A . Similar to the direct method, we make the following regression assumption in the actions, for fixed x,
+
+a 7 → ϱ(x, a ) = β0(x) + 
+
+> q
+
+X
+
+> j=1
+
+βj (x)fj (a) = f (a)⊤β(x) , (4.2) with regression parameter β(x) = (β0(x), β 1(x), . . . , β q(x)) ⊤ ∈ Rq+1 and a vector of ba-sis functions f (a) = (1 , f 1(a), . . . , f q(a)) ⊤ ∈ Rq+1 for smooth functions fj : R → R, for 
+
+j = 1 , . . . , q . In contrast to the direct method, we do not specify a regression relation between the policyholder’s features x and the expected rewards ϱ(x, a ) in (4.2). Specifying a regression in the actions a ∈ A allows us to smooth over different actions and extrapolate to the new action space ¯A. Thus, we implicitly extend the regression assumption (4.2) to the actions ¯ a ∈ ¯A on the new action space. Choosing q = 1 and f1(a) = a simplifies to a linear regression in a. In this case, equation (4.2) means that actions impact the expected rewards linearly, for given policyholders x ∈ X . If this is not the case, one should use a different set of smooth functions. The regression assumption (4.2) even accommodates a simple additive model on the action space A (with a linear link function). Unlike in the direct method, we do not use the regression model (4.2) to estimate the values 
+
+V (π) and V (¯ π), respectively, but we use it to determine the kernel matrix K(x). To this end, we need to specify the linear regression parameter β(x) ∈ Rq+1 for any x ∈ X . Assume that for each action a(k) ∈ A , 1 ≤ k ≤ d, there is a reward rk(x) ∈ R, for given x. This gives the reward vector r(x) = ( r1(x), . . . , r d(x)) ⊤ ∈ Rd for given x. This allows us to consider the weighted least squares problem to find the regression parameter bβ(x), 
+
+bβ(x) ∈ arg min 
+
+> β
+
+(r(x) − Dβ)⊤ W (x) ( r(x) − Dβ) , (4.3) 7with a symmetric positive-definite weight matrix W ∈ Rd×d and design matrix D given by 
+
+D =
+
+
+
+1 f1(a(1) ) · · · fq(a(1) )... ... . . . ...1 f1(a(d)) · · · fq(a(d))
+
+ ∈ Rd×(q+1) .
+
+We assume that D has full column rank q + 1. Choosing 
+
+W (x) = diag 
+
+eπ(a(k) | x)
+
+dk=1 , (4.4) results in the standard weighted least squares formulation, minimizing the objective function 
+
+> d
+
+X
+
+> k=1
+
+eπ(a(k) | x)
+
+
+
+rk(x) − f (a(k))⊤ β
+
+2
+
+.
+
+Thus, when the learning sample Leπ contains observations generated under different observed policies eπi, 1 ≤ i ≤ n, the corresponding weight matrices Wi(x) may also differ across obser-vations. The above choice (4.4) of the diagonal weight matrix W (x) is motivated by classical regression settings with independent observations. Here, however, the reward vector r(x) col-lects rewards of a single individual under different actions, which are generally correlated. For this reason, alternative specifications of the weight matrix W (x) may be more appropriate. We return to this question in Propositions 4.4–4.7, below, and we will refer to the kernel matrix corresponding to the choice (4.4) as the naive kernel matrix leading to a naive kernelized IPS estimator .The weighted least squares problem (4.3) has a unique solution since the matrix D has full rank and W (x) is symmetric positive-definite. The solution is given by 
+
+bβ(x) = 
+
+
+
+D⊤W (x)D
+
+−1
+
+D⊤W (x) r(x) = D+ 
+
+> x
+
+r(x) ,
+
+where we defined the matrix 
+
+D+ 
+
+> x
+
+=
+
+
+
+D⊤W (x)D
+
+−1
+
+D⊤W (x) ∈ R(q+1) ×d .
+
+Assuming that the regression assumption (4.2) extends to ¯A, we estimate the conditionally expected rewards for fixed x as 
+
+bϱ(x, ¯a(1) )...
+
+bϱ(x, ¯a(m))
+
+ =
+
+
+
+1 f1(¯ a(1) ) · · · fq(¯ a(1) )... ... . . . ...1 f1(¯ a(m)) · · · fq(¯ a(m))
+
+ bβ(x) = ¯D D + 
+
+> x
+
+r(x) , (4.5) where we defined the design matrix on the new action space ¯A,¯D =
+
+
+
+1 f1(¯ a(1) ) · · · fq(¯ a(1) )... ... . . . ...1 f1(¯ a(m)) · · · fq(¯ a(m))
+
+ ∈ Rm×(q+1) .
+
+This directly links to the wanted kernel matrix. Namely, we set 
+
+K(x) = ( D+ 
+
+> x
+
+)⊤ ¯D⊤ = W (x)D
+
+
+
+D⊤W (x)D
+
+−1 ¯D⊤ ∈ Rd×m . (4.6) 8Taking an action ¯ π(x) ∈ ¯A, gives an estimated expected reward bϱ(x, ¯π(x)). This estimated expected reward is given by, see (4.5), 
+
+bϱ(x, ¯π(x)) = ¯ e⊤
+
+> ¯π(x)
+
+K(x)⊤r(x) =  K(x)¯ e¯π(x)
+
+⊤ r(x) .
+
+The final step is to consider action Ai with corresponding reward Ri, for given Xi, 1 ≤ i ≤ n,from the learning sample Leπ. This leads to the kernelized inverse propensity score estimate 
+
+bVK(¯ π) = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+Ri
+
+eAi , Ki(Xi) ¯ e¯π(Xi)
+
+eπi(Ai | Xi) = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+Ri
+
+Ki(Xi)⊤eAi , ¯e¯π(Xi)
+
+eπi(Ai | Xi) , (4.7) which is precisely as defined in (4.1), and with the kernel matrices obtained from (4.6). The following example illustrates the difference between the IPS estimator and its kernelized counterpart. 
+
+Example 4.1 In this example, we study the kernelized IPS estimator under the assumption that A = ¯A, i.e., we only want to study the effect of kernelization on the same action space. Assume that we observe three policyholders and, for simplicity, let them have the same features 
+
+x1 = x2 = x3 ∈ X . Based on a default price of 100, we offer each policyholder i ∈ { 1, 2, 3} apremium reduction Ai ∈ A = {10% , 20% , 30% } with uniform probability eπi(a | x) = 13 for all 
+
+a ∈ A . Let the reward be defined as the total signed premium. Thus, if the policyholder does not accept the offer, the reward is 0, and (1 − Ai) 100 otherwise. We observe the following pairs of actions and rewards, which form the learning sample Leπ.Policyholder i Action Ai Reward Ri
+
+1 10% 90 2 20% 03 30% 70 We use this information to approximate the value of three new constant deterministic policies ¯π(k)(x) = a(k) = 10 k %, 1 ≤ k ≤ 3, for a(k) ∈ ¯A = A and for all x ∈ X .Using the IPS estimator, we calculate 
+
+bVIPS (¯ π(1) ) = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+Ri
+
+1{Ai=¯ π(1) (Xi)}
+
+eπi(Ai | Xi) = 13
+
+
+
+90 11/3 + 0 01/3 + 70 01/3
+
+
+
+= 90 ,
+
+and equivalently bVIPS (¯ π(2) ) = 0 and bVIPS (¯ π(3) ) = 70. For the kernelized IPS estimator, we make a locally linear regression assumption 
+
+ϱ(x, a ) = β0(x) + β1(x) a . 
+
+We choose the weight matrix W (x) = Wi(x) = diag  eπi(a(k)|x)dk=1 , 1 ≤ i ≤ 3 and the design matrix D follows as 
+
+W (x) = 
+
+ 
+
+> 13
+
+0 00 13 00 0 13
+
+ and D =
+
+
+
+1 0.11 0.21 0.3
+
+ .
+
+9Analogously to the weight matrix W (x), the kernel matrix K(x) is identical for all policyholders because the observed policies eπi, 1 ≤ i ≤ 3, are identical. Hence, 
+
+K(x) = W (x)D
+
+
+
+D⊤W (x)D
+
+−1
+
+D⊤ ≈
+
+
+
+0.833 0.333 −0.167 0.333 0.333 0.333 
+
+−0.167 0.333 0.833 
+
+ .
+
+Note that the columns of K(x) aggregate to one, but it is not a probability tensor. We use this to determine the kernelized IPS estimator 
+
+bVK(¯ π(1) ) = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+Ri
+
+D
+
+eAi , K(Xi) ¯ e¯π(1) (Xi)
+
+Eeπi(Ai | Xi) = 13
+
+
+
+90 0.833 1/3 + 0 0.333 1/3 − 70 0.167 1/3
+
+
+
+= 63 .28 ,
+
+and equivalently bVK(¯ π(2) ) = 53 .28 and bVK(¯ π(3) ) = 43 .28 . 10% 15% 20% 25% 30% 
+
+> 0
+> 20
+> 40
+> 60
+> 80
+> 100
+
+action taken by new policy policy value 
+
+> IPS estimates
+> Kernelized IPS estimates
+
+Figure 1: Kernelized and IPS estimates of policy value for constant policies under the setting in Example 4.1. The IPS estimator only relies on the information provided by observations where recorded actions match the action of the new policy. The kernelized IPS estimator, on the other hand, takes into account the rewards generated under different actions and smooths the rewards across the action space A. The kernelized IPS estimates lie on the regression line obtained by fitting the locally linear model (4.1) to the IPS estimates. This is shown in Figure 1. From this illustration, it is intuitively clear that the kernelized IPS estimator can reduce the variance in estimation compared to the IPS estimator. In the next subsection, we formalize this observation. This completes the example. 
+
+4.2 Statistical properties 
+
+In this subsection, we analyze the statistical properties of the kernelized IPS estimator. In particular, we prove its unbiasedness under the local regression assumption (4.2) and compare its variance to that of the classical IPS estimator. The regression structure introduced in Section 4.1 is used to construct a variance-optimal kernel matrix, and it plays a key role in establishing these results. 10 The kernelized IPS estimator (4.7) itself is model-free. However, we have assumed a regression structure (4.2) in the actions a ∈ A to determine an explicit form of the kernel matrix K(x). This regression structure smooths over the action space and is used again to prove unbiasedness in the following Proposition. 
+
+Proposition 4.2 Under the regression assumption (4.2) , the kernelized IPS estimator (4.7) is unbiased for the value V (¯ π).
+
+Proof. In fact, we will show that every summand of the kernelized IPS estimator 
+
+bVK(¯ π) = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+Ri
+
+eAi , Ki(Xi) ¯ e¯π(Xi)
+
+eπi(Ai | Xi) ,
+
+is an unbiased estimator for E¯π [Ri]. Consider a single tuple ( X, A, R ), where the action A follows some policy eπ,leading to a kernel matrix K(X). We compute the expected value under the regression assumption (4.2) 
+
+Eeπ
+
+"
+
+R eA, K(X) ¯ e¯π(X)
+
+eπ(A | X)
+
+#
+
+= Eeπ
+
+"
+
+E [R | X, A ] eA, K(X) ¯ e¯π(X)
+
+eπ(A | X)
+
+#
+
+= Eeπ
+
+"
+
+f (A)⊤ β(X) eA, K(X) ¯ e¯π(X)
+
+eπ(A | X)
+
+#
+
+= E
+
+" X
+
+> a∈A
+
+f (a)⊤ β(X) ea, K(X) ¯ e¯π(X)
+
+#
+
+= E
+
+" X
+
+> a∈A
+
+f (a)⊤ β(X)e⊤
+
+> a
+
+!
+
+K(X) ¯ e¯π(X)
+
+#
+
+= E
+
+h
+
+(D β(X)) ⊤ K(X) ¯ e¯π(X)
+
+i
+
+= E
+
+h
+
+β(X)⊤D⊤K(X) ¯ e¯π(X)
+
+i
+
+.
+
+The crucial step now is the following simplification: we use the fact that D⊤W D is symmetric, 
+
+D⊤K(X) = D⊤(D+ 
+
+> X
+
+)⊤ ¯D⊤ = D⊤
+
+
+
+D⊤W (X)D
+
+−1
+
+D⊤W (X)
+
+⊤
+
+¯D⊤
+
+= D⊤W (X)D
+
+
+
+D⊤W (X)D
+
+−1 ¯D⊤ = ¯D⊤ .
+
+Inserting this into the previous expected value and reverting all the previous steps allows us to obtain (using the regression assumption once more) 
+
+Eeπ
+
+"
+
+R eA, K(X) ¯ e¯π(X)
+
+eπ(A | X)
+
+#
+
+= E
+
+h
+
+β(X)⊤D⊤K(X) ¯ e¯π(X)
+
+i
+
+= E
+
+h
+
+β(X)⊤ ¯D⊤ ¯e¯π(X)
+
+i
+
+= E
+
+X 
+
+> ¯a∈¯A
+
+f (¯ a)⊤ β(X)¯ e⊤
+
+> ¯a
+
+ ¯e¯π(X)
+
+ = E
+
+ X 
+
+> ¯a∈¯A
+
+E [R | X, A = ¯ a] 1{¯π(X)=¯ a}
+
+
+
+= E [E¯π [R | X]] = E¯π [R] .
+
+This completes the proof. 2
+
+In the previous proof, we have verified the following corollary. 
+
+Corollary 4.3 We have for all x ∈ X 
+
+K(x)⊤D = ¯D . 
+
+The column sums of K(x) are equal to one, since the regression assumption (4.2) contains a bias term β0(x).
+
+11 This corollary shows how the actions in A are mapped to ¯A by the kernel K(x). We can also consider the special case of ¯A = A. In this case, we have ¯D = D, which provides the kernel matrix 
+
+K(x) = ( D+ 
+
+> x
+
+)⊤ ¯D⊤ = W (x)D
+
+
+
+D⊤W (x)D
+
+−1
+
+D⊤ .
+
+Generally, this is different from the identity matrix, but Corollary 4.3 immediately gives 
+
+K(x)⊤D = D , 
+
+by multiplying the kernel matrix K(x) from the left with D⊤.Under ¯A = A, we can also multiply from the right, providing 
+
+K(x)W (x)D = W (x)D
+
+
+
+D⊤W (x)D
+
+−1
+
+D⊤W (x)D = W (x)D . 
+
+In the special case ¯A = A, the identities K(x)⊤D = D and K(x)W (x)D = W (x)D show that 
+
+K(x) leaves the regression subspace spanned by D invariant and thus acts like a (weighted) projection onto the subspace given by the local model (4.2). Intuitively, applying this projec-tion to the IPS weights preserves the components needed for unbiasedness while discarding the components orthogonal to that subspace. This is precisely where the variance can be reduced. Similarly, Example 4.1 suggests that the kernelized IPS estimator is less noisy than the IPS estimator since it uses information from all observations instead of only perfect matches. The following result introduces an upper bound for the variance of the kernelized IPS estimator relative to the IPS estimator. This upper bound is a function of the chosen weight matrix 
+
+W (x). We will use this result to determine an optimal weight matrix in the following. 
+
+Proposition 4.4 (Variance bound) For 1 ≤ i ≤ n, let the weight matrix Wi(Xi) ∈ Rd×d be any symmetric positive-definite matrix and choose the corresponding kernel matrix Ki(Xi) as in (4.6) .Denote by Σi(Xi) the conditional covariance matrix of the per-action IPS weights with entries 
+
+Σi,jk (Xi) = Cov eπi
+
+
+
+Ri
+
+1{Ai=a(j)}
+
+eπi(a(j) | Xi) , R i
+
+1{Ai=a(k)}
+
+eπi(a(k) | Xi) Xi
+
+
+
+.
+
+Then, for any policy π defined on the action space ¯A = A, we have 
+
+Var eπ
+
+  bVK(π) | X1, . . . , Xn
+
+ ≤ max 
+
+> 1≤i≤n
+
+ κ Wi(Xi) Σ i(Xi) Var eπ
+
+  bVIPS (π) | X1, . . . , Xn
+
+ ,
+
+(4.8) 
+
+where for a square matrix M , κ(M ) ≥ 1 denotes the spectral condition number of M , defined as the ratio between the maximum and the minimum eigenvalue of M .                         
+
+> Proof. Recall that both estimators can be written as averages of nindependent summands. Conditionally on the features X1, . . . , Xn, the tuples ( Xi, A i, R i) are independent, and therefore the summands in bVIPS (π) and
+> bVK(π) are independent as well. Hence, we obtain Var eπ
+>   bVIPS (π)|X1, . . . , Xn
+> =1
+> n2
+> nX
+> i=1
+> Var eπi
+> 
+> Ri
+> 1{Ai=π(Xi)}
+> eπi(Ai|Xi)Xi
+> 
+> ,
+> Var eπ
+>   bVK(π)|X1, . . . , Xn
+> =1
+> n2
+> nX
+> i=1
+> Var eπi
+> 
+> Ri
+> ⟨eAi,Ki(Xi)eπ(Xi)⟩
+> eπi(Ai|Xi)Xi
+> 
+> .
+
+12 Thus, we can treat every instance separately. Therefore, similarly to the previous proof, we consider a single tuple (X, A, R ) where the action A is determined by a policy eπ, which leads to a kernel matrix K(X). Let Y ∈ Rd denote the vector of per-action IPS weights with entries 
+
+Yj = R 1{A=a(j)}
+
+eπ(a(j) | X) .
+
+Then, we can write 
+
+bVIPS (π) = e⊤
+
+> π(X)
+
+Y and bVK(π) = e⊤
+
+> π(X)
+
+(K(X)⊤Y ) .
+
+We have defined Σ( X) as the conditional covariance matrix of Y . Then Var eπ
+
+  bVK (π) | X = Var eπ
+
+ e⊤
+
+> π(X)
+
+K(X)⊤Y | X = e⊤
+
+> π(X)
+
+K(X)⊤ Σ( X) K(X)eπ(X) ,
+
+and analogously Var eπ
+
+  bVIPS (π) | X = e⊤
+
+> π(X)
+
+Σ( X)eπ(X) .
+
+Now, set Z = Σ( X)1/2eπ(X). Then Var eπ ( bVK | X) = Z⊤ Σ( X)−1/2K(X)⊤Σ( X)K(X)Σ( X)−1/2Z
+
+= (Σ( X)−1/2K(X)⊤Σ( X)1/2) Z 22 ≤ ∥ Σ( X)−1/2K(X)⊤Σ( X)1/2∥22 ∥Z∥22,
+
+and ∥Z∥22 = Var eπ ( bVIPS | X). Factor K(X)⊤ as K(X)⊤ = W (X)−1/2P (X)W (X)1/2 with 
+
+P (X) = W (X)1/2D D⊤W (X)D−1D⊤W (X)1/2,
+
+which is an ordinary Euclidean projector and hence ∥P (X)∥2 = 1 (see, e.g., Harville, 1997, Chapter 12). Then 
+
+∥Σ( X)−1/2K(X)⊤Σ( X)1/2∥22 = (Σ( X)−1/2W (X)−1/2) P (X) ( W (X)1/2Σ( X)1/2) 22
+
+≤ ∥ Σ( X)−1/2W (X)−1/2∥22 ∥W (X)1/2Σ( X)1/2∥22.
+
+Since ∥W (X)−1/2Σ( X)−1/2∥22 = λmax (Σ( X)−1W (X)−1) = 1 /λ min (W (X)Σ( X)) is the inverse of the minimum eigenvalue of W (X)Σ( X) and ∥Σ( X)1/2W (X)1/2∥22 = λmax (W (X)Σ( X)) its maximum eigenvalue, their product equals κ(W (X)Σ( X)). Now, aggregating over several tuples ( Xi, A i, R i), 1 ≤ i ≤ n, yields (4.8). 2
+
+Note that if we choose Wi(Xi) = Σ i(Xi)−1, 1 ≤ i ≤ n, we have κ(Wi(Xi)Σ i(Xi)) = 1, which motivates the following corollary. 
+
+Corollary 4.5 Let the weight matrices Wi(Xi) = Σ i(Xi)−1, 1 ≤ i ≤ n, equal the inverse of the conditional covariance matrix as defined in Proposition 4.4. Under the regression assumption 
+
+(4.2) , we have 
+
+Var eπ
+
+  bVK(π) ≤ Var eπ
+
+  bVIPS (π) ,
+
+for any policy π defined on the action space ¯A = A.
+
+Proof. By the law of total variance, Var eπ
+
+  bVM (π) = E
+
+h
+
+Var eπ
+
+  bVM (π) | X1, . . . , Xn
+
+i
+
++ Var 
+
+
+
+Eeπ
+
+ bVM (π) | X1, . . . , Xn
+
+
+
+,
+
+for M ∈ { K, IPS }. The second term is identical for bVK and bVIPS since both estimators are conditionally unbiased, see the proofs of Propositions 3.1 and 4.2. Now the result follows immediately with Proposition 4.4. 2
+
+We have just demonstrated that choosing the weight matrices Wi(Xi) = Σ i(Xi)−1, 1 ≤ i ≤ n,ensures that the kernelized IPS estimator reduces the variance relative to the IPS estimator. Additionally, it yields the lowest upper bound in (4.8) among all choices for the weight matrices 
+
+Wi(Xi). In fact, the following proposition shows that this choice minimizes the variance among all symmetric positive-definite weight matrices Wi(Xi) ∈ Rd×d.13 Proposition 4.6 (Minimal variance) Let the conditional covariance matrix Σi(Xi), 1 ≤ i ≤
+
+n, be defined as in Proposition 4.4. Let 
+
+K∗ 
+
+> i
+
+(Xi) = Σi(Xi)−1D D⊤Σi(Xi)−1D−1 ¯D⊤ .
+
+If the regression assumption (4.2) holds, then we have, for any policy ¯π defined on the action space ¯A,
+
+Var eπ
+
+  bVK∗ (¯ π) ≤ Var eπ
+
+  bVeK(¯ π) ,
+
+for any symmetric positive-definite weight matrix fWi(Xi) ∈ Rd×d leading to kernel matrices 
+
+eKi(Xi) = fWi(Xi)D D⊤ fWi(Xi)D−1 ¯D⊤ .
+
+Proof. As in the proof of Proposition 4.4, we introduce a single tuple ( X, A, R ), with some policy eπ determining the distribution of the action A and leading to a kernel matrix K(X). As argued in Corollary 4.5, it is sufficient to minimize the conditional variance of the kernelized IPS estimator, given X. Recall that Var eπ
+
+  bVK (¯ π) | X = e⊤
+
+> ¯π(X)
+
+K(X)⊤ Σ( X) K(X)e¯π(X) ,
+
+and set ω = K(X)e¯π(X). Then Corollary 4.3 yields 
+
+D⊤ω = ¯D⊤e¯π(X) .
+
+Thus, we determine the weight ω ∈ Rd which minimizes the conditional variance under this constraint via the method of Lagrange multipliers min  
+
+> ω∈Rd
+
+L(ω, λ ) = min  
+
+> ω∈Rd
+
+ω⊤Σ( X)ω − λ⊤(D⊤ω − ¯D⊤e¯π(X)) , (4.9) for some λ ∈ Rq+1 . The following derivation is standard and included for completeness. The first order condition in ω gives 0 = ∂L ∂ω = Σ( X)ω − Dλ =⇒ ω = Σ( X)−1Dλ. 
+
+Similarly, considering λ, yields the constraint ¯D⊤e¯π(X) = D⊤ω = D⊤Σ( X)−1Dλ . 
+
+We solve for λ and find 
+
+λ = ( D⊤Σ( X)−1D)−1 ¯D⊤e¯π(X) ,
+
+and therefore 
+
+ω = Σ( X)−1Dλ = Σ( X)−1D(D⊤Σ( X)−1D)−1 ¯D⊤e¯π(X) = K∗e¯π(X) .
+
+This is precisely our kernelized IPS estimator with weight matrix W (X) = Σ −1(X). 2
+
+We will refer to the kernelized IPS estimator corresponding to the choice Wi(Xi) = Σ i(Xi)−1,1 ≤ i ≤ n, as the variance-optimal kernelized IPS estimator . This is in contrast to the naive approach (4.4). To use the previous result in practice, we require an explicit description of the conditional covariance matrix, given the policyholder features X. The next proposition provides these conditional moments. 
+
+Proposition 4.7 (Entries of the covariance matrix) Consider a single tuple of policyholder features, action, and reward (X, A, R ). Assume that the action A follows a policy eπ. For x ∈ X ,define 
+
+μj (X) = E[R | X, A = a(j)] , σ2 
+
+> j
+
+(X) = Var( R | X, A = a(j)) .
+
+14 The conditional covariance matrix Σ( X), as defined in Proposition 4.4, is given by 
+
+Σjj (X) = σ2 
+
+> j
+
+(X)
+
+eπ(a(j) | X) + μj (X)2 1 − eπ(a(j) | X)
+
+eπ(a(j) | X) ,
+
+and, for j̸ = k,
+
+Σjk (X) = − μj (X) μk(X) .
+
+Proof. Let Y ∈ Rd, denote the vector of per-action IPS weights with entries 
+
+Yj = R 1{A=a(j)}
+
+eπ(a(j) | X) .
+
+First, for each j ∈ { 1, . . . , d }, we find 
+
+Eeπ [Yj | X] = Eeπ
+
+
+
+R 1{A=a(j)}
+
+eπ(a(j) | X) X
+
+
+
+= eπ(a(j) | X)
+
+eπ(a(j) | X) E[R | X, A = a(j)] = μj (X).
+
+Next, we determine 
+
+Eeπ [Y 2 
+
+> j
+
+| X] = Eeπ
+
+
+
+R2 1{A=a(j)}
+
+eπ(a(j) | X)2 X
+
+
+
+= eπ(a(j) | X)
+
+eπ(a(j) | X)2 E[R2 | X, A = a(j)]= E[R2 | X, A = a(j)]
+
+eπ(a(j) | X) = σj (X)2 + μj (X)2
+
+eπ(a(j) | X) ,
+
+hence Σjj (X) = Var eπ (Yj | X) = Eeπ [Y 2 
+
+> j
+
+| X] −  Eeπ [Yj | X]2 = σj (X)2 + μj (X)2
+
+eπ(a(j) | X) − μj (X)2 .
+
+For j̸ = k, 1 ≤ j, k ≤ d since at most one action is taken, 1{A=a(j)}1{A=a(k)} = 0 almost surely, so 
+
+Eeπ [Yj Yk | X] = Eeπ
+
+
+
+R2 1{A=a(j)}1{A=a(k)}
+
+eπ(a(j) | X) eπ(a(k) | X) X
+
+
+
+= 0 ,
+
+and therefore Σjk = Cov eπ (Yj , Y k | X) = Eeπ [Yj Yk | X] − Eeπ [Yj | X]Eeπ [Yk | X] = − μj (X) μk (X) .
+
+> 2
+
+The previous results imply that achieving the variance-optimal kernelized IPS estimator requires certain conditional moments of the reward, which in practice must be estimated. One option is to approximate these moments using a regression model, similar to the direct method (3.3). Importantly, however, the kernelized IPS estimator does not rely on the global model in the same way as the direct method. Its unbiasedness relies only on the local regression assumption (4.2) used to construct the kernel matrix K(x), not on a correct specification of a full regression model in the features x ∈ X . Misspecifying the weight matrix W (x) can still affect efficiency, since the variance reduction relative to the IPS estimator is no longer guaranteed. Still, Proposition 4.4 provides a bound to the variance. In Section 6, we show that, in practice, relying on the naive kernel matrix corresponding to the weight matrix defined in (4.4) may be sufficient. 
+
+# 5 Computation of optimal policy 
+
+In Sections 3 and 4, we described methods to determine the value of a new policy ¯ π, given an observed learning sample recorded under a different policy eπ. It remains to approximate the optimal policy ¯ π∗, see (2.3). A distinctive feature of the off-policy framework is that the 15 entire optimisation is performed offline on a fixed learning sample Leπ. This has two important practical consequences. First, any number of candidate policies can be evaluated and compared without additional data collection: the IPS and kernelized IPS estimators reuse the same exper-imental observations for every counterfactual evaluation, enabling exhaustive search over policy parameterisations at no marginal experimental cost. Second, the reliability of the selected policy can be verified on held-out data. Specifically, by partitioning the learning sample into a training set (used for policy optimisation) and a validation set (used for value estimation), we obtain an unbiased estimate of the optimised policy’s value that is free of the selection bias inherent in evaluating a policy on the same data used to choose it. This train/validation split is analogous to cross-validation in supervised learning and provides a principled safeguard against overfitting to noise in the reward estimates. In the following, we describe two alternatives. 
+
+Data-shared Lasso. The following method has been proposed by Semenovich and Petterson (2021), and it is based on Gross and Tibshirani (2016). We rewrite the kernelized IPS estimator as follows 
+
+bVK(¯ π) = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+Ri
+
+eAi , Ki(Xi) ¯ e¯π(Xi)
+
+eπi(Ai | Xi) = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+X 
+
+> ¯a∈¯A
+
+1{¯π(Xi)=¯ a} Vi, ¯a ,
+
+where we define 
+
+Vi, ¯a = Ri
+
+⟨eAi , Ki(Xi) ¯ e¯a⟩
+
+eπi(Ai | Xi) .
+
+The goal is to remove the explicit dependence on ( Ai, R i) from Vi, ¯a by again considering a regres-sion setting (i.e., we want to remove this dependence by exploiting a conditional expectation). This yields a policy optimization problem that depends only on the covariates Xi, allowing us to directly construct a decision rule. For this, Vi, ¯a are approximated by a so-called data-shared Lasso regression. This approach is based on a linear regression in the risk factors x ∈ X de-fined by the parameters w0 ∈ Rp and with action-specific deviations defined by the parameters 
+
+w¯a ∈ Rp for actions ¯ a ∈ ¯A. This yields the conditional expectation approximation 
+
+Vi, ¯a ≈ X⊤ 
+
+> i
+
+( bw0 + bw¯a) , (5.1) where we regularize the two sets of parameters. Specifically, we solve ( bw0, bw¯a(1) , . . . , bw¯a(m) ) = arg min 
+
+> w0,w¯a
+> n
+
+X
+
+> i=1
+
+X 
+
+> ¯a∈¯A
+
+
+
+Vi, ¯a − X⊤ 
+
+> i
+
+(w0 + w¯a)
+
+2
+
++τ
+
+∥w0∥1 + X 
+
+> ¯a∈¯A
+
+γ¯a∥w¯a∥1
+
+ ,
+
+where τ > 0 is a global regularization parameter and γ¯a > 0 are additional regularization parameters. For details on the choice of γ¯a > 0, see Gross and Tibshirani (2016); if there is an equal number of observations for each action, Gross and Tibshirani (2016) suggest choosing 
+
+γ¯a = 1√m , where m is the number of actions in the new action space ¯A.Using approximation (5.1), we can remove the individual instance dependence, which allows us to approximate the policy value by 
+
+eVK(¯ π) = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+X⊤
+
+> i
+
+X 
+
+> ¯a∈¯A
+
+1{¯π(Xi)=¯ a} ( bw0 + bw¯a) .
+
+We then approximate the optimal policy as ¯πDSL (x) = arg max  
+
+> ¯a∗∈¯A
+
+X 
+
+> ¯a∈¯A
+
+1{¯a∗=¯ a} x⊤ bw¯a , x ∈ X .
+
+16 Neural network approximation. We consider a neural network (NN) as a flexible approxi-mator for the optimal pricing policy. Formally, a feedforward neural network defines a recursive sequence of transformations 
+
+z(0) = x, z(ℓ) = σ(ℓ) 
+
+W (ℓ)z(ℓ−1) + b(ℓ)
+
+, ℓ = 1 , . . . , N, 
+
+where W (ℓ) ∈ Rnℓ−1×nℓ and b(ℓ) ∈ Rnℓ are the weight matrix and bias vector of layer ℓ, which consists of nℓ neurons. The function σ(ℓ) denotes an element-wise activation (e.g., ReLU or tanh). The output layer z(N ) is assumed to be a vector in Rm, where m was the number of actions in ¯A. The corresponding network policy ¯ πθ is then defined via a softmax activation on the output layer ¯πθ(¯ a(i) | x) = exp 
+
+
+
+z(N ) 
+
+> i
+
+(x, θ )
+
+Pmj=1 exp 
+
+
+
+z(N ) 
+
+> j
+
+(x, θ )
+
+ , 1 ≤ i ≤ m , 
+
+where θ = {W (ℓ), b (ℓ)}Nℓ=1 denotes all trainable network parameters. The softmax transformation ensures that ¯ πθ(· | x) defines a stochastic control on the new action space ¯A.The policy network is trained to maximize the estimated policy value 
+
+θ∗ = arg max 
+
+> θ
+
+bVK(¯ πθ) ,
+
+where bVK(¯ πθ) is the kernelized IPS estimator defined in Section 4, see formula (4.7). Note that, so far, we have only defined the kernelized IPS estimator for deterministic policies. However, it naturally extends to stochastic policies by replacing the one-hot encoding vector ¯e¯π(x) with a vector of action probabilities ( π(¯ a(1) | x), . . . , π (¯ a(m) | x)) ⊤ ∈ Rm in (4.7). In practice, the maximization is performed using stochastic gradient ascent (or an adaptive optimizer such as Adam) on mini-batches of the learning sample Leπ.Overall, this yields an adaptive policy that maps individual features x to optimal pricing actions. In addition, since the output is a vector, ¯ πθ(¯ a | x) can be interpreted either as a stochastic policy or, by taking ¯πNN (x) = arg max  
+
+> ¯a∈¯A
+
+¯πθ(¯ a | x) ,
+
+as a deterministic control. 
+
+# 6 Application to insurance pricing 
+
+Consider an insurer offering travel insurance alongside airline tickets on a price comparison website. For each potential customer, the insurer observes characteristics X, such as the ticket price, travel duration, and booking lead time. Based on this information, the insurer chooses a pricing action A = A(X), which adjusts the loading applied to a fair premium Pfair according to 
+
+P (X, A ) = Pfair (X) 1 + (1 + A) λ ,
+
+where λ > 0 is the default profit loading. The customer then decides whether to purchase the insurance at price P (X, A ). If the contract is accepted, the insurer’s reward R is the resulting expected profit 
+
+R = P (X, A ) − Pfair (X) .
+
+17 Otherwise, the profit is zero. One could also define the reward as the realized profit by replacing the fair premium with realized claims. Here, however, we assume that the idiosyncratic claims risk is diversified across the portfolio. Thus, the insurer’s reward depends both on the chosen premium and the customer’s price sensitivity. Our goal is to learn, from historical data, a pricing rule that maps customer characteristics to premium adjustments to maximize expected profit. 
+
+6.1 Synthetic data generation 
+
+To evaluate and compare the different off-policy value estimation and pricing optimization meth-ods introduced in Sections 3–5, we generate a large-scale synthetic data set that closely mimics a realistic travel insurance pricing environment. Using synthetic data allows us to (i) control the underlying behavioral response to prices, (ii) define a known ground truth for expected rewards, enabling objective benchmarking, and (iii) ensure that the policy eπ is fully observed. We simulate the learning sample 
+
+Leπ = ( Xi, A i, R i)ni=1 ,
+
+with n observations. All observations are generated under a single known, uniform policy, i.e., 
+
+eπi = eπ, 1 ≤ i ≤ n, on the finite action space 
+
+A = {− 20% , −10% , 0% , +10% , +20% } , eπ(a | x) = 15 , a ∈ A , x ∈ X .
+
+The actions represent an increase/decrease of the default profit loading λ.
+
+Covariates. For each policyholder i ∈ { 1, . . . , n }, we generate a feature vector Xi ∈ Rp
+
+where the components follow the sampling rules in Table 1. We assume that all covariates are mutually independent. In the following sections, we will treat the country of destination as a latent variable. We intentionally exclude the destination variable to introduce controlled model misspecification, allowing us to study the robustness of different off-policy estimators. Variable Support Sampling rule Ticket price [100 , 2000] continuous uniform Lead time {1, . . . , 365 } discrete uniform Number of Passengers {1, . . . , 5} discrete uniform Country of origin 7 categories discrete uniform Country of destination 7 categories discrete uniform Return trip {True , False } discrete uniform Trip duration {1, . . . , 30 } discrete uniform Table 1: List of covariates for the travel insurance pricing environment. 
+
+Premium adjustment. We assume that the insurer determines a baseline (actuarially fair) premium. For simplicity, we set this as a fixed share of the displayed ticket price Ti (first component of Xi), i.e., 
+
+Pfair (Xi) = 0 .1 Ti .
+
+18 On top of this fair premium, the insurer charges a profit margin. We assume that, by default, this loading is given by a constant factor λ > 0. The pricing decision of the insurer then consists of adjusting this loading depending on the characteristics of the policyholder. This adjustment is captured by the action Ai, which scales the profit loading up or down. More precisely, the charged premium P (Xi, A i) is given by 
+
+P (Xi, A i) = Pfair (Xi) 1 + (1 + Ai) λ ,
+
+where Ai < 0 corresponds to a reduction and Ai > 0 to an increase in the loading relative to the default level λ = 5%. 
+
+Conversion model. Customer decisions are driven by the offered premium. In particular, we assume that the probability of purchasing the insurance depends on the charged premium 
+
+P (Xi, A i) through a price-sensitive demand model. We model the conversion probability as a function of the policyholder characteristics Xi and the pricing action Ai. Specifically, the policyholder is assumed to accept the offer with probability 
+
+p(Xi, A i), which depends on an individual local price elasticity E(Xi) via 
+
+p(Xi, A i) = min 
+
+
+
+1, σ 
+
+
+
+X⊤ 
+
+> i
+
+α1
+
+
+
+(1 + E(Xi) Ai)
+
+
+
+,
+
+for some weight vector α1 ∈ Rp and the logistic sigmoid function σ. The truncation at 1 ensures valid probabilities and introduces mild nonlinearities near the boundaries of the action space. For Ai = 0, the baseline conversion probability for the premium 
+
+P (Xi, 0) = Pfair (Xi)(1 + λ)is given by the term σ  X⊤ 
+
+> i
+
+α1
+
+. The local price elasticity E(Xi) captures how sensitive the poli-cyholder is to price changes, with more negative values corresponding to higher price sensitivity. It is defined as 
+
+E(x) = − min 
+
+
+
+exp( x⊤α2 + h(x)) , 4
+
+
+
+, x ∈ X ,
+
+for a weight vector α2 ∈ Rp. Note that E(x) ≤ 0 ensures that demand decreases as prices increase. The function h(x) collects higher-order terms in the covariates and is defined as 
+
+h(x) = α⊤
+
+> 3
+
+
+
+x31
+
+x1x2
+
+x1x3
+
+x3x6
+
+ , (6.1) where x1 denotes the ticket price, x2 the lead time, x3 the number of passengers, and x6 the return-trip indicator, while α3 ∈ R4 is another weight vector. We will investigate the effect of this higher-order term h(x) on the performance of different estimators and policy optimization approaches in the following. Let Ci denote the conversion outcome for policyholder Xi, which equals 1 if the policyholder purchases the insurance and 0 otherwise. It is the realization of a Bernoulli variable with probability p(Xi, A i). 19 Rewards. Given the conversion outcome Ci, the reward Ri from policyholder Xi for the insurer corresponds to the expected profit. That is, if the policyholder accepts the offer, the insurer expects to earn the difference between the charged premium and the fair premium, and otherwise, the reward is zero. Hence, 
+
+Ri = Ci
+
+ P (Xi, A i) − Pfair (Xi) = Ci Pfair (Xi) (1 + Ai) λ . 
+
+For each observation i, we additionally compute the expected rewards for all possible actions 
+
+a ∈ A ,
+
+ϱ(Xi, a ) = p(Xi, a ) Pfair (Xi) (1 + a) λ . (6.2) This information is used for counterfactually validating new policies. Note that the premium for policyholder i is linear in the action Ai. The same holds approximately for the conversion prob-ability p(Xi, A i), which is, however, capped at 1. Thus, the expected reward is approximately quadratic in the action Ai. We will use this information in the construction of our kernelized IPS estimator. For sufficiently large discounts or surcharges, however, the truncations introduce nonlinearities that break this quadratic relationship, which will affect extrapolation accuracy, see Section 6.4, below. 
+
+6.2 Predict-then-optimize 
+
+As a baseline for optimal pricing, we consider a classical predict-then-optimize (PTO) strategy, see, e.g., Chen et al. (2022) and Elmachtoub and Grigas (2022). In this approach, the demand or conversion behavior is first estimated using a parametric regression model, and the optimal pricing decision is obtained by maximizing the resulting predicted reward. In contrast to the two methods introduced in Section 5, this approach relies on an explicit structural model for customer response. We model the conditional conversion probability p(x, a ) for x ∈ X and a ∈ A using a logistic regression model. Specifically, we assume that the conversion indicator satisfies 
+
+C |X=x,A =a ∼ Bernoulli( p(x, a )) .
+
+The conversion probability is approximated by 
+
+bp(x, a ) = g−1 η(x, a ),
+
+where g : (0 , 1) → R denotes the logit link function 
+
+g(μ) = log 
+
+ μ
+
+1 − μ
+
+
+
+.
+
+We consider a score η that contains a quadratic influence in the actions, i.e. 
+
+η(x, a ) = ϕ⊤
+
+> 1
+
+
+
+1
+
+aa2
+
+ + ϕ⊤ 
+
+> 2
+
+x + ϕ3 a x⊤ ,
+
+where ϕ1 ∈ R3 represents the polynomial effect of the action, ϕ2 ∈ Rp captures the main effects of the covariates, and ϕ3 ∈ Rp represents action-covariate interactions. Note that this regressor does not capture the higher-order interactions h(x), as selected in (6.1). 20 Given an estimate bp(x, a ) of the conversion probability, the expected reward of performing action 
+
+a is approximated by the DM estimator 
+
+bϱ DM (x, a ) = bp(x, a ) P (x, a ) − Pfair (x) ,
+
+where P (x, a ) denotes the adjusted premium associated with action a ∈ A . While the historical data are generated on the original action space A, the policy optimization procedures introduced below may operate on a new action space ¯A. This requires that the expected reward function 
+
+ϱ(x, a ) extends to actions outside the observed set. The resulting policy is obtained by selecting the action that provides the maximal estimated reward, i.e., ¯πPTO (x) = arg max  
+
+> ¯a∈¯A
+
+bϱ DM (x, ¯a) .
+
+The advantage of this two-stage procedure lies in its interpretability and computational sim-plicity, as standard actuarial tools such as GLMs can be used to model the demand. However, the performance depends on the accuracy of the specified regression model. Model misspeci-fication may lead to biased reward estimates and, therefore, to suboptimal pricing decisions. Crucially, this may propagate to the estimated policy value if the same demand model is reused for estimating the value 
+
+bVDM (¯ πPTO ) = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+max  
+
+> ¯a∈¯A
+
+bϱ DM (Xi, ¯a) .
+
+We will return to this issue in Section 6.5. The PTO approach serves as a natural benchmark for the kernelized off-policy optimization methods introduced in Section 5 and studied below. 
+
+6.3 Variance reduction of the kernelized IPS estimator 
+
+A primary motivation for introducing the kernelized IPS estimator bVK is variance reduction compared to the classical IPS estimator bVIPS , see Propositions 4.4–4.6. This section empirically verifies these theoretical results. We consider a fixed deterministic policy π0 corresponding to the constant action a = 0, i.e., 
+
+π0(x) = 0 for all x ∈ X . For varying sample sizes n, we generate learning samples Leπ and evaluate the estimators on these samples. Since the synthetic data generation process provides access to the true expected rewards ϱ(x, a ) via (6.2) for all policyholder features x ∈ X and actions a ∈ A , the empirical policy value bVn(π) is known, which allows us to compute the root mean square error (RMSE) of the estimators directly. The kernel matrix is constructed according to Section 4 using the regression assumption (4.2) with a quadratic basis in the action variable, i.e., q = 2 with f1(a) = a and f2(a) = a2, a ∈ A .This choice reflects the structure of the simulation environment, where the expected rewards are approximately quadratic in the actions as discussed in Section 6.1. The left panel of Figure 2 illustrates the empirical RMSE of the DM estimator bVDM , the classical IPS estimator bVIPS , and the variance-optimal kernelized IPS estimator bVK as a function of the sample size when evaluating the constant policy π0. We observe that the kernelized IPS estimator exhibits substantially lower RMSE than the IPS estimator across all sample sizes. This behavior empirically confirms Corollary 4.5, which predicts a variance reduction since the kernel aggregates information across neighboring actions. In contrast, the IPS estimator only uses observations for which the realized action Ai matches the action chosen by a target policy 21 π(Xi), 1 ≤ i ≤ n, which leads to a higher variability. The kernelized IPS estimator achieves approximately the same RMSE as the IPS estimator does with twice the number of samples. At the same time, beyond a sample size of n = 50 000, the RMSE of the DM estimator does not significantly decrease further. This behavior is driven by misspecification of the global regression model bϱ DM . In particular, the model fails to capture the higher-order interaction term h(x) and omits the flight destination, which acts as a latent variable. As a result, the estimated rewards are systematically biased. In addition to the variance-optimal kernel derived in Proposition 4.6, we also consider a naive kernelized IPS estimator based on the diagonal weight matrix (4.4). The comparison between the naive and the variance-optimal kernelized IPS estimators is shown in the right panel of Figure 2. Each point corresponds to one simulation run with a fixed sample size n = 500 000, and the two axes display the corresponding kernelized IPS estimates obtained under the two kernel constructions, each for the value of the constant policy π0. The estimates lie almost exactly on the diagonal, indicating that both approaches produce essentially identical results in this setting. Note that, conditional on conversion, the reward associated with an action a ∈ A is given by 
+
+Pfair (Xi) (1 + a) λ . 
+
+Thus, the effect of the action on the reward is relatively moderate in our setting, as it enters only through the multiplicative factor (1 + a). In particular, the variation across actions is limited to a narrow range between 0 .8 and 1 .2 in our specification. As a consequence, differences in rewards across actions are relatively small, and the benefit of using a variance-optimal kernel over a simpler (naive) kernel is less pronounced. In settings where the action has a stronger impact on the reward, we expect the variance reduction achieved by the optimal kernel to be more substantial. From a computational perspective, replacing the variance-optimal kernel matrix with the naive kernel matrix is particularly relevant. The naive kernelized IPS estimator avoids the need to estimate conditional reward moments or covariance structures when constructing the kernel matrix. In contrast, constructing the variance-optimal kernel requires estimating the conditional covariance matrix Σ( x) and computing a policyholder-specific kernel matrix, which involves forming the matrix D⊤Σ( x)−1D and its inversion. The naive kernel, on the other hand, allows reusing the same matrix across policyholders sharing identical action propensities and therefore provides a substantial scalability advantage in large-scale applications. 
+
+6.4 Extrapolation with the kernelized IPS estimator 
+
+A further advantage of the kernelized IPS estimator is its ability to evaluate policies defined on action spaces that extend beyond the actions observed in the historical data. Recall that the learning sample is generated on the action space 
+
+A = {− 20% , −10% , 0% , +10% , +20% } .
+
+In practice, however, insurers may wish to evaluate pricing strategies that involve stronger discounts or surcharges, or a finer resolution of possible price adjustments. To study this behavior, we consider an extended action space defined on a dense grid, ¯A = {− 30% , −29% , −28% , . . . , 28% , 29% , 30% } ,
+
+22 10 3 10 4 10 5
+
+0.3 
+
+0.1 
+
+0.03 
+
+0.01 
+
+sample size    
+
+> root mean square error
+> DM estimator ̂VDM
+> IPS estimator ̂VIPS
+> Kernelized IPS estimator ̂VK
+
+0.66 0.67 0.68 
+
+0.66 
+
+0.67 
+
+0.68 
+
+variance-optimal kernelized IPS estimate 
+
+> naive kernelized IPS estimate
+
+1Figure 2: Left panel: Empirical RMSE of the IPS estimator, the variance-optimal kernelized IPS estimator, and the DM estimator for the constant policy π0(x) = 0, shown as a function of the sample size on the log–log scale. Right panel: Scatter plot of the naive kernelized IPS estimates versus the variance-optimal kernelized IPS estimates, each for the value of the constant policy π0(x) = 0, across different simulations with n = 500 000 samples each. The orange dashed line represents the identity line, indicating equality between the two estimators. which contains actions both outside the historical range and intermediate adjustments that were not offered under policy eπ. This grid can be viewed as a discretized approximation of a continuous pricing adjustment interval. The kernelized IPS estimator introduced in Section 4 naturally accommodates such settings. Because the kernel matrix is constructed using a regression structure in the action variable, it allows information from the observed actions to be smoothly extrapolated to nearby actions in the extended space. In contrast, the classical IPS estimator cannot evaluate policies on ¯A, since it requires exact matches between the actions taken by the target policy and those observed in the historical data. For each action ¯ a ∈ ¯A, we compute the value of the constant policy ¯ π¯a(x) = ¯ a using the kernelized IPS estimator based on learning samples of size n = 100 000. Since the synthetic data generation process provides access to the true expected rewards ϱ(x, ¯a) in (6.2), we again measure accuracy via the RMSE across repeated simulations. Figure 3 displays the empirical RMSE of the kernelized IPS estimator for different constant policies. The estimator remains stable across the central region of the action space and produces reliable estimates even for actions slightly outside the historical support. However, the estimation error increases more noticeably when moving further beyond the interval [ −20% , 20%]. This behavior can be explained by the structure of the data generation process described in Section 6.1. Recall that the premium P (x, a ) is linear in the action a, while the purchase probability 
+
+p(x, a ) = min 
+
+
+
+1, σ 
+
+
+
+x⊤α1
+
+
+
+(1 + E(x)a)
+
+
+
+is approximately linear in a only when the truncation at 1 is inactive. As discussed in Sec-23 tion 6.1, this truncation introduces nonlinearities in the reward structure once the actions be-come sufficiently large in magnitude. Consequently, the expected reward ϱ(x, a ) deviates from the approximately quadratic relationship in a that motivates the kernel construction in Section 4. As a result, extrapolation becomes less accurate for large discounts or surcharges, where these caps are more likely to be active. Nevertheless, the results show that the kernelized framework can effectively interpolate between observed actions and extrapolate moderately beyond them, allowing the evaluation of pricing strategies on a much finer and broader set of possible price adjustments. −30% −20% −10% 0% 10% 20% 30% 
+
+> 0.01
+> 0.02
+> 0.03
+> constant policy ¯ π¯a
+> root mean square error
+
+Figure 3: Empirical RMSE of the kernelized IPS estimator for constant policies ¯ π¯a(x) = ¯ a,¯a ∈ ¯A, across different simulations of sample size n = 100 000. 
+
+6.5 Policy optimization 
+
+We now turn to the empirical performance of the policy optimization methods introduced in Section 5. In particular, we compare the data-shared Lasso (DSL) and the neural network (NN) approaches to the predict-then-optimize (PTO) benchmark. 
+
+Implementation of data-shared Lasso and neural network policies. We implement both the DSL and the NN policies using standardized input features, with categorical variables encoded via one-hot representations. The neural network architecture consists of two hidden layers with 32 units each and ReLu activation functions. Hyperparameters are tuned via automated search over predefined ranges. For DSL, this includes the regularization parameter and interaction penalty. For the NN, we tune network depth, width, learning rate, and batch size using randomized search. 
+
+Benchmark. Since the simulation environment provides the expected reward function ϱ, we determine the optimal policy ¯π∗(x) = arg max  
+
+> ¯a∈¯A
+
+ϱ(x, ¯a) .
+
+We compute its empirical policy value bVn(¯ π∗), as defined in (3.2), on a reference data set con-sisting of n = 1 000 000 policyholders. 24 We generate 20 learning samples Leπ, containing n = 1 000 000 observations each, used to fit 20 policies ¯ π per method. The training procedure of the neural network is stochastic, and results depend on the initialization of the trainable network parameters θ. This is why for every learning sample, we fit 5 networks with different random initializations. Ultimately, we select the network and the training epoch that produces the highest kernelized IPS estimate on a subset of the learning sample that has not been used for training. This use of a held-out evaluation set is a direct benefit of the offline framework: because the kernelized IPS estimator is unbiased and can be computed on any subset of data collected under the logging policy, it provides a reliable, unbiased assessment of each candidate policy’s performance without requiring deployment. For each resulting policy ¯ π, we evaluate its performance through the relative gap in policy value on the reference data set with respect to the optimal policy, 
+
+bVn(¯ π) − bVn(¯ π∗)
+
+bVn(¯ π∗) ,
+
+Since bVn(¯ π∗) represents the maximal achievable expected reward, this quantity measures the loss in expected reward relative to the optimal pricing strategy. 
+
+Results. The top left panel in Figure 4 illustrates the empirical relative gap to the optimal policy value bVn(¯ π∗) for the policy determined via DSL, for the NN policy, and for the GLM-based PTO policy. Each gray bar shows the average gap obtained over all learning samples, and the error bars represent one standard deviation across these runs. All approaches produce policies whose values are close to the optimal benchmark. The NN policy consistently achieves the smallest performance gap. This can be attributed to the ability of the NN to capture the higher-order interactions h(x) that influence the expected reward in our simulation environment. In contrast to the NN policy, the PTO approach and the DSL policy are more sensitive to model misspecification since they are restricted to (generalized) linear relations in the features x ∈ X . Overall, the DSL approach provides an interpretable linear structure with action-specific deviations, while the NN offers greater flexibility at the cost of reduced interpretability and substantially higher computational effort. As described in Section 6.2, if we use the DM estimator to estimate the value of the PTO policy via 
+
+bVDM (¯ πPTO ) = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+max  
+
+> ¯a∈¯A
+
+bϱ DM (Xi, ¯a) ,
+
+we tend to overestimate the true value. This is because the estimated expected rewards bϱ DM 
+
+are used for determining the PTO policy as well as estimating its value. Since this estimator is inevitably noisy, the maximization step introduces a selection bias, which favors actions with positive estimation errors and thereby leads to an upward bias in the estimated policy value. This effect can be seen in the bottom left panel of Figure 4. To assess the sensitivity of the results to the complexity of the data generation process, we repeated the numerical experiments using a simplified specification without the higher-order interaction term h(x) in the elasticity model (6.1). In this setting, the expected reward is closer to the linear structure in the features x ∈ X implicitly assumed by the DSL and PTO policies. As anticipated, the performance differences between the methods become negligible as shown in the right panels of Figure 4. Crucially, however, the DM estimator overestimates the policy 25 2% 
+
+0% 
+
+−2% 
+
+−4% 
+
+> policy value compared to optimal policy  π∗
+
+¯πDSL ¯πNN ¯πPTO 
+
+2% 
+
+0% 
+
+−2% 
+
+policy 
+
+> estimator bias
+
+¯πDSL ¯πNN ¯πPTO 
+
+policy   
+
+> DM estimator ̂VDM
+> Kernelized IPS estimator ̂VK
+
+(a) With higher-order terms h(x) (b) Without higher-order terms h(x)Figure 4: Top row: Mean relative gap in policy value to the optimal policy π∗ for the learned policies across 20 repeated samples of the training data. Gray bars show the mean gap, and black error bars indicate one standard deviation. Bottom row: Bias of the policy value estimators for the learned policies. Values above zero indicate overestimation of policy performance, while values below zero indicate underestimation. In the left column, the data-generating process includes the higher-order interaction term h(x)in the price elasticity, as selected in (6.1), whereas in the right column this term is excluded. 26 value of the PTO policy even when no higher-order term h(x) is included. The kernelized IPS estimator only shows little noise for all policies. These results strongly suggest that the expected reward estimator bϱ DM used to calibrate the PTO policy should not be chosen to estimate its value. 
+
+# 7 Conclusion 
+
+This paper studies insurance pricing from the perspective of off-policy evaluation and control. By viewing pricing decisions as actions taken on policyholders with observable characteristics, we connect demand-sensitive pricing problems with tools from reinforcement learning and counter-factual inference. This perspective allows pricing strategies to be evaluated and optimized using historical data collected under previous pricing policies, without the need for new experiments. A central contribution of the paper is the introduction of a kernelized inverse propensity score estimator that exploits structure in the action space. The estimator smooths information across neighboring actions while preserving unbiasedness under a mild regression assumption. This leads to a substantial reduction in variance relative to the classical inverse propensity score estimator and allows policies defined on new action spaces to be evaluated using historical data. We further characterize the variance-optimal kernel and discuss computationally efficient approximations that perform similarly in practice. Building on these value estimates, we study two approaches for policy optimization: an inter-pretable data-shared Lasso formulation and a flexible neural network parameterization. In a controlled synthetic travel insurance environment, both approaches produce pricing rules that perform close to the optimal benchmark. The neural network policies achieve slightly higher policy values on average, while the data-shared Lasso provides a more transparent structure and performs similarly to the classical predict-then-optimize approach. Overall, the results highlight the potential of off-policy methods for actuarial pricing problems where demand responses to price changes play an important role. The proposed framework cleanly separates experimentation from deployment: a single randomised data-collection phase supports offline evaluation of an arbitrary number of counterfactual pricing strategies, and the unbiasedness of the IPS-based estimators allows the insurer to validate the chosen policy on held-out experimental data before committing to production. This provides a principled, low-risk pathway from data collection to optimised pricing, while avoiding strong structural assumptions about customer behaviour. In addition, the kernelized inverse propensity score estimator enables interpolation between observed actions and moderate extrapolation to previously unseen price adjustments. As illustrated in our numerical experiments, the accuracy of such extrapolation naturally depends on how well the assumed local regression structure approximates the true reward function. Several directions for future research appear promising. Extending the framework to sequential decision problems could allow insurers to study dynamic pricing strategies over the customer lifecycle. Incorporating richer behavioral models or market interactions may further improve policy performance in competitive environments. Finally, applying the proposed methods to real insurance portfolios would provide valuable insights into the practical impact of data-driven pricing strategies. 27 References 
+
+Alley, M., Biggs, M., Hariss, R., Herrmann, C., Li, M. L., and Perakis, G. (2023). Pricing for heterogeneous products: Analytics for ticket reselling. Manufacturing & Service Operations Management , 25(2):409–426. Baardman, L., Boroujeni, S. B., Cohen-Hillel, T., Panchamgam, K., and Perakis, G. (2023). De-tecting customer trends for optimal promotion targeting. Manufacturing & Service Operations Management , 25(2):448–467. Biggs, M. (2022). Convex surrogate loss functions for contextual pricing with transaction data. 
+
+arXiv:2202.10944 .Biggs, M., Sun, W., and Ettl, M. (2021). Model distillation for revenue optimization: Inter-pretable personalized pricing. In Proceedings of the 38th International Conference on Machine Learning , volume 139. Chen, X., Owen, Z., Pixton, C., and Simchi-Levi, D. (2022). A statistical learning approach to personalization in revenue management. Management Science , 68(3):1923–1937. Dud´ ık, M., Erhan, D., Langford, J., and Li, L. (2014). Doubly robust policy evaluation and optimization. Statistical Science , 29(4):485–511. Elmachtoub, A. N. and Grigas, P. (2022). Smart “Predict, then Optimize”. Management Science ,68(1):9–26. Emms, P. (2007). Dynamic pricing of general insurance in a competitive market. ASTIN Bulletin - the Journal of the IAA , 37(1):1–34. Emms, P. and Haberman, S. (2005). Pricing general insurance using optimal control theory. 
+
+ASTIN Bulletin - the Journal of the IAA , 35(2):427–453. Ferreira, K. J., Lee, B. H. A., and Simchi-Levi, D. (2016). Analytics for an online retailer: De-mand forecasting and price optimization. Manufacturing & Service Operations Management ,18(1):69–88. Gross, S. M. and Tibshirani, R. (2016). Data shared lasso: A novel tool to discover uplift. 
+
+Computational Statistics & Data Analysis , 101:226–235. Guven, S. and McPhail, M. (2013). Beyond the cost model: Understanding price elasticity and its applications. Casualty Actuarial Society E-Forum .Harville, D. A. (1997). Matrix Algebra From a Statistician’s Perspective . Springer, New York. Horvitz, D. G. and Thompson, D. J. (1952). A generalization of sampling without replacement from a finite universe. Journal of the American Statistical Association , 47:663–685. Jagabathula, S. and Rusmevichientong, P. (2017). A nonparametric joint assortment and price choice model. Management Science , 63(9):3128–3145. 28 Jiang, N. and Li, L. (2016). Doubly robust off-policy value evaluation for reinforcement learning. In Proceedings of The 33rd International Conference on Machine Learning , volume 48, pages 652–661. Krasheninnikova, E., Garc´ ıa, J., Maestre, R., and Fern´ andez, F. (2019). Reinforcement learn-ing for pricing strategy optimization in the insurance industry. Engineering Applications of Artificial Intelligence , 80:8–19. Krikler, S., Dolberger, D., and Eckel, J. (2004). Method and tools for insurance price and revenue optimisation. Journal of Financial Services Marketing , 9(1):68–79. Moriconi, F. (1982). A pricing model in a sensitive insurance market. ASTIN Bulletin - the Journal of the IAA , 13(2):135–149. Semenovich, D. and Petterson, J. (2019). Unbiased estimation of economic value of pricing strategies. GIRO, Institute and Faculty of Actuaries .Semenovich, D. and Petterson, J. (2021). Operational decision optimisation in business context. 
+
+Australian Institute of Actuaries Data Analytics .Thomas, P. and Brunskill, E. (2016). Data-efficient off-policy policy evaluation for reinforce-ment learning. In Proceedings of The 33rd International Conference on Machine Learning ,volume 48, pages 2139–2148. Treetanthiploet, T., Zhang, Y., Szpruch, L., Bowers-Barnard, I., Ridley, H., Hickey, J., and Pearce, C. (2023). Insurance pricing on price comparison websites via reinforcement learning. 
+
+arXiv . arXiv:2308.06935 .Ye, P., Qian, J., Chen, J., Wu, C.-h., Zhou, Y., De Mars, S., Yang, F., and Zhang, L. (2018). Customized regression model for Airbnb dynamic pricing. In Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining , pages 932–940. Young, E. J., Rogers, A., Tong, E., and Jordon, J. (2024). Reinforcement learning applied to insurance portfolio pursuit. arXiv . arXiv:2408.00713 .29

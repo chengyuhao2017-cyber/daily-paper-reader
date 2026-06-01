@@ -1,0 +1,2409 @@
+Title: The Role of Causal Features in Strategic Classification for Robustness and Alignment
+
+URL Source: https://arxiv.org/pdf/2605.27163v1
+
+Published Time: Wed, 27 May 2026 01:24:31 GMT
+
+Number of Pages: 32
+
+Markdown Content:
+# The Role of Causal Features in Strategic Classification for Robustness and Alignment 
+
+Ant´ onio G´ ois ∗ 1 Sophia G¨ unl¨ uk ∗ 1 Nir Rosenfeld 3
+
+Nidhi Hegde 2,4 Simon Lacoste-Julien 1,2 Dhanya Sridhar 1,21Mila & Universit´ e de Montr´ eal 2Canada CIFAR AI Chair 
+
+> 3
+
+Faculty of Computer Science, Technion - Israel Institute of Technology 
+
+> 4
+
+Dept. of Computing Science, Amii & University of Alberta, Canada 
+
+Abstract 
+
+In strategic classification, an institution (e.g., a bank) anticipates adaptation from users who change their features to increase utility in a classification task (e.g., loan repayment). Since a key challenge is the distribution shift induced by users, we turn to causal models, which have been shown to bound the worst-case out-of-distribution (OOD) risk, and es-tablish several new results that link causal-ity and strategic classification. First, we show that causal classification leads to opti-mal classification error after any sufficiently large adaptation, when the noise is bounded in a certain way. Second, when these as-sumptions do not hold, we show OOD cross-entropy risk of optimal classifiers decomposes into an OOD bias term and a term arising from not using all observable features, allow-ing us to understand when causal classifiers have an advantage. Finally, we show that the use of causal features can allow align-ment of long-term incentives between insti-tutions and users, contrasting with previous work that highlights social costs of such ap-proaches. We validate our theory empirically on synthetic data, finding that our results predict behavior in practice. 
+
+1 INTRODUCTION 
+
+As classifiers are deployed in decision-making con-texts, it becomes increasingly important to study 
+
+> ∗
+
+Equal contribution, alphabetical order. Proceedings of the 29 th International Conference on Arti-ficial Intelligence and Statistics (AISTATS) 2026, Tangier, Morocco. PMLR: Volume 300. Copyright 2026 by the au-thor(s). 
+
+strategic classification (Hardt et al., 2016), where decision-makers seek to maximize accuracy as agents adapt their features in response to classifications. As we develop better algorithms under varying assump-tions about adaptation (Levanon and Rosenfeld, 2022; Kleinberg and Raghavan, 2018), there are growing concerns about negative social impact on the agents who adapt to these systems, whether outcomes are static (Milli et al., 2019) or dynamic (G´ ois et al., 2025). When agents adapt, depending on the un-derlying causal model (Horowitz and Rosenfeld, 2018; Miller et al., 2020), some changes improve agent out-comes while others constitute gaming the classifier, worsening classification error. In this paper, we study whether classifiers can maintain accuracy without sac-rificing alignment with predicted agent’s goals. Taking inspiration from the link between causal mod-els and robustness to distribution shifts (Peters et al., 2017), we explore the impact of causal features in strategic classification, both as a reliable predictor and as an incentive. We consider settings where an un-observed variable confounds prediction by introducing spurious features that do not cause the outcome of in-terest. We first show that a causal classifier can reach optimal loss when the unobserved variable introduces ambiguity in a bounded region of the input space. Intuitively, if agents are willing to adapt enough, a causal classifier will move points away from ambigu-ous regions, reducing error, while classifiers that ex-ploit spurious correlations run the risk of gaming. Such classifier is optimal not only against a specific adap-tation, but to any large-enough adaptation. Next, we show that even without this bounded influence from the latent, causal features lead to bounded error un-der changing distributions. We then study how the predicted population is impacted, when an institu-tion switches from vanilla prediction to methods that leverage agent adaptation – dubbed a strategic insti-tution . Although myopic agents concerned with short-term utility may perceive a drop in utility, considering 
+
+> arXiv:2605.27163v1 [cs.LG] 26 May 2026 The Role of Causal Features in Strategic Classification for Robustness and Alignment
+
+long-term consequences of gaming behavior shows that agents may be better off interacting with a strategic in-stitution. Surprisingly, this can be the case even if the agents’ short-term gain surpasses the long-term cost, when gaming. This shows that, unlike previous work where causal influence of X on Y was not considered, strategic classification may improve agents’ utility in-stead of imposing a social cost. 
+
+2 RELATED WORK 
+
+This paper contributes to the body of work on strate-gic classification (Hardt et al., 2016), where utility-maximizing agents are incentivised to adapt their fea-tures in response to deployed models, changing the distribution of their features and potentially even out-comes (Kleinberg and Raghavan, 2018; Miller et al., 2020; Perdomo et al., 2020). Work on strategic clas-sification largely focuses on developing algorithms in service of maintaining predictive performance (Dong et al., 2017; Chen et al., 2019; Ahmadi et al., 2020; Levanon and Rosenfeld, 2021), and studying the social costs and (mis)aligned incentives of strategic institu-tions (Kleinberg and Raghavan, 2018; Bechavod et al., 2021; Levanon and Rosenfeld, 2022; Vo et al., 2024; Chen et al., 2025). Our work most closely follows pa-pers that consider both incentive alignment and robust prediction through the lens of causal models (Shavit et al., 2020; Rosenfeld et al., 2020). Most similar to this work is Horowitz and Rosenfeld (2018), who show that causal classifiers face covariate shift while general classifiers face shifts due to predicted agents gaming. We also build upon Miller et al. (2020) who show that incentivising improvement requires learning causal fea-tures. We go beyond these results by establishing a richer range of implications of causal classifiers for strategic classification, from optimality under bounded ambiguity to robustness under no strong assumptions. We further link causal classification to aligned incen-tives. Milli et al. (2019) show that strategic classi-fication harms social welfare for the predicted, when there is no causal relation between features and out-comes. Somerstep et al. (2024) study agents who can directly manipulate their outcome, identifying condi-tions where they are positively impacted by strategic classification, in labour markets. We study social wel-fare when agents can manipulate their features, and outcomes change indirectly via a causal mechanism. Our work also builds extensively on a long line of work on causality and out-of-distribution (OOD) generaliza-tion starting with Peters et al. (2016, 2017); Heinze-Deml et al. (2018) that establishes that causal models have bounded OOD risk since they remain invariant to changes in the feature distribution. Much of work in this area focuses on using data from multiple distri-Xc Y 
+
+> XsU
+
+Figure 1: Causal graph for our data generating pro-cess. U is an unobserved confounder between outcome 
+
+Y and spurious feature Xs. Xc is a direct cause of Y .butions to discover causal models based on the invari-ance principle (Arjovsky et al., 2019; Perry et al., 2022; Eastwood et al., 2022; Rojas-Carulla et al., 2018). However, Magliacane (2018) go further and show that regression under domain shift entails a trade-off: re-stricting to invariant features guarantees robustness but may sacrifice predictive information, while us-ing all features risks unbounded error in the target domain. Our work follows mostly closely from this contribution. We establish this tradeoff in the case of strategic classification, analyzing directly the post-adaptation cross entropy loss. 
+
+3 SETTING 
+
+In strategic classification, we consider institutions that deploy classifiers to make decisions, and predicted agents that strategically respond to these classifica-tions. We start by considering the causal model in Figure 1, which relates d input features and the bi-nary outcome Y realized by a predicted agent. In this model, a set of causal features Xc ∈ X c ⊆ Rdc di-rectly influence the value of the outcome Y ∈ { 0, 1}
+
+while spurious features Xs ∈ X s ⊆ Rds are only predictive of the outcome Y due to confounding from an unobserved variable U ∈ U . The binary outcome 
+
+Y is: 
+
+Y = 1 {ysco (xc,u )≥0} or 
+
+Y ∼ Bernoulli  σ(ysco (xc, u )) . (1) That is, the outcome is a deterministic or stochastic (potentially nonlinear) function of its causal parents, as specified by the real-valued function ysco (xc, u ), and 
+
+σ refers to the standard sigmoid function. We refer to the set of all observed features as X ∈ X ⊆ Rd. This assumed causal model captures many decision-making scenarios. Consider predicting whether an applicant can pay back their loan: an agent’s income might be causally linked to loan defaulting (the outcome), while an agent’s level of education might only spuriously pre-dict defaulting due to latent common causes like socio-economic status. Typically, the institution seeks a classifier f : X →G´ ois, G¨ unl¨ uk, Rosenfeld, Hegde, Lacoste-Julien, Sridhar 
+
+R based on all available features and make decisions using the function h : X → { 0, 1} such that, ˆy = h(x) = 1 {f (x)≥0} (2) In standard classification, we want a classifier ˆf (x)that minimizes classification errors (i.e., 0-1 loss), ˆf ∈ arg min  
+
+> f∈F
+
+E
+
+> x,y
+
+[ℓ0−1(1 {f (x)≥0}, y )] . (3) Since the 0-1 loss is costly to minimize directly, we typically deploy classifiers ˆf (x) that minimize a surro-gate loss function, e.g., the cross entropy loss that we study later. We also distinguish between two families of classifiers in this work: F, the family of classifiers that use all available features, and Fcausal (⊂ F ) which is a subset of classifiers that only use the causal fea-tures (essentially masking the spurious ones). In the strategic classification setting, however, after the institution deploys the ˆf (x) and its corresponding decision rule h(x), the predicted agents respond to the classification they receive. Each predicted agent gains utility δ from a positive prediction (ˆ y = 1), and 0 util-ity from ˆ y = 0. Hence, a utility-maximizing agent spends at most a budget δ to flip ˆ y = 0 into ˆ y = 1. Expanding on the typical assumption that δ is static, we provide results that are valid both for a static δ and for any δ′ > δ , i.e. under a shift in the agents’ bud-get. This represents, for instance, malicious or highly motivated actors – such as an applicant who has a lot to gain by getting a loan approved – who will go to greater lengths to adjust their features than what is observed in historical training data. Given knowledge of ˆf and a cost function c(x, x ′) : X ×X → R≥0, agents with ˆ y = 0 compute the cheapest intervention over x
+
+that flips their prediction: ∆h(x; δ) : X × F × R≥0 → X ≜
+
+arg max 
+
+> x′∈X
+
+δh (x′) − c(x, x ′) (4) In the rest of the paper we assume a tie-breaking rule, making this solution set a singleton. Since predicted agents can take actions to change their features in or-der to improve their outcome, as described above, clas-sifiers induce new distributions over the population. We denote the post-adaptation distribution (after one step of adaptation) as D(f,δ ), where D is the original distribution, f is a classifier that induces the adapta-tion, and δ is the agents’ budget. Formally, D(f,δ ) is obtained by mapping each point ( x, y ) from D to its adapted counterpart, i.e. (x, y ) 7 → (∆ h(x), y (∆ h(x), u )) , (5) where the notation y(∆ h(x), u ) is the counterfactual outcome after adaptation given observed features x
+
+and the unobserved value u. In the running exam-ple, this counterfactual reflects whether a particular loan applicant would repay their loan if they increased their salary from x to x′, given their unobserved so-cioeconomic status u.An institution that is strategic anticipates the re-sponses of the predicted agents, and seeks a classifier 
+
+f ∗(x) that minimizes the classification error after one step of adaptation. That is, the institution wants to minimize their post-adaptation 0-1 loss, 
+
+Ex,u [ℓ0−1(h(∆ h(x)) , y (∆ h(x), u ))] . (6) 
+
+Main idea. The goal of this paper is to shed light on how the causal model (in Figure 1) of the outcome is related to the optimal post-adaptation classifier f ∗(x). At a high-level, we leverage two key insights to de-velop results about the role of causal features in strate-gic classification. First, when predicted agents change their causal features, they can improve their post-adaptation outcome y(∆ h(x), u ) (Miller et al., 2020). Second, causal features are related to the outcome y
+
+by the mechanism ysco (xc, u ) that remains invariant to distribution shifts. In contrast, the relationship between spurious features and the outcome changes as predicted agents adapt these features (Magliacane, 2018). We show that by using causal features, institu-tions can obtain good post-adaptation loss and align their incentives with those of the predicted agents. 
+
+4 OPTIMALITY OF CAUSAL CLASSIFIERS AFTER ADAPTATION 
+
+We start by considering the setting where the out-come Y is a deterministic function of the causal fea-tures Xc and the unobserved variable U , i.e., y =
+
+1{ysco (xc, u ) ≥ 0}. For ease, in this section, we will directly refer to the decision function h(x) = 1 {f (x) ≥
+
+0} as the classifier. In this setting, we study the im-pact for an institution when it deploys a causal clas-sifier: a classifier that uses only the causal features 
+
+Xc, variables that are invariant predictors of the out-come. We prove that, under some assumptions, causal classifiers h(xc) lead to zero post-adaptation 0-1 loss ( E
+
+> xc,u
+
+[ℓ0−1(h(∆ h(xc; δ)) , y )] = 0). Furthermore they re-main optimal to any budget δ′ > δ , and are in this sense robust to all large-enough adaptations. To show this result, intuitively, we note that the unobserved variable U creates ambiguity in the outcome values. If this ambiguity can be limited to a specific region in the input space X ⊆ Rd, and predicted agents have a sufficient budget δ to move out of this region, then by deploying a causal classifier h(xc), an institution in-duces previously misclassified agents to improve into The Role of Causal Features in Strategic Classification for Robustness and Alignment 
+
+true positives. Conversely, if the institution deploys a classifier that uses spurious features, predicted agents can waste their adaptation budget δ on feature changes that do not affect their true outcome value, thereby gaming and only contributing to false positives post-adaptation. We show that this optimality holds even when we consider post-adaptation cross-entropy loss. We first define the region of causal feature space Xc
+
+where the outcome Y is uncertain, to characterize its boundaries and conditions to move points outside it. 
+
+Definition 4.1. (Domain with ambiguous outcome) The domain with ambiguous outcome, Xambiguous ⊆Xc, is the subset of causal features where the unob-served u can flip the outcome’s sign. A point xc is considered ambiguous if we can find two latent states, 
+
+u, u ′ ∈ U , such that ysco (xc, u ) ≥ 0 but ysco (xc, u ′) < 0. In what follows we’ll study the scenario where this region is bounded, i.e., Xc \ X ambiguous ̸ = ∅. We begin by introducing an assumption on the distance from any ambiguous xc to a non-ambiguous xc, in Lp-norm. 
+
+Assumption 4.2. (Ambiguity compensation by δ)We assume that any ambiguous point can be pushed to a non-negative outcome using a perturbation of bounded size. Formally, there exists a finite con-stant δ ≥ 0 such that for any ambiguous feature 
+
+xc ∈ X ambiguous , there is a vector v ∈ Rd bounded by ∥v∥p ≤ δ that satisfies ysco (xc + v, u ) ≥ 0 for all u.The intuition for this assumption is that each data point has the possibility to improve its true outcome given enough effort. Improvement is only possible when effort is applied to features xc with a causal im-pact on the outcome y. Alternatively, applying effort to features xs that do not affect y but change the pre-diction consists in gaming. This is close in spirit to recourse, but our assumption applies to the true gen-erative process whereas in recourse it is with respect to the classifier. To help characterize an optimal classifier, we rely on the concept of an Os-nondecreasing function (Boyd and Vandenberghe, 2004) defined with respect to an orthant Os in Rd (where an orthant is a subset of Rd
+
+as detailed in Appendix A). We define a partial or-dering such that x ⪯Os y if and only if the difference 
+
+y − x belongs to Os. A function f is then considered 
+
+Os-nondecreasing when x ⪯Os y implies f (x) ≤ f (y). Similarly, we write x ≺Os y to indicate strict inequal-ity, meaning y − x lies in the interior of the orthant, denoted int( Os). Assuming ysco is Os-nondecreasing with respect to xc,we define the decision boundary ∂u for a specific latent state u as the set of features xc where the score is exactly zero ( ysco (xc, u ) = 0). Note that while ysco 1 2 3 4 5  
+
+> Xc1
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> Xc2
+> ysco < 0
+> ysco ≥ 0
+> ambiguous
+> max-gap
+
+## }  
+
+> ∂U= 0
+> ∂U= 1
+> ∂upp
+> ∂low
+
+Figure 2: Example of bounds ∂ for an O-nondecreasing 
+
+ysco (xc, u ). Here Os is the positive orthant, so increas-ing either XC1 or XC2 leads to an improvement in 
+
+ysco . The unobserved U ∈ { 0, 1} is a binary variable in this example. ∂U =0 and ∂U =1 show the boundary for each u, where ysco flips between negative and pos-itive values. From them we can determine the overall boundaries ∂upp , ∂ low , delimiting the ambiguous region where U can flip the sign of ysco . The max-gap is de-termined from ∂upp and ∂low .does not need to be Os-nondecreasing with respect to 
+
+u, the orthant Os must remain the same across all values of U . We then let B = S 
+
+> u
+
+∂u denote the union of all such boundaries over u. This allows us to define the bounds of the ambiguous domain: 
+
+Definition 4.3. (Upper and lower bound of 
+
+Xambiguous ) We define the upper bound of the ambigu-ous domain, denoted ∂upp , as the subset of boundary points xupp ∈ B for which no strictly larger point be-longs to B. Formally, the intersection of the shifted in-terior orthant int( xupp + Os) with the boundary union 
+
+B is empty. Similarly, the lower bound ∂low is the sub-set of boundary points xlow ∈ B for which no strictly smaller point belongs to B, meaning the intersection int( xlow − Os) ∩ B is empty. Using the previous assumptions together with the con-tinuity of ysco , we can show that ∂upp and ∂low separate the ambiguous domain from two non-empty regions of definitive outcomes. 
+
+Lemma 4.4. (Partition of Xc through ∂upp and ∂low )Assume y = sign (ysco ), the score ysco is continuous and Os-nondecreasing with respect to xc, and Assump-tion 4.2 holds. The bounds ∂upp and ∂low partition the causal feature space Xc into three disjoint, non-empty subsets: the ambiguous domain Xambiguous , an unambiguously pos-itive region, and an unambiguously negative region. Specifically, for any point xc ∈ X c:1. If there exists a point xupp ∈ ∂upp such that 
+
+xupp ⪯Os xc, then xc is outside the ambiguous domain and yields a non-negative score for all la-tent states ( ysco (xc, u ) ≥ 0 for all u). G´ ois, G¨ unl¨ uk, Rosenfeld, Hegde, Lacoste-Julien, Sridhar 
+
+2. If there exists a point xlow ∈ ∂low such that xc ≺Os
+
+xlow , then xc is outside the ambiguous domain and yields a strictly negative score for all latent states (ysco (xc, u ) < 0 for all u). The proof is provided in Appendix A, Corollary A.6. 
+
+Additionally, we define the max-gap as the maximum 
+
+Lp distance from any point in the ambiguous domain to the upper bound ∂upp . Formally, this is given by max  
+
+> u
+
+max  
+
+> xlow ∈∂u
+
+min 
+
+> xupp ∈∂upp
+
+∥xupp − xlow ∥p. In the following lemma, we establish that this gap is strictly bounded: 
+
+Lemma 4.5. (Bounded max-gap in Xambiguous ) For every point xc in the ambiguous domain Xambiguous ,the shortest Lp distance to the upper bound ∂upp is at most the max-gap, which is guaranteed to be finite. That is, for any xc ∈ X ambiguous :
+
+min 
+
+> xupp ∈∂upp
+
+|| xupp − xc|| p ≤
+
+max  
+
+> u
+
+max  
+
+> xlow ∈∂u
+
+min 
+
+> xupp ∈∂upp
+
+|| xupp − xlow || p < +∞
+
+The proof is provided in Appendix A.7. 
+
+Note that this result is well-defined following Lemma 4.4, which shows that the boundaries ∂upp , ∂ low , and each specified subset of Xc are non-empty sets. We show a visualization of the concept of Xambiguous and its boundaries in Figure 2 for the setting of Xc = R2
+
+and U = {0, 1}.Further, assuming the cost of adapting features is an 
+
+Lp-norm, we prove there exists a causal classifier which achieves zero ℓ0−1 post-adaptation, for all adaptations where δ is high enough. This is achieved by mov-ing points away from Xambiguous and anticipating the adaptation’s impact on post-adaptation outcome y:
+
+Theorem 4.6. (Causal ℓ0−1-optimality) Suppose the assumptions of Lemma 4.4 hold and the adaptation cost is an Lp-norm. Then there exists a finite threshold 
+
+e ∈ R and a causal classifier hc ∈ H causal ⊂ H (whose outputs are unaffected by spurious features xs) such that for any adaptation budget δ ≥ e, the expected post-adaptation 0-1 loss is strictly zero. That is, 
+
+Ex,u [ℓ0−1 (hc(∆ hc (x; δ)) , sign( ysco (∆ hc (x; δ), u )))] = 0 .
+
+The proof is provided in Appendix A, Theorem A.9. 
+
+The essence of this result is that the causal classifier works by being overly demanding but incentivising false negatives in Xambiguous to adapt, turning them into true positives. Intuitively, a spurious classifier wastes effort in the sense that users use their budget to game (introducing false positives) rather than im-prove to true positives. Hence this post-adaptation optimal classifier hc(x) remains optimal even if agents adapt with δ′ > δ at a subsequent time point. This is further validated in the empirical studies, and in Ap-pendix E we also illustrate this mathematically with an example, showing that the causal classifier character-ized by Theorem 4.6 can remain optimal even outside the range δ ∈ [max -gap , +∞) proved here. In that example we show a phase transition, where a causal classifier suddenly becomes optimal as δ increases. Additionally, we note that the same optimality re-sult holds for cross-entropy in this setting. For a learned probability estimator ˆf (x) : X → [0 , 1], define 
+
+ℓCE ( ˆf (x), y ) ≜ −y log ˆf (x) + (1 − y) log(1 − ˆf (x)) .
+
+Corollary 4.7. (Causal cross-entropy optimality un-der bounded Xambiguous ) Under the assumptions of Theorem 4.6, we have zero ℓCE ( ˆf (x), y ) for all post-adaptation points, using a large-enough δ. Proof in Appendix B. 
+
+5 ROBUSTNESS OF CAUSAL CLASSIFIERS IN STOCHASTIC SETTINGS 
+
+We now consider the setting where the outcome Y is a stochastic function of the causal features Xc and the unobserved variable U , i.e., there is some func-tion of causal parents g(xc, u ) ≜ P (Y = 1 |xc, u ) = 
+
+σ(ysco (xc, u )). Unlike in the previous setting where we consider a bounded ambiguous region where the latent variable U influences the value of the outcome 
+
+Y , here, without further assumptions, the latent vari-able is informative about the outcome in all regions of the input. This means that we cannot simply de-ploy a causal classifier f ∈ F causal to move predicted agents out of the ambiguous region to achieve optimal loss post-adaptation. Nevertheless, in this setting, we show a different advantage of causal classifiers: if we only have access to historical data before observing agents’ adaptation, by training causal classifiers, we can incur bounded CE loss after the classifier is de-ployed, while spurious classifiers risk arbitrarily bad post-adaptation CE loss. We start by defining optimal classifiers, ˆf = arg min  
+
+> f∈F
+
+ED [KL ( g(xc, u )∥f (x))] ˆf ∗ 
+
+> δ
+
+= arg min  
+
+> f∗∈F
+
+ED( ˆf ,δ ) [KL ( g(xc, u )∥f ∗(x))] (7) The classifier ˆf minimizes the cross entropy loss on the training data – that is, the historical data obtained before agents adapt to a deployed classifier. The clas-sifier ˆf ∗ refers to the classifier that minimizes cross The Role of Causal Features in Strategic Classification for Robustness and Alignment 
+
+entropy loss on the distribution induced by deploying the classifier ˆf . That is, we consider samples from the distribution D( ˆf ,δ ).With classifiers defined this way, we can now analyze the impact of minimizing CE loss on training data to generalize to samples that result from predicted agents adapting to classifications. First, we show that the CE loss post-adaptation follows a decomposition that gives us insights into the behavior of causal classifiers. 
+
+Lemma 5.1. (Decomposition of CE loss post-adaptation, informal) Under mild assumptions on measurability and support of the classifiers, post-adaptation cross-entropy loss of a classifier ˆf that was trained on pre-adaptation data with family F can be decomposed as: 
+
+LCE ( ˆf , δ ) = ED( ˆf ,δ )
+
+h
+
+KL 
+
+
+
+g(xc, u )∥ ˆf ∗ 
+
+> δ
+
+(xc, x s)
+
+i | {z }
+
+> incomplete information error
+
++ ED( ˆf ,δ )
+
+"
+
+g(xc, u ) log ˆf ∗ 
+
+> δ
+
+(xc, x s)ˆf (xc, x s)+(1 − g(xc, u )) log 1 − ˆf ∗ 
+
+> δ
+
+(xc, x s)1 − ˆf (xc, x s)
+
+#| {z }
+
+> transfer error
+
++ ED( ˆf ,δ ) [H (g(xc, u ))] 
+
+| {z }
+
+> entropy of post-adapt distribution
+
+where H(X) is the entropy of X.
+
+We derive this decomposition in Appendix C.1. Here, we extend results from Magliacane (2018) who derive a similar tradeoff when considering the bias of clas-sifiers that are trained on different distributions. In the next result, we consider what happens when we restrict our hypothesis class to functions f ∈ F causal 
+
+versus when we consider all functions including those that use spurious features. 
+
+Theorem 5.2. (Robustness of causal classifiers) For a classifier ˆf in the family Fcausal of causal classi-fiers, assuming that it is the optimal classifier in the sense of Equation (7) , the post-adaption cross-entropy loss LCE ( ˆf , δ ) is bounded by the sum of entropy terms 
+
+H(U ) + H(Y |X). The post-adaptation loss of an op-timal classifier ˆf in the family of spurious classifiers 
+
+Fall cannot be bounded due to non-zero transfer error. 
+
+We derive this result in Appendices C.3 and C.4. When we consider classifiers that only use causal fea-tures, i.e. f ∈ F causal , the pre-adaptation optimal classifier ˆf is the same as the post-adaptation optimal classifier ˆf ∗ 
+
+> δ
+
+, avoiding transfer error. Intuitively, this is because the causal relationship between Xc and the outcome Y remains invariant to changing the feature distribution P(Xc), a fact that we formalize in Ap-pendix C.3.2. However, the optimal causal classifier ˆf
+
+incurs incomplete information error by discarding spu-rious features, which is equivalent to the conditional mutual information between the latent variable U and 
+
+Y given causal features Xc, and bounded by the en-tropy of U .In contrast, in Appendix C.4 we show that a classifier ˆf that uses all the features avoids some incomplete information error (bounded by the entropy of U con-ditioned on Xs in the post-adaptation distribution). This is because even after predicted agents intervene on their spurious features Xs, changing its association with the latent variable U , it may still remain infor-mative about U and thus, the outcome Y (which relies on the value of U ). However, a classifier that uses all features incurs transfer error exactly because of the intervention that agents perform on their features: by changing their spurious features Xs, they can arbi-trarily change how well the outcome is predicted by these features. Thus, the transfer error of a spurious classifier cannot be bounded. In the Appendix C.4.3, we further analyze thresholded classifiers and establish conditions under which transfer error can be made ar-bitrarily large. Note that defining the classifiers ˆf and ˆf ∗ as optimal classifiers before and after adaptation is key to this interpretation, since if these classifier were not opti-mal, the transfer error could be nonzero even for a causal classifier. Finally, note that this analysis can be extended to consider the post-adaptation loss of classifiers ˆf that are trained on data after historical deployments where agents had a different budget δ′,which we show in Appendix C.2. 
+
+6 INCENTIVE ALIGNMENT 
+
+We now consider the question of how agents are im-pacted in a strategic setting and whether their inter-ests are aligned with the institution. If Y is static (i.e. there is no causal effect of X on Y ) and agents seek positive predictions h(∆ h(x)) = 1, Milli et al. (2019) show that strategic classification harms utility of pre-dicted agents. Levanon and Rosenfeld (2022) study the case where alignment is built-in – the predicted agents gain from accuracy just like the institution, and 
+
+Y is static. Miller et al. (2020) provide an equivalency between agent improvement and causal discovery, but leave unclear whether the agents and/or the institu-tion benefit from this improvement. This leaves unan-swered the question of whether strategic classification can benefit the predicted agents, when X causally af-fects Y and agents seek positive predictions ˆY = 1. G´ ois, G¨ unl¨ uk, Rosenfeld, Hegde, Lacoste-Julien, Sridhar 
+
+We begin by defining the long-term goals of the insti-tution and of the predicted agents. An agent with a positive prediction ( h(∆ h(x)) = 1) has an immediate gain, but may suffer a loss in the long-term if its true outcome is negative ( h(∆ h(x)) = 1 ∧ y(∆ h(x), u ) = 0). For instance an agent can get a home loan approved but later lose it by defaulting, or be accepted to col-lege but then fail courses. Analogously an institution aims to minimize ℓ0−1, but in the long-term may bene-fit more from true positives (TPs) than true negatives (TNs) — banks need to identify good borrowers and universities need good students. We now define long-term rewards or utilities. 
+
+Definition 6.1. (Predicted agents’ long-term utility) Agents gain δ from a positive prediction, and we let 
+
+δ2 denote the loss when agents obtain a false positive. Setting δ2 = 0 represents a short-term goal. 
+
+rp(h, x, u ) = δh (∆ h(x)) − c(x, ∆h(x)) 
+
+− δ2h(∆ h(x))(1 − y(∆ h(x), u )) 
+
+Definition 6.2. (Institution’s long-term utility) In-stitution gains from lowering post-adaptation 0-1 loss 
+
+ℓ0−1 and, among correct predictions, prefers true pos-itives over true negatives over the long term. We call this an ϵ-advantage where ϵ denotes a loss in the insti-tution utility due to true negatives. When ϵ = 0, the utility represents a short-term goal. 
+
+ri(h, x, u ) = − 1{h(∆ h(x)) ̸ = y(∆ h(x), u )}− ϵ1{h(∆ h(x)) = y(∆ h(x), u ) = 0 }
+
+We are interested in understanding how these two goals interact in the strategic setting, where agents re-act to predictions by modifying X and the institution anticipates agent modifications. For this analysis we introduce the notion of h-change, the expected change in utility when the classifier is changed. 
+
+Definition 6.3. (h-change) Expected change in util-ity when switching from classifier h into h′, for role k,where k ∈ { p, i } is predicted agent p or institution i:∆rk(h′, h ) = Ex,u [rk(h′, ∆h′ (x), u )] 
+
+− Ex,u [rk(h, ∆h(x), u )] Before we consider the case of strategic agents, we build intuition by first considering static agents that can never adapt, ∆ h(x) = x (c(·) → +∞), and the setting of short-term goals ( δ2 = ϵ = 0). 
+
+Proposition 6.4. (Static alignment) Let 
+
+∆rk|Y =y (h′, h ) be the h-change for the subpopulation 
+
+Y = y (F.1). Assume ∆h(x) = x and δ2 = ϵ = 0 . For any pair of classifiers ( ˆf ′, ˆf ), institution’s goals match the goals of agents whose Y = 1 but not whose Y = 0 ,in the following sense (proof in Appendix F.2): 
+
+∆rp|Y =1 (h′, h ) > 0 ⇐⇒ ∆ri|Y =1 (h′, h ) > 0∆rp|Y =0 (h′, h ) < 0 ⇐⇒ ∆ri|Y =0 (h′, h ) > 0Intuitively, agents in the Y = 0 group are either TNs or false positives (FPs). Since in this static setting, agents cannot improve their outcomes, institution only gains utility from an h′ that switches FPs into TNs, which strictly lowers agents’ utility. We now consider the more general case where agents can adapt ∆ h(x)̸ = x, and hence change y(∆ h(x), u ). The institution becomes strategic when it switches from a classifier that wrongly assumes agents are static (hpre ), into one considering agents’ adaptation ( hpost ). Note that, by definition, ∆ ri(hpost , h pre ) ≥ 0. There is alignment if, as the institution becomes strategic, pre-dicted agents also benefit. 
+
+Definition 6.5. (Aligned incentives) Consider hpre ,the classifier that maximizes Ex,u [ri(h, x, u )] wrongly assuming that ∆h(x) = x, and hpost maximizing 
+
+Ex,u [ri(h, ∆h(x), u )] with the correct ∆ h(x) (i.e. post-adaptation). We say that incentives are aligned if: ∆rp(hpost , h pre ) ≥ 0To study short-term alignment when agents are strate-gic, we first consider the set of pre-adaptation x that adapted towards a point ∆ h(x). We define it as its preimage ∆ −1 
+
+> h
+
+(x; δ) := {x′ ∈ Rd : ∆ h(x′; δ) = x}.The next lemma shows that by assuming X has sup-port over all values that could have adapted given δ,short-term goals ( δ2 = ϵ = 0), and a flexible enough 
+
+H, fewer points receive h(x) = 1 post-adaptation. 
+
+Lemma 6.6. (Support over positive predictions) For 
+
+h(x) = 1{f (x) ≥ 0} let its boundary be ∂h = {x ∈X : f (x) = 0}. Assume full support over points that can adapt towards hpre and hpost : ∆−1 
+
+> hpre
+
+(∂hpre ) ∪
+
+∆−1 
+
+> hpost
+
+(∂hpost ) ⊂ X , and δ2 = ϵ = 0 . For a flexible enough hypothesis family H we have (proof in F.2): 
+
+{x ∈ X : hpost (x) = 1 } ⊂ { x ∈ X : hpre (x) = 1 }
+
+Under the assumptions above, less agents receive a positive prediction under hpost than under hpre . With Lemma 6.6 and the assumptions above, we now show misalignment in short-term goals, where agent utility in the short-term decreases when institution becomes strategic. 
+
+Proposition 6.7. (Short-term misalignment) Let 
+
+∆rp-short be the h-change for δ2 = 0 , and hpost -short The Role of Causal Features in Strategic Classification for Robustness and Alignment 
+
+be optimal for ϵ = 0. Under the assumptions of Lemma 6.6, we have (proof in F.2): 
+
+∆rp-short (hpost -short , h pre ) < 0.
+
+Having shown that there is misalignment in short-term goals, we now show that considering long-term goals allows incentives to be aligned. In particular, we show that maintaining a flexible H with ϵ = 0 for institution, and a high-enough δ2 for agents, enables alignment. Consider all four post-adaption cases, when switching from hpre into a more demanding hpost (F.2.2): 
+
+• (maint) Maintained FP or TP at higher cost; 
+
+• (impr) Switched from gaming to improvement (FP → TP); 
+
+• (TP → N) Switched from TP into FN or TN; 
+
+• (FP → TN) Switched from FP into TN. For each of these cases, denote their densities as: P(maint) := R 
+
+> x∈{ maint }
+
+P(x), and similarly 
+
+P(impr), P(TP → N), P(FP → TN). Define ∆ c(x) ≜
+
+c(x, ∆hpost (x)) − c(x, ∆hpre (x)). Their total costs are 
+
+c(all) := R 
+
+> x∈X
+
+∆c(x)P(x). Our next result shows a lower bound for the cost of FP, such that agents value enough switching from gaming to improvement, in order to have alignment. 
+
+Proposition 6.8. (Long-term alignment) Consider-ing a flexible enough H and ϵ = 0 , having alignment requires (proof in F.2): 
+
+δ2 > c(all) + δ(P(TP → N) + P(FP → TN)) 
+
+P(impr) + P(FP → TN) We provide an example in Appendix E.2.3 where align-ment occurs for any δ2 > c , for a constant c < δ . If we additionally consider ϵ > 0, interactions between 
+
+δ2, ϵ and alignment become more complex. We re-sort to simulations to illustrate their behaviour in Fig-ure 4, and analyze mathematically an example in Ap-pendix F.3. Note that, by our definition, we study alignment of optimal classifiers, which are causal classifiers under the conditions presented in § 4. Our theory does not exclude alignment with classifiers using both causal and spurious features, under different conditions. If no causal features are present, Milli et al. (2019) show that alignment is not possible for δ2 = 0. 
+
+Figure 3: 0-1 Loss. Left: As δ increases, the opti-mal classifier on simulated post-adaptation data puts progressively less weight on spurious feature Xs, until arriving at the optimal causal classifier characterized in Theorem 4.6. We averaged the optimal weight over three datasets of size N = 20000 to obtain the error bars. Right: When training and evaluation involve different levels of strategic shift δtrain and δtest , a clas-sifier restricted to the causal feature recovers this opti-mal post-adaptation classifier, while one that exploits the spurious feature leads to poor performance when the shift is larger than anticipated. 
+
+7 EXPERIMENTS 
+
+We empirically validate our theoretical results with simulated data from the causal model in Figure 1 pa-rameterized by a linear outcome and two features: 
+
+u ∼ Bernoulli( pu)
+
+xc ∼ N (0 , σ 2 
+
+> c
+
+)
+
+xs = wu→s u + εs, εs ∼ N (0 , σ 2 
+
+> s
+
+)
+
+ysco ≜ wcxc + wuu + b
+
+(det) y = 1{ysco (xc, u )}
+
+(stoch) y ∼ Bernoulli  στ (ysco (xc, u )) .
+
+We assume L2-norm for the agents’ adaptation cost 
+
+c(x′, x ) ≜ || x′ − x|| 2, and they adapt following 4. 
+
+Optimality under bounded ambiguity. First, we study Theorem 4.6, which says that with a bounded ambiguous region, a causal classifier can incur zero 
+
+ℓ0−1 loss post-adaptation given that agents have enough budget δ to adapt away from the ambiguous region. To validate this result, we plot the coefficients of the classifier f ∗ ∈ F that achieves optimal post-adaptation ℓ0−1. Because the post-adaptation data distribution involves computing agents’ best response to a classifier, we cannot use gradient-based optimiza-tion to minimize post-adaptation loss. Instead, we perform a grid search over the coefficients of linear classifiers f and select the model that minimizes the loss on the post-adaptation distribution generated by some adaptation budget δ. The left panel in Figure 3 shows that with sufficient δ, optimal classifiers post-G´ ois, G¨ unl¨ uk, Rosenfeld, Hegde, Lacoste-Julien, Sridhar 
+
+adaptation choose to ignore the spurious feature, val-idating the result. 
+
+Robustness to changing δ. The optimality result of Theorem 4.6 also holds if, after deployment, agents increase their adaptation budget so that δ′ > δ . We study this in the right panel of Figure 3, by perform-ing the same grid search procedure over two classifier families, one that considers all features and another that considers only causal features, both optimized for a fixed adaptation budget we refer to as δtrain . We evaluate the best classifier in each family on data gen-erated by deploying that classifier but with a different, unseen δtest . We see that when δtest > δ train , causal classifiers remain optimal as expected while spurious classifiers incur error due to differences between the train and test distributions. Additionally, the causal classifier is able to achieve zero loss after sufficiently large δtrain (i.e. ≥ max -gap, marked by the light grey line). In Appendix D.1, we also evaluate the implications of the result on robustness in Theorem 5.2, finding set-tings where causal classifiers’ zero transfer loss trans-lates into advantages post-adaptation. 
+
+Incentive Alignment. We explore how alignment (Definition 6.5) is impacted as we vary properties of agent utility rp (Definition 6.1) and institution util-ity ri (Definition 6.2). Specifically, as we increase δ2,agents increasingly prefer to avoid false positives in the long term, and as we increase ϵ, institutions prefer true positives over true negatives. Following Proposi-tion 6.8 we observe in Figure 4 there is a minimum δ2
+
+to have alignment (∆ rp > 0) for ϵ = 0. This is due to hpost preventing more gaming than hpre (TN →FP), which is more valued by agents with higher δ2. As 
+
+ϵ increases, hpre avoids TN by increasing FP, since it cannot anticipate agent adaptation. hpost can avoid TN by encouraging points to improve (TN →TP) in-stead of allowing gaming (TN →FP). A switch from gaming to improvement is valued by agents when δ2 is higher, whereas low δ2 makes agents care only about the total count of positive predictions (FP+TP). The dynamics between alignment and utilities are further explored in Appendix F.3. While these experiments were performed on fully syn-thetic data, we also have semi-synthetic results us-ing real-world data for the observed feature in Ap-pendix D.2 which also confirms our theoretical findings hold under real-world observed distributions. 
+
+8 CONCLUSION 
+
+In this work we characterize the role of causal vari-ables in classification, when agents adapt to predic-
+
+Figure 4: Simulation for δ = 0 .3. As the institution anticipates agent adaptation to maximize ri (i.e., be-comes strategic) agents’ utility rp can increase as well, depending on δ2 and ϵ. The grey dashed line indicates where rp stays constant, and to its right there is align-ment (i.e. an increase in rp). tions. Strategic classification is inherently a causal problem, since whether feature adaptation translates to outcomes depends on the underlying causal model. While previous work connects causality to robustness, we take a step further and identify conditions where causal classifiers are simultaneously optimal to a range of adaptations. Additionally, we show a nuanced pic-ture of how the welfare of predicted agents is affected by strategic classification. While existing work high-lights a social burden imposed on the population, we identify conditions where both predicted and predictor can be better off under strategic classification. This is possible due to the causal modeling aspect of our gen-erative process. Assuming the existence of a bounded feature region where outcomes are ambiguous, and an acceptable effort that moves points out of such re-gion, are limitations of our analysis. Therefore, future work should characterize optimality inside ambiguous regions under adaptation. Developing practical meth-ods for strategic classification is also an important line of research. In this direction, designing learning al-gorithms that encourage data points to move outside ambiguous regions is also a promising avenue for future work. 
+
+Acknowledgements 
+
+This research was supported in part by the Canada CIFAR AI Chair program, by a grant from Samsung Electronics Co., Ltd., an unrestricted gift from Google, an NSERC Discovery Grant (RGPIN-2023-04869) and the Israel Science Foundation (grant no. 278/22). Si-mon Lacoste-Julien is a CIFAR Associate Fellow in the Learning in Machines & Brains program. We would like to thank Pedram Khorsandi for their feedback. The Role of Causal Features in Strategic Classification for Robustness and Alignment 
+
+References 
+
+Ahmadi, S., Beyhaghi, H., Blum, A., and Naggita, K. (2020). The strategic perceptron. CoRR ,abs/2008.01710. Arjovsky, M., Bottou, L., Gulrajani, I., and Lopez-Paz, D. (2019). Invariant risk minimization. In 
+
+arXiv preprint arXiv:1907.02893 .Bechavod, Y., Ligett, K., Wu, Z. S., and Ziani, J. (2021). Gaming helps! learning from strategic inter-actions in natural dynamics. In Proceedings of the 38th International Conference on Machine Learning (ICML) , volume 139, pages 756–765. PMLR. Boyd, S. P. and Vandenberghe, L. (2004). Convex op-timization . Cambridge university press. Chen, Y., Estornell, A., Vorobeychik, Y., and Liu, Y. (2025). To give or not to give? the impacts of strate-gically withheld recourse. In Proceedings of the 28th International Conference on Artificial Intelligence and Statistics (AISTATS) . PMLR. Chen, Y., Liu, Y., and Podimata, C. (2019). Grind-ing the space: Learning to classify against strategic agents. CoRR , abs/1911.04004. Dong, J., Roth, A., Schutzman, Z., Waggoner, B., and Wu, Z. S. (2017). Strategic classification from re-vealed preferences. CoRR , abs/1710.07887. Eastwood, C., Robey, A., Singh, S., von K¨ ugelgen, J., Hassani, H., Pappas, G. J., and Sch¨ olkopf, B. (2022). Probable domain generalization via quan-tile risk minimization. In Proceedings of the 36th Conference on Neural Information Processing Sys-tems (NeurIPS) .G´ ois, A., Mofakhami, M., Santos, F. P., Lacoste-Julien, S., and Gidel, G. (2025). Performative pre-diction on games and mechanism design. In Inter-national Conference on Artificial Intelligence and Statistics , pages 1855–1863. PMLR. Hardt, M., Megiddo, N., Papadimitriou, C., and Woot-ters, M. (2016). Strategic classification. In Proceed-ings of the 2016 ACM conference on innovations in theoretical computer science , pages 111–122. Heinze-Deml, C., Peters, J., and Meinshausen, N. (2018). Invariant causal prediction for nonlinear models. Journal of Causal Inference , 6(2). Horowitz, G. and Rosenfeld, N. (2018). Causal strate-gic classification: A tale of two shifts. In Proceed-ings of the 40th International Conference on Ma-chine Learning (ICML 2023) .Kleinberg, J. M. and Raghavan, M. (2018). How do classifiers induce agents to invest effort strate-gically? CoRR , abs/1807.05307. Levanon, S. and Rosenfeld, N. (2021). Strategic clas-sification made practical. CoRR , abs/2103.01826. Levanon, S. and Rosenfeld, N. (2022). Generalized strategic classification and the case of aligned in-centives. In International Conference on Machine Learning , pages 12593–12618. PMLR. Magliacane, S. (2018). Domain adaptation by using causal inference to predict invariant conditional dis-tributions. In 32nd Conference on Neural Informa-tion Processing Systems (NIPS 2018) .Miller, J., Milli, S., and Hardt, M. (2020). Strategic classification is causal modeling in disguise. In In-ternational Conference on Machine Learning , pages 6917–6926. PMLR. Milli, S., Miller, J., Dragan, A. D., and Hardt, M. (2019). The social cost of strategic classification. In 
+
+Proceedings of the conference on fairness, account-ability, and transparency , pages 230–239. Perdomo, J., Zrnic, T., Mendler-D¨ unner, C., and Hardt, M. (2020). Performative prediction. In In-ternational Conference on Machine Learning , pages 7599–7609. PMLR. Perry, R., von K¨ ugelgen, J., and Sch¨ olkopf, B. (2022). Causal discovery in heterogeneous environments un-der the sparse mechanism shift hypothesis. In Pro-ceedings of the 36th Conference on Neural Informa-tion Processing Systems (NeurIPS) .Peters, J., B¨ uhlmann, P., and Meinshausen, N. (2016). Causal inference using invariant prediction: iden-tification and confidence intervals. In Journal of the Royal Statistical Society, Series B (Statistical Methodology) , volume 78, pages 947–1012. Peters, J., Janzing, D., and Sch¨ olkopf, B. (2017). Ele-ments of Causal Inference: Foundations and Learn-ing Algorithms . MIT Press, Cambridge, MA. Rojas-Carulla, M., Sch¨ olkopf, B., Turner, R., and Pe-ters, J. (2018). Invariant models for causal transfer learning. In Proceedings of the 21st International Conference on Artificial Intelligence and Statistics (AISTATS) , volume 84 of Proceedings of Machine Learning Research , pages 164–173. Rosenfeld, N., Hilgard, S., Ravindranath, S. S., and Parkes, D. C. (2020). From predictions to deci-sions: Using lookahead regularization. In 34th Con-ference on Neural Information Processing Systems (NeurIPS 2020) . Curran Associates, Inc. Shavit, Y., Edelman, B. L., and Axelrod, B. (2020). Learning from strategic agents: Accuracy, improve-ment, and causality. ArXiv , abs/2002.10066. Somerstep, S., Sun, Y., and Ritov, Y. (2024). Learning in reverse causal strategic environments with rami-fications on two sided markets. In Kim, B., Yue, Y., G´ ois, G¨ unl¨ uk, Rosenfeld, Hegde, Lacoste-Julien, Sridhar 
+
+Chaudhuri, S., Fragkiadaki, K., Khan, M., and Sun, Y., editors, International Conference on Learning Representations , volume 2024, pages 56533–56555. Tse, L. (2018). Credit risk dataset. 
+
+https://www.kaggle.com/datasets/laotse/ credit-risk-dataset . Accessed: Nov. 25, 2025. Vo, K. Q. H., Aadil, M., Chau, S. L., and Muandet, K. (2024). Causal strategic learning with competitive selection. In Proceedings of the 38th AAAI Confer-ence on Artificial Intelligence (AAAI 2024) . AAAI Press. 
+
+Checklist 
+
+1. For all models and algorithms presented, check if you include: (a) A clear description of the mathematical set-ting, assumptions, algorithm, and/or model. [Yes] (b) An analysis of the properties and complexity (time, space, sample size) of any algorithm. [Not Applicable] (c) (Optional) Anonymized source code, with specification of all dependencies, including external libraries. [Not Applicable] 2. For any theoretical claim, check if you include: (a) Statements of the full set of assumptions of all theoretical results. [Yes] (b) Complete proofs of all theoretical results. [Yes] (c) Clear explanations of any assumptions. [Yes] 3. For all figures and tables that present empirical results, check if you include: (a) The code, data, and instructions needed to reproduce the main experimental results (ei-ther in the supplemental material or as a URL). [Yes] (b) All the training details (e.g., data splits, hy-perparameters, how they were chosen). [Yes] (c) A clear definition of the specific measure or statistics and error bars (e.g., with respect to the random seed after running experiments multiple times). [Yes] (d) A description of the computing infrastructure used. (e.g., type of GPUs, internal cluster, or cloud provider). [Not Applicable] 4. If you are using existing assets (e.g., code, data, models) or curating/releasing new assets, check if you include: (a) Citations of the creator If your work uses ex-isting assets. [Not Applicable] (b) The license information of the assets, if ap-plicable. [Not Applicable] (c) New assets either in the supplemental mate-rial or as a URL, if applicable. [Not Applica-ble] (d) Information about consent from data providers/curators. [Not Applicable] (e) Discussion of sensible content if applicable, e.g., personally identifiable information or of-fensive content. [Not Applicable] 5. If you used crowdsourcing or conducted research with human subjects, check if you include: (a) The full text of instructions given to partici-pants and screenshots. [Not Applicable] (b) Descriptions of potential participant risks, with links to Institutional Review Board (IRB) approvals if applicable. [Not Appli-cable] (c) The estimated hourly wage paid to partici-pants and the total amount spent on partic-ipant compensation. [Not Applicable] The Role of Causal Features in Strategic Classification for Robustness and Alignment 
+
+# The Role of Causal Features in Strategic Classification for Robustness and Alignment: Supplementary Materials 
+
+A 0-1 optimality of causal classifier under enough shift 
+
+We assume y is a deterministic function of ( xc, u ) given by sign( ysco (xc, u )). Note that knowing the deterministic effect of xc on ysco requires knowing u, which is an unobserved random variable. The function ysco (xc, u ) is not explicitly defined here, and is not necessarily linear. 
+
+Assumption A.1. (Sign function y) y(xc, u ) ≜ 1{ysco (xc, u ) ≥ 0}, where ysco : Rd × R → R
+
+Assumption A.2. (ysco continuity) ysco is continuous with respect to xc.Following Boyd and Vandenberghe (2004) we define an O-nondecreasing function. Let the collection of all orthants in Rd be O = {{ x ∈ Rd : sixi ≥ 0, ∀ i ∈ [d]}, s ∈ {− 1, +1 }d}, and Os ∈ O be the orthant defined by s.We define a partial ordering on Rd as x ⪯Os y ⇔ y − x ∈ Os. Similarly we have x ≺Os y ⇔ y − x ∈ int( Os). We say a function f : Rd → R is called O-nondecreasing if x ⪯Os y ⇒ f (x) ≤ f (y). We then assume ysco (xc, u ) is O-nondecreasing with respect to xc, using the same orthant Os for all u ∈ U .
+
+Assumption A.3. (O-nondecreasing ysco ) ∃ Os ∈ O ∀ xc ∈ X c, x ′ 
+
+> c
+
+∈ X c, u ∈ U : xc ⪯Os x′ 
+
+> c
+
+=⇒ ysco (xc, u ) ≤
+
+ysco (x′
+
+> c
+
+, u )We define Xambiguous as the subset of causal feature space where ysco can take both negative and positive values. 
+
+Definition A.4. (Domain with ambiguous outcome) Xambiguous ≜ {xc s.t. ∃ u ∈ U : ysco (xc, u ) ≥ 0, ∃ u′ ∈ U :
+
+ysco (xc, u ′) < 0} ⊆ X c
+
+Assumption A.5. (Ambiguity compensation through xc) ∃ δ ∈ R : ∀xc ∈ X ambiguous : ∃ v ∈ Rd, || v|| p ≤ δ :
+
+∀ u, y sco (xc + v, u ) ≥ 0
+
+Corollary A.6. (Partition of Xc through ∂upp and ∂low ) Assume A.2, A.3, A.5. Let ∂u = {xc : ysco (xc, u ) = 0, ∀˜xc ∈ int( xc − Os), y sco (˜ xc, u ) < 0}, where the last condition prevents “thick” boundary regions. Let B ≜ ∪ 
+
+> u
+
+∂u.Define ∂upp ≜ {xc ∈ B : int( xc + Os) ∩ B = ∅} and ∂low ≜ {xc ∈ B : int( xc − Os) ∩ B = ∅}. It follows that 
+
+∀xc : ∃ xupp ∈ ∂upp , x upp ⪯Os xc ⇒ xc̸ ∈ X ambiguous , ∀u : ysco (xc, u ) ≥ 0 and ∀xc : ∃ xlow ∈ ∂low , x c ≺Os xlow ⇒
+
+xc̸ ∈ X ambiguous , ∀u : ysco (xc, u ) < 0. Hence, we can partition Xc into three disjoint subsets, separated by ∂upp 
+
+and ∂low : Xambiguous , {xc : ∀u, y sco (xc, u ) ≥ 0} and {xc : ∀u, y sco (xc, u ) < 0}.Proof. We prove by contradiction that ∀˜xc : ∃ xupp ∈ ∂upp , x upp ⪯Os ˜xc ⇒ ˜xc̸ ∈ X ambiguous , ∀u : ysco (˜ xc, u ) ≥ 0. Suppose ∃ u′, ˜xc : ysco (˜ xc, u ′) < 0, ∃ xupp ∈ ∂upp , x upp ⪯Os ˜xc.From the definition of ∂upp , we have that ∃ xupp ∈ ∂upp , x upp ⪯Os ˜xc ⇒ int(˜ xc + Os) ∩ B = ∅ and hence int(˜ xc + Os) ∩ ∂u′ = ∅.Due to continuity (A.2) there exists an ϵ-ball around ˜ xc where ysco (˜ xc, u ′) < 0, particularly ∃ ϵ ∈ Os : ysco (˜ xc +
+
+ϵ, u ′) < 0. It follows that int(˜ xc + Os) ∩ ∂u′ = ∅ ⇒ int(˜ xc + ϵ + Os) ∩ ∂u′ = ∅.However, from A.5, ysco (˜ xc + ϵ, u ′) < 0 ⇒ ∃ v ∈ Rd : ysco (˜ x + ϵ + v, u ′) = 0. From A.3 there must also be a vector 
+
+v′ ∈ Os which increases ysco to zero, ∃ q ∈ Os, v ′ ≜ q + v : v′ ∈ Os, y sco (˜ xc + ϵ + v′, u ′) = 0. Hence int(˜ xc + ϵ + Os) ∩ ∂u′̸ = ∅, which is a contradiction. We can show similarly by contradiction that ∀xc : ∃ xlow ∈ ∂low , x c ≺Os xlow ⇒ xc̸ ∈ X ambiguous , ∀u : ysco (xc, u ) <
+
+0. G´ ois, G¨ unl¨ uk, Rosenfeld, Hegde, Lacoste-Julien, Sridhar 
+
+Corollary A.7. (Bounded distance to Xambiguous boundary) ∀xc ∈ X ambiguous ⇒ min 
+
+> xupp ∈∂upp
+
+|| xupp − xc|| p ≤
+
+max  
+
+> xlow ∈∂low
+
+min 
+
+> xupp ∈∂upp
+
+|| xupp − xlow || p = max  
+
+> u
+
+max  
+
+> xlow ∈∂u
+
+min 
+
+> xupp ∈∂upp
+
+|| xupp − xlow || p < +∞
+
+Proof. By contradiction, suppose that ∃ ˜xc ∈ X ambiguous : min 
+
+> xupp ∈∂upp
+
+|| xupp − ˜xc|| p > max  
+
+> xlow ∈∂low
+
+min 
+
+> xupp ∈∂upp
+
+|| xupp −
+
+xlow || p.It follows that ˜ xc̸ ∈ ∂low .Denote ˜ xupp ≜ arg min 
+
+> xupp ∈∂upp
+
+|| xupp − ˜xc|| p. From A.3, we have that ˜ xupp ∈ ˜xc + Os. To prove this, consider ˜xupp −O ≜ min 
+
+> x∈∂upp ∩˜xc+Os
+
+|| x − ˜xc|| p. We know ∀x ∈ ∂upp \ { xupp −O} ⇒ x̸ ∈ xupp −O − int( Os). Hence ∀x ∈
+
+∂upp \ { xupp −O}, p < +∞ ⇒ || x − ˜xc|| p > || xupp − ˜xc|| p, therefore xupp = xupp −O. For p = + ∞ there can be ties with other arg min, but we pick xupp since it is one of the minimizers. Since ˜ xc̸ ∈ ∂low , then ∃ xlow ∈ ∂low : xlow ∈ ˜xc − Os. Hence ∀p, || xupp − xlow || p > || xupp − ˜xc|| p, leading to a contradiction. This shows that min 
+
+> xupp ∈∂upp
+
+|| xupp − xc|| p ≤ max  
+
+> xlow ∈∂low
+
+min 
+
+> xupp ∈∂upp
+
+|| xupp − xlow || p.The equality max  
+
+> xlow ∈∂low
+
+min 
+
+> xupp ∈∂upp
+
+|| xupp − xlow || p = max  
+
+> u
+
+max  
+
+> xlow ∈∂u
+
+min 
+
+> xupp ∈∂upp
+
+|| xupp − xlow || p comes from the definition of 
+
+B and ∂low .Assumption A.5 provides a finite upper bound on the distance between any point in the ambiguous region and a positive point outside it, and the path between these points necessarily crosses the boundary ∂upp . Note that any point xlow lies either in the ambiguous region or on one of its two boundaries (by definition), and that any 
+
+xlow that lies on a boundary ∂u has a bounded distance to ∂upp (from above). Therefore, it follows that: max  
+
+> u
+
+max  
+
+> xlow ∈∂u
+
+min 
+
+> xupp ∈∂upp
+
+|| xupp − xlow || p < +∞.
+
+Assumption A.8. (Agent adaptation with Lp-norm cost) Before being classified, agents have knowledge of classifier h(x). They adapt their features, from x into ∆ h(x), by maximizing their reward rp(h, x ) = δh (∆ h(x)) −
+
+c(x, ∆h(x)). Assume c(x, x ′) := || x′ − x|| p.Under the previous assumptions, there exists a classifier which achieves zero 0-1 loss post-adaptation, by ignoring spurious features and setting a threshold that moves points away from Xambiguous .
+
+Theorem A.9. (Causal ℓ0−1 optimality) Assume A.1, A.2, A.3, A.5, A.8. Let hc be a causal classifier whose outputs are not changed by xs.
+
+∃ e ∈ R, h c ∈ H : ∀ δ ≥ e : Ex,u [ℓ0−1(hc(∆ hc (x; δ)) , sign( ysco (∆ hc (x; δ), u )))] = 0 
+
+Proof. Consider the following definitions from Corollary A.6, of ∂u = {xc ∈ X c : ysco (xc, u ) = 0 , ∀˜xc ∈ int( xc −
+
+Os), y sco (˜ xc, u ) < 0} ⊂ X c, and B := ∪ 
+
+> u
+
+∂u.Denote the learned classification boundary of a hypothesis h(x) = 1{f (x) ≥ 0} by ∂h = {x ∈ X : f (x) = 0 }.Given ∂h, h(x) is such that if ∃ x′ ∈ ∂h : x′ ⪯Os x then h(x) = 1, else h(x) = 0. We can build the optimal classifier named hc(xc) : Xc → { 0, 1} s.t. xc ∈ ∂hc if xc ∈ B and int( xc + Os) ∩ B = ∅.We split the proof in three parts: 1. Static TPs (true positives where ∆ h(x) = x) are correctly classified as h(∆ h(x)) = 1; 2. All points in Xambiguous adapt (∆ h(x)̸ = x) such that they are correctly classified as h(∆ h(x)) = 1; 3. Pre-adaptation TNs are correctly classified post-adaptation, either remaining static (∆ h(x) = x) with 
+
+h(∆ h(x)) = 0, or adapting into TPs. The Role of Causal Features in Strategic Classification for Robustness and Alignment 
+
+1. Correct classification of static TPs: 
+
+From A. 8, ∀x : h(x) = 1 ⇒ ∆h(x) = x, since a point with h(x) = 1 cannot further increase its utility by adapting features. 
+
+hc(˜ x) = 1 ⇒ ∀ u′ : ysco (˜ x, u ′) ≥ 0. Below we prove this by contradiction. This implies all points hc(˜ x) are correctly classified since their true outcome y = 1 (from A.1). Assume ∃ u′ : ysco (˜ x, u ′) < 0, h (˜ x) = 1. Since h(˜ x) = 1, we know from the definition on hc that int(˜ x + Os) ∩ B = ∅ and hence int(˜ x + Os) ∩ ∂u′ = ∅.Due to continuity (A.2) there exists an ϵ-ball around ˜ x where ysco < 0, particularly ∃ ϵ ∈ Os : ysco (˜ x + ϵ, u ′) < 0. It follows that int(˜ x + Os) ∩ ∂u′ = ∅ ⇒ int(˜ x + ϵ + Os) ∩ ∂u′ = ∅.However, from A.5, ysco (˜ x + ϵ, u ′) < 0 ⇒ ∃ v ∈ Rd : ysco (˜ x + ϵ + v, u ′) = 0. From A.3 there must also be a vector 
+
+v′ ∈ Os which increases ysco to zero, ∃ q ∈ Os, v ′ ≜ q + v : v′ ∈ Os, y sco (˜ x + ϵ + v′, u ′) = 0. Hence int(˜ x + ϵ + Os) ∩ ∂u′̸ = ∅, which is a contradiction. 
+
+2. Correct classification of Xambiguous post-adaptation: 
+
+We proved above that hc(˜ x) = 1 ⇒ ∀ u′ : ysco (˜ x, u ′) ≥ 0. From A.1 we have the same implication for post-adaptation data points: ∀˜x, h c(∆ hc (˜ x)) = 1 ⇒ ∀ u′, y (∆ hc (˜ x), u ′) = 1. From A.3, A.8 and the definition of hc, we have ∀x : hc(x) = 0 , h c(∆ hc (x)) = 1 ⇒ ∆hc (x) ∈ ∂hc for any Lp-norm cost. To show by contradiction assume ∃ x : hc(x) = 0 , h c(∆ hc (x)) = 1 , ∆hc (x)̸ ∈ ∂hc . From the definition of hc
+
+and A.3, ∃ b ∈ ∂hc : x ⪯Os b ⪯Os ∆hc (x). From A.8 we have c(x, b ) < c (x, ∆hc (x)) for any Lp-norm, hence x
+
+must have adapted instead to b ∈ ∂hc .Define e ≜ max  
+
+> u
+
+max 
+
+> x∈∂u
+
+min 
+
+> x′∈∂h
+
+c(x, x ′). From A.7 we have that this quantity is bounded. 
+
+δ ≥ e ⇒ ∀ x ∈ X ambiguous , ∆hc (x) ∈ ∂hc , h c(x) = 1 , ∀u, y (x, u ) = 1. 
+
+3. Correct classification of static TNs: 
+
+If any remaining points xneg ∈ X c exist not covered by the cases above, it has ∀u′ : ysco (xneg , u ′) < 0 and 
+
+hc(xneg ) = 0, since ∀xneg , ∃ xlow ∈ ∂low : xneg ≺Os xlow . After adaptation it either remains unchanged or adapts such that ∀u′ : ysco (∆ h(xneg ), u ′) ≥ 0 and h(∆( xneg )) = 1, since it must have adapted to ∂upp .
+
+B CE loss optimality of causal classifier under enough shift 
+
+From Corollary A.6, we define the following sets: 
+
+Xupp ≜ {xc : ∀u, y sco (xc, u ) ≥ 0}Xlow ≜ {xc : ∀u, y sco (xc, u ) < 0}
+
+where the sets Xupp , Xambiguous , Xlow are disjoint subsets of Xc and Xupp ∪ X ambiguous ∪ X low = Xc. Note that by this definition and following Assumption A.1, for any u, if xc ∈ X upp , y(xc, u ) = 1, and if xc ∈ X low , y(xc, u ) = 0. G´ ois, G¨ unl¨ uk, Rosenfeld, Hegde, Lacoste-Julien, Sridhar 
+
+LCE ( ˆf , δ ) = Ex,y ∼D ( ˆf ,δ )
+
+h
+
+−y log ˆf (x) − (1 − y) log(1 − ˆf (x)) 
+
+i
+
+=Exc,x s,u ∼D ( ˆf ,δ )
+
+h
+
+−1{ysco (xc,u )≥0} log ˆf (xc, x s) − (1 {ysco (xc,u )<0}) log(1 − ˆf (xc, x s)) 
+
+i
+
+=Exc∼D ( ˆf ,δ )
+
+h
+
+Exs,u ∼D ( ˆf ,δ )
+
+h
+
+−1{ysco (xc,u )≥0} log ˆf (xc, x s) − 1{ysco (xc,u )<0} log(1 − ˆf (xc, x s)) 
+
+ii 
+
+=
+
+Z
+
+> Xc
+
+PD( ˆf ,δ ) (xc) ∗
+
+h
+
+Exs,u ∼D ( ˆf ,δ )
+
+h
+
+−1{ysco (xc,u )≥0} log ˆf (xc, x s) − 1{ysco (xc,u )<0} log(1 − ˆf (xc, x s)) 
+
+ii 
+
+dx c
+
+=
+
+Z
+
+> Xlow
+
+PD( ˆf ,δ ) (xc) ∗
+
+h
+
+Exs,u ∼D ( ˆf ,δ )
+
+h
+
+−1{ysco (xc,u )≥0} log ˆf (xc, x s) − 1{ysco (xc,u )<0} log(1 − ˆf (xc, x s)) 
+
+ii 
+
+dx c
+
++
+
+Z
+
+> Xambiguous
+
+PD( ˆf ,δ ) (xc) ∗
+
+h
+
+Exs,u ∼D ( ˆf ,δ )
+
+h
+
+−1{ysco (xc,u )≥0} log ˆf (xc, x s) − 1{ysco (xc,u )<0} log(1 − ˆf (xc, x s)) 
+
+ii 
+
+dx c
+
++
+
+Z
+
+> Xupp
+
+PD( ˆf ,δ ) (xc) ∗
+
+h
+
+Exs,u ∼D ( ˆf ,δ )
+
+h
+
+−1{ysco (xc,u )≥0} log ˆf (xc, x s) − 1{ysco (xc,u )<0} log(1 − ˆf (xc, x s)) 
+
+ii 
+
+dx c
+
+=
+
+Z
+
+> Xlow
+
+PD( ˆf ,δ ) (xc) ∗
+
+h
+
+Exs,u ∼D ( ˆf ,δ )
+
+h
+
+−1 · log(1 − ˆf (xc, x s)) 
+
+ii 
+
+dx c
+
++
+
+Z
+
+> Xambiguous
+
+PD( ˆf ,δ ) (xc) ∗
+
+h
+
+Exs,u ∼D ( ˆf ,δ )
+
+h
+
+−1{ysco (xc,u )≥0} log ˆf (xc, x s) − 1{ysco (xc,u )<0} log(1 − ˆf (xc, x s)) 
+
+ii 
+
+dx c
+
++
+
+Z
+
+> Xupp
+
+PD( ˆf ,δ ) (xc) ∗
+
+h
+
+Exs,u ∼D ( ˆf ,δ )
+
+h
+
+−1 · log ˆf (xc, x s)
+
+ii 
+
+dx c
+
+Using the same causal classifier from Theorem A.9, we define hc s.t. xc ∈ ∂hc if xc ∈ B and int( xc + Os) ∩ B = ∅.This means for all points xc ∈ X upp , hc(xc) = 1 and x′ 
+
+> c
+
+∈ X low , hc(x′
+
+> c
+
+) = 0. We define the “scoring” function ˆfc : X → [0 , 1] that cross entropy uses as the same function as hc, meaning it outputs strictly 0 and 1. With this data generating process and classifier, we previously proved that for finite δ > e (which we call the max-gap), all points will move from Xambiguous into Xupp , obtaining true outcome y(xc, u ) = 1 and correct prediction h(xc) = 1. Thus, the cross entropy loss after δ > e will also be 0 with this specific causal classifier. We can clearly see this from the derivation above because with this ˆfc, the first and last terms will = 0 for any δ,and the middle term will take value 0 once the probability density in that region becomes 0, which occurs when all the points have adapted out of the region, i.e. δ > e .
+
+C Cross Entropy Loss Analysis 
+
+C.1 Cross Entropy Loss Decomposition 
+
+Assuming 0 log 0 := 0, ˆf : X → (0 , 1) is measurable, and there is support-compatibility (i.e. {g > 0} ⊆ { ˆf > 
+
+0, ˆfδ > 0} and {g < 1} ⊆ { ˆf < 1, ˆfδ < 1} almost surely), we can decompose the cross entropy loss after adaptation to classifier ˆf as follows: The Role of Causal Features in Strategic Classification for Robustness and Alignment 
+
+LCE ( ˆf , δ ) = Ex,y ∼D ( ˆf ,δ )
+
+h
+
+−y log ˆf (x) − (1 − y) log(1 − ˆf (x)) 
+
+i
+
+= Exc,x s,u ∼D ( ˆf ,δ )
+
+h
+
+−g(xc, u ) log ˆf (xc, x s) − (1 − g(xc, u )) log(1 − ˆf (xc, x s)) 
+
+i
+
+= ED( ˆf ,δ )
+
+h
+
+− g(xc, u ) log ˆf (xc, x s) − (1 − g(xc, u )) log(1 − ˆf (xc, x s)) + (1 − 1) ∗
+
+
+
+g(xc, u ) log g(xc, u ) + (1 − g(xc, u )) log(1 − g(xc, u )) 
+
+i 
+
+= ED( ˆf ,δ )
+
+"
+
+g(xc, u ) log g(xc, u )ˆf (xc, x s) + (1 − g(xc, u )) log 1 − g(xc, u )1 − ˆf (xc, x s)
+
+#
+
+− ED( ˆf ,δ ) [g(xc, u ) log g(xc, u ) + (1 − g(xc, u )) log(1 − g(xc, u ))] = ED( ˆf ,δ )
+
+h
+
+KL 
+
+
+
+g(xc, u )∥ ˆf (xc, x s)
+
+i | {z }
+
+> (KL divergence)
+
++ ED( ˆf ,δ ) [H (g(xc, u ))] 
+
+| {z }
+
+> (entropy)
+
+.
+
+= ED( ˆf ,δ )
+
+"
+
+g(xc, u ) log g(xc, u )ˆf (xc, x s) + (1 − g(xc, u )) log 1 − g(xc, u )1 − ˆf (xc, x s)
+
+#
+
+− ED( ˆf ,δ ) [g(xc, u ) log g(xc, u ) + (1 − g(xc, u )) log(1 − g(xc, u ))] + ED( ˆf ,δ )
+
+h
+
+(1 − 1) · g(xc, u ) log ˆf ∗
+
+> ( ˆf ,δ )
+
+(xc, x s) + (1 − 1) · (1 − g(xc, u )) log(1 − ˆf ∗ 
+
+> δ
+
+(xc, x s)) 
+
+i
+
+= ED( ˆf ,δ )
+
+"
+
+g(xc, u ) log g(xc, u )ˆf ∗ 
+
+> δ
+
+(xc, x s) + (1 − g(xc, u )) log 1 − g(xc, u )1 − ˆf ∗ 
+
+> δ
+
+(xc, x s)
+
+#
+
++ ED( ˆf ,δ )
+
+"
+
+g(xc, u ) log ˆf ∗ 
+
+> δ
+
+(xc, x s)ˆf (xc, x s) + (1 − g(xc, u )) log 1 − ˆf ∗ 
+
+> δ
+
+(xc, x s)1 − ˆf (xc, x s)
+
+#
+
+− ED( ˆf ,δ ) [g(xc, u ) log g(xc, u ) + (1 − g(xc, u )) log(1 − g(xc, u ))] = ED( ˆf ,δ )
+
+h
+
+KL 
+
+
+
+g(xc, u )∥ ˆf ∗ 
+
+> δ
+
+(xc, x s)
+
+i 
+
++ ED( ˆf ,δ )
+
+"
+
+g(xc, u ) log ˆf ∗ 
+
+> δ
+
+(xc, x s)ˆf (xc, x s) + (1 − g(xc, u )) log 1 − ˆf ∗ 
+
+> δ
+
+(xc, x s)1 − ˆf (xc, x s)
+
+#
+
++ ED( ˆf ,δ ) [H (g(xc, u ))] If we define ˆf = arg min  
+
+> f∈F
+
+ED [KL ( g(xc, u )∥f (xc, x s))] ˆf ∗ 
+
+> δ
+
+= arg min  
+
+> f∈F
+
+ED( ˆf ,δ ) [KL ( g(xc, u )∥f (xc, x s))] we can interpret the the decomposition as follows: G´ ois, G¨ unl¨ uk, Rosenfeld, Hegde, Lacoste-Julien, Sridhar 
+
+LCE ( ˆf , δ ) = ED( ˆf ,δ )
+
+h
+
+KL 
+
+
+
+g(xc, u )∥ ˆf ∗ 
+
+> δ
+
+(xc, x s)
+
+i | {z }
+
+> (incomplete information error)
+
++ ED( ˆf ,δ )
+
+"
+
+g(xc, u ) log ˆf ∗ 
+
+> δ
+
+(xc, x s)ˆf (xc, x s) + (1 − g(xc, u )) log 1 − ˆf ∗ 
+
+> δ
+
+(xc, x s)1 − ˆf (xc, x s)
+
+#| {z }
+
+> (transfer error)
+
++ ED( ˆf ,δ ) [H (g(xc, u ))] 
+
+| {z }
+
+> (entropy)
+
+Note: all terms are nonnegative. 
+
+• incomplete information error: KL Divergence is always non-negative. 
+
+• transfer error: since we define ˆf ∗ 
+
+> δ
+
+= arg min  
+
+> f∈F
+
+ED( ˆf ,δ ) [KL ( g(xc, u )∥f (xc, x s))], we have the fact that transfer error is nonnegative (i.e. ≥ 0). Since ED( ˆf ,δ ) [KL ( g(xc, u )∥f ∗ 
+
+> δ
+
+(xc, x s))] ≤ ED( ˆf ,δ )
+
+h
+
+KL 
+
+
+
+g(xc, u )∥ ˆf (xc, x s)
+
+i 
+
+for all ˆf (xc, x s) ∈ F , we have: 
+
+LCE ( ˆf , δ ) = ED( ˆf ,δ )
+
+h
+
+KL 
+
+
+
+g(xc, u )∥ ˆf (xc, x s)
+
+i 
+
++ ED( ˆf ,δ ) [H (g(xc, u ))] 
+
+≥ ED( ˆf ,δ )
+
+h
+
+KL 
+
+
+
+g(xc, u )∥ ˆf ∗ 
+
+> δ
+
+(xc, x s)
+
+i 
+
++ ED( ˆf ,δ ) [H (g(xc, u ))] but from the derivation above, we have: 
+
+LCE ( ˆf , δ ) = ED( ˆf ,δ )
+
+h
+
+KL 
+
+
+
+g(xc, u )∥ ˆf ∗ 
+
+> δ
+
+(xc, x s)
+
+i 
+
++ ED( ˆf ,δ ) [H (g(xc, u ))] + ED( ˆf ,δ )
+
+"
+
+g(xc, u ) log ˆf ∗ 
+
+> δ
+
+(xc, x s)ˆf (xc, x s) + (1 − g(xc, u )) log 1 − ˆf ∗ 
+
+> δ
+
+(xc, x s)1 − ˆf (xc, x s)
+
+#
+
+implying that the last term (which is transfer error) is nonnegative: 
+
+ED( ˆf ,δ )
+
+"
+
+g(xc, u ) log ˆf ∗ 
+
+> δ
+
+(xc, x s)ˆf (xc, x s) + (1 − g(xc, u )) log 1 − ˆf ∗ 
+
+> δ
+
+(xc, x s)1 − ˆf (xc, x s)
+
+#
+
+≥ 0
+
+• entropy: The entropy of a binary variable Y with success probability p = g(xc, u ) is nonnegative almost surely, since for all p ∈ [0 , 1], entropy −p log p − (1 − p) log(1 − p) is nonnegative and thus the expectation must be nonnegative with probability 1. 
+
+C.2 Extending to training data with adaptive shifts 
+
+We can further extend this decomposition by considering that a classifier has access to some strategic behavior when training the initial classifier ˆf . This means we define the classifier ˆf as the optimal classifier under δ′ to some classifier f ′ (which could be ˆf itself), formally: ˆf = arg min  
+
+> f∈F
+
+ED(f ′,δ ′) [KL ( g(xc, u )∥f (xc, x s))] ˆf ∗ 
+
+> δ
+
+= arg min  
+
+> f∈F
+
+ED( ˆf ,δ ) [KL ( g(xc, u )∥f (xc, x s))] The Role of Causal Features in Strategic Classification for Robustness and Alignment 
+
+The decomposition still holds with nonnegative terms. Incomplete information and entropy are trivially nonneg-ative from the same reasoning as before. Transfer error also remains nonnegative since we are still selecting ˆf ∗
+
+> δ
+
+to be the optimal classifier on the shifted data, so we still have for all ˆf (xc, x s) ∈ F :
+
+ED( ˆf ,δ )
+
+h
+
+KL 
+
+
+
+g(xc, u )∥ ˆf ∗ 
+
+> δ
+
+(xc, x s)
+
+i 
+
+≤ ED( ˆf ,δ )
+
+h
+
+KL 
+
+
+
+g(xc, u )∥ ˆf (xc, x s)
+
+i 
+
+This allows us to conclude that even if the learned classifier is able to anticipate some strategic shift or only has access to training data with some shift already present, causal classifiers still provide robustness while spurious classifiers can have arbitrarily large error due to the transfer term. 
+
+C.3 CE Error of Causal Classifier Family C.3.1 Incomplete Information Error 
+
+First, we consider families of causal classifiers only, Fcausal , i.e. classifiers that do not use spurious features for prediction. We defined ˆf ∗ 
+
+> δ
+
+such that ˆf ∗ 
+
+> δ
+
+= arg min  
+
+> f∈F causal
+
+ED( ˆf ,δ ) [KL ( g(xc, u )∥f (xc))], so the incomplete information error is the minimum value of this objective, and when trying to bound this term, we actually want to bound the minimum. If we assume that Fcausal includes the minimum of this objective, which is the function ED( ˆf ,δ ) [Y |Xc] (for example a family of classifiers that includes logistic functions must include any linear combination of logistic functions), then: min  
+
+> f∈F causal
+
+Exc,u ∼D ( ˆf ,δ )
+
+h
+
+KL 
+
+
+
+g(xc, u ) ∥ ˆf ∗(xc)
+
+i 
+
+= Exc,u ∼D ( ˆf ,δ ) [KL ( E[Y |Xc, U ] ∥ E[Y |Xc])] = Exc,,u ∼D ( ˆf ,δ )
+
+
+
+E[Y |Xc, U ] log E[Y |Xc, U ]
+
+E[Y |Xc] + (1 − E[Y |Xc, U ]) log 1 − E[Y |Xc, U ]1 − E[Y |Xc]) 
+
+
+
+= Exc,,u ∼D ( ˆf ,δ )
+
+
+
+P(Y = 1 |Xc, U ) log P(Y = 1 |Xc, U )
+
+P(Y = 1 |Xc) + P(Y = 0 |Xc, U ) log P(Y = 0 |Xc, U )
+
+P(Y = 0 |Xc)
+
+
+
+= Exc,u ∼D ( ˆf ,δ )
+
+
+
+Ey|xc,u ∼D ( ˆf ,δ )
+
+
+
+log P(Y |Xc, U )
+
+P(Y |Xc)
+
+ 
+
+= Exc∼D ( ˆf ,δ )
+
+"X
+
+> u∈U
+
+P(U |Xc) · Ey|xc,u ∼D ( ˆf ,δ )
+
+
+
+log P(Y |Xc, U )
+
+P(Y |Xc)
+
+#
+
+= Exc∼D ( ˆf ,δ )
+
+ X
+
+> u∈U,y ∈Y
+
+P(U ) ∗ P(Y |Xc, U )
+
+
+
+log P(Y |Xc, U )
+
+P(Y |Xc)
+
+
+
+= Exc∼D ( ˆf ,δ )
+
+ X
+
+> u∈U,y ∈Y
+
+P(Y, U |Xc)
+
+
+
+log P(Y, U |Xc)/P(U |Xc)
+
+P(Y |Xc)
+
+
+
+= Exc∼D ( ˆf ,δ )
+
+ X
+
+> u∈U,y ∈Y
+
+P(Y, U |Xc)
+
+
+
+log P(Y, U |Xc)
+
+P(Y |Xc) P(U |Xc)
+
+
+
+= ED( ˆf ,δ )
+
+h
+
+KL 
+
+
+
+P(Y, U |Xc) ∥ P(Y |Xc)P(U |Xc)
+
+i 
+
+= I(Y ; U |Xc)= H(U |Xc) − H(U |Xc, Y )
+
+≤ H(U |Xc) = H(U )Therefore, the transfer bias of a causal classifier is equal to the conditional mutual information between Y and 
+
+U given Xc and can be upper-bounded by the entropy of U .G´ ois, G¨ unl¨ uk, Rosenfeld, Hegde, Lacoste-Julien, Sridhar 
+
+C.3.2 Transfer Error 
+
+We are only considering families of causal classifiers. We previously defined: ˆf = arg min  
+
+> ˆf∈F
+
+ED
+
+h
+
+KL 
+
+
+
+g(xc, u )∥ ˆf (xc)
+
+i 
+
+ˆf ∗ 
+
+> δ
+
+= arg min  
+
+> ˆf∗∈F
+
+ED( ˆf ,δ )
+
+h
+
+KL 
+
+
+
+g(xc, u )∥ ˆf ∗(xc)
+
+i 
+
+which are minimized at ED [Y |Xc] and ED( ˆf ,δ ) [Y |Xc] respectively. U cannot be intervened on and causal mecha-nisms are invariant, so the only difference is a covariate shift of the distribution, meaning they are both equal to 
+
+E[Y |Xc] = E [EU [Y |Xc, U ]]. Since we already assumed this function to be part of the classifier family, ˆf = ˆf ∗
+
+and therefore transfer error is 0 when training with a causal classifier family. 
+
+C.3.3 Entropy Error 
+
+The outcome Y is a binary variable i.e. ∈ [0 , 1] so: 
+
+H(Y ) = E[− log P (Y )] ≤ max  
+
+> x
+
+(− log P (Y = y)) ≤ (− log 0 .5) = 1 .
+
+Hence, H(Y ) ≤ 1, (or entropy of any binary variable) with equality iff P (X = 0) = P (X = 1) = 0 .5. 
+
+C.4 CE Error of Spurious Classifier Family C.4.1 Incomplete Information Error 
+
+Repeating the same logic as before with a causal classifier family, when considering a family of classifiers F that now uses all features, including spurious ones, ˆf ∗ 
+
+> δ
+
+is defined such that ˆf ∗ 
+
+> δ
+
+=arg min  
+
+> f∈F all
+
+ED( ˆf ,δ ) [KL ( g(xc, u )∥f (xc, x s))], thus the incomplete information error term is again the minimum value of this objective. If we similarly assume that F includes the function ED( ˆf ,δ ) [Y |Xc, X s] : The Role of Causal Features in Strategic Classification for Robustness and Alignment 
+
+min   
+
+> f∈F
+
+Exc,x s,u ∼D ( ˆf ,δ )
+
+h
+
+KL 
+
+
+
+g(xc, u )∥ ˆf ∗(xc, x s)
+
+i 
+
+= Exc,x s,u ∼D ( ˆf ,δ ) [KL ( E[Y |Xc, U ]∥E[Y |Xc, X s])] = Exc,x s,u ∼D ( ˆf ,δ )
+
+
+
+E[Y |Xc, U ] log E[Y |Xc, U ]
+
+E[Y |Xc, X s] + (1 − E[Y |Xc, U ]) log 1 − E[Y |Xc, U ]1 − E[Y |Xc, X s]) 
+
+
+
+= Exc,x s,u ∼D ( ˆf ,δ )
+
+
+
+P(Y = 1 |Xc, U ) log P(Y = 1 |Xc, U )
+
+P(Y = 1 |Xc, X s) + P(Y = 0 |Xc, U ) log P(Y = 0 |Xc, U )
+
+P(Y = 0 |Xc, X s)) 
+
+
+
+= Exc,x s,u ∼D ( ˆf ,δ )
+
+
+
+Ey|xc,u ∼D ( ˆf ,δ )
+
+
+
+log P(Y |Xc, U )
+
+P(Y |Xc, X s)
+
+ 
+
+= Exc,x s,u ∼D ( ˆf ,δ )
+
+
+
+Ey|xc,u ∼D ( ˆf ,δ )
+
+
+
+log P(Y |Xc, U, X s)
+
+P(Y |Xc, X s)
+
+ 
+
+= Exc,x s∼D ( ˆf ,δ )
+
+"X
+
+> u∈U
+
+P(U |Xs) · Ey|xc,u ∼D ( ˆf ,δ )
+
+
+
+log P(Y |Xc, U, X s)
+
+P(Y |Xc, X s)
+
+#
+
+= Exc,x s∼D ( ˆf ,δ )
+
+ X
+
+> u∈U,y ∈Y
+
+P(U |Xs) ∗ P(Y |Xc, U, X s)
+
+
+
+log P(Y |Xc, U, X s)
+
+P(Y |Xc, X s)
+
+
+
+= Exc,x s∼D ( ˆf ,δ )
+
+ X
+
+> u∈U,y ∈Y
+
+P(Y, U |Xc, X s)
+
+
+
+log P(Y, U |Xc, X s)/P(U |Xc, X s)
+
+P(Y |Xc, X s)
+
+
+
+= Exc,x s∼D ( ˆf ,δ )
+
+ X
+
+> u∈U,y ∈Y
+
+P(Y, U |Xc, X s)
+
+
+
+log P(Y, U |Xc, X s)
+
+P(Y |Xc, X s) P(U |Xc, X s)
+
+
+
+= ED( ˆf ,δ )
+
+h
+
+KL 
+
+
+
+P(Y, U |Xc, X S ) ∥ P(Y |Xc, X s)P(U |Xc, X s)
+
+i 
+
+= I(Y ; U |Xc, X s)= H(U |Xc, X s) − H(U |Xc, X s, Y )
+
+≤ H(U |Xc, X s) = H(U |Xs) ≤ H(U )Therefore, the transfer bias of a spurious classifier is equal to the conditional mutual information of Y and U
+
+given Xc and Xs i.e. all features. It can also be upper-bounded by the conditional entropy of U given Xs, or more loosely bounded by entropy of U .
+
+C.4.2 Transfer Error 
+
+Now considering families of classifiers F that use all features, we have: ˆf = arg min  
+
+> f∈F
+
+ED [KL ( g(xc, u )∥f (xc, x s))] ˆf ∗ 
+
+> δ
+
+= arg min  
+
+> f∈F
+
+ED( ˆf ,δ ) [KL ( g(xc, u )∥f (xc, x s))] which are minimized at ED [Y |Xs, X c] and ED( ˆf ,δ ) [Y |Xs, X c] respectively. Only causal mechanisms are invariant, so these conditional expectations can be arbitrarily different based on the distribution shift. Thus, transfer error can be arbitrarily large, since KL divergence can range from 0 to ∞ (for example if there are x ∈ X where 
+
+g(xc, u ) is very high and ˆf (xc, x s) is very small, this will have a large KL value). 
+
+C.4.3 Analysis for unbounded transfer error with thresholded classifier 
+
+To make this more concrete, consider the following setting: given that minimizing cross-entropy loss learns a probability estimator ˆf (x) : X → [0 , 1], institutions may require candidates to exceed a certain probability threshold for a positive prediction (which we previously assumed was 0 .5 or 50%); for instance, accepting a loan application only when the estimated repayment probability exceeds τ ∈ [0 , 1]: ˆy = h(x) = 1{ ˆf (x)≥τ }G´ ois, G¨ unl¨ uk, Rosenfeld, Hegde, Lacoste-Julien, Sridhar 
+
+The transfer error is then affected by three key factors: the cost function c(x, x ′), which determines which features agents adapt and their relative cost; the budget δ, which bounds how much effort agents can spend; and the threshold τ , which determines the decision boundary agents adapt towards. We can further analyze the transfer error by partitioning the input space as X = X adapt ∪ X stay , where X adapt =
+
+{x : PD (x)̸ = PD( ˆf ,δ ) (x)} contains points whose distribution changed under adaptation, and X stay its complement. Let pa = P (x ∈ X adapt ) and ps = 1 − pa. The transfer error splits as: transfer error = pa ED( ˆf ,δ )
+
+"
+
+g log ˆf ∗
+
+> δ
+
+ˆf + (1 − g) log 1 − ˆf ∗
+
+> δ
+
+1 − ˆf x ∈ X adapt 
+
+#
+
++ ps ED
+
+"
+
+g log ˆf ∗
+
+> δ
+
+ˆf + (1 − g) log 1 − ˆf ∗
+
+> δ
+
+1 − ˆf x ∈ X stay 
+
+#
+
+, (8) where the stay term uses D since D and D( ˆf ,δ ) agree on X stay by construction. On X adapt , all points have been moved to the decision boundary ∂h, so ˆf (xc, x s) = τ . Since τ is constant on this region, the adapt term separates as: 
+
+ED( ˆf ,δ )
+
+h
+
+g log ˆf ∗ 
+
+> δ
+
++ (1 − g) log(1 − ˆf ∗ 
+
+> δ
+
+) x ∈ X adapt i
+
+− ¯g log τ − (1 − ¯g) log(1 − τ ), (9) where ¯ g = ED( ˆf ,δ ) [g(xc, u ) | x ∈ X adapt ]. The transfer error on adapted points is amplified under two conditions that expand X adapt :
+
+• δ: increasing the adaptation budget δ allows more points to reach the decision boundary, increasing pa and giving this term more weight. 
+
+• c(x, x′): since the cost function is a weighted ℓp-norm, reducing the cost of perturbing spurious features 
+
+μs has a compounding effect: for a fixed δ, more agents can cross the boundary by modifying spurious features, increasing pa; simultaneously these agents allocate proportionally more of their budget to changing 
+
+Xs rather than Xc, so the causal features of adapted points are perturbed less, keeping ¯ g bounded away from 1. Furthermore, as τ → 1−, the transfer error on adapted points diverges entirely, driven by the −(1 − ¯g) log(1 − τ )component, whenever ¯ g < 1; that is, whenever any adapted point has nonzero negative-class probability. Since 
+
+g(xc, u ) depends only on causal features and the unobserved variable, and if agents entering X adapt do so by significantly changing spurious features, the expanding region includes points with diverse values of g, ensuring ¯g < 1. This illustrates why classifiers in Fall that rely on spurious features risk unbounded transfer error when strategic behavior is unknown: δ and μs control how much agents adapt and how much of that adaptation targets spurious features, which leads to gaming, while more demanding τ makes the consequences of this gaming increasingly severe for the spurious classifier. 
+
+C.4.4 Entropy Error 
+
+Same as with the causal classifier case, the outcome Y is a binary variable i.e. ∈ [0 , 1] so H(Y ) ≤ 1, (or entropy of any binary variable). 
+
+D Additional Experimental Results 
+
+D.1 Robustness under varying ambiguity. 
+
+We highlight a trade-off in post-adaptation cross-entropy loss in Theorem 5.2: causal classifiers incur incomplete information loss by ignoring the informative spurious features while spurious classifiers incur transfer loss due to changing optimal predictive distributions. The theory allows us to form another prediction, related to our findings in Section 4: if we further bound how influential the latent U is on the value of the outcome Y (limiting the incomplete information loss further), a causal classifier trained on pre-adaptation data should achieve lower post-adaptation CE loss compared to their spurious counterparts. To implement this idea, we minimally modify The Role of Causal Features in Strategic Classification for Robustness and Alignment 
+
+the outcome model to be: 
+
+ysco ≜ wcXc + wuU · 1{Xc∈(−max-gap ,0)} + b (10) where max-gap ensures that latent U impacts Y in a bounded region. Figure 5 visualizes the post-adaptation CE loss difference between the pre-adaptation optimal causal and spurious classifiers (blue is better i.e. causal has an advantage) as the adaptation budget δ and max-gap vary. We simulated the data using the setting described in Section 7 with a modified ysco , and used sklearn’s Logistic Regression model to train the optimal classifiers with static data (both pre and post-strategic shift). As expected, for larger values of δ (inducing a bigger distribution shift) and max-gap, transfer loss of a spurious classifier is worse than information loss from masking spurious features, giving causal classifiers the advantage. 
+
+Figure 5: Simulations with varying max-gap. When there is a bounded ambiguous region through max-gap in the ysco , a causal classifier trained on pre-adaptation data can have an advantage after sufficiently large δ
+
+(denoted by the blue region, grey dashed line represents regret = 0). However, in order to see the effect of incurring a significant amount of transfer error when exploiting spurious features, we need to alter the adaptation incentives, specifically such that agents’ are encouraged to adapt their spurious features more when a classifier puts weight on it. While large enough δ allows for agents to make larger strategic shifts, this may not be enough if they do not shift adversarially. We therefore explicitly model the agents’ cost function of adapting features. We previously assumed the cost of adapting features is a standard Lp-norm, but we can instead consider weighted Lp-norm in order to control how much agents’ adapt their spurious features. By lowering cost of changing xs, agents will be incentivized more drastic shifts along xs, which can be adversarial for even slightly spurious classifiers. Based on Theorem 5.2, this leads to significant transfer error for spurious classifiers trained on pre-adaptation data, even with some incomplete information from settings like stochastic Y with an unbounded max -gap . This is because the agents will be incentivized to game and adapt to regions of Xs where the pre-adaptation classifier ˆf very poorly estimates the post-adaptation ˆf = ED( ˆf ,δ ) [Y |X]. This leads the post-adaptation transfer error term to dominate the causal incomplete information term when there is an incentive to significantly game. We empirically show that the pre-adaptation causal classifier leads to robustness in these settings by reducing the cost of xs. We simulate data using the described setting in Section 7, and use sklearn’s Logistic Regression model to train the classifiers on static data (both pre and post-strategic shift). We consider the cost function to be weighted L2-norm of the two features in our experiments: 
+
+c(x, x ′) = 
+
+sX
+
+> j
+
+μj (x′ 
+
+> j
+
+− xj )2 = pμs (x′ 
+
+> s
+
+− xs)2 + μc (x′ 
+
+> c
+
+− xc)2. (11) This allows us to confirm our hypothesis that as the cost of changing the spurious feature, μs, decreases, then the spurious transfer error can increases arbitrarily, which can lead spurious classifiers to have significantly more error in the worst case. On the other hand, causal classifiers will have relatively stable error, even when the cost of changing the spurious feature is larger. To ensure causal classifier actually provides robustness, we also look G´ ois, G¨ unl¨ uk, Rosenfeld, Hegde, Lacoste-Julien, Sridhar 
+
+at the performance of the classifiers when the costs are switched, meaning the cost of changing xc is much less than xs.0 1 2 3 4 5                
+
+> Budget ( δ)
+> 0.020
+> 0.021
+> 0.022
+> 0.023
+> 0.024
+> Incomplete Information Error
+> Incomplete Information Error
+> Causal
+> Spurious
+> 012345
+> Budget ( δ)
+> 0.00
+> 0.01
+> 0.02
+> 0.03
+> 0.04
+> 0.05
+> Transfer Error
+> Transfer Error
+> Causal
+> Spurious
+> 012345
+> Budget ( δ)
+> 0.560
+> 0.562
+> 0.564
+> 0.566
+> 0.568
+> 0.570
+> 0.572
+> Entropy Error
+> Entropy Error
+> Causal
+> Spurious
+> 012345
+> Budget ( δ)
+> 0.58
+> 0.59
+> 0.60
+> 0.61
+> 0.62
+> 0.63
+> 0.64
+> Total Error
+> Total Error
+> Causal
+> Spurious
+> Error decomposition: μ s= 0.001
+
+(a) Cost function weights: ( μs = 0 .001 , μ c = 1) 0 1 2 3 4 5                
+
+> Budget ( δ)
+> 0.020
+> 0.021
+> 0.022
+> 0.023
+> 0.024
+> Incomplete Information Error
+> Incomplete Information Error
+> Causal
+> Spurious
+> 012345
+> Budget ( δ)
+> 0.00
+> 0.01
+> 0.02
+> 0.03
+> 0.04
+> 0.05
+> Transfer Error
+> Transfer Error
+> Causal
+> Spurious
+> 012345
+> Budget ( δ)
+> 0.560
+> 0.562
+> 0.564
+> 0.566
+> 0.568
+> 0.570
+> 0.572
+> Entropy Error
+> Entropy Error
+> Causal
+> Spurious
+> 012345
+> Budget ( δ)
+> 0.58
+> 0.59
+> 0.60
+> 0.61
+> 0.62
+> 0.63
+> 0.64
+> Total Error
+> Total Error
+> Causal
+> Spurious
+> Error decomposition: μ c= 0.001
+
+(b) Cost function weights: ( μs = 1 , μ c = 0 .001) 
+
+Figure 6: Simulations with varying cost. Top: When the cost of changing spurious feature is significantly less that the causal feature (i.e. μs ≪ μc), transfer error leads the spurious classifier to have a significant disadvantage after strategic shifts. Bottom: On the other hand when μc ≪ μs, transfer error leads the causal classifier to have a slight disadvantage after strategic shifts due to the incomplete information error difference. From Figure 6, we observe that when μc ≪ μs, the spurious advantage is relatively minor compared to the causal advantage when the cost is reversed, due to the transfer error incurred by the spurious classifer. More specifically, when μc ≪ μs, both classifier achieve 0 transfer error because agents are not incentivized to game significantly, meaning the spurious feature remains a good proxy of the unobserved causal feature U . This leads the same spurious classifier to be optimal even after strategic shifts. However, when μs ≪ μc, the spurious feature is cheaper and easier to modify, which incentivizes agents to game more and intervene on their spurious feature. This results in Xs becoming a bad proxy of U after strategic shifts, and thus the optimal post-adaptation spurious classifier changes. This leads to significant transfer error for the spurious classifier, giving the pre-adaptaion causal classifier an advantage overall. The incomplete information also shows the effect of the spurious feature becoming a bad proxy of the unobserved causal feature. In the left-most graph of Figure 6a, the incomplete information error of the spurious classifier increases after strategic shifts. This behavior results from Xs becoming a weaker signal for U , and thus the optimal spurious classifier post-adaptation must mainly rely on the causal feature, the same as the causal classifier. When Xs remains a good proxy of U , which we see in the left graph of Figure 6b, the spurious classifier has a stable advantage due to the stable incomplete information error gap. From the second to last graphs, there are some slight variations in entropy due to the strategic shifts to the causal and spurious classifiers, but neither are large enough ( ≈ 10 −3) to affect which classifier has an advantage; they in fact just make the “advantage” gap in both cases slightly smaller. Overall, this confirms our interpretation of the decomposition in Section 5 and robustness of causal classifiers. The causal advantage in Figure 6a is due to the spurious classifier’s transfer error, even though the spurious incomplete information error simultaneously increases slightly. On the other hand in Figure 6b, the slight advantage of the spurious classifier comes from the small advantage of using the spurious feature and resulting difference in incomplete information error. The Role of Causal Features in Strategic Classification for Robustness and Alignment 
+
+D.2 Semi-synthetic Data 
+
+Because it is impossible to observe true post-adaptation data after agents strategically modify their features, our main experiments are conducted on fully synthetic data, allowing us to precisely control the data-generating process and ensure that the assumptions required by our theory hold. In particular, our theoretical results depend on knowledge of the causal structure and on the ability to compute counterfactual outcomes under strategic shifts, making experiments on purely real-world data infeasible for our purposes. To incorporate real-world feature distributions while retaining these guarantees, we additionally conduct semi-synthetic experiments. In this setting, the observed features X are taken from the real world Credit Risk dataset from Kaggle, while the remaining variables (namely U and Y ) are generated synthetically according to a known causal model (Tse, 2018). This allows us to evaluate our results under realistic feature distributions without introducing ambiguity about the underlying causal structure or counterfactual outcomes. Specifically, 
+
+• From the dataset, we define the causal feature XC to be the applicant’s income and spurious feature XS
+
+to be their age (which should not directly cause whether someone will pay back a loan but is likely to be correlated, for example confounded by whether the applicant has a savings account). 
+
+• We generate U as a Bernoulli variable with probability p = σ(XS ) so that U and XS are correlated. 
+
+• We generate Y as a function of XC and U as described in the fully synethetic experiments. Across all experimental settings, we observe the same qualitative behavior as in the fully synthetic case. In Figure 7, the optimal post-adaptation classifier again converges to a causal classifier once the adaptation budget 
+
+δ is sufficiently large, while classifiers relying on spurious features degrade as δ increases when trained on data with limited adaptation. In Figure 8, the incentive alignment experiments similarly show that the incentives of the institution and agents align for sufficiently large δ2 (the boundary of the region is denoted by the grey dashed line). Finally, the robustness experiments in Figure 9 reproduce the same tradeoff between transfer error and incomplete-information error, which we see through both varying max-gap and different cost functions for adaptation. 0.00 0.25 0.50 0.75 1.00 1.25 1.50         
+
+> δ
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Optimal ̂  ws in  (̂ f, δ)
+> Optimal spurious coefficient for varying δ
+> 0.00 0.25 0.50 0.75 1.00 1.25 1.50
+> δtest
+> 0.00
+> 0.05
+> 0.10
+> 0.15
+> 0.20
+> 0.25
+> 0.30
+> 0-1 loss
+> max -gap = 1
+> δtrain  = 0.1
+> 0-1 loss for small δtrain
+> Causal Classifier Error
+> Spurious Classifier Error
+
+Figure 7: 0-1 Loss (semi-synthetic data, cf. Figure 3). To obtain error bars we resample U five times, obtaining datasets with varying Y and train-test splits on the entire dataset. 0.00 0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00  
+
+> δ2
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> ε
+> Utility Alignment (Δ rp(hpost ,hpre ))
+> −0.4
+> −0.2
+> 0.0
+> 0.2
+> 0.4
+> Utility Difference (Post - Pre)
+
+Figure 8: Incentive Alignment (semi-syntheic data, cf. Figure 4). G´ ois, G¨ unl¨ uk, Rosenfeld, Hegde, Lacoste-Julien, Sridhar 0.0 0.5 1.0 1.5 2.0 2.5 3.0 
+
+Budget( δ)
+
+0.5 
+
+1.0 
+
+1.5 
+
+2.0 
+
+2.5 
+
+3.0 
+
+> max-gap
+
+Δ total loss (causal − spurious) 
+
+−0.002 
+
+−0.001 
+
+0.000 
+
+0.001 
+
+0.002 
+
+> CE diff (causal − spurious)
+
+(a) Varying max-gap (cf. Figure 5). 0 1 2 3 4 5
+
+> Budget ( δ)
+> 0.023
+> 0.024
+> 0.025
+> 0.026
+> 0.027
+> Incomplete Information Error
+
+Incomplete Information Error      
+
+> Causal
+> Spurious
+> 012345
+> Budget ( δ)
+> 0.0000
+> 0.0025
+> 0.0050
+> 0.0075
+> 0.0100
+> 0.0125
+> 0.0150
+> 0.0175
+> Transfer Error
+
+Transfer Error      
+
+> Causal
+> Spurious
+> 012345
+> Budget ( δ)
+> 0.604
+> 0.606
+> 0.608
+> 0.610
+> 0.612
+> 0.614
+> 0.616
+> Entropy Error
+
+Entropy Error      
+
+> Causal
+> Spurious
+> 012345
+> Budget ( δ)
+> 0.625
+> 0.630
+> 0.635
+> 0.640
+> 0.645
+> 0.650
+> 0.655
+> 0.660
+> Total Error
+
+Total Error 
+
+> Causal
+> Spurious
+
+Error decomposition: μ s = 0.001 
+
+(b) Cost weights: ( μs = 0 .001 , μ c = 1) 0 1 2 3 4 5
+
+> Budget ( δ)
+> 0.023
+> 0.024
+> 0.025
+> 0.026
+> 0.027
+> Incomplete Information Error
+
+Incomplete Information Error      
+
+> Causal
+> Spurious
+> 012345
+> Budget ( δ)
+> 0.0000
+> 0.0025
+> 0.0050
+> 0.0075
+> 0.0100
+> 0.0125
+> 0.0150
+> 0.0175
+> Transfer Error
+
+Transfer Error      
+
+> Causal
+> Spurious
+> 012345
+> Budget ( δ)
+> 0.604
+> 0.606
+> 0.608
+> 0.610
+> 0.612
+> 0.614
+> 0.616
+> Entropy Error
+
+Entropy Error      
+
+> Causal
+> Spurious
+> 012345
+> Budget ( δ)
+> 0.625
+> 0.630
+> 0.635
+> 0.640
+> 0.645
+> 0.650
+> 0.655
+> 0.660
+> Total Error
+
+Total Error 
+
+> Causal
+> Spurious
+
+Error decomposition: μ c = 0.001 
+
+(c) Cost weights: ( μs = 1 , μ c = 0 .001) 
+
+Figure 9: Robustness of causal classifiers ross-entropy loss (semi-synthetic data). (a) Varying max-gap (cf. Figure 5). (b)–(c) Varying cost function weights (cf. Figure 6). 
+
+E Example Setting 
+
+Consider the data generating process below, where X is sampled from a uniform distribution. 
+
+U ∼ Bern(0 .5) 
+
+Xc ∼ U (−1, 1) 
+
+Xs ∼ U (−1 + U, 1 + U )
+
+y = 1{Xc + 0 .5U + b ≥ 0}
+
+Under this setting, with knowledge of U it would be possible to obtain zero ℓ0−1, by the following classifier: 
+
+h(x, u ) = 
+
+(
+
+1{xc ≥ 0} if U = 0 
+
+1{xc ≥ − 0.5} if U = 1 
+
+Figure 10: Data generating process where X is sampled from a uniform distribution, and u ∈ { 0, 1}. Dashed grey lines are the correct decision boundaries for U = 0 and U = 1. On the right-hand side we have the analogous of Figure 2 for this example, where Xc ⊂ R has one dimension. As long as δ ≥ 0.5, where max-gap= 0 .5, our theory predicts the causal classifier hc(xc) ≜ 1{xc ≥ 0} obtains zero ℓ0−1 post-adaptation. The Role of Causal Features in Strategic Classification for Robustness and Alignment 
+
+However, without knowledge of U , there is an ambiguous region of X pre-adpatation. We can see in Figure 10 that, for δ ≥ 0.5, points can be moved out of this ambiguous region to obtain zero ℓ0−1 (Theorem 4.6). For 
+
+δ < max-gap, optimality of a causal hc(xc) is more nuanced, and we study the optimal classifier for this particular example in the next section. 
+
+E.1 Characterizing post-adaptation ℓ0−1 minimizers for δ < max-gap 
+
+When δ < max-gap, existing theory does not predict whether a causal classifier will remain optimal post-adaptation. In this example, when δ < 0.5 we lose the guarantee of Theorem 4.6. However, we show that the same causal classifier remains optimal for any δ ≥ 13 , among linear classifiers. We study the minimizer of ℓ0−1, among a family of linear classifiers defined as hlin (xc, x s) = 1{xc ≥ ax s + b}.We are interested in minimizing post-adaptation loss: min  
+
+> a,b
+
+E
+
+> x,u
+
+[ℓ0−1(hlin (∆ hlin (x; δ)) , y (x, u ))]. The closed-form expression for ℓ(a, b ) depends on how the boundary ∂hlin intersects the edges of the support over 
+
+X. Here we assume adaptation cost is L1-norm, resulting in the adaptation boundary xc = ax s + b − δ, where agents are indifferent between adapting or not. Other Lp-norms consist simply of shifting this boundary. We split the loss in four regions: FN for U = 0, FN for U = 1, FP for U = 0 and FP for U = 1. For FN, the shape of the error region depends on where the left and right edges of the support X for U = u
+
+are intersected by the adaptation boundary xc = ax s + b − δ. Denote this boundary as hδ-lin (xs) ≜ ax s + b − δ.For FN in U = 0, we have 9 different possible shapes for the loss region of given a, b parameters. Which of the 9 geometrical figures we get from a certain a, b depends on whether hδ-lin (−1) ≤ 0, hδ-lin (−1) ∈ (0 , 1) or 
+
+hδ-lin (−1) ≥ 1, and hδ-lin (1) ≤ 0, hδ-lin (1) ∈ (0 , 1) or hδ-lin (1) ≥ 1, resulting in 3 × 3 combinations. Similarly for FN in U = 1, the error shape depends on whether hδ-lin (−0.5) ≤ 0, hδ-lin (0) ∈ (−0.5, 1) or hδ-lin (0) ≥ 1, and 
+
+hδ-lin (2) ≤ − 0.5, hδ-lin (2) ∈ (−0.5, 1) or hδ-lin (2) ≥ 1. For FP, the shape of the error region depends on the classification boundary. We denote the classification boundary by h0-lin (xs), where δ = 0. We also obtain 9 possible shapes, which for U = 0 depends on whether 
+
+h0-lin (−1) ≥ 0, h0-lin (−1) ∈ (0 , −1 + δ) or h0-lin (−1) ≤ − 1 + δ, and h0-lin (1) ≥ 0, h0-lin (1) ∈ (0 , −1 + δ)or h0-lin (1) ≤ − 1 + δ. Similarly for U = 1, the area of error of FP depends on whether h0-lin (0) ≥ − 0.5, 
+
+h0-lin (0) ∈ (−0.5, −1+ δ) or h0-lin (0) ≤ − 1+ δ, and h0-lin (2) ≥ − 0.5, h0-lin (2) ∈ (−0.5, −1+ δ) or h0-lin (2) ≤ − 1+ δ.To circumvent the combinatorial explosion presented above, we resort to grid-search in this example to identify the shape of error induced by optimal a, b parameters, for a given δ. Let a spurious classifier be an h(xc, x s) such that xs can change the output ( a̸ = 0 in this parameterization). We identify a condition among the possible 94 described above, which is optimal for at least δ ∈ [0 .2, 13 ), arriving at a spurious classifier with the following description for ℓ0−1:
+
+ℓspur (a, b ) = 14 [( b − a − δ)(1 + δ − ba )
+
+| {z }  
+
+> FN for U=0
+
++ (0 .5 + δ − b)( −0.5 + δ − ba )
+
+| {z }  
+
+> FN for U=1
+
++ (1 + ba )(2 δ − b − a)
+
+| {z }  
+
+> FP for U=0
+
++ 0|{z}   
+
+> FP for U=1
+
+]By solving for ∂· 
+
+> ∂a
+
+= 0 and ∂· 
+
+> ∂b
+
+= 0 we get: aspur = −p1/12 − 0.5δ2, b spur = δ − 1/6. This analytical solution matches grid-search results and is depicted in Figure 11a. As δ increases, we see though grid-search a sudden transition to the causal classifier acaus = bcaus = 0, with loss ℓcaus (a, b ) = 2(0 .5 − δ). By setting ℓcaus (a = 0 , b = 0) = ℓspur (a = −p1/12 − 0.5δ2, b = δ − 1/6) and solving for δ, we arrive at δ = 13 .This identifies a phase transition, as δ increases, switching suddenly from an optimal spurious classifier into a causal one, when δ increases beyond 13 .Interestingly, our theory predicted this causal classifier to be optimal for δ > 12 , which is our max-gap for this setting. When δ < max-gap it becomes challenging to charaterize the optimal solution generally. However, we provide here an example where the same causal solution remains optimal even for δ < max-gap, particularly for any δ ∈ ( 13 , +∞) despite max-gap= 12 .G´ ois, G¨ unl¨ uk, Rosenfeld, Hegde, Lacoste-Julien, Sridhar      
+
+> (a) Optimal classifier for δ= 0 .3. (b) Optimal classifier for δ= 0 .34.
+
+Figure 11: Optimal classifiers for different δ, near the transition between causal and spurious solutions. 
+
+E.2 Including negative impact of FP’s in population’s utility 
+
+Consider the generative process described in the beginning of this section, and δ = 0 .5. We compute below the population’s utility (Definition 6.1) after deploying 2 classifiers: the one optimizing post-adaptation ℓ0−1 (which is causal, since δ ≥max-gap) and the one optimizing pre-adaptation ℓ0−1 (which uses the spurious feature). We then characterize alignment in this example, for varying δ2.
+
+E.2.1 Best ℓ0−1 post-adapt 
+
+Assume δ = 0 .5. The causal classifier a = 0 , b = 0 obtains zero ℓ0−1 post-adaptation (Theorem 4.6). 
+
+Figure 12: Best ℓ0−1 post-adaptation classification boundary ∂h, for δ = 0 .5, under the data generating process of section E. Regions where points adapted are labeled following Definition F.4. This yields: 
+
+• 75% positive labels 
+
+• Zero FPs The Role of Causal Features in Strategic Classification for Robustness and Alignment 
+
+• Expected cost of adapting Ex[c(x, ∆ ˆf (x))] = 0 .0625. This comes from R 
+
+> xc,x s
+
+c(x, ∆ ˆf (x)) P(xc, x s) = 0.52 ∗ 14 +0 ∗ 34 , where 0.52 is the average cost of adapting for those who move. (area of a triangle with base 0 .5 and height 0 .5 — those who move from furthest spend 0 .5, the ones touching the boundary spend 0). The expected utility of the predicted agents E[rp(hpost , x, u )] is then .75 ∗ .5 − .0625 − 0δ2 = 0 .3125. 
+
+E.2.2 Best ℓ0−1 pre-adapt 
+
+The parameters for the linear classifier that minimizes pre-adaptation ℓ0−1 are a = −0.224 , b = −0.138, which uses the spurious feature since a̸ = 0 (obtained through grid-search).      
+
+> (a) Support for U= 0. (b) Support for U= 1.
+
+Figure 13: Best ℓ0−1 pre-adaptation classification boundary ∂h, under the data generating process of section E. Regions where points adapted are labeled following Definition F.4. 
+
+• 87.25% positive labels 
+
+• 16.16% FPs 
+
+• Expected cost of adapting is 0 .0542 < Ex[c(x, ∆ ˆf (x))] < 0.0557. It is 0 .0625 − d where 0 .0068 < d < 0.0083 is the small triangle outside support X (with area .384 ∗ .086 /2) multiplied by its cost (which varies between .5 and .414 inside the triangle). The expected utility for the predicted agents E[rp(hpre , x, u )] is then upper-bounded by .8725 ∗.5−0.0542 −.1616 δ2
+
+and lower-bounded by .8725 ∗ .5 − 0.0557 − .1616 δ2, or 0 .38055 − .1616 δ2 < E[rp(h, x, u )] < 0.38205 − .1616 δ2.
+
+E.2.3 Comparing predicted agents’ utility rp under hpre or hpost 
+
+Agent utility from post-adaptation minimizer: E[rp(hpost , x, u )] = 0.3125. Agent utility from pre-adaptation minimizer: 0 .38055 − .1616 δ2 < E[rp(hpre , x, u )] < 0.38205 − .1616 δ2.The lowest δ∗ 
+
+> 2
+
+which guarantees alignment (∆ rp(hpost , h pre ) ≥ 0) is then upper-bounded by δ∗ 
+
+> 2
+
+< 0.43, for δ = 0 .5. Even if δ > δ 2 (i.e., FPs still provide a small gain) we have alignment, ∆ rp(hpost , h pre ) ≥ 0. In words, the population still prefers on average a strategic institution that prevents gaming, even though this would bring a small benefit to agents compared to being classified as TN. 
+
+F Incentive Alignment 
+
+Consider the following definition of h-change: G´ ois, G¨ unl¨ uk, Rosenfeld, Hegde, Lacoste-Julien, Sridhar 
+
+Definition F.1. (Conditional h-change) Expected change in utility when switching from classifier h into h′ for role k, where k ∈ { p, i } is either predicted agent p or institution i. For the subset of agents where Y = y, we have ∆ rp|Y =y and ∆ ri|Y =y :∆rk|Y =y (h′, h ) = Ex,u |y [rk(h′, ∆h′ (x), u )] − Ex,u |y [rk(h, ∆h(x), u )] 
+
+F.1 Static Alignment Proposition F.2. (Static alignment) Assume ∆h(x) = x and δ2 = ϵ = 0 . For any pair of classifiers ( ˆf ′, ˆf ),institution’s goals match the goals of agents whose y = 1 but not of y = 0 , in the following sense: 
+
+∆rp|Y =1 (h′, h ) > 0 ⇐⇒ ∆ri|Y =1 (h′, h ) > 0∆rp|Y =0 (h′, h ) < 0 ⇐⇒ ∆ri|Y =0 (h′, h ) > 0
+
+Definition F.3. (FN, FP, TN, TP) Consider the following auxiliary definitions: 
+
+FN (h(x), y ) = 1{h(x) = 0 and y = 1 }
+
+FP (h(x), y ) = 1{h(x) = 1 and y = 0 }
+
+TN (h(x), y ) = 1{h(x) = 0 and y = 0 }
+
+TP (h(x), y ) = 1{h(x) = 1 and y = 0 }
+
+Proof. With static ( y, x ) pairs, the only changes which can occur from a change in h are: 1. for y = 1, FN ↔ TP 2. for y = 0, FP ↔ TN From the definitions of rp (6.1) and ri (6.2), we see that in case 1. both rp and ri increase with TP and decrease with FN. For case 2. TN increases ri and reduces rp, while FP reduces ri and increases rp.This follows from the fact that agents always gain when a negative prediction ( h(∆ h(X)) = 0) is changed into positive ( h′(∆ h′ (X)) = 1), while the institution only benefits from this change if true outcome is also positive (y = 1). It is illustrated by Table 1. 
+
+Institution Predicted Agents 
+
+δ2 = 0 (δ2 > δ )TP ! !
+
+FN X X
+
+TN ! X ( !)
+
+FP X !(X) Table 1: Contribution of static points (∆ h(x) = x) to utility of institution ( ri) and of predicted agents ( rp). 
+
+!denotes a non-negative contribution, and X a decrease in utility. Green rows indicate similar impact for institution and agents (contributing to alignment), and red otherwise. Parentheses in predicted agents indicate contribution when δ2 > δ , if it does not match contribution when δ2 = 0. 
+
+F.2 Dynamic Alignment 
+
+To understand how hpost may differ from hpre , we can ask what additional information the institution receives when it knows the correct adaptation model ∆ h(x; δ), instead of wrongly assuming static behavior ∆ h(x) = x.Agents adapt to increase their utility, which is only possible when, pre-adaptation, they would be assigned a negative label h(x) = 0. This allows enumerating all four kinds of additional information for the institution when it becomes strategic (i.e., when it anticipates agents’ adaptation). For a given classifier hpre , a population of agents may respond through (some of) the following adaptations: The Role of Causal Features in Strategic Classification for Robustness and Alignment 
+
+Definition F.4. (All possible adaptations) For any x : ∆ h(x)̸ = x, its adaptation must fall in one of four categories, which we name below. This is because a point only moves to switch from negative h(x) = 0 into positive h(∆ h(x)) = 1. We also characterize their impact on ri.
+
+• TN → TP ( improvement ) ri →
+
+• FN → TP ( wasted effort ) ri ↗
+
+• TN → FP ( gaming ) ri ↘
+
+• FN → FP ( reversed incentive ) ri →
+
+The arrows describe whether ri goes up ( ↗), down ( ↘), or stays constant ( →) after agent-adaptation, for a fixed classifier, assuming short-term goals ( δ2 = ϵ = 0). Table 2 also depicts this. An illustration is provided in the running example of § E.2 for intuition. 
+
+Institution Predicted Agents 
+
+ϵ = 0 (ϵ > 0) δ2 = 0 (δ2 > δ )
+
+Improvement ( TN → TP ) = ( !) !
+
+Wasted effort ( FN → TP ) ! !
+
+Gaming ( TN →FP ) X !(X) Reversed incentive ( FN →FP ) X !(X) Table 2: Contribution of dynamic points (∆ h(x)̸ = x) to utility of institution ( ri) and of predicted agents (rp), when they switch from pre-adaptation x into post-adaptation ∆ h(x). !denotes an increase in utility, and X a decrease. Green rows indicate similar impact for institution and agents (contributing to alignment), red indicates opposite impact, and grey indicates indifferent for the institution. Parentheses in predicted agents indicate contribution when δ2 > δ , if it does not match contribution when δ2 = 0. Parentheses in institution indicate contribution when ϵ > 0, if it does not match contribution when ϵ = 0. We can then study which changes an institution can make when switching from hpre (x) to hpost (x) (when 
+
+becoming strategic ). Note that, if our family of hypotheses H (where h ∈ H ) is sufficiently expressive, we can independently estimate P(Y |X) for each X, and then threshold it to obtain classifier h(x). 
+
+F.2.1 Short-term Alignment Lemma F.5. (Support over positive predictions) Let the learned classifier be h(x) = 1{f (x) ≥ 0}, where 
+
+f (x) estimates P(Y |X), and its boundary be ∂h = {x ∈ X : f (x) = 0 }. Assume the family of hypotheses H
+
+is flexible enough that it can estimate independently P(Y |X) for each x. Assume full support over points that can adapt towards hpre and hpost : ∆−1 
+
+> hpre
+
+(∂hpre ) ∪ ∆−1 
+
+> hpost
+
+(∂hpost ) ⊂ X , also δ2 = ϵ = 0 , hpost ̸ = hpre and ysco is O-nondecreasing with respect to xc. Then, we have that points obtaining a positive prediction under hpost are a subset of those obtaining a positive prediction under hpre : {x ∈ X : hpost (x) = 1 } ⊂ { x ∈ X : hpre (x) = 1 }.Proof. Any agent’s adaptation must fall in one of the four categories defined in F.4, since points only adapt to switch from h(x) = 0 into h(∆ h(x)) = 1. Given H is flexible enough, hpost ̸ = hpre only happens as a response to wasted effort or gaming, since the two remaining adaptations do not impact ri.
+
+ysco is O-nondecreasing with respect to xc. Hence, to improve utility as a response to gaming or wasted effort, the boundary should move from hpre to hpost along orthant Os. To prevent gaming, it should increase along the direction where ysco increases (along Os). Awareness of wasted effort allows to incur in error by being overly demanding (also along Os) knowing that points will self-correct, by switching, from hpost (x) yielding FN, into 
+
+hpost (∆ hpost (x)) yielding TP. hpost may gain from increasing wasted effort, if it avoids other errors made by hpre ,such as FPs. Formally, we have that ∀xpost -∂ ∈ ∂post \ ∂pre , ∃ xpre -∂ ∈ ∂pre \ ∂post : xpost -∂ ∈ Os \⃗ 0 + xpre -∂ .From the full support assumption: G´ ois, G¨ unl¨ uk, Rosenfeld, Hegde, Lacoste-Julien, Sridhar 
+
+∆−1 
+
+> hpre
+
+(∂hpre ) ⊂ X ⇒ ∀ xpre -∂ ∈ ∂hpre ∃ ˜x ∈ ∆−1 
+
+> hpre
+
+(xpre -∂ ) ⊂ X : δ = min  
+
+> x′
+
+c(˜ x, x ′) s .t. (hpre (x′) = 1). Combining both results above, we have that ∃ ˜x : hpre (∆ hpre (˜ x)) = 1 , h post (∆ hpost (˜ x)) = 0, since any point ˜ x
+
+whose cost of adapting to hpre was δ and ∆ hpre (˜ x)̸ ∈ ∂hpost , has cost of adapting to hpost as δ′ > δ , hence will not adapt. Analogously, since the post-adapt boundary became more demanding, no point that is positively classified by 
+
+hpost is negatively classified by hpre :
+
+∀xpost -∂ ∈ ∂post \ ∂pre , ∃ xpre -∂ ∈ ∂pre : xpost -∂ ∈ xpre -∂ + Os ⇏ ∃ ˜x : hpost (∆ hpost (˜ x)) = 1 , h pre (∆ hpre (˜ x)) = 0 Since we have points ˜ x that lose their positive label post-adapt, and no point that gains one, then: 
+
+{x ∈ X : hpost (x) = 1 } ⊂ { x ∈ X : hpre (x) = 1 }
+
+Under short term goals δ2 = ϵ = 0, for hpost ̸ = hpre , a flexible enough H and O-nondecreasing ysco , we do not have aligned incentives. 
+
+Proposition F.6. (Short-term misalignment) Let ∆rp-short be h-change for δ2 = 0 , and hpost -short be optimal for ϵ = 0 . Under the assumptions of Lemma F.5, we have: 
+
+∆rp-short (hpost -short , h pre ) < 0
+
+Proof. From the proof of Lemma F.5 we have that hpost is more demanding than hpre , in the sense that ∀xpost -∂ ∈
+
+∂post \ ∂pre , ∃ xpre -∂ ∈ ∂pre \ ∂post : xpost -∂ ∈ xpre -∂ + Os \⃗ 0. Since ysco is O-nondecreasing with respect to xc, a point ˜ x is classified as h(˜ x) = 1 if ∃ xb ∈ ∂h : xb ≺Os ˜x.We know ∀˜x, ∆hpre (˜ x)̸ = ˜ x ⇒ h(˜ x) = 0, so when the boundary changes by summing v ∈ Os its distance to ˜ x
+
+increases in Lp-norm. Hence ∀˜x, ∆hpost (˜ x)̸ = ∆ hpre (˜ x), h (∆ hpost (˜ x)) = 1 : c(˜ x, ∆hpost (˜ x)) > c (˜ x, ∆hpre (˜ x)). From Lemma F.5, the number of points receiving δ from h(∆ h(x)) = 1 will reduce. From the definition of rp (Definition 6.1), higher cost and reduced δ determine lower E
+
+> x,u
+
+[rp(h, x, u )], since we are assuming δ2 = 0. Therefore ∆ rp-short (hpost -short , h pre ) < 0. 
+
+F.2.2 Long-term Alignment 
+
+Assuming δ2 > 0 and ϵ = 0, we have the same hpost as when δ2 = ϵ = 0, since institution’s utility ri does not change. From Lemma F.5, we have that the boundary ∂hpost becomes more demanding than ∂hpre , by increasing along Os. Then for any ˜ x, if ∆ hpost (˜ x)̸ = ∆ hpre (˜ x), its change from hpre to hpost must have been one of the categories below: 
+
+• (maint) Maintained FP or TP at higher cost; 
+
+• (impr) Switched from gaming to improvement (FP → TP); 
+
+• (TP → N) Switched from TP into FN or TN; 
+
+• (FP → TN) Switched from FP into TN. Denote a point’s change in adaptation cost as: ∆c(x) ≜ c(x, ∆hpost (x)) − c(x, ∆hpre (x)) To compute ∆ rp(hpre , h post ) we must then consider how each group’s utility rp changed: The Role of Causal Features in Strategic Classification for Robustness and Alignment 
+
+• Increased cost of maintaining FP or TP: −∆c(x)
+
+• Gain of improving (FP → TP): δ2 − ∆c(x)
+
+• Cost of TP → N: −δ − ∆c(x)
+
+• Cost of FP → FN: −(δ − δ2) − ∆c(x)For each of the previous groups, denote their densities as: P(maint) := R 
+
+> x∈{ maint }
+
+P(x), and similarly P(impr), 
+
+P(TP → N), P(FP → TN). Their total costs are c(all) := R 
+
+> x∈X
+
+∆c(x)P(x). 
+
+Proposition F.7. (Long-term alignment) Considering a flexible enough H and ϵ = 0 , having alignment requires: 
+
+δ2 > c(all) + δ(P(TP → N) + P(FP → TN)) 
+
+P(impr) + P(FP → TN) 
+
+Proof. ∆rp(hpost , h pre ) ≥ 0 ⇔
+
+δ2P(impr) − δP(TP → N) − (δ − δ2)P(FP → TN) − c(all) ≥ 0 ⇔
+
+δ2 > c(all)+ δ(P(TP →N)+ P(FP →TN)) 
+
+> P(impr)+ P(FP →TN)
+
+As long as enough agents benefit from improvement, δ2 > δ is not required. One example of long-term alignment with δ2 < δ is in § E.2.3 in the appendix. 
+
+F.3 Simulations 
+
+To understand Figure 4, we provide additional heatmaps in Figure 14. In (c) we have the same plot as in Figure 4, but for a wider range of ϵ. In (a) and (b) we have expected agent utilities under hpre and hpost , respectively. Note (c) is generated by subtracting (b) −(a). In (b), for low values of ϵ, the classifier hpost is always the same and does not incur any FPs, hence rp is not affected by variations in δ2. Since hpre for low ϵ incurs some FPs, as 
+
+δ2 increases agents progressively prefer hpost , as seen in (c). As epsilon increases to intermediate values (around 
+
+ϵ ∈ (0 .3, 0.65)), both hpre and hpost incur in more FPs, as a consequence of avoiding TNs. This makes agents prefer higher ϵ when δ2 is low. However, increasing δ2 reverses this trend, and agents are more harmed by hpre 
+
+than by hpost , since hpre incurs more FPs. For high values of ϵ, both hpre and hpost arrive at the same solution. 
+
+(a) E
+
+> x,u
+
+[rp(hpre , x, u )], expected agent utility when minimizing ℓ0−1 un-aware of agent adaptation. 
+
+(b) E
+
+> x,u
+
+[rp(hpost , x, u )], expected agent utility when minimizing ℓ0−1
+
+aware of agent adaptation. 
+
+(c) Alignment ∆ rp(hpost , h pre ), dif-ference between both heatmaps to the left. ( hpost − hpre )(d) All three plots above consider ϵ when minimizing pre-adaptation ℓ0−1
+
+Figure 14: Detail version of Figure 4, also using δ = 0 .3. (c) is alignment ∆ rp(hpost − hpre ), equal to Figure 4 but for a wider range of ϵ. (a) and (b) are expected agent utilities, where the subtraction (b) −(a) leads to plot (c).

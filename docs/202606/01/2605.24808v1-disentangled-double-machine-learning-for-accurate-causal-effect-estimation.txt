@@ -1,0 +1,1884 @@
+Title: Disentangled Double Machine Learning for Accurate Causal Effect Estimation
+
+URL Source: https://arxiv.org/pdf/2605.24808v1
+
+Published Time: Tue, 26 May 2026 01:00:32 GMT
+
+Number of Pages: 15
+
+Markdown Content:
+> JOURNAL OF L ATEX CLASS FILES, VOL. 18, NO. 9, SEPTEMBER 2020 1
+
+# Disentangled Double Machine Learning for Accurate Causal Effect Estimation 
+
+Guodu Xiang, Kui Yu*, Senior Member, IEEE , Yujie Wang, Richang Hong, Senior Member, IEEE ,Fuyuan Cao, and Jiye Liang, Fellow, IEEE 
+
+Abstract —Confounding bias is a key challenge in causal effect estimation from observational data. Double Machine Learning (DML) addresses this issue by estimating treatment and outcome nuisance functions, constructing treatment and outcome residu-als, and estimating causal effects from the residuals. However, DML often produces biased and unstable estimates in high-dimensional or finite-sample scenarios. One reason is that DML estimates nuisance functions using all covariates without disen-tangling distinct latent factors, resulting in unreliable nuisance function estimation. Another is that imprecise nuisance estima-tion further introduces residual dependence between the treat-ment residual and the remaining outcome error, undermining the accuracy of causal effect estimates. To address these issues, in this paper, we propose Disentangled Double Machine Learning (DDML), a novel algorithm that integrates two key strategies. First, a causal role disentanglement strategy decomposes covari-ates into confounders, treatment-specific factors, and outcome-specific factors for enabling reliable nuisance function estimation. And second, a residual dependence orthogonalization strategy mitigates residual dependence caused by nuisance estimation errors for enhancing the precision of causal effect estimates. Experimental results on synthetic, semi-synthetic, and real-world datasets demonstrate that DDML significantly outperforms 13 state-of-the-art baseline algorithms in both MAE and RMSE. 
+
+Index Terms —Double Machine Learning; Causal Effect Esti-mation; Disentangled Representation Learning; Neyman Orthog-onality 
+
+I. I NTRODUCTION 
+
+Causal effect estimation aims to calculate the impact of a treatment variable T on the outcome variable Y , and has been widely used in many fields [1], [2], [3]. For example, in labor economics, researchers may wish to evaluate whether partic-ipating in a job training program ( T ) affects an individual’s income ( Y ). However, estimating causal effects from observa-tional data remains challenging because of confounding bias, caused by confounders that simultaneously influence both the treatment and the outcome [4]. To reduce confounding bias, traditional methods such as matching and propensity score-based approaches [5], [6] ad-just observed covariates ( X) between treatment and control groups. Nevertheless, these methods often struggle with high-dimensional covariates and with complex relationships. To 
+
+Guodu Xiang, Kui Yu, Yujie Wang and Richang Hong are with the School of Computer Science and Information Engineering, Hefei University of Technology, Hefei 230601, China. (e-mail: {xgd600600, yujiewang }@mail.hfut.edu.cn; ykui713@gmail.com; hongrc@hfut.edu.cn) (*corresponding author: Kui Yu). Fuyuan Cao and Jiye Liang are with the School of Computer and Infor-mation Technology, Shanxi University, Taiyuan 030006, China. (e-mail: {cfy, ljy }@sxu.edu.cn). 
+
+address this limitation, representation learning-based methods [7], [8], [9] have been proposed to learn balanced representa-tions of covariates in latent spaces. Although these methods have achieved some empirical success, many existing ap-proaches are primarily designed for binary treatment settings, which limits their applicability to more general treatment scenarios. To address this issue, Double Machine Learning (DML) [10] provides a flexible framework for causal effect estimation. Specifically, DML first estimates two nuisance functions: the conditional expectation functions of the treat-ment and outcome, denoted by ˆm(X) and ˆg(X), where 
+
+m(X) = E[T | X] and g(X) = E[Y | X]. It then constructs the residuals of the treatment and outcome as ˜T = T − ˆm(X)
+
+and ˜Y = Y − ˆg(X), to remove the influence explained by 
+
+X. The causal effect θ is estimated by regressing ˜Y on ˜T .Built on Neyman orthogonality, DML has desirable theoretical debiasing properties for estimating causal effects. 1.0 0.5 0.0 0.5 1.0   
+
+> Estimation bias ()
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> 1.2
+> Density
+> DML-MLP
+> C-DML
+> True
+
+(a) DML-MLP C-DML True  
+
+> Method
+> 0.00
+> 0.02
+> 0.04
+> 0.06
+> 0.08
+> Additional residual dependency  DML-MLP
+> C-DML
+> True
+
+(b) 
+
+Fig. 1: (a) Bias distributions of causal effect estimates ob-tained by DML-MLP (i.e., DML with a multi-layer perceptron estimator) and C-DML on the IHDP dataset, where ˆθ and θ
+
+denote the estimated and true causal effects. (b) Additional dependency between the treatment residual and the remaining outcome error after removing the treatment effect under DML-MLP and C-DML. However, this desirable orthogonal debiasing property is often difficult to be satisfied in practice, especially when a dataset has limited samples, high-dimensional covariates, or complex dependency relationships. As a result, DML-based methods may remain biased in real-world settings. As shown in Fig. 1 (a), we validate this issue on the semi-synthetic 
+
+IHDP dataset, where the bias distributions of the classic DML [10] and its improved variant C-DML [11] are shifted away from zero rather than centered around it, indicating that their estimation results are not consistent with the true causal effect. We find that this inaccuracy mainly arises from two reasons.  
+
+> arXiv:2605.24808v1 [cs.LG] 24 May 2026 JOURNAL OF L ATEX CLASS FILES, VOL. 18, NO. 9, SEPTEMBER 2020 2
+
+First, during nuisance function estimation, DML learns 
+
+m(X) and g(X) from the full covariates X, without separating variables with different causal roles. For example, when study-ing whether participating in a job training program ( T ) affects income ( Y ), education level and prior work experience may act as confounders that influence T and Y , enrollment preference as a treatment-specific factor that influences only T , and job skill level as an outcome-specific factor that influences only 
+
+Y . Therefore, treatment-specific factors may be introduced into the outcome model g(X), while outcome-specific factors may be introduced into the treatment model m(X), leading to nuisance estimation errors. Second, during causal effect estimation, DML estimates the causal effect by regressing ˜Y on ˜T , which relies on accurate nuisance estimation to remove covariate effects. Ideally, the remaining error term ϵ = ˜Y − θ ˜T should be uncorrelated with 
+
+˜T , i.e., E[ ˜T ϵ ] = 0 . However, when the nuisance functions are estimated inaccurately, some covariate effects may remain in the residuals. As a result, additional statistical dependence may remain between the treatment residual and the remaining outcome error after removing the treatment effect, which can be reflected by a violation of the moment condition E[ ˜T ( ˜Y −
+
+θ ˜T )] ̸ = 0 , reducing the accuracy of causal effect estimation. As shown in Fig. 1 (b), our experiments on the IHDP dataset provide empirical evidence for this extra dependence in both DML and C-DML. This indicates that the orthogonal moment condition may not be fully satisfied in practice. To address the above issues, we propose DDML, a disen-tangled double machine learning algorithm that enhances the accuracy of causal effect estimation. Our main contributions are summarized as follows: 
+
+• We develop a Causal Role Disentanglement (CRD) strat-egy to decompose covariates into distinct causal factors, enabling more accurate estimation of nuisance functions under complex covariate dependency relationships. 
+
+• We design a Residual Dependence Orthogonalization (RDO) constraint to mitigate residual dependence be-tween the treatment residual and the remaining outcome error, improving the precision of causal effect estimation. 
+
+• We conduct extensive experiments on synthetic, semi-synthetic, and real-world datasets to validate the effec-tiveness of DDML. Results show that DDML outperforms 13 state-of-the-art baselines, achieving average improve-ments of 57.45% in MAE and 58.85% in RMSE over the best competitor on synthetic datasets, and average improvements of 32.2% in MAE and 29.3% in RMSE on semi-synthetic and real-world datasets. II. R ELATED WORK 
+
+We focus on the potential outcomes model (POM) [7], [12]-based causal effect estimation methods which can be broadly categorized into traditional methods, representation learning methods, and debiased estimation methods. Traditional methods mitigate confounding bias primarily through covariate adjustment and propensity score modeling, with representative approaches including matching [13], [6], inverse probability weighting (IPW) [14], [15], doubly robust estimation (DR) [16], [17], and tree-based models [18], [19]. However, in high-dimensional settings with complex nonlin-earities, these methods suffer from the curse of dimensionality. To overcome these limitations, representation learning meth-ods map covariates into a latent space and balance these learned representations across different treatment groups. Clas-sic balancing-based methods, such as BNN [20] and CFRNet [7], estimate causal effects by reducing distributional discrep-ancies between treatment and control groups in the learned representation space. Related extensions further improve rep-resentation balancing through local similarity preservation and contrastive learning [8], [21]. Representative generative and adversarial methods, such as CEVAE [22] and GANITE [23], improve causal effect estimation by recovering latent con-founders or predicting counterfactual outcomes. Subsequent variants [9], [24], [25] of these models have further enhanced robustness against complex observational biases. In addition, methods such as D2VD [26], DR-CFR [27], and related extensions [28], [29], [30], improve causal effect estimation by incorporating additional constraints into representation learn-ing, enhancing the model’s robustness. However, existing rep-resentation learning methods are mainly designed for binary treatments and rely on representation balancing, limiting their applicability to more general treatment settings. Double Machine Learning (DML) [10] is a flexible frame-work for causal effect estimation with strong debiasing prop-erties. It estimates causal effects by residualizing the treat-ment and outcome variables with their corresponding nuisance functions. Combined with Neyman orthogonality and cross-fitting, DML enables more reliable causal effect estimation. Building on this framework, several extensions have been proposed. DML-ID [31] extends DML to general causal dia-grams. C-DML [11] improves finite-sample estimation through coordinated learning. Auto-DML [32] further automates bias correction and avoids manual derivation of orthogonal score functions. However, these methods do not distinguish covariate roles in nuisance estimation, leading to inaccurate effect estimates in practice. III. P RELIMINARIES 
+
+A. Notations and Assumptions 
+
+Let the observed dataset be D = {(Xi, T i, Y i)}Ni=1 , where 
+
+i indexes individuals and N is the sample size. For each individual i, Xi ∈ X ⊂ Rd denotes a d-dimensional vector of observed covariates, Ti denotes the treatment, and Yi ∈ R
+
+denotes the observed outcome. In this paper, we consider both binary and continuous treatment settings. For simplicity, we take the binary treatment setting as an example, where 
+
+Ti ∈ { 0, 1}, with Ti = 1 indicating treatment and Ti = 0 
+
+indicating control. Under the POM, let Yi(1) and Yi(0) denote the potential outcomes of individual i under treatment and control, respectively, such that the observed outcome satisfies 
+
+Yi = TiYi(1) + (1 − Ti)Yi(0) . The individual treatment effect (ITE) is defined as τi = Yi(1) − Yi(0) , but it is not directly estimated because one potential outcome is always missing. Our target estimand is the average treatment effect (ATE), 
+
+θ = E[Yi(1) − Yi(0)] , where the expectation is taken over JOURNAL OF L ATEX CLASS FILES, VOL. 18, NO. 9, SEPTEMBER 2020 3
+
+the population. The continuous treatment setting considered later is formulated under the partially linear model, where the target parameter corresponds to the ATE of treatment on the outcome. The main notations are summarized in Table I. TABLE I: Notations and Their Meanings                                              
+
+> Notation Meaning
+> P(Y, T, X )Data distribution
+> iIndividual
+> NSample size
+> X∈RdCovariates (Features)
+> dFeature dimension
+> T∈RTreatment
+> Y∈ROutcome
+> Y(0) , Y (1) Potential outcomes of control and treatment
+> DDataset {(Xi, T i, Y i)}Ni=1
+> τiIndividual causal effect, ITE
+> θAverage treatment effect, ATE
+> g(·)Outcome nuisance
+> m(·)Treatment nuisance
+> η={g, m }Nuisance functions
+> ψ(·)Orthogonal score
+> IkThe k-th fold
+> Itra Training fold D \ I k
+> Ihold Held-out fold, Ik
+> ΦDisentangled encoder
+> ΨPrediction network
+> (Zc, Z t, Z y)Latent representations for different causal roles
+> ˆT , ˆYCross-fitted nuisance predictions
+> KThe number of folds
+> λdis Weight of Ldis
+> λort Weight of Lort
+> ΘRegularization term
+
+The ATE can be estimated from the data distribution 
+
+P(X, T, Y ) under the following assumptions. 
+
+Assumption 3.1. Consistency: For each individual i, the observed outcome equals the potential outcome under the received treatment, i.e., Yi = Yi(Ti) (equivalently, if Ti = t
+
+then Yi = Yi(t)). 
+
+Assumption 3.2. Stable Unit Treatment Value Assumption (SUTVA): There is no interference between units and no hidden versions of treatment, so each unit’s potential outcomes depend only on its own treatment assignment. 
+
+Assumption 3.3. Unconfoundedness: Treatment assignment is independent of the potential outcomes conditional on observed covariates, i.e., T ⊥⊥ { Y (t)} | X, implying that all confound-ing variables are observed. 
+
+Assumption 3.4. Positivity: For every individual, the probabil-ity of receiving either treatment is positive, i.e., 0 < P (T = t |
+
+X) < 1, ensuring that all relevant subgroups are represented in treatment groups. B. Double Machine Learning 
+
+Under Assumptions 3.1–3.4, the target causal effect θ0 can be estimated from the observed data distribution P(X, T, Y ).We consider the partially linear model (PLM), where N
+
+independent and identically distributed samples (Xi, T i, Y i)
+
+are drawn from the same distribution: 
+
+Y = θ0T + f0(X) + ζ, E[ζ | X, T ] = 0 ,T = m0(X) + ε, E[ε | X] = 0 , (1) where θ0 is the target causal effect, m0(X) = E[T | X], and 
+
+g0(X) = E[Y | X]. Under the PLM, we have 
+
+g0(X) = θ0m0(X) + f0(X). (2) DML estimates θ0 through an orthogonal score function 
+
+ψ(W ; θ, η ), where W = ( X, T, Y ) and η = {g, m } denotes the nuisance functions. At the population level, define the residualized treatment and outcome under the true nuisance functions as 
+
+˜T = T − m0(X), ˜Y = Y − g0(X). (3) Then the PLM implies 
+
+˜Y = θ0 ˜T + ζ, (4) which yields the ideal population moment condition 
+
+E( ˜Y − θ0 ˜T ) ˜T  = 0 . (5) Motivated by this oracle moment equation, the Neyman-orthogonal score is given by 
+
+ψ(W ; θ, η ) =  Y − g(X) − θ(T − m(X))   T − m(X), (6) where g(X) and m(X) are generic nuisance functions. This score satisfies the Neyman orthogonality condition at the true parameter values (θ0, η 0), with η0 = {g0, m 0}, namely, 
+
+∂∂η Eψ(W ; θ0, η )
+
+> η=η0
+
+= 0 . (7) To mitigate overfitting and enable valid inference when estimating nuisance functions with flexible machine learning models, DML employs K-fold cross-fitting. Specifically, the sample indices {1, . . . , N } are randomly partitioned into K
+
+mutually exclusive folds {I k}Kk=1 . For each fold k, the nui-sance functions ˆgk and ˆmk are estimated on the complemen-tary sample {1, . . . , N }\I k and evaluated on the held-out fold 
+
+Ik. For each i ∈ I k, the out-of-fold residuals are constructed as: ˜Ti = Ti − ˆmk(Xi), ˜Yi = Yi − ˆgk(Xi). (8) Aggregating the out-of-fold residuals across all folds yields the DML estimator: 
+
+ˆθ = ˜T⊤ ˜Y
+
+˜T⊤ ˜T . (9) Therefore, DML estimates the causal effect by regressing the cross-fitted residualized outcome on the cross-fitted residual-ized treatment under the orthogonal moment condition. IV. T HE PROPOSED DDML M ETHOD 
+
+To address the practical bias of double machine learning caused by mixed covariate roles and residual dependence, we propose a Disentangled Double Machine Learning (DDML) algorithm. As illustrated in Fig. 2, DDML consists of three procedures. First, to resolve the mixed causal roles of covari-ates in nuisance learning, we design a Causal Role Disentan-glement (CRD) strategy to separate confounders, treatment-specific factors, and outcome-specific factors for improving the accuracy of nuisance estimation. Second, to mitigate the remaining dependence between the treatment residual JOURNAL OF L ATEX CLASS FILES, VOL. 18, NO. 9, SEPTEMBER 2020 4Causal Role Disentanglement Residual Dependence Orthogonalization Orthogonal ATE Estimation 
+
+## T
+
+## X
+
+## Y
+
+## Zt
+
+## Zc
+
+## Zy
+
+Y
+
+##  
+
+> ort
+
+Corr( ), v u 
+
+## Zt Zc Zy
+
+## Zt Zc Zy   
+
+> Observation covariates Neural networks Covariate representation Prediction results
+
+hold-out fold train fold K-1 
+
+## k-th all K folds results 
+
+Ypre ^
+
+## K-fold cross-fitting 
+
+Tpre ^
+
+ˆpre e Y Y  ˆ km ˆkg
+
+ hold T  hold Y
+
+ˆpre v T T 
+
+> tra
+
+  
+
+v e v e 
+
+> 
+> tra
+
+ u e v
+
+ res  T T T
+
+ res  Y Y Y    
+
+> 
+> res res res res ˆ
+
+   
+
+> TYTT
+> 
+
+total sup dis dis ort ort         
+
+# λ λ  
+
+> sup TY
+
+##   λ λ
+
+Tλ
+
+Yλ
+
+dis  sup                   
+
+> dis HSIC( )HSIC( )HSIC( )ctcytyZ Z Z Z Z Z ,,,
+
+Fig. 2: Overview of the DDML algorithm. and the remaining outcome error, we develop a Residual Dependence Orthogonalization (RDO) constraint. Finally, we integrate these two components into a cross-fitted procedure for orthogonal ATE estimation. The pseudocode of DDML is provided in Algorithm 1. 
+
+A. Causal Role Disentanglement 
+
+As shown in Fig. 3 (a), the observed covariates X may contain confounders Xc, treatment-specific factors Xt, and outcome-specific factors Xy . Directly learning the treatment and outcome nuisance functions from the original covariates may mix these causal roles, impairing nuisance estimation and reducing the accuracy of causal effect estimation. To address this issue, we propose a Causal Role Disentanglement (CRD) strategy, which disentangles X into three role-specific latent representations for nuisance learning as in Fig. 3 (b). X
+
+Xt Xc Xy
+
+T Y
+
+(a) 
+
+X
+
+Zt Zc Zy
+
+T Y
+
+(b) 
+
+CRD  
+
+> false interference causal role influence covariate decomposition
+
+Fig. 3: (a) The observed covariates X contain treatment-specific variables Xt, confounders Xc, and outcome-specific variables Xy . (b) CRD disentangles X into three latent repre-sentations Zt, Zc and Zy .For the k-th fold of data, we use Ihold = Ik as the held-out sample and Itra = {1, . . . , N } \ I k as the training sample. On Itra , we first initialize a representation function Φ, which maps the original covariates into three disentangled latent representations, as defined in Eq. (10): 
+
+(Zc, Zt, Zy ) = Φ( X[Itra ]) , (10) 
+
+Algorithm 1 DDML: Disentangled Double Machine Learning 
+
+1: Input: dataset D = {(Xi, T i, Y i)}Ni=1 ; folds K; hyperpa-rameters λdis , λ ort ; constant δ
+
+2: Output: ˆθ
+
+3: Randomly split indices {1, . . . , N } into K folds {I k}Kk=1 
+
+4: ˆT ← ∅ ; ˆY ← ∅ 
+
+5: for k = 1 to K do 
+
+6: Ihold ← I k, Itra ← { 1, . . . , N } \ I k
+
+7: Initialize encoder Φ and prediction networks Ψ
+
+8: # Causal Role Disentanglement 
+
+9: (Zc, Zt, Zy ) = Φ( X[Itra ]) 
+
+10: Ldis = HSIC( Zc, Zt)+HSIC( Zc, Zy )+HSIC( Zt, Zy )
+
+11: ˆTpre = Ψ T (Zc, Zt), ˆYpre = Ψ Y (Zc, Zy )
+
+12: Lsup = ℓT ( ˆTpre , T[Itra ]) + ℓY ( ˆYpre , Y[Itra ]) 
+
+13: # Residual Dependence Orthogonalization 
+
+14: v = T[Itra ] − ˆTpre 
+
+15: e = Y[Itra ] − ˆYpre 
+
+16: θtra = v⊤ev⊤v + δ
+
+17: u = e − θtra v
+
+18: Lort = |Corr( v, u)|
+
+19: Ltotal = Lsup + λdis Ldis + λort Lort + Θ 
+
+20: Update (Φ , Ψ) by minimizing Ltotal 
+
+21: # Orthogonal ATE Estimation 
+
+22: (Ztra  
+
+> c
+
+, Ztra  
+
+> t
+
+, Ztra  
+
+> y
+
+) = Φ k(X[Itra ]) 
+
+23: (Zhold  
+
+> c
+
+, Zhold  
+
+> t
+
+, Zhold  
+
+> y
+
+) = Φ k(X[Ihold ]) 
+
+24: Fit treatment model ˆmk on (Ztra  
+
+> c
+
+, Ztra  
+
+> t
+
+, T[Itra ]) 
+
+25: Fit outcome model ˆgk on (Ztra  
+
+> c
+
+, Ztra  
+
+> y
+
+, Y[Itra ]) 
+
+26: ˆT[Ihold ] = ˆ mk(Zhold  
+
+> c
+
+, Zhold  
+
+> t
+
+);
+
+ˆY[Ihold ] = ˆ gk(Zhold  
+
+> c
+
+, Zhold  
+
+> y
+
+)
+
+27: ˆT = ˆT ∪ ˆT[Ihold ] ; ˆY = ˆY ∪ ˆY[Ihold ] ;
+
+28: end for 
+
+29: ˜Tres = T − ˆT, ˜Yres = Y − ˆY
+
+30: ˆθ = ˜T⊤ 
+
+> res
+
+˜Yres 
+
+˜T⊤ 
+
+> res
+
+˜Tres + δJOURNAL OF L ATEX CLASS FILES, VOL. 18, NO. 9, SEPTEMBER 2020 5
+
+where Zc captures confounding information, Zt captures treatment-specific information, and Zy captures outcome-specific information. To disentangle the mixing of information from different causal roles in the learned representations, we decompose the representation space into three subspaces. As shown in Eq. (11), we employ the Hilbert-Schmidt Independence Cri-terion (HSIC) to penalize the statistical dependence among 
+
+(Zc, Zt, Zy ), which promotes the disentanglement of repre-sentations associated with different causal roles. 
+
+Ldis = HSIC( Zc, Zt)+HSIC( Zc, Zy )+HSIC( Zt, Zy ). (11) Compared with linear correlation constraints, HSIC can capture higher-order nonlinear dependencies among latent rep-resentations, making it more suitable for disentangling com-plex causal factors and providing clearer and more structured representations for nuisance estimation. To ensure that the learned representations remain informa-tive for both treatment and outcome modeling, we further design a task-specific prediction network. Specifically, we employ a dual-head prediction network Ψ to predict T and 
+
+Y based on these representations, as shown in Eq. (12): 
+
+ˆTpre = Ψ T (Zc, Zt), ˆYpre = Ψ Y (Zc, Zy ). (12) Here, ˆTpre denotes the predicted treatment, which is a proba-bility for binary T , or a real-valued prediction for continuous 
+
+T , and ˆYpre denotes the predicted outcome. We train the pre-diction heads using task-specific supervised losses, as shown in Eq. (13). 
+
+Lsup = ℓT
+
+ ˆTpre , T[Itra ]
+
+
+
++ ℓY
+
+ ˆYpre , Y[Itra ]
+
+
+
+. (13) We set ℓY (·, ·) to mean squared error (MSE) for real-valued outcomes. For the treatment loss ℓT (·, ·), we instantiate it as binary cross-entropy when T ∈ { 0, 1}, and as mean squared error (MSE) when T is continuous. Since the dual-head prediction network is built upon differ-ent subspace representations, this task-specific design encour-ages the learned representations to encode treatment-related and outcome-related information into separate latent compo-nents. In this way, representation separation together with task-specific supervision promotes role-specific disentanglement without additional constraints. Moreover, the CRD module is applicable to both binary and continuous treatment settings. 
+
+B. Residual Dependence Orthogonalization 
+
+After obtaining disentangled representations through CRD, we further design a RDO constraint to reduce residual de-pendence between the treatment residual and the remaining outcome error. Specifically, as shown in Eq. (14), we first calculate the treatment and outcome residuals on the training set: 
+
+v = T[Itra ] − ˆTpre , e = Y[Itra ] − ˆYpre . (14) We then compute the treatment effect θtra on the training set according to Eq. (15): 
+
+θtra = v⊤ev⊤v + δ , (15) where δ > 0 is a small constant for numerical stability. Based on θtra , we define the orthogonalized outcome residual in Eq. (16): 
+
+u = e − θtra v. (16) To further mitigate the remaining residual dependence, we penalize the absolute Pearson correlation between v and u:
+
+Lort = |Corr( v, u)| , (17) where Corr( v, u) denotes the sample Pearson correlation, defined as Corr( v, u) = 
+
+> P
+> i(vi−¯v)( ui−¯u)
+
+√P
+
+> i(vi−¯v)2
+
+√P 
+
+> i(ui−¯u)2+ϵ
+
+, with a small ϵ > 0 for numerical stability. Under this residual construction, v represents the treatment residual, while u denotes the orthogonalized outcome residual obtained by removing the linear contribution of the treatment residual from the outcome residual. Therefore, minimizing 
+
+|Corr( v, u)| directly reduces residual dependence between the treatment residual and the orthogonalized outcome residual, improving residual orthogonality and enhancing the accuracy of subsequent orthogonal ATE estimation. Building on the CRD strategy for causal role disentangle-ment and the RDO constraint for residual orthogonalization, we jointly optimize the representation encoder and task-specific prediction heads through the following total objective: 
+
+Ltotal = Lsup + λdis Ldis + λort Lort + Θ , (18) where λdis and λort control the weights of disentanglement and orthogonality regularization, respectively, and Θ denotes standard regularization terms. In this objective, Lsup pre-serves task-relevant predictive loss for nuisance estimation, 
+
+Ldis encourages the separation of latent factors with different causal roles, and Lort reduces the residual dependence that may remain after residualization. As a result, the learned representation is not only predictive but also structurally aligned with causal roles and better suited for orthogonal effect estimation. Sections VI-B3 and VI-B4 further demonstrate through visualization analysis and ablation studies that both CRD and RDO are effective, and that each module contributes to the performance of DDML. 
+
+C. Orthogonal ATE Estimation 
+
+Through the CRD and RDO procedures, we learn a disen-tangled and orthogonally regularized representation function. Based on this, we perform orthogonal ATE estimation by in-tegrating causal role-guided nuisance function estimation with cross-fitting. Specifically, under the cross-fitting framework, for the k-th fold data, we learn a representation function Φk
+
+on Itra . We apply Φk to the covariates in both Itra and Ihold 
+
+to produce three disentangled latent representations, as shown in Eq. (19): 
+
+(Ztra  
+
+> c
+
+, Ztra  
+
+> t
+
+, Ztra  
+
+> y
+
+) = Φ k(X[Itra ]) ,
+
+(Zhold  
+
+> c
+
+, Zhold  
+
+> t
+
+, Zhold  
+
+> y
+
+) = Φ k(X[Ihold ]) . (19) Then, we fit the nuisance functions ˆmk and ˆgk on the training fold Itra according to the disentangled causal roles in the learned representation, as shown in Eq. (20): 
+
+ˆmk : ( Ztra  
+
+> c
+
+, Ztra  
+
+> t
+
+) 7 → T[Itra ], ˆgk : ( Ztra  
+
+> c
+
+, Ztra  
+
+> y
+
+) 7 → Y[Itra ].
+
+(20) JOURNAL OF L ATEX CLASS FILES, VOL. 18, NO. 9, SEPTEMBER 2020 6
+
+This design encourages each nuisance function to be built on causally relevant representations, which reduces nuisance estimation errors. As shown in Eq. (21), the nuisance models 
+
+ˆmk and ˆgk fitted on the training fold are applied to the held-out fold to generate out-of-fold predictions: 
+
+ˆT[Ihold ] = ˆ mk(Zhold  
+
+> c
+
+, Zhold  
+
+> t
+
+), ˆY[Ihold ] = ˆ gk(Zhold  
+
+> c
+
+, Zhold  
+
+> y
+
+).
+
+(21) After completing the K-fold cross-fitting procedure, we obtain nuisance predictions ( ˆT, ˆY) for all samples. Based on these predictions, we define the treatment and outcome residuals as given in Eq. (22): 
+
+˜Tres = T − ˆT, ˜Yres = Y − ˆY. (22) As shown in Eq. (23), the estimated causal effect, denoted by ˆθ, is obtained via residual-on-residual regression using the residuals of treatment and outcome from all samples: 
+
+ˆθ = ˜T⊤ 
+
+> res
+
+˜Yres 
+
+˜T⊤ 
+
+> res
+
+˜Tres + δ , (23) where δ > 0 is a small constant for numerical stability. V. T HEORETICAL ANALYSIS 
+
+This section presents the theoretical analysis of DDML. We first show that performing nuisance estimation on the disen-tangled representation, rather than on the original covariates, preserves the identification of the target causal effect. We then prove that the score function induced by the disentangled rep-resentation continues to satisfy Neyman orthogonality. Finally, we establish the consistency of the DDML estimator under cross-fitting. To support the above theoretical analysis, we make the following assumptions. 
+
+Assumption 5.1. Role-preserving representation sufficiency. 
+
+Let Z = ( Zc, Z t, Z y ) = Φ( X) be the learned representation. Assume that: 
+
+E[T | X] = E[T | Zc, Z t], E[Y | X] = E[Y | Zc, Z y ].
+
+(24) That is, the learned representation preserves the treatment-related and outcome-related information required for nuisance estimation in separate subspaces. 
+
+Assumption 5.2. Regularity and non-degeneracy. Let m(Z) = 
+
+m(Zc, Z t) = E[T | Zc, Z t] and g(Z) = g(Zc, Z y ) = E[Y |
+
+Zc, Z y ]. Assume that 
+
+EY 2 + T 2 + ( Y − g(Z)) 2 + ( T − m(Z)) 2 < ∞, (25) 
+
+E(T − m(Z)) 2 ≥ c > 0. (26) These conditions ensure that the orthogonal moment is well-defined and that the residualized treatment remains non-degenerate. 
+
+Assumption 5.3. Cross-fitted nuisance consistency with de-pendence control. Let ˆm and ˆg be cross-fitted estimators of the nuisance functions m0 and g0, respectively, where each prediction is obtained from a model trained on a sample that excludes the corresponding observation. Assume that 
+
+∥ ˆm − m0∥L2 = op(1) , ∥ˆg − g0∥L2 = op(1) , (27) 
+
+and 
+
+E[( ˆ m − m0)(ˆ g − g0)] = op(1) . (28) Here, ∥h∥L2 := ( E[h2]) 1/2 denotes the L2 norm, and op(1) 
+
+means convergence to zero in probability. That is, both nui-sance estimators are simultaneously consistent in L2 norm, and the interaction between their estimation errors becomes asymptotically negligible. Under Assumptions 5.1 and 5.2, Proposition 5.1 shows that the causal effect remains identifiable in the disentangled representation space, and the ATE θ can be estimated through orthogonal moments on Z.
+
+Proposition 5.1. Under Assumptions 5.1 and 5.2, let m(Z) = 
+
+m(Zc, Z t) and g(Z) = g(Zc, Z y ). Then the true causal effect 
+
+θ0 satisfies: 
+
+θ0 = E(T − m(Z))( Y − g(Z)) 
+
+E(T − m(Z)) 2 . (29) 
+
+Proof. By the partially linear model, 
+
+Y = θ0T + f0(X) + ζ, E[ζ | X, T ] = 0 ,
+
+where f (X) denotes the structural regression term. Let 
+
+Z = Φ( X), m (Z) = m(Zc, Z t), g (Z) = g(Zc, Z y ).
+
+Under Assumption 5.1, the treatment and outcome nuisance functions depend on X through the corresponding representation subspaces. Hence, 
+
+E[T | X] = E[T | Zc, Z t] =: m(Z),
+
+E[Y | X] = E[Y | Zc, Z y ] =: g(Z).
+
+By Assumption 5.1 and the tower property, we have 
+
+E[T | Z] = m(Z), E[Y | Z] = g(Z).
+
+Taking conditional expectation of the PLM given X yields 
+
+E[Y | X] = θ0 E[T | X] + f0(X).
+
+Substituting E[Y | X] = g(Z) and E[T | X] = m(Z) gives 
+
+g(Z) = θ0m(Z) + f0(X),
+
+and therefore 
+
+f (X) = g(Z) − θ0m(Z).
+
+Substituting this identity into the PLM gives 
+
+Y − g(Z) = θ0
+
+ T − m(Z) + ζ. 
+
+Multiplying both sides by T −m(Z) and taking expectations yields 
+
+E(T − m(Z))( Y − g(Z))  = θ0 E(T − m(Z)) 2
+
++ E(T − m(Z)) ζ.
+
+For the last term, since T − m(Z) is measurable with respect to 
+
+(Z, T ) and 
+
+E[ζ | Z, T ] = E[E[ζ | X, T ] | Z, T ] = 0 ,
+
+we have 
+
+E(T − m(Z)) ζ = E[( T − m(Z)) E[ζ | Z, T ]] = 0 .
+
+Therefore, 
+
+E(T − m(Z))( Y − g(Z))  = θ0 E(T − m(Z)) 2.
+
+Assumption 5.2 ensures that E(T − m(Z)) 2 > 0, rearranging the above equality yields Eq. (29). JOURNAL OF L ATEX CLASS FILES, VOL. 18, NO. 9, SEPTEMBER 2020 7
+
+Proposition 5.1 provides a formal identification basis for CRD by showing that the causal effect remains recoverable from the disentangled representation. Building on this, Theo-rem 5.1 establishes that the score constructed on the learned representation remains Neyman-orthogonal. 
+
+Theorem 5.1. Under Assumptions 5.1 and 5.2, let m(Z) = 
+
+m(Zc, Z t) and g(Z) = g(Zc, Z y ), and consider the score 
+
+ψZ (W ; θ, η ) =  Y − g(Z) − θ(T − m(Z))   T − m(Z),
+
+where η = ( g, m ). Then, at the true parameter (θ0, η 0),
+
+∂∂η EψZ (W ; θ0, η )
+
+> η=η0
+
+= 0 . (30) 
+
+Proof. Let (θ0, η 0) denote the true parameter pair, where 
+
+η0 = ( g0, m 0), m 0(Z) = m0(Zc, Z t), g 0(Z) = g0(Zc, Z y ).
+
+Under Assumption 5.1, the treatment and outcome conditional means depend on X through the corresponding representation subspaces. Thus, 
+
+E[T | X] = E[T | Zc, Z t] =: m0(Z),
+
+E[Y | X] = E[Y | Zc, Z y ] =: g0(Z).
+
+Since Z = ( Zc, Zt, Zy ) is a function of X, iterated expecta-tions imply 
+
+E[T | Z] = m0(Z), E[Y | Z] = g0(Z).
+
+Define the score based on the learned representation: 
+
+ψZ (W ; θ, η ) =  Y − g(Z) − θ(T − m(Z))   T − m(Z).
+
+Let 
+
+v := T − m0(Z).
+
+Then, by construction, 
+
+E[v | Z] = E[T | Z] − m0(Z) = 0 .
+
+Moreover, by the partially linear model: 
+
+Y = θ0T + f (X) + ζ, E[ζ | X, T ] = 0 .
+
+Since Z = Φ( X) is a function of X, the tower property gives 
+
+E[ζ | Z, T ] = E[E[ζ | X, T ] | Z, T ] = 0 .
+
+At the true parameter pair (θ0, η 0), define 
+
+u := Y − g0(Z) − θ0
+
+ T − m0(Z).
+
+Using the PLM and the identity 
+
+g0(Z) = E[Y | Z] = θ0m0(Z) + E[f (X) | Z],
+
+we obtain 
+
+u = f (X) − E[f (X) | Z] + ζ. 
+
+Hence, 
+
+E[u | Z] = 0 ,
+
+because 
+
+E[f (X) − E[f (X) | Z] | Z] = 0 
+
+and 
+
+E[ζ | Z] = 0 .
+
+Now consider a perturbation path ηt = ( gt, m t) with 
+
+gt = g0 + th g , m t = m0 + th m,
+
+where hg and hm are measurable perturbation functions defined on the corresponding representation subspaces. We compute the pathwise derivative of the moment at (θ0, η t):
+
+ddt E[ψZ (W ; θ0, η t)] 
+
+> t=0
+
+= E
+
+h  − hg (Z) + θ0hm(Z)v − hm(Z)u
+
+i
+
+.
+
+Since hg (Z) and hm(Z) are Z-measurable, iterated expec-tations yield 
+
+E[hg (Z) v] = E[hg (Z) E[v | Z]] = 0 ,
+
+E[hm(Z) v] = E[hm(Z) E[v | Z]] = 0 ,
+
+E[hm(Z) u] = E[hm(Z) E[u | Z]] = 0 .
+
+Therefore, 
+
+ddt E[ψZ (W ; θ0, η t)] 
+
+> t=0
+
+= 0 ,
+
+which is exactly the Neyman orthogonality condition: 
+
+∂∂η E[ψZ (W ; θ0, η )] 
+
+> η=η0
+
+= 0 .
+
+Theorem 5.1 implies that DDML is locally insensitive to small perturbations in the nuisance functions, so that first-order nuisance estimation errors do not affect the causal effect estimation. Assumption 5.3 formalizes the role of RDO by ensuring that the interaction between nuisance estimation errors is asymptotically negligible. Building on this, Theorem 5.2 shows consistency of the cross-fitted DDML estimator. 
+
+Theorem 5.2. Under Assumptions 5.1–5.3, let ˆθ be the DDML estimator obtained from the empirical orthogonal moment equation with cross-fitted nuisance predictions. Then 
+
+ˆθ p
+
+−→ θ0 as N → ∞ . (31) 
+
+Proof. Define the cross-fitted residuals 
+
+ˆvi := Ti − ˆm(Zi), ˆui := Yi − ˆg(Zi),
+
+where m(Z) = m(Zc, Z t) and g(Z) = g(Zc, Z y ). Set 
+
+ˆQ := 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+ˆvi ˆui, ˆD := 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+ˆv2 
+
+> i
+
+, ˆθ = ˆQ
+
+ˆD .
+
+Let 
+
+v0 
+
+> i
+
+:= Ti − m(Zi), u 0 
+
+> i
+
+:= Yi − g(Zi),
+
+and denote 
+
+Q := E[v0u0], D := E(v0)2 .JOURNAL OF L ATEX CLASS FILES, VOL. 18, NO. 9, SEPTEMBER 2020 8
+
+a) (i) Denominator.: Write 
+
+ˆvi = v0 
+
+> i
+
++ ∆ m,i , ∆m,i := m(Zi) − ˆm(Zi).
+
+Then 
+
+ˆv2 
+
+> i
+
+− (v0 
+
+> i
+
+)2 = 2 v0 
+
+> i
+
+∆m,i + ∆ 2
+
+> m,i
+
+.
+
+Consequently, by the triangle inequality and Cauchy– Schwarz, 
+
+ˆD − 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+(v0 
+
+> i
+
+)2 ≤ 2
+
+N
+
+> N
+
+X
+
+> i=1
+
+|v0 
+
+> i
+
+∆m,i | + 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+∆2
+
+> m,i
+
+≤ 2
+
+ 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+(v0 
+
+> i
+
+)21/2 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+∆2
+
+> m,i
+
+1/2
+
++ 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+∆2
+
+> m,i
+
+.
+
+By Assumption 5.2 and the law of large numbers, 
+
+1
+
+N
+
+> N
+
+X
+
+> i=1
+
+(v0 
+
+> i
+
+)2 p
+
+−→ D, 
+
+and by Assumption 5.3, 
+
+1
+
+N
+
+> N
+
+X
+
+> i=1
+
+∆2 
+
+> m,i
+
+= ∥ ˆm − m∥2 
+
+> L2
+
+= op(1) .
+
+Thus, 
+
+ˆD p
+
+−→ D. 
+
+Moreover, Assumption 5.2 implies that D ≥ c > 0, hence 
+
+Pr( ˆD > c/ 2) → 1.
+
+b) (ii) Numerator.: Write 
+
+ˆui = u0 
+
+> i
+
++ ∆ g,i , ∆g,i := g(Zi) − ˆg(Zi).
+
+Then 
+
+ˆvi ˆui − v0 
+
+> i
+
+u0 
+
+> i
+
+= v0 
+
+> i
+
+∆g,i + u0 
+
+> i
+
+∆m,i + ∆ m,i ∆g,i .
+
+Hence, by Cauchy–Schwarz, 
+
+ˆQ − 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+v0 
+
+> i
+
+u0 
+
+> i
+
+≤
+
+ 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+(v0 
+
+> i
+
+)21/2 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+∆2
+
+> g,i
+
+1/2
+
++
+
+ 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+(u0 
+
+> i
+
+)21/2 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+∆2
+
+> m,i
+
+1/2
+
++
+
+ 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+∆2
+
+> m,i
+
+1/2 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+∆2
+
+> g,i
+
+1/2
+
+.
+
+By Assumption 5.2, 
+
+1
+
+N
+
+> N
+
+X
+
+> i=1
+
+(u0 
+
+> i
+
+)2 = op(1) , 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+(v0 
+
+> i
+
+)2 = op(1) ,
+
+while Assumption 5.3 gives 
+
+1
+
+N
+
+> N
+
+X
+
+> i=1
+
+∆2 
+
+> m,i
+
+= op(1) , 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+∆2 
+
+> g,i
+
+= op(1) .
+
+Therefore, 
+
+ˆQ − 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+v0 
+
+> i
+
+u0 
+
+> i
+
+= op(1) .
+
+By the law of large numbers, 
+
+1
+
+N
+
+> N
+
+X
+
+> i=1
+
+v0 
+
+> i
+
+u0
+
+> ip
+
+−→ Q, 
+
+and hence 
+
+ˆQ p
+
+−→ Q. 
+
+c) (iii) Identify the limit.: Under the partially linear model and Assumption 5.1, 
+
+u0 = Y − g(Z) = θ0
+
+ T − m(Z) + ζ = θ0v0 + ζ. 
+
+Thus, 
+
+Q = E[v0u0] = θ0 E(v0)2 + E[v0ζ] = θ0D + E[v0ζ].
+
+Since 
+
+E[ζ | Z, T ] = E[E[ζ | X, T ] | Z, T ] = 0 ,
+
+we have 
+
+E[v0ζ] = Ev0 E[ζ | Z, T ] = 0 .
+
+Hence, 
+
+Q = θ0D. 
+
+Combining (i)–(iii), we have 
+
+( ˆQ, ˆD) p
+
+−→ (Q, D ), D > 0.
+
+By Slutsky’s theorem, 
+
+ˆθ = ˆQ
+
+ˆD
+
+> p
+
+−→ QD = θ0.
+
+These analyses provide the theoretical foundation of DDML by showing that CRD preserves the target causal effect and RDO supports consistent effect estimation under cross-fitting. VI. E XPERIMENTS 
+
+A. Experiment Settings 1) Datasets: We used the following synthetic, semi-synthetic, and real-world datasets to comprehensively evaluate the effectiveness of the proposed method. •Synthetic data. We generated synthetic datasets with both 
+
+binary and continuous treatments to evaluate the effectiveness of our method under strong nonlinear confounding and highly mixed covariates. For each setting, we sampled N = 6000 
+
+instances with feature dimensions d ∈ { 20 , 50 , 100 , 200 } and repeated each (N, d ) configuration over 20 independent runs. Across all settings, the true causal effect is fixed to θ = 5 .0.Following the settings in [27], [28], in each experiment, we first draw latent variables Z ∈ RN ×d with i.i.d. entries Zij ∼N (0 , 1) . To induce strong entanglement in the observed space, we sample a random mixing matrix M ∈ Rd×d with entries JOURNAL OF L ATEX CLASS FILES, VOL. 18, NO. 9, SEPTEMBER 2020 9
+
+Mij ∼ N (0 , λ 2), where λ = 8 .0 controls the entanglement strength. We then construct a linearly mixed representation: 
+
+Xlin = Z + 1
+
+d ZM, (32) and further apply nonlinear distortions: 
+
+X = tanh  Xlin 
+
+ + 0 .2 sin 
+
+ Xlin M ⊤
+
+d
+
+
+
+, (33) yielding the observed covariates X ∈ RN ×d. This procedure globally mixes coordinates and introduces strong nonlinearity, producing highly mixed and non-axis-aligned representations. Given X, we first define a shared nonlinear confounder 
+
+Zc, which affects both treatment assignment and outcome generation: 
+
+Zc = 0 .6 X:,0 ⊙ X:,1 + 0 .4 X⊙2:,2 + 0 .3 sin  X:,3 + X:,4
+
+, (34) where ⊙ denotes elementwise product and X:,k denotes the 
+
+k-th feature column. We further construct a treatment-specific factor Zt, which affects treatment assignment but does not directly enter outcome generation: 
+
+Zt = 0 .5 X:,5 ⊙ X:,6 + 0 .3 tanh  X:,7
+
+ + 0 .2 cos  X:,8 + X:,9
+
+.
+
+(35) In addition, we define an outcome-specific factor Zy , which affects the outcome but does not directly drive treatment assignment: 
+
+Zy = 0 .5 X:,1 ⊙ X:,2 + 0 .3 cos  X:,0 + X:,3
+
+. (36) The treatment T is then generated in two variants while keep-ing (X, Z c, Z t, Z y ) fixed, so that the binary- and continuous-treatment settings differ only in the treatment assignment mechanism. For the binary-treatment setting, we generate T ∈ { 0, 1}
+
+according to 
+
+Pr( Ti = 1 | Xi) = σ αcZc,i + αtZt,i 
+
+, σ (u) = 11 + e−u ,
+
+(37) where αc = 4 .0 controls the confounding strength and αt =2.0 controls the treatment-specific signal strength. We then sample 
+
+Ti ∼ Bernoulli(Pr( Ti = 1 | Xi)) . (38) This induces strong dependence between T and X through nonlinear interactions, making naive treated–control compar-isons biased. For the continuous-treatment setting, we generate a noisy nonlinear treatment signal from both the shared confounder and the treatment-specific factor: 
+
+Ti = αc
+
+
+
+Zc,i +0 .5 tanh( Zc,i )
+
+
+
++αt
+
+
+
+Zt,i +0 .3 sin( Zt,i )
+
+
+
++ηi,
+
+(39) where αc = 4 .0, αt = 2 .0, and ηi ∼ N (0 , σ 2 
+
+> T
+
+) with σT = 1 .0.Unless otherwise stated, we further standardize T to have zero mean and unit variance to stabilize learning across different feature dimensions. Finally, for both treatment variants, outcomes are generated as 
+
+Yi = α (Zc,i + Zy,i ) + θ T i + εi, (40) where εi ∼ N (0 , σ 2 
+
+> Y
+
+) with σY = 1.0. Here, Zt affects the outcome only indirectly through Ti and does not directly appear in the outcome equation. •Semi-synthetic data. IHDP (Infant Health and Develop-ment Program) is derived from a real randomized controlled trial that investigated the effect of professional home-visiting services on children’s cognitive development. We use the widely adopted semi-synthetic benchmark introduced in [7], which contains 747 samples (139 treated and 608 control), each with 25 covariates. Following prior work, we report re-sults averaged over 100 replications. Twins is a semi-synthetic dataset designed to study the causal relationship between birth-related factors and infant mortality outcomes. We adopt the experimental setup in [22], where each sample is represented by 46 covariates. To reduce variance and ensure stable com-parison, we report results averaged over 10 replications. •Real-world data. Jobs is a widely used dataset for bench-marking causal effect estimation in observational studies, aiming to quantify the effect of participating in a job-training program on individuals’ income. Following previous work [7], we report the mean performance over 10 independent replications. 
+
+2) Comparison Algorithms: We compared the proposed DDML with 13 representative baseline methods from the following categories. Traditional methods : OLS-1 treats the treatment as a standard feature and estimates the effect via a single linear regression; OLS-2 fits separate regressions for the treated and control groups; KNN infers counterfactual outcomes using cross-group nearest neighbors; BART captures nonlinear relationships with a nonparametric tree-ensemble model. Representation learning methods : CFR-wass/CFR-mmd [7] learn balanced representations across groups via Wasserstein and MMD regularization; SITE [8] preserves local similarity among samples under global balance; DeR-CFR [28] reduces selection bias by decoupling representations to separate confounding and adjustment information; DIGNet 
+
+[29] enhances robustness by decoupling latent patterns and imposing geometric constraints; FCCL [30] combines normal-izing flows with counterfactual contrastive learning to generate and align counterfactual representations. Debiased estimation methods : DML-RF/DML-MLP [10] estimate nuisance func-tions using random forest and multi-layer perceptron within DML; C-DML [11] employs coordinated nuisance training to estimate the causal effect. 
+
+3) Evaluation Metrics: For the semi-synthetic dataset, 
+
+IHDP and Twins , the ground-truth causal effect is avail-able. Following prior work [26], we evaluate methods using the mean absolute error (MAE) and root mean squared error (RMSE) of the estimated average treatment effect (ATE) over repeated trials. Specifically, given R re-peated experiments, let ˆAT E (r) denote the estimated ATE in the r-th run and AT E ⋆ denote the true ATE. We compute MAE ATE = 1    
+
+> R
+> PRr=1 ˆAT E (r)−AT E ⋆
+
+, RMSE ATE =    
+
+> r
+> 1
+> R
+> PRr=1
+> ˆAT E (r)−AT E ⋆
+> 2
+> .
+
+For the Jobs dataset, we sim-ilarly report MAE and RMSE of the estimated aver-age treatment effect on the treated (ATT) over repeated trials. Let ˆAT T (r) be the estimated ATT in the r-th JOURNAL OF L ATEX CLASS FILES, VOL. 18, NO. 9, SEPTEMBER 2020 10 
+
+TABLE II: Performance comparison under different feature dimensions ( Binary 20 , Binary 50 , Binary 100 , Binary 200 ). Results are reported as mean ± std (Best results are highlighted in bold, and second-best results are underlined.) 
+
+Binary 20 Binary 50 Binary 100 Binary 200 Method MAE RMSE MAE RMSE MAE RMSE MAE RMSE OLS-1 1.9949 ±0.4142 2.0353 ±0.4142 1.7467 ±0.1638 1.7540 ±0.1638 1.8085 ±0.1771 1.8167 ±0.1771 1.4796 ±0.0942 1.4825 ±0.0942 
+
+OLS-2 2.0077 ±0.4142 2.0479 ±0.4142 1.7528 ±0.1659 1.7602 ±0.1659 1.8113 ±0.1745 1.8193 ±0.1745 1.4846 ±0.0959 1.4875 ±0.0959 
+
+KNN 1.6674 ±0.2652 1.6873 ±0.2652 1.7733 ±0.1331 1.7780 ±0.1331 1.9194 ±0.1437 1.9245 ±0.1437 1.6944 ±0.0864 1.6965 ±0.0864 
+
+BART 0.9369 ±0.1938 0.9558 ±0.1938 0.8018 ±0.1290 0.8116 ±0.1290 0.8231 ±0.1090 0.8299 ±0.1090 0.6041 ±0.0825 0.6094 ±0.0825 
+
+CFR-wass 0.2005 ±0.1311 0.2377 ±0.1311 0.1936 ±0.1227 0.2276 ±0.1227 0.3556 ±0.1543 0.3861 ±0.1543 0.3697 ±0.1713 0.4057 ±0.1713 
+
+CFR-mmd 0.2018 ±0.1372 0.2421 ±0.1372 0.3092 ±0.1468 0.3407 ±0.1468 0.3609 ±0.1228 0.3802 ±0.1228 0.5191 ±0.1147 0.5310 ±0.1147 
+
+SITE 0.2577 ±0.1346 0.2892 ±0.1346 0.4150 ±0.1499 0.4400 ±0.1499 0.6768 ±0.1498 0.6923 ±0.1498 0.8667 ±0.2050 0.8895 ±0.2050 
+
+DeR-CFR 0.1584 ±0.0707 0.1727 ±0.0707 0.1369 ±0.0952 0.1654 ±0.0952 0.1432 ±0.1263 0.1888 ±0.1263 0.2876 ±0.1214 0.3219 ±0.1214 
+
+DIGNet 0.1949 ±0.1000 0.2180 ±0.1000 0.2595 ±0.1679 0.3068 ±0.1679 0.2750 ±0.1472 0.3102 ±0.1472 0.3784 ±0.1757 0.4154 ±0.1757 
+
+FCCL 0.1200 ±0.0981 0.1534 ±0.0981 0.1748 ±0.1311 0.2166 ±0.1311 0.2611 ±0.1073 0.2812 ±0.1073 0.2999 ±0.1022 0.3160 ±0.1022 
+
+DML-RF 1.9373 ±0.3596 1.9687 ±0.3596 1.7243 ±0.1647 1.7318 ±0.1647 1.7708 ±0.1650 1.7781 ±0.1650 1.4772 ±0.0896 1.4798 ±0.0896 
+
+DML-MLP 0.4292 ±0.0706 0.4347 ±0.0706 0.7790 ±0.0923 0.7841 ±0.0923 1.0111 ±0.1056 1.0163 ±0.1056 0.5759 ±0.1748 0.6005 ±0.1748 
+
+C-DML 0.3755 ±0.2795 0.4639 ±0.2795 0.7999 ±0.2375 0.8327 ±0.2375 1.0634 ±0.2778 1.0974 ±0.2778 1.1308 ±0.3710 1.1872 ±0.3710 
+
+DDML-RF 0.0769 ±0.0522 0.0922 ±0.0522 0.0520 ±0.0337 0.0615 ±0.0337 0.1550 ±0.0911 0.1786 ±0.0911 0.2615 ±0.0862 0.2747 ±0.0862 
+
+DDML-MLP 0.0488 ±0.0295 0.0567 ±0.0295 0.1278 ±0.0610 0.1409 ±0.0610 0.2379 ±0.0727 0.2452 ±0.0727 0.1942 ±0.1045 0.2193 ±0.1045 
+
+**DDML achieves average improvements of 36.4% in MAE and 40.5% in RMSE compared with the best baseline method. 
+
+TABLE III: Performance comparison under different feature dimensions ( Continuous 20 , Continuous 50 , Continuous 100 ,
+
+Continuous 200 ). Results are reported as mean ± std (Best results are highlighted in bold, and second-best results are underlined.) 
+
+Continuous 20 Continuous 50 Continuous 100 Continuous 200 Method MAE RMSE MAE RMSE MAE RMSE MAE RMSE OLS-1 1.6857 ±0.2160 1.6988 ±0.2160 1.5734 ±0.1384 1.5791 ±0.1384 1.5773 ±0.1054 1.5806 ±0.1054 1.3991 ±0.0679 1.4006 ±0.0679 
+
+BART 1.1659 ±0.4326 1.2398 ±0.4326 1.0551 ±0.3297 1.1030 ±0.3297 0.9282 ±0.3812 0.9998 ±0.3812 0.8684 ±0.3149 0.9210 ±0.3149 
+
+DML-RF 1.6517 ±0.1976 1.6629 ±0.1976 1.5647 ±0.1304 1.5699 ±0.1304 1.5649 ±0.1051 1.5683 ±0.1051 1.3926 ±0.0663 1.3941 ±0.0663 
+
+DML-MLP 1.5191 ±0.0793 1.5248 ±0.0793 1.1625 ±0.0831 1.1653 ±0.0831 1.5213 ±0.1102 1.5251 ±0.1102 1.3159 ±0.1102 1.3202 ±0.1102 
+
+C-DML 0.4039 ±0.6964 0.7898 ±0.6964 0.7852 ±0.1230 0.7943 ±0.1230 1.2910 ±0.1603 1.3004 ±0.1603 0.7457 ±0.1888 0.7680 ±0.1888 
+
+DDML-RF 0.2400 ±0.1011 0.2595 ±0.1011 0.0706 ±0.0425 0.0819 ±0.0425 0.3943 ±0.3035 0.4930 ±0.3035 0.2455 ±0.1900 0.3075 ±0.1900 
+
+DDML-MLP 0.0820 ±0.0649 0.1036 ±0.0649 0.2416 ±0.0465 0.2459 ±0.0465 0.2226 ±0.1731 0.2793 ±0.1731 0.4519 ±0.1543 0.4763 ±0.1543 
+
+**DDML achieves average improvements of 78.5% in MAE and 77.2% in RMSE compared with the best baseline method. 
+
+run and AT T ⋆ be the target ATT. The metrics are de-fined as MAE ATT = 1
+
+> R
+
+PRr=1 ˆAT T (r) − AT T ⋆ , RMSE ATT =
+
+r
+
+> 1
+> R
+
+PRr=1 
+
+ ˆAT T (r) − AT T ⋆
+
+2
+
+.
+
+4) Implementation Details: All experiments were con-ducted on a Windows 10 computer equipped with an Intel(R) Core(TM) i9-10900F 2.80GHz CPU, NVIDIA GeForce RTX 3060 GPU, and 32GB RAM. All algorithms were implemented in Python . For both DML and DDML, we adopt 5-fold cross-fitting ( K = 5 ) for data splitting and effect estimation, employing both MLP and RF as nuisance estimators. 
+
+B. Experiment Results 
+
+Sections VI-B1-VI-B5 present comprehensive experimen-tal evaluations on synthetic, semi-synthetic, and real-world datasets, followed by visualization analysis, ablation study, and parameter sensitivity analysis. 
+
+1) Results on Synthetic Data: Tables II and III show the results on synthetic datasets with varying feature dimensions for the binary and continuous treatment settings, respectively. As shown in Table II, under the binary-treatment set-ting, DDML consistently outperforms traditional methods and maintains clear advantages even in high-dimensional set-tings. Compared with representation learning methods, DDML achieves the best performance on nearly all datasets, except that DeR-CFR obtains lower MAE on the 100-dimensional dataset. DDML also shows clear improvements over debi-ased estimation methods, especially in low-dimensional cases. These results indicate that the proposed disentanglement and residual orthogonalization effectively reduce the estimation bias caused by mixed covariates. As shown in Table III, for continuous treatments, we compare against baselines that natively support continuous treatments (OLS-1, BART, DML, and C-DML). Under the JOURNAL OF L ATEX CLASS FILES, VOL. 18, NO. 9, SEPTEMBER 2020 11 
+
+TABLE IV: Performance comparison on IHDP , Twins and Jobs datasets. Results are reported as mean ± std. (Best results are highlighted in bold, and second-best results are underlined.) 
+
+IHDP Twins Jobs Method MAE RMSE MAE RMSE MAE RMSE OLS-1 0.7474 ±1.4530 1.6275 ±1.4530 0.0016 ±0.0009 0.0018 ±0.0009 0.1280 ±0.0000 0.1280 ±0.0000 
+
+OLS-2 0.1340 ±0.1134 0.1752 ±0.1134 0.0013 ±0.0011 0.0016 ±0.0011 0.0385 ±0.0000 0.0385 ±0.0000 
+
+KNN 0.1513 ±0.1790 0.2337 ±0.1790 0.0016 ±0.0015 0.0022 ±0.0015 0.1288 ±0.0001 0.1288 ±0.0001 
+
+BART 0.4036 ±0.7487 0.8472 ±0.7487 0.0026 ±0.0016 0.0030 ±0.0016 0.0652 ±0.0217 0.0684 ±0.0217 
+
+CFR-mmd 0.2852 ±0.1262 0.2882 ±0.1262 0.0059 ±0.0028 0.0059 ±0.0028 0.1583 ±0.0727 0.1727 ±0.0727 
+
+CFR-wass 0.2153 ±0.1721 0.2702 ±0.1721 0.0036 ±0.0028 0.0036 ±0.0028 0.1574 ±0.0368 0.1612 ±0.0368 
+
+SITE 0.5365 ±0.9607 1.0576 ±0.9607 0.0027 ±0.0017 0.0027 ±0.0017 0.1173 ±0.0280 0.1203 ±0.0280 
+
+DeR-CFR 0.2602 ±0.2742 0.3680 ±0.2742 0.0035 ±0.0038 0.0035 ±0.0038 0.0768 ±0.0532 0.0919 ±0.0532 
+
+DIGNet 0.2028 ±0.1936 0.2736 ±0.1936 0.0043 ±0.0029 0.0043 ±0.0029 0.1066 ±0.0508 0.1170 ±0.0508 
+
+FCCL 0.2175 ±0.2192 0.3009 ±0.2192 0.0051 ±0.0034 0.0051 ±0.0034 0.0788 ±0.0551 0.0946 ±0.0551 
+
+DML-RF 0.7253 ±1.7363 1.7998 ±1.7363 0.0081 ±0.0090 0.0082 ±0.0073 0.0524 ±0.0333 0.0612 ±0.0333 
+
+DML-MLP 0.9696 ±1.5547 1.7651 ±1.5547 0.2192 ±0.2851 0.2518 ±0.2225 0.0573 ±0.0302 0.0641 ±0.0302 
+
+C-DML 3.4081 ±2.4953 4.1496 ±2.4953 0.0954 ±0.2606 0.0954 ±0.2606 0.0737 ±0.0122 0.0746 ±0.0122 
+
+DDML-RF 0.1450 ±0.1506 0.2035 ±0.1506 0.0005 ±0.0003 0.0005 ±0.0003 0.0284 ±0.0114 0.0304 ±0.0114 
+
+DDML-MLP 0.1220 ±0.1374 0.1785 ±0.1374 0.0007 ±0.0005 0.0007 ±0.0005 0.0354 ±0.0111 0.0370 ±0.0111     
+
+> **DDML achieves average improvements of 32.2% in MAE and 29.3% in RMSE compared with the best baseline method.
+
+continuous-treatment setting, DDML achieves the best perfor-mance across all datasets, substantially outperforming both tra-ditional methods and debiased estimation methods. Although the performance of all methods generally declines as the feature dimension increases, DDML remains consistently su-perior. These results demonstrate that the proposed approach is not only robust and effective under complex high-dimensional confounding, but also more broadly applicable to continuous-treatment scenarios. 
+
+2) Results on Semi-synthetic and Real-world Data: Ta-ble IV presents the performance of all methods on the semi-synthetic IHDP and Twins datasets, as well as the real-world 
+
+Jobs dataset. On IHDP , DDML-MLP achieves the best MAE, while OLS-2 gives the best RMSE, indicating that DDML remains highly competitive on this dataset. On Twins , DDML-RF ranks first on both MAE and RMSE, with DDML-MLP achieving the second-best results, showing clear superiority over all baselines. On Jobs , DDML-RF again performs best and DDML-MLP remains among the top methods, further demonstrating the robustness and practical effectiveness of the proposed approach. These results verify that the proposed disentanglement and residual orthogonalization design gener-alizes well across different data settings. 
+
+3) Visualization Analysis: To provide more intuitive evi-dence for the effectiveness of DDML, we conduct a visual-ization analysis to verify the effects of causal-role disentan-glement and residual dependence orthogonalization. We first use probing heatmaps to examine whether the learned latent subspaces demonstrate clear role specialization, validating the CRD module. We then analyze the dependence between the treatment residual and the remaining outcome error to assess whether the RDO module improves orthogonality in practice. These analyses are conducted on the Binary 100 ,
+
+Continuous 100 , and IHDP datasets. T Y*    
+
+> Zt
+> Zy
+> Zc
+> 0.86
+> ±0.04
+> 0.14
+> ±0.04
+> 0.22
+> ±0.04
+> 0.89
+> ±0.08
+> 0.69
+> ±0.02
+> 0.58
+> ±0.07
+> Linear Probing
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> (a) TY*
+> Zt
+> Zy
+> Zc
+> 0.48
+> ±0.01
+> 0.09
+> ±0.01
+> 0.12
+> ±0.02
+> 0.90
+> ±0.02
+> 0.63
+> ±0.01
+> 0.61
+> ±0.02
+> Linear Probing
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0 (b) TY*
+> Zt
+> Zy
+> Zc
+> 0.80
+> ±0.02
+> 0.06
+> ±0.04
+> 0.04
+> ±0.02
+> 0.79
+> ±0.06
+> 0.73
+> ±0.02
+> 0.68
+> ±0.02
+> Linear Probing
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0 (c)
+
+Fig. 4: Linear probing results on datasets of (a) Binary 100 ,(b) Continuous 100 , and (c) IHDP . Each row corresponds to a latent subspace ( Zt, Zy , Zc), and each column reports predictability of treatment T and residualized outcome Y ∗.(i) We use the encoder trained on the training fold to extract (Zt, Z y , Z c) for the corresponding held-out samples, and then fit simple linear probes on each subspace to predict the treatment T and the residualized outcome Y ∗. Here, 
+
+Y ∗ = Y − ˆθ(T − m(Z)) removes the direct contribution of the treatment residual from Y , so that probing on Y ∗
+
+better reflects outcome-specific information encoded in each subspace. Treatment-related information is quantified by AUC on Binary 100 and IHDP , and by Spearman’s rank correla-tion on Continuous 100 , while outcome-related information is measured by the R2 of regressing Y ∗ on each subspace. As shown in Fig. 4, the learned subspaces show a consistent specialization pattern across datasets. Zt is more predictive of 
+
+T than Y ∗, Zy shows the reverse, and Zc remains moderately predictive of both, confirming that the CRD module learns causal role-guided latent subspaces that effectively separate JOURNAL OF L ATEX CLASS FILES, VOL. 18, NO. 9, SEPTEMBER 2020 12 
+
+covariates into treatment-specific, outcome-specific, and con-founding information while reducing information leakage. Binary_100 Continuous_100 IHDP 
+
+> 0.00
+> 0.02
+> 0.04
+> 0.06
+> 0.08
+
+Additional residual dependency 
+
+> DML-MLP
+> C-DML
+> DDML-MLP
+
+(a) Binary_100 Continuous_100 IHDP 
+
+> 0.00
+> 0.02
+> 0.04
+> 0.06
+
+Additional residual dependency 
+
+> DML-RF
+> C-DML
+> DDML-RF
+
+(b) 
+
+Fig. 5: Additional dependency between the treatment residual and the remaining outcome error after removing the treatment effect across Binary 100 , Continuous 100 , and IHDP datasets of DDML with MLP and RF nuisance estimators. (ii) We construct the treatment residual ˜T = T − ˆm(Z)
+
+and the outcome error ϵ = ˜Y − ˆθ ˜T , and measure their absolute Pearson correlation. As shown in Fig. 5, DDML-MLP and DDML-RF consistently achieve the lowest dependence between ˜T and ϵ across all datasets, with smaller medians, narrower spreads, and fewer extreme values than DML and C-DML. The improvement is especially pronounced on IHDP ,where DDML markedly reduces both the magnitude and variability of residual correlation. Notably, although C-DML often yields lower residual correlation than DML, this does not result in more accurate causal effect estimation. This is because C-DML focuses more on coordinated optimization of the residual dependence term, which can directly reduce the correlation metric itself. In contrast, DDML improves both nuisance estimation and residual orthogonality, leading to more accurate causal effect estimation. The above results show that the representation learned by DDML can effectively separate causal role information, while the residual correlation analysis further demonstrates that such disentanglement significantly weakens the dependence be-tween the treatment residual and the remaining outcome error. As shown in Fig. 6, on the IHDP dataset, the causal effect estimates produced by DDML are closer to the true causal effect and exhibit smaller bias and lower variability than those of DML and C-DML. Consequently, DDML can effectively mitigate the estimation bias caused by mixed covariates and insufficient residual orthogonality. 1.0 0.5 0.0 0.5 1.0   
+
+> Estimation bias ()
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> 1.2
+> 1.4
+> Density
+> DML-MLP
+> C-DML
+> DDML-MLP
+> True
+
+(a) 1.0 0.5 0.0 0.5 1.0    
+
+> Estimation bias ()
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> 1.2
+> 1.4
+> Density
+> DML-RF
+> C-DML
+> DDML-RF
+> True
+
+(b) 
+
+Fig. 6: Distribution of causal effect estimation bias for DML, C-DML, and DDML on the IHDP dataset with MLP and RF nuisance estimators. 
+
+4) Ablation Study: To evaluate the contribution of each module in DDML, we conduct systematic ablation studies. Specifically, we consider three variants: DDML w/o enc (re-moving the encoder), DDML w/o dis (removing the disen-tanglement loss), and DDML w/o ort (removing the orthog-onalization loss). We conducted experiments on Binary 100 ,
+
+Binary 200 , Continuous 100 , Continuous 200 , as well as the 
+
+IHDP dataset. The results of DDML are shown in Fig. 7. Bi_100 Bi_200 Con_100 Con_200 IHDP          
+
+> 0.0
+> 0.4
+> 0.8
+> 1.2
+> MAE ( )
+> Bi_100 Bi_200 Con_100 Con_200 IHDP
+> 0.0
+> 0.4
+> 0.8
+> 1.2
+> RMSE ( )
+> DDML-MLP w/o enc DDML-MLP w/o dis DDML-MLP w/o ort DDML-MLP(ours)
+
+(a) Bi_100 Bi_200 Con_100 Con_200 IHDP          
+
+> 0.0
+> 0.4
+> 0.8
+> 1.2
+> MAE ( )
+> Bi_100 Bi_200 Con_100 Con_200 IHDP
+> 0.0
+> 0.4
+> 0.8
+> 1.2
+> RMSE ( )
+> DML-RF w/o enc DDML-RF w/o dis DDML-RF w/o ort DDML-RF(ours)
+
+(b) 
+
+Fig. 7: Ablation study on Binary 100 , Binary 200 , Continu-ous 100 , Continuous 200 , and IHDP datasets of DDML with MLP and RF nuisance estimators. As shown in Fig. 7, the complete DDML-MLP and DDML-RF consistently achieves the lowest MAE and RMSE across all datasets. Removing any module leads to a significant perfor-mance degradation, confirming that each module contributes to the final effect estimation. Among the ablations, removing the disentanglement loss usually causes the largest drop, espe-cially in high-dimensional settings, indicating that causal role JOURNAL OF L ATEX CLASS FILES, VOL. 18, NO. 9, SEPTEMBER 2020 13 
+
+TABLE V: Cross-domain accuracy on Amazon Reviews dataset. (Best result is highlighted in bold.) 
+
+B→D B→E B→K D→B D→E D→K E→B E→D E→K K→B K→D K→E Avg Avg. Rank DGBR 0.6693 0.6582 0.6473 0.5975 0.5856 0.6108 0.5875 0.6253 0.6908 0.5775 0.5918 0.6752 0.6264 7.00 EAMB 0.7469 0.7252 0.7539 0.7250 0.7472 0.7492 0.6810 0.6968 0.8090 0.6850 0.7190 0.8028 0.7368 3.71 CVS 0.7569 0.7307 0.7704 0.7300 0.7007 0.7429 0.6355 0.6378 0.7554 0.6850 0.6983 0.8023 0.7205 4.83 PCFS 0.7539 0.6872 0.7269 0.7160 0.7202 0.7434 0.6465 0.6918 0.7969 0.6840 0.7294 0.7963 0.7244 4.83 CIFD 0.7674 0.7382 0.7709 0.7300 0.7297 0.7484 0.6400 0.7084 0.8024 0.6755 0.7264 0.7923 0.7358 3.79 DDML-RF 0.7824 0.7352 0.7729 0.7460 0.7528 0.7739 0.6855 0.7064 0.8294 0.6805 0.7284 0.8088 0.7502 1.92 
+
+DDML-MLP 0.7739 0.7417 0.7854 0.7340 0.7247 0.7699 0.6715 0.7214 0.8044 0.6885 0.7339 0.8083 0.7462 1.92 **Note: DDML-RF/MLP denote DDML-based top-K effect-ranked causal feature selection using RF/MLP nuisance learners. 
+
+disentanglement is essential for accurate nuisance estimation. Removing the orthogonalization constraint or the encoder also degrades performance, showing that residual dependence control and representation learning are both necessary for stable estimation. Overall, the ablation results verify that the three components are complementary and jointly responsible for the robustness of DDML. 2 3 4 5 6 7 8 9 10                                     
+
+> K
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00 MAE ( )
+> 0.0001 0.001 0.01 0.1 110
+> dis
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00 MAE ( )
+> 0.0001 0.001 0.01 0.1 110
+> ort
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00 MAE ( )
+> 2345678910
+> K
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00 RMSE ( )
+> 0.0001 0.001 0.01 0.1 110
+> dis
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00 RMSE ( )
+> 0.0001 0.001 0.01 0.1 110
+> ort
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00 RMSE ( )
+> Binary_100 Continuous_100 IHDP
+
+(a) 2 3 4 5 6 7 8 9 10                                   
+
+> K
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00 MAE ( )
+> 0.0001 0.001 0.01 0.1 110
+> dis
+> 0.00
+> 0.15
+> 0.30
+> 0.45
+> MAE ( )
+> 0.0001 0.001 0.01 0.1 110
+> ort
+> 0.00
+> 0.15
+> 0.30
+> 0.45
+> 0.60 MAE ( )
+> 2345678910
+> K
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00 RMSE ( )
+> 0.0001 0.001 0.01 0.1 110
+> dis
+> 0.00
+> 0.15
+> 0.30
+> 0.45
+> RMSE ( )
+> 0.0001 0.001 0.01 0.1 110
+> ort
+> 0.00
+> 0.15
+> 0.30
+> 0.45
+> 0.60 RMSE ( )
+> Binary_100 Continuous_100 IHDP
+
+(b) 
+
+Fig. 8: Sensitivity analysis of MAE and RMSE with respect to K, λdis , and λort on Binary 100 , Continuous 100 , and 
+
+IHDP of DDML. (a) MLP for nuisance estimation. (b) RF for nuisance estimation 
+
+5) Parameter Sensitivity Analysis: We perform a parameter sensitivity analysis to evaluate the influence of key hyperpa-rameters on model performance, focusing on the number of cross-fitting folds K and the two loss weights λdis and λort .We conduct experiments on Binary 100 , Continuous 100 , and 
+
+IHDP datasets. The results for DDML are shown in Fig. 8. (i) To study the effect of the number of cross-fitting folds (K), we vary K from 2 to 10 while fixing all other hy-perparameters. As shown in Fig. 8, both MAE and RMSE generally decrease as K increases from small to moderate values, indicating that additional folds help alleviate nuisance estimation bias. As K further increases, both metrics tend to stabilize with only minor fluctuations. These results suggest that moderate values of K are sufficient to achieve stable and accurate estimation across both settings and datasets. (ii) To study the effect of the two loss weights (λdis 
+
+and λort ), we vary both loss weights from 0.0001 to 10 while keeping all other hyperparameters fixed. As shown in Fig. 8, MAE and RMSE remain largely stable, with noticeable degradation only at extreme values. These results indicate that our method is not highly sensitive to these loss weights, and stable performance can be achieved without extensive tuning. VII. R EAL DATA APPLICATION 
+
+To further validate the effectiveness of DDML in estimating causal effects, we extend DDML to an out-of-distribution (OOD) generalization task through causal feature selection. Specifically, we treat each feature as a candidate treatment variable and use DDML to estimate its effect on the target label while controlling for the remaining covariates. We then select features with the largest estimated effects that are also stable across source domains, and train a downstream classifier using only the selected features. This setting evaluates whether DDML can identify causal features that remain stable across domains and improve OOD generalization performance. 
+
+A. Experimental Setup 
+
+We evaluate our method on the real-world Amazon Reviews 
+
+dataset with four domains (Books, DVDs, Kitchen appliances, and Electronics). Each domain contains approximately 2,000 samples, 400 features, and one label variable. We adopt pre-processed binary sentiment datasets and treat each domain as a distinct environment [33]. Following [34], we adopt a single-source identification and multi-target validation protocol: we select one domain as the source, estimate feature-level causal effects and select causal features on the source, then directly JOURNAL OF L ATEX CLASS FILES, VOL. 18, NO. 9, SEPTEMBER 2020 14 
+
+evaluate on the other three domains, yielding 4×3 = 12 cross-domain transfer tasks. DDML is used to estimate the causal effect of each feature; features are ranked according to the magnitude of their estimated effects, and the top-K ranked features are used to train downstream classifiers. We conduct comprehensive experiments and compare DDML with five state-of-the-art causal feature selection methods. DGBR [35] leverages sample reweighting to eliminate variable correlations for stable prediction across unknown environments. EAMB [36] adopts an error-aware Markov blanket learning algorithm to enhance the robustness of causal feature discovery. CVS [37] utilizes seed variables to guide the learning of invariant causal structures for robust generalization. PCFS [34] employs a progressive learning strategy to address the challenge of causal feature selection under sample selection bias. CIFD [38] focuses on identifying causally invariant features to improve OOD generalization performance. We use classification accu-racy as the evaluation metric, reporting the result for each transfer task as well as the average across all tasks. 
+
+B. Experimental Results 
+
+As shown in Table V, DDML-RF achieves the best average accuracy (0.7502) and the best average rank (1.92), while DDML-MLP attains a comparable average rank (1.92) with a slightly lower average accuracy (0.7462). Across the 12 transfer tasks, methods based on DDML-RF and DDML-MLP achieve the best or second-best accuracy in most cases, demonstrating the effectiveness of causal feature selection for OOD generalization. In contrast, existing baselines (DGBR, EAMB, CVS, PCFS, CIFD) are clearly weaker, with average accuracies ranging from 0.6264 to 0.7368 and substantially worse average ranks, and DGBR performing the worst (Avg = 0.6264, Avg Rank = 7.00). These results indicate that ranking and selecting features by causal effects estimated by DDML can identify more stable features, leading to more reliable cross-domain prediction. 
+
+C. Statistical Test 
+
+To comprehensively evaluate the performance of our al-gorithm on the real-world dataset, we adopt non-parametric statistical tests to compare DDML-based methods with com-peting methods across all tasks. We first apply the Friedman test at the 0.05 significance level, with the null hypothesis that all methods have identical average ranks. We then use the Nemenyi test [39] for pairwise comparisons, declaring two methods significantly different if their average-rank difference exceeds the critical difference ( CD ). The CD for the Nemenyi test is computed as: 
+
+CD = qα, ∆
+
+s
+
+∆(∆ + 1) 6η , (41) where ∆ is the number of compared methods, η is the number of tasks, α is the significance level, and qα, ∆ is the critical value from the Studentized range statistic. In our setting, we compare ∆ = 7 methods on η = 12 transfer tasks at α = 0 .05 ,yielding CD = 2 .60 .
+
+Fig. 9: CD diagram of the Nemenyi test for the Accuracy metric on the Amazon Reviews dataset (the lower the rank value, the better the performance). Fig. 9 shows the CD diagram of the Nemenyi test based on average ranks over the 12 cross-domain transfer tasks (lower is better). DDML-RF and DDML-MLP achieve the best ranks (both 1.92), forming the leading group in the diagram. Their rank differences to the strongest baselines, such as EAMB (3.71) and CIFD (3.79), are smaller than the critical difference (CD = 2.60), indicating that these methods are statistically indistinguishable at the chosen significance level. In contrast, DGBR (7.00) is well separated from the leading group with a rank gap exceeding the CD, and is therefore significantly worse under the Nemenyi criterion. Overall, the CD analysis supports that DDML consistently ranks among the top performers across domain shifts and provides stable cross-domain generalization performance. VIII. C ONCLUSION AND FUTURE WORK 
+
+In this paper, we addressed causal effect estimation with mixed covariate roles, where DML often suffers from biased and unstable estimates. This issue mainly arises from the mixing of distinct latent factors in the covariates, which hinders reliable nuisance estimation, and from the residual dependence induced by nuisance estimation errors, which further compromises causal effect estimation. To address these challenges, we propose DDML, a novel method for accurate causal effect estimation. DDML first improves nui-sance estimation by disentangling covariates into confounders, treatment-specific factors, and outcome-specific factors based on their causal roles. It further strengthens causal effect estimation by mitigating the residual dependence caused by nuisance estimation errors, improving estimation accuracy in practice. Extensive experiments on synthetic, semi-synthetic, and real-world datasets demonstrate that DDML consistently outperforms existing baselines. In future work, we will extend DDML to federated causal effect estimation, enabling privacy-preserving and communication-efficient estimation under het-erogeneous, decentralized data. REFERENCES [1] S. Feuerriegel, D. Frauen, V. Melnychuk, J. Schweisthal, K. Hess, A. Curth, S. Bauer, N. Kilbertus, I. S. Kohane, and M. van der Schaar, “Causal machine learning for predicting treatment outcomes,” Nat. Med. ,vol. 30, no. 4, pp. 958–968, 2024. [2] L. Liu, S. Sun, S. Zhi, F. Shi, Z. Liu, J. Heikkil¨ a, and Y. Liu, “A causal adjustment module for debiasing scene graph generation,” IEEE Trans. Pattern Anal. Mach. Intell. , vol. 47, no. 5, pp. 4024–4043, 2025. JOURNAL OF L ATEX CLASS FILES, VOL. 18, NO. 9, SEPTEMBER 2020 15 
+
+[3] J. Li, D. Lin, H. Chen, H. Liu, L. Wan, and W. Feng, “Causal inference via style bias deconfounding for domain generalization,” IEEE Trans. Pattern Anal. Mach. Intell. , vol. 48, no. 5, pp. 5357–5370, 2026. [4] D. Cheng, J. Li, L. Liu, J. Liu, and T. D. Le, “Data-driven causal effect estimation based on graphical causal modelling: A survey,” ACM Comput. Surv. , vol. 56, no. 5, pp. 1–37, 2024. [5] G. Ridgeway, S. A. Kovalchik, B. A. Griffin, and M. U. Kabeto, “Propen-sity score analysis with survey weighted data,” J. Causal Inference ,vol. 3, no. 2, pp. 237–249, 2015. [6] X. Wu, F. Mealli, M.-A. Kioumourtzoglou, F. Dominici, and D. Braun, “Matching on generalized propensity scores with continuous exposures,” 
+
+J. Amer. Stat. Assoc. , vol. 119, no. 545, pp. 757–772, 2024. [7] U. Shalit, F. D. Johansson, and D. Sontag, “Estimating individual treatment effect: generalization bounds and algorithms,” in Proc. 34th Int. Conf. Mach. Learn. , 2017, pp. 3076–3085. [8] L. Yao, S. Li, Y. Li, M. Huai, J. Gao, and A. Zhang, “Representation learning for treatment effect estimation from observational data,” in 
+
+Proc. 32nd Int. Conf. Neural Inf. Process. Syst. , 2018, pp. 2638–2648. [9] I. Bica, J. Jordon, and M. van der Schaar, “Estimating the effects of continuous-valued interventions using generative adversarial networks,” in Proc. 34th Int. Conf. Neural Inf. Process. Syst. , 2020, pp. 16 434– 16 445. [10] V. Chernozhukov, D. Chetverikov, M. Demirer, E. Duflo, C. Hansen, W. Newey, and J. Robins, “Double/debiased machine learning for treatment and structural parameters,” Econ. J. , vol. 21, no. 1, pp. C1– C68, 2018. [11] N. Fingerhut, M. Sesia, and Y. Romano, “Coordinated double machine learning,” in Proc. 39th Int. Conf. Mach. Learn. , 2022, pp. 6499–6513. [12] L. Yao, Z. Chu, S. Li, Y. Li, J. Gao, and A. Zhang, “A survey on causal inference,” ACM Trans. Knowl. Discov. Data , vol. 15, no. 5, pp. 1–46, 2021. [13] S. Li, N. Vlassis, J. Kawale, and Y. Fu, “Matching via dimensionality reduction for estimation of treatment effects in digital marketing cam-paigns,” in Proc. 25th Int. Joint Conf. Artif. Intell. , 2016, pp. 3768–3774. [14] Y. Wang and R. D. Shah, “Debiased inverse propensity score weight-ing for estimation of average treatment effects with high-dimensional confounders,” Ann. Stat. , vol. 52, no. 5, pp. 1978–2003, 2024. [15] X. Ma and J. Wang, “Robust inference using inverse probability weight-ing,” J. Amer. Stat. Assoc. , vol. 115, no. 532, pp. 1851–1860, 2020. [16] M. J. Funk, D. Westreich, C. Wiesen, T. St¨ urmer, M. A. Brookhart, and M. Davidian, “Doubly robust estimation of causal effects,” Am. J. Epidemiol. , vol. 173, no. 7, pp. 761–767, 2011. [17] Z. Zhang, D. Yi, and Y. Fan, “Doubly robust estimation of optimal dynamic treatment regimes with multicategory treatments and survival outcomes,” Stat. Med. , vol. 41, no. 24, pp. 4903–4923, 2022. [18] H. Chipman, E. George, and R. McCulloch, “Bayesian ensemble learn-ing,” in Proc. 20th Int. Conf. Neural Inf. Process. Syst. , 2006, pp. 265– 272. [19] H. A. Chipman, E. I. George, and R. E. McCulloch, “Bart: Bayesian additive regression trees,” Ann. Appl. Stat. , pp. 266–298, 2010. [20] F. Johansson, U. Shalit, and D. Sontag, “Learning representations for counterfactual inference,” in Proc. 33rd Int. Conf. Mach. Learn. , 2016, pp. 3020–3029. [21] H. Wang, Z. Chen, Z. Liu, X. Chen, H. Li, and Z. Lin, “Proximity matters: Local proximity enhanced balancing for treatment effect esti-mation,” in Proc. 31st ACM SIGKDD Conf. Knowl. Discov. Data Min. ,2025, pp. 2927–2937. [22] C. Louizos, U. Shalit, J. M. Mooij, D. Sontag, R. Zemel, and M. Welling, “Causal effect inference with deep latent-variable models,” in Proc. 31st Int. Conf. Neural Inf. Process. Syst. , 2017, pp. 6449–6459. [23] J. Yoon, J. Jordon, and M. van der Schaar, “GANITE: Estimation of individualized treatment effects using generative adversarial nets,” in Proc. 6th Int. Conf. Learn. Represent. , 2018. [Online]. Available: https://openreview.net/pdf?id=ByKWUeWA-[24] X. Du, L. Sun, W. Duivesteijn, A. Nikolaev, and M. Pechenizkiy, “Adversarial balancing-based representation learning for causal effect inference with observational data,” Data Min. Knowl. Discov. , vol. 35, no. 4, pp. 1713–1738, 2021. [25] S. Qiang, “Glcn: Treatment effect estimation via global-local networks with adversarial debiasing,” in Proc. 34th ACM Int. Conf. Inf. Knowl. Manag. , 2025, pp. 5136–5140. [26] K. Kuang, P. Cui, B. Li, M. Jiang, S. Yang, and F. Wang, “Treatment effect estimation with data-driven variable decomposition,” in Proc. 31st AAAI Conf. Artif. Intell. , 2017, pp. 140–146. [27] N. Hassanpour and R. Greiner, “Learning disentangled representations for counterfactual regression,” in Proc. 7th Int. Conf. Learn. Represent. , 2019. [Online]. Available: https://openreview.net/forum?id= HkxBJT4YvB [28] A. Wu, J. Yuan, K. Kuang, B. Li, R. Wu, Q. Zhu, Y. Zhuang, and F. Wu, “Learning decomposed representations for treatment effect estimation,” 
+
+IEEE Trans. Knowl. Data Eng. , vol. 35, no. 5, pp. 4989–5001, 2023. [29] Y. Huang, W. Siyi, C. H. Leung, Q. Wu, D. Wang, and Z. Huang, “Dignet: Learning decomposed patterns in representation balancing for treatment effect estimation,” Trans. Mach. Learn. Res. , 2024. [Online]. Available: https://openreview.net/pdf?id=Z20FInfWlm [30] J. Zhang, E. Eldele, F. Cao, Y. Wang, X. Li, and J. Liang, “Counter-factual contrastive learning with normalizing flows for robust treatment effect estimation,” in Proc. 42nd Int. Conf. Mach. Learn. , 2025, pp. 74 819–74 839. [31] Y. Jung, J. Tian, and E. Bareinboim, “Estimating identifiable causal effects through double machine learning,” in Proc. 35th AAAI Conf. Artif. Intell. , 2021, pp. 12 113–12 122. [32] V. Chernozhukov, W. K. Newey, and R. Singh, “Automatic debiased machine learning of causal and structural effects,” Econometrica , vol. 90, no. 3, pp. 967–1027, 2022. [33] J. Wang, W. Feng, Y. Chen, H. Yu, M. Huang, and P. S. Yu, “Visual domain adaptation with manifold embedded distribution alignment,” in 
+
+Proc. 26th ACM Int. Conf. Multimedia , 2018, pp. 402–410. [34] S. Yang, X. Guo, K. Yu, X. Huang, T. Jiang, J. He, and L. Gu, “Causal feature selection in the presence of sample selection bias,” ACM Trans. Intell. Syst. Technol. , vol. 14, no. 5, pp. 1–18, 2023. [35] K. Kuang, P. Cui, S. Athey, R. Xiong, and B. Li, “Stable prediction across unknown environments,” in Proc. 24th Int. Conf. Knowl. Discov. Data Min. , 2018, pp. 1617–1626. [36] X. Guo, K. Yu, F. Cao, P.-P. Li, and H. Wang, “Error-aware markov blanket learning for causal feature selection,” Inf. Sci. , vol. 589, pp. 849–877, 2022. [37] K. Kuang, H. Wang, Y. Liu, R. Xiong, R. Wu, W. Lu, Y. T. Zhuang, F. Wu, P. Cui, and B. Li, “Stable prediction with leveraging seed variable,” IEEE Trans. Knowl. Data Eng. , vol. 35, no. 6, pp. 6392–6404, 2023. [38] Y. Wang, K. Yu, G. Xiang, F. Cao, and J. Liang, “Discovering causally invariant features for out-of-distribution generalization,” Pattern Recog-nit. , vol. 150, p. 110338, 2024. [39] J. Demˇ sar, “Statistical comparisons of classifiers over multiple data sets,” 
+
+J. Mach. Learn. Res. , vol. 7, no. Jan, pp. 1–30, 2006.

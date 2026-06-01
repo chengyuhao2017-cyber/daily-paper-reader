@@ -1,0 +1,3046 @@
+Title: One Currency, Two Forward Prices: The Onshore-Offshore Renminbi Puzzle
+
+URL Source: https://arxiv.org/pdf/2605.25392v1
+
+Published Time: Tue, 26 May 2026 01:44:12 GMT
+
+Number of Pages: 28
+
+Markdown Content:
+ONE CURRENCY, TWO FORWARD PRICES: THE ONSHORE-OFFSHORE RENMINBI PUZZLE 
+
+Samuel Drapeau a,b,1 , Peng Luo a,2 , Xuan Tao a,3 , Tan Wang b,4 ABSTRACT 
+
+Partially convertible economies face a market-design problem: trade integration, cross-border investment, and domestic balance-sheet ex-posure increase the demand for currency hedging before full finan-cial integration is complete. China adopted a distinctive architecture for this problem by fostering a deliverable offshore Renminbi market (CNH) alongside the segmented onshore market (CNY), rather than relying only on non-deliverable forwards. This creates two venues for closely related claims on the same currency. Spot prices are tightly linked, yet CNY and CNH forwards display a persistent and econom-ically large discrepancy. We study that discrepancy in a joint equi-librium model for spot and forward trading with transaction costs and segmented supply. In the benchmark case with common constant sup-ply and deterministic costs, spot parity implies a forward differential with the wrong sign relative to the data. Random offshore stress, mod-eled as a jump in trading costs, overturns this benchmark while pre-serving tight spot parity. The model yields a semi-explicit representa-tion in the CNY/CNH application and a calibration of the observed forward discrepancy in terms of the market-implied likelihood and severity of offshore liquidity stress. KEYWORDS 
+
+On/Off-Shore Forward Pricing, Spot/Forward Equilibrium, Transac-tion Costs, FBSDE, Market Segmentation, Liquidity Stress AUTHORS INFO       
+
+> aSchool of Mathematical Sciences, Shang-hai Jiao Tong University, Shanghai, China
+> bShanghai Advanced Institute of Finance, Shanghai Jiao Tong University, Shanghai, China
+> 1sdrapeau@saif.sjtu.edu.cn
+> 2peng.luo@sjtu.edu.cn
+> 3taoxuan@htsc.com.cn
+> 4tan.wang@saif.sjtu.edu.cn
+
+PAPER INFO    
+
+> Last updated: May 26, 2026
+> MSC: 91B50, 60H10, 91G20, 91B24.
+> JEL: F31, G12, G15.
+
+1. I NTRODUCTION 
+
+Developing economies that retain partial capital-account restrictions face a persistent mar-ket design problem. Convertibility limits can reduce exposure to abrupt capital-flow re-versals and give domestic financial markets time to deepen. At the same time, trade in-tegration, outward and inward investment, and larger cross-border balance sheets create a growing demand for currency hedging. That demand comes not only from international investors, but also from domestic exporters, importers, and financial institutions whose cash flows are tied to foreign currency markets. The issue is therefore not a binary choice between control and openness. It is a sequencing problem: how to expand hedging ac-cess and market depth while maintaining a gradual integration of domestic and offshore financial conditions. Offshore non-deliverable forward (NDF) markets have been one important response to this problem. They allow exchange-rate risk to be traded without full access to the domestic currency market, and they often become the first liquid hedging venue for a partially con-vertible currency. But NDFs are indirect claims: they settle in a reference currency rather than delivering the underlying domestic currency. As they grow, they can also become central to price discovery, expectations, and offshore funding conditions. Many economies have therefore used a range of approaches, from widening participation in NDF markets to 
+
+Date : May 26, 2026. 
+
+> 1
+> arXiv:2605.25392v1 [q-fin.MF] 25 May 2026
+
+expanding onshore hedging access and developing market-connect programs. China’s re-sponse to the same broad problem was distinctive. Although a CNY NDF market existed, beginning in 2009 China promoted a deliverable offshore Renminbi market in Hong Kong (CNH) while the onshore Renminbi market (CNY) remained segmented. 1 At the same time, the traditional CNY non-deliverable forward market has gradually been replaced by the deliverable offshore CNH market. 2 This architecture is not simply an intermediate step between restrictions and liberalization. It creates two deliverable venues for closely related claims on the same currency: an onshore market embedded in a more regulated financial system and an offshore market operating under more flexible but potentially more fragile liquidity conditions. One offshore RMB is still one Renminbi, which gives spot prices a strong common anchor. Yet the two venues differ in their hedging technology, funding conditions, and exposure to liquidity stress. The CNY/CNH pair is therefore a natural laboratory for a broader question: how do spot and forward prices behave when the same terminal payoff is traded across segmented venues with different dynamic hedging costs? Empirically, the spot relation is extremely tight. Aside from occasional deviations during periods of financial turbulence, 3 the spot price difference between the two markets rarely exceeds a few basis points, see Figure 1. Over the period 2010–2021, the log ratio of CNY/CNH spot prices averaged −0.01% , with interquartile ranges of −0.1% and 0.1% .If spot parity were the dominant force at all horizons, forward prices should also be close across markets. Yet the forward market shows a markedly different picture. Forward price deviations are systematically negative and economically large across maturities. More precisely, 
+
+rY /H T := 1
+
+T ln 
+
+ F YT
+
+F HT
+
+
+
+≈ − 4.4% 
+
+consistently since the establishment of the CNH market and across all maturities T =1M, 2M, 3M, 6M, 1Y , see Figure 2, and Table 1. 
+
+FIGURE 1. Log ratio of CNY/CNH spot rates in %.
+
+> 1Over the past decade and a half, China has implemented additional policies to liberalize RMB trade. Notable measures include enabling RMB trade settlement in over 25 countries via local banks, launching stock (2015) and bond (2017) interconnect programs for qualified financial institutions to access onshore markets, and expanding the use of swap lines with foreign central banks. These developments have contributed to a decline in the relative turnover of offshore RMB (CNH) compared to onshore RMB (CNY).
+> 2According to the BIS Triennial Survey, the daily turnover of CNY NDFs decreased by 40% from $17.1 billion in 2013 to $10.4 billion in 2016. During the same period, the daily turnover of CNH forwards doubled to $16.4 billion, surpassing NDFs.
+> 3For example, during and after the 2015 financial crisis in mainland China.
+> 2
+
+FIGURE 2. Box plot of the annualized forward differential rY /H T = 
+
+> 1
+> T
+
+ln( F YT /F HT ) across maturities. 
+
+rY /H  
+
+> 1
+
+rY /H  
+
+> 2
+
+rY /H  
+
+> 3
+
+rY /H  
+
+> 6
+
+rY /H 
+
+> 12
+
+mean -4.47% -4.58% -4.41% -4.44% -4.39% std 4.98% 3.36% 2.07% 1.54% 1.17% 
+
+q25% -6.36% -5.71% -5.50% -5.20% -4.86% Median -4.29% -4.18% -4.22% -4.32% -4.26% 
+
+q75% -2.27% -2.87% -3.14% -3.43% -3.59% TABLE 1. Summary statistics about the yield rY /H T = 1 
+
+> T
+
+ln( F YT /F HT )
+
+from 2010 to 2021 for maturities 1, 2, 3, 6 and 12 months. The empirical object is therefore a persistent and economically large difference between onshore and offshore forward prices, despite nearly identical spot prices across the two venues. A natural first benchmark is the standard no-arbitrage relation between spot prices, forward prices, and funding rates. In stylized classical foreign exchange theory, this relation gives 
+
+F YT = SY e(rY −r)T and F HT = SH e(rH −r)T
+
+where rY , rH , and r are the funding rates onshore, offshore, and foreign (USA), respec-tively. Since SY ≈ SH , we would have 
+
+rY /H T = rY − rH
+
+At the macro level, however, the relevant onshore-offshore funding differential is much smaller on average than the forward wedge and does not display the same persistent pattern. What it does exhibit are rare but extraordinary spikes, especially around the 2016 CNH stress episode, when offshore liquidity conditions tightened abruptly. This suggests that the forward wedge is not explained by a stable carry differential alone. It reflects a state-contingent hedging environment: offshore trading may be cheaper in normal times but much more expensive in stress states. This points to a different mechanism. Because the two venues ultimately trade the same currency, spot parity can remain tightly anchored by convertibility channels, institutional linkages, and arbitrage. Forward pricing is different: dealers who absorb forward demand must hedge dynamically in the spot market, so the relevant marginal object is the expected future cost of hedging rather than the current spot differential alone. If the offshore market is cheap in normal times but exposed to rare and severe liquidity squeezes, those state-contingent hedging costs are capitalized into the offshore forward price even when the 
+
+> 3
+
+spot differential remains negligible. The spikes observed in offshore funding markets, together with contemporaneous increases in margin requirements, point directly to this type of random cost shock. Under this interpretation, tight spot parity and a persistently more expensive offshore forward are not contradictory: they indicate that state-contingent offshore frictions are priced mainly in forwards rather than in spot. 
+
+FIGURE 3. Onshore overnight repo minus offshore overnight Hibor in 
+
+%. The top panel focuses on the regular range, while the bottom panel shows the full stress episode. The differential is moderate on average but exhibits rare and pronounced spikes, especially around the 2016 CNH liquidity squeeze. This is the mechanism we formalize in the model. The model allows both supply conditions and trading costs to differ across venues, but in the CNY/CNH application the central force is the possibility of abrupt offshore cost deterioration. Onshore trading is more regulated and typically more expensive at the margin, while offshore trading is more flexible and cheaper in normal times but can become suddenly much more expensive when liquidity conditions tighten. The January 2016 CNH squeeze is the natural example: the overnight funding rate jumped from roughly 3% to above 70% within days, together with a sharp increase in margin requirements. Our contribution is to study this mechanism in a joint equilibrium model for spot and for-wards. The spot market is dynamic, the forward market is static, and the two are linked be-cause forward dealers hedge through future spot trading. This mixed static-dynamic struc-ture separates current spot linkage from future hedging costs. The deterministic benchmark gives a sharp empirical test: under common constant supply and spot parity, it implies 
+
+F Y − F H ≈ m(cY − cH ), so with the normal ordering cY > c H it predicts F Y > F H ,the opposite of the data. Random offshore stress is therefore not an auxiliary feature but the mechanism that reverses the sign while preserving tight spot parity. In the jump speci-fication, the ordering is cH < c Y < c H : offshore hedging is cheaper in normal times and more expensive after a stress event. The observed forward wedge can then be read as a market-implied assessment of abrupt offshore stress: prices internalize both the perceived probability of a future liquidity squeeze and the expected severity of the associated hedging cost increase. 1.1. Literature Review. The paper is related to three strands of literature. 
+
+> 4
+
+The first strand concerns the institutional development of offshore RMB markets and the empirical relation between CNY and CNH. The emergence of the offshore RMB market and its interaction with the broader Asian offshore-currency architecture are documented, for instance, by Maziad and Kang [19], Craig et al. [7], Schmittmann and Teng [23], and Cheung et al. [6]. The shift from non-deliverable to deliverable offshore RMB instruments is discussed by McCauley and Shu [20] and Ehlers et al. [9], while Packer et al. [22] doc-ument the later tilt of renminbi turnover back toward onshore trading. Empirical work on CNY/CNH itself has mostly focused on price discovery, volatility spillovers, and liquidity or policy determinants of the onshore-offshore gap; see, among others, Shen [24], Wu and Chen [28], Cheung and Rime [5], Leung and Fu [17], Yan et al. [29], Shu et al. [25], and Funke et al. [11]. That literature is informative about co-movements, market segmenta-tion, and RMB internationalization, but it does not provide an equilibrium explanation for a persistent deliverable forward wedge under near-spot parity. The second strand studies exchange rates and asset prices under segmentation, liquidity frictions, or capital-account distortions. In particular, Gabaix and Maggiori [12] empha-size the role of financial intermediaries and international liquidity in exchange-rate deter-mination. The paper is also connected to the literature on covered interest parity failures and cross-currency bases, where balance-sheet costs and hedging imbalances generate per-sistent deviations from frictionless no-arbitrage benchmarks; see Du et al. [8] and Borio et al. [2]. For the RMB specifically, Jermann et al. [16] and McCauley and Shu [21] study the exchange-rate-policy regime and its relation to broader currency co-movements. Our setting is narrower and more microstructural: the two venues trade the same RMB payoff, the spot side is tightly linked across venues, and the object of interest is the forward wedge generated by heterogeneous hedging conditions rather than the level of the exchange rate itself. The third strand is the equilibrium literature with transaction costs and trading frictions. Dynamic asset-pricing effects of trading costs appear already in Vayanos and Vila [26], Lo et al. [18], and Buss and Dumas [4]. More recent equilibrium work with transaction costs includes Bouchard et al. [3], Herdegen et al. [15], Weston [27], Escauriaza et al. [10], and Gonon et al. [14]. Related optimal trading papers such as Garleanu and Pedersen [13] and Almgren and Li [1] study super-linear trading frictions in dynamic hedging problems, but with prices taken as exogenous. Relative to these literatures, the present paper combines endogenous spot and forward pricing, random trading frictions, and a jump specification motivated by offshore RMB stress episodes. This is the feature that allows the model to address both the wrong-sign deterministic benchmark and the calibration of market-implied stress beliefs. 1.2. Economic Mechanism. Section 3 specializes the theory to the CNY/CNH case. At the economic level, the mechanism is simple. We consider two trading venues, onshore 
+
+Y and offshore H, for the same RMB payoff G delivered at time T . On each venue, the spot price is determined dynamically while the forward price is determined in static equilibrium. The two markets differ only through local trading frictions and local balance-sheet capacity. More precisely, on each venue i ∈ { Y, H }, the spot price Si of the common payoff satisfies 
+
+Si(t) = Si(0) + 
+
+> t
+
+Z
+
+> 0
+
+μi(s) ds +
+
+> t
+
+Z
+
+> 0
+
+σi(s) dW (s), Si(T ) = G,
+
+while the forward price F i is the static equilibrium price at which dealer supply meets investor demand. The link between the two comes from hedging: dealers absorb forward demand and then replicate that exposure by trading dynamically in spot. Trading q units on the spot market entails a quadratic execution cost ci(t)2 q2, so the forward price depends on the entire future path of spot hedging costs, not only on current funding conditions. At 
+
+> 5
+
+the same time, the local availability of the asset is described by a supply process 
+
+M i(t) = M i(0) + 
+
+> t
+
+Z
+
+> 0
+
+mi(s) ds, 
+
+which determines how much inventory the arbitrage sector can absorb on each venue. For CNY/CNH, the key asymmetry is in trading costs. Onshore costs are structurally higher and more stable because of capital-account restrictions, whereas offshore costs are lower in normal times but can jump sharply when liquidity conditions tighten. The important point is that these changes need not build up smoothly over calendar time: they can be triggered by a liquidity event that arrives unexpectedly, and from that random date onward hedging costs can change dramatically. This is exactly the type of specification studied in the application section: if τ denotes a random stress time, then the offshore cost process can be modeled by 
+
+cH (t) = 
+
+(
+
+cH , t < τ, cH , t ≥ τ, 
+
+with cH ≪ cY < c H . The general model also allows time-varying supply, but in the baseline calibration we keep the supply rate constant and common across venues and let the random shift operate through costs, because the data point most directly to sudden changes in funding and margin conditions. Three groups of agents interact on each venue. Investors demand forward contracts for hedging purposes, with demand decreasing in the forward price. Dealers absorb that for-ward demand and hedge it by trading in the spot market. Their spot inventory evolves according to their trading rate, and they face a trade-off between expected trading gains, execution costs, inventory risk, and a terminal mismatch penalty if their final inventory does not match their forward commitment. Finally, arbitrageurs trade in the spot market and absorb part of the available supply; in equilibrium, they expand their position until marginal trading gains equal marginal trading costs. This leads to a mixed static-dynamic equilibrium. For a given forward supply, spot-market clearing determines the spot dynamics and the dealer inventory path. Conversely, the dealer’s willingness to supply forwards depends on the dynamic spot hedging problem they face, because a forward position is valuable only through the future sequence of spot trades required to hedge it. Equating dealer supply with investor demand then pins down the forward price. Hence the forward is not priced in a separate static block: it is linked to the entire dynamic spot equilibrium through expected future inventory and trading costs. This feedback from future hedging conditions to current forward supply is the key eco-nomic channel of the paper. In the CNY/CNH application, the mechanism gives a clear interpretation of the data. Spot parity can remain tight because both venues ultimately trade the same currency and are linked by policy and arbitrage. At the same time, forward prices may diverge because the expected cost of hedging forward positions differs across venues. In particular, if the off-shore market is cheap in normal times but exposed to rare and severe liquidity squeezes, those state-contingent costs are capitalized into the offshore forward price even when the spot differential remains small. The role of randomness is substantive rather than cos-metic. In the constant-cost benchmark, once the spot equality constraint SY (0) = SH (0) 
+
+is imposed, the model implies 
+
+∆F = m(cY − cH ),
+
+With common constant supply m on both sides and the empirically relevant ordering 
+
+cY > c H , this gives the wrong sign for the forward wedge: it predicts that the onshore forward should be more expensive than the offshore one. The main empirical message of the application is that random offshore stress reverses this deterministic prediction while 
+
+> 6
+
+preserving tight spot parity. This is also why we do not rely here on cross-market supply differences to generate the wedge. In the jump specification, the offshore forward price already reflects the possibility of a future stress episode, so current forward prices incor-porate expected future hedging conditions rather than only current trading conditions. The numerical exercise then gives a simple interpretation of the wedge. Holding fixed the com-mon supply rate and the normal-times offshore cost, each target value of F Y − F H can be mapped, under spot parity, into a market-implied pair (λ, c H ) describing the probability of an offshore stress episode and the size of the offshore cost increase. The forward wedge therefore tells us which combinations of stress probability and stress severity are consistent with the observed data. 1.3. Outline. The paper is organized as follows. Section 2 presents the general spot-forward equilibrium model, states the existence results, and isolates the no-risk-aversion representation used in the application. Section 3 applies this representation to CNY/CNH: it formulates the spot-parity restriction, shows the deterministic sign failure, introduces random offshore stress, and interprets the forward wedge through an inverse calibration of stress likelihood and severity. Section 4 contains the proofs of the equilibrium results, the derivations behind the CNY/CNH formulas stated in Section 3, and the technical estimates for the small-risk-aversion argument. 2. S POT AND FORWARD MARKET EQUILIBRIUM WITH RANDOM TRANSACTION 
+
+COSTS AND SUPPLY 
+
+We now introduce the general equilibrium model underlying the economic mechanism de-scribed in the introduction. Throughout, we work on a filtered probability space (Ω , F, F =(Ft)0≤t≤T , P) generated by a Brownian motion W and an independent compensated Pois-son random measure ˜N defined on Ω × [0 , T ] × R with compensator ν(t, dx )dt .4 For notational convenience, we denote by X = ( W, ˜N ) the resulting martingale. We use the following spaces: 
+
+• S∞ and Sp denote the set of càdlàg processes μ such that sup t≤T |μ(t)| is either bounded or p-integrable, respectively. 
+
+• H denote those processes σ = ( σ1, σ 2) for which R σdX is well defined. 5
+
+• Hp and HBM O are those integrands σ in H such that R σdX is in Sp or is BM O ,respectively. For σ in H2, we define σ2 := σ21 + R 
+
+> R
+
+σ22 dν , since this is the quadratic variation density of the process R σdX .We consider a fixed bounded measurable contingent claim G. This contingent claim is dynamically traded on the spot market at price S = ( S(t)) and statically on the forward market at price F . In equilibrium, the spot price follows a Bachelier dynamic 
+
+S(t) = S(0) + 
+
+> t
+
+Z
+
+> 0
+
+μds +
+
+> t
+
+Z
+
+> 0
+
+σdX, with S(T ) = G
+
+where μ is in S∞ and σ is in HBM O . Market constraints enter through supply and trading costs. The supply of the underlying asset is denoted by M (t) = M (0) + R t 
+
+> 0
+
+m ds , where 
+
+m is the supply rate, and spot trading costs are quadratic in quantity: trading an amount q
+
+at time t costs c(t) q2 
+
+> 2
+
+.There are three types of market participants:        
+
+> 4Intuitively, but not necessarily, the Brownian motion drives idiosyncratic risk, while the Poisson process represents exogenous sudden changes in market constraints.
+> 5That is σ1is a progressively measurable stochastic process, while σ2is such that R
+> Rσ2ν(dx )is progres-sively measurable.
+> 7
+
+• Investors , with a forward demand function F 7 → d(F ) that is strictly decreasing and continuous in the forward price F .
+
+• Retailers who, after selling an amount s of forward contracts at price F , hedge in the spot market with a trading rate q in H2 and corresponding inventory Q = R q ds . Their objective function is 
+
+J(q, s) = E
+
+" TZ
+
+> 0
+
+Qμdt + s(F − S(T )) − ρ
+
+2 (Q(T ) − s)2
+
+#
+
+− 12 E
+
+" TZ
+
+> 0
+
+cq 2dt + ϕ
+
+> T
+
+Z
+
+> 0
+
+Q2σ2dt 
+
+#
+
+where ϕ is the risk-aversion parameter and ρ(Q(T ) − s)2 penalizes hedge mismatch at maturity. Throughout the paper, we will assume ρ > 0 is a fixed constant. 
+
+• Arbitrageurs , with inventory ˜Q = ˜Q(0) + R ˜q ds and trading rate ˜q in H2, who equate instantaneous gains and marginal costs, that is, c(t)˜ q(t) = μ(t).The equilibrium we consider is of Arrow–Debreu type. Since investor optimality is already encoded by the demand function F 7 → d(F ), the equilibrium conditions only need to specify retailer optimality, arbitrageur optimality, and clearing in the forward and spot markets. 
+
+Definition 2.1. An equilibrium is a tuple (F ∗, S ∗, q ∗, ˜q∗, s∗) such that: 
+
+(i) S∗ has the form 
+
+S∗(t) = S∗(0) + 
+
+> t
+
+Z
+
+> 0
+
+μ∗(s) ds +
+
+> t
+
+Z
+
+> 0
+
+σ∗ dX, S∗(T ) = G,
+
+for some μ∗ ∈ S∞ and σ∗ ∈ HBM O ;
+
+(ii) retailer optimality holds: 
+
+J(q∗, s∗) ≥ J(q, s∗)
+
+for every admissible spot strategy q;
+
+(iii) arbitrageur optimality holds: 
+
+c˜q∗ = μ∗;
+
+(iv) the forward and spot markets clear: 
+
+s∗ = d(F ∗), Q∗(t) + ˜Q∗(t) = M (0) + 
+
+> t
+
+Z
+
+> 0
+
+m(s) ds, 
+
+where Q∗ = R q∗ ds and ˜Q∗ = ˜Q∗(0) + R ˜q∗ ds .
+
+We can now state the two main equilibrium results of the paper. We start with the general small-risk-aversion result, which gives the local equilibrium structure around the bench-mark case. We then turn to the no-risk-aversion case ϕ = 0 , which is the most explicit and economically transparent benchmark. 
+
+Theorem 2.2 (Small-Risk-Aversion Equilibrium) . Assume that ρ2T 2∥1/c ∥2 
+
+> ∞
+
+< 1. Then there exists ϕ0 > 0 such that, for every ϕ ∈ [0 , ϕ 0], there exists a unique equilibrium. It is 
+
+> 8
+
+characterized by the coupled FBSDE system 
+
+(2.1) 
+
+
+
+S(t) = G −
+
+> T
+
+Z
+
+> t
+
+μ ds −
+
+> T
+
+Z
+
+> t
+
+σ dX Q(t) =
+
+> t
+
+Z
+
+> 0
+
+q ds c(t)q(t) = −ρ (Q(T ) − s) + 
+
+> T
+
+Z
+
+> t
+
+ μ − ϕσ 2Q ds −
+
+> T
+
+Z
+
+> t
+
+Z dX μ(t) = c(t)( m(t) − q(t)) 
+
+E[Q(T )] = s − 1
+
+ρ (F − E[G]) 
+
+s = d(F ).
+
+Moreover, with cq = ρ(Λ − P Q ), the equilibrium is equivalently characterized by 
+
+
+
+S(t) = G −
+
+> T
+
+Z
+
+> t
+
+(cm − ρ (Λ − P Q )) dt −
+
+> T
+
+Z
+
+> t
+
+σdX E[Q(T )] = s − 1
+
+ρ (F − E[G]) 
+
+s = d(F )
+
+where P , Λ, and Q satisfy the Riccati system 
+
+
+
+P (t) = 1 −
+
+> T
+
+Z
+
+> t
+
+
+
+P
+
+ ρP c + 1 
+
+
+
+− ϕρ σ2
+
+
+
+ds −
+
+> T
+
+Z
+
+> t
+
+ZP dX 
+
+Λ( t) = s −
+
+> T
+
+Z
+
+> t
+
+
+
+Λ
+
+ ρP c + 1 
+
+
+
+− cm ρ
+
+
+
+dt −
+
+> T
+
+Z
+
+> t
+
+ZΛdX Q(t) = ρ
+
+> t
+
+Z
+
+> 0
+
+ Λ
+
+c − Pc Q
+
+
+
+ds. 
+
+Theorem 2.3 (No-Risk-Aversion Equilibrium) . If ϕ = 0 , there exists a unique equilibrium regardless of ρ or T and characterized by the coupled FBSDE system (2.1) . The Ricatti system is then decoupled from σ and simplifies to 
+
+
+
+P (t) = 1 −
+
+> T
+
+Z
+
+> t
+
+P
+
+ ρP c + 1 
+
+
+
+ds −
+
+> T
+
+Z
+
+> t
+
+ZP dX 
+
+Λ( t) = s −
+
+> T
+
+Z
+
+> t
+
+
+
+Λ
+
+ ρP c + 1 
+
+
+
+− cm ρ
+
+
+
+dt −
+
+> T
+
+Z
+
+> t
+
+ZΛdX Q(t) = ρ
+
+> t
+
+Z
+
+> 0
+
+ Λ
+
+c − Pc Q
+
+
+
+ds. 
+
+In particular, 
+
+F − S(0) = ρΛ(0) .
+
+The no-risk-aversion case is sufficiently explicit to yield semi-closed formulas and to make the equilibrium mechanism fully transparent. Once P is known, the BSDE for Λ is linear, hence affine in the forward supply s, while the equation for Q is a linear stochastic ODE 
+
+> 9
+
+driven by Λ. As a result, both Λ and Q are affine in s, which in turn implies that the equilibrium supply curve s(F ) is itself affine in the forward price F . To make this structure explicit, introduce 
+
+H(t) = 
+
+> t
+
+Z
+
+> 0
+
+ ρP c + 1 
+
+
+
+ds, δ(t) = eH(t)Et
+
+
+
+> T
+
+Z
+
+> t
+
+e−H cm ds 
+
+ ,α(t) = e−H(t)+ ttZ
+
+> 0
+
+e−s
+
+c eH P ds, β(t) = e−H(t)+ ttZ
+
+> 0
+
+e−s
+
+c eH δ ds. 
+
+Then the linear BSDE for Λ and the linear ODE for Q can be solved explicitly as 
+
+Λ( t) = P (t)s + δ(t)
+
+ρ , Q(t) = ρα (t)s + β(t).
+
+The term δ captures the contribution of the supply rate m to the retailer’s continuation value, while β is the corresponding contribution to the inventory process. Substituting the affine form of Q(T ) into the clearing condition 
+
+E[Q(T )] = s − 1
+
+ρ (F − E[G]) 
+
+gives 
+
+ρE [α(T )] s + E[β(T )] = s − 1
+
+ρ (F − E[G]) .
+
+Rearranging,  1 − ρE [α(T )] s = E[β(T )] + 1
+
+ρ (F − E[G]) .
+
+To identify the slope explicitly, note that 
+
+α(T ) = eH(T )+ TTZ
+
+> 0
+
+e−s
+
+c eH P ds 
+
+and, from the Riccati equation for P ,
+
+de −tP = ρe −t P 2
+
+c dt + e−tZP dX. 
+
+Taking expectations and integrating from 0 to T gives 
+
+ρE 
+
+
+
+> T
+
+Z
+
+> 0
+
+e−s
+
+c P 2 ds 
+
+ = e−T − P (0) .
+
+Since P (t) = eH(t)Et[e−H(T )], the same conditioning argument as in the proof below yields 
+
+1 − ρE [α(T )] = 1 − ρe T E
+
+
+
+> T
+
+Z
+
+> 0
+
+e−s
+
+c P 2 ds 
+
+ = eT P (0) > 0.
+
+resulting into an affine strictly decreasing endogenous supply curve 
+
+s(F ) = e−T E[β(T )] 
+
+P (0) + e−T
+
+ρP (0) 
+
+ F − E[G].
+
+Thus higher forward prices induce greater dealer supply, and the equilibrium forward price is obtained by intersecting this increasing affine supply curve with the decreasing investor demand curve d(F ). In particular, when demand is perfectly inelastic, market clearing fixes s = ¯ d, so the affine supply relation can be solved immediately for the equilibrium forward price. 
+
+> 10
+
+Corollary 2.4 (Constant Forward Demand) . Assume ϕ = 0 and d(F ) ≡ ¯d. Then the equilibrium forward and spot prices at time 0 are given by 
+
+F = E[G] + ρ eT P (0)¯ d − E[β(T )]  ,S(0) = E[G] + (1 − e−T )ρ eT P (0)¯ d − E[β(T )]  − ρe −T E[β(T )] − δ(0) ,
+
+so that 
+
+F − S(0) = ρP (0)¯ d + δ(0) .
+
+In the homogeneous case m ≡ 0, one has δ ≡ 0 and β ≡ 0, and the formulas reduce to 
+
+F = E[G] + ρe T P (0)¯ d,S(0) = E[G] + (1 − e−T )ρe T P (0)¯ d,
+
+with 
+
+F − S(0) = ρP (0)¯ d.
+
+Remark 2.5. In the no-risk-aversion case, the forward-spot spread admits a natural eco-nomic decomposition into a hedging-cost component and a cost-weighted supply compo-nent. Indeed, as the Riccati equation shows, P (0) depends only on the transaction-cost process c and not on the supply rate m. Moreover, P (0) is increasing in c: higher spot trading costs make it more expensive for a dealer to dynamically build and unwind the hedge associated with a forward position, so the term ρP (0) s raises the premium of the forward over the spot price. By contrast, once P is known, the second component is given by 
+
+δ(0) = E
+
+
+
+> T
+
+Z
+
+> 0
+
+e−H(s)c(s)m(s) ds 
+
+ ,
+
+so it depends on the supply rate only through the product cm . This shows that supply does not matter in isolation: what matters for pricing is the cost of absorbing that supply in the spot market. For fixed c, the quantity δ(0) is linear in m, so a larger supply rate increases the spread only insofar as dealers and arbitrageurs must intermediate larger inventories. Conversely, for fixed m, larger transaction costs amplify the contribution of supply to the spread. Thus higher transaction costs increase the spread directly through hedging frictions and indirectly by magnifying the price impact of supply. In this sense, the relevant state variable for forward pricing is not supply alone, but cost-weighted supply. 
+
+3. CNY/CNH A PPLICATION 
+
+We apply the no-risk-aversion representation to the CNY/CNH forward wedge. The on-shore market is denoted by Y and the offshore market by H. Both venues trade the same terminal RMB payoff G; forward demand is common and constant, dY = dH = ¯ d; and the spot supply rate is the same constant m in both venues. The application therefore attributes the wedge to heterogeneous hedging conditions, not to cross-market differences in forward demand or supply. For each venue i ∈ { Y, H }, the no-risk-aversion representation gives the forward–spot premium 
+
+F i − Si(0) = ρP i(0)¯ d + δi(0) .
+
+Here P i(0) is the marginal dynamic hedging coefficient and δi(0) is the cost-weighted inventory component. Both are venue-specific because both depend on the local spot-trading cost process. With ∆X := XY − XH , spot parity is the constraint 
+
+(eT − 1) ρ∆P (0)¯ d − ρE [∆ β(T )] − ∆δ(0) = 0 .
+
+> 11
+
+It equates the spot effect of the difference in dynamic hedging costs, represented by ∆P (0) 
+
+and ∆β(T ), with the difference in cost-weighted inventory terms. Under the same con-straint, the forward differential is 
+
+F Y − F H = ρ∆P (0)¯ d + ∆ δ(0) .
+
+Thus equality of spot prices restricts the hedging and inventory coefficients, but it leaves the forward wedge equal to the difference between two equilibrium forward premia. The empirical relation F Y < F H means that the offshore forward premium must be larger than the onshore one, even though offshore trading is cheaper in ordinary conditions. The deterministic benchmark makes this tension explicit. Assume constant costs with the normal ordering 
+
+cH < c Y .
+
+The large-ρ regime corresponds to a retailer facing a strong terminal mismatch penalty, so that the forward position is hedged as a contract to be delivered rather than left to be covered by a terminal spot purchase. In this regime, the formulas derived in Section 4 imply that spot parity yields 
+
+F Y − F H ∼ m(cY − cH ).
+
+Since m > 0 and cY > c H , the deterministic model predicts F Y > F H . The benchmark therefore fails as empirically the onshore forward is persistently cheaper than the offshore one. Random offshore stress changes the relevant marginal hedging cost without breaking spot parity. We keep the onshore cost constant and let the offshore cost jump at the first arrival time τ of a Poisson process with intensity λ:
+
+cY (t) ≡ cY , cH (t) = cH 1{t<τ } + cH 1{t≥τ }, cH < c Y < c H .
+
+The offshore venue is cheaper in the normal state, cH < c Y , but becomes more expensive in the stress state, cH > c Y . At time 0, before any stress event, the offshore hedging coefficient already incorporates the possibility of the future transition. We write P H for the offshore coefficient in the normal pre-stress state and P H for the corresponding coefficient after the stress event. Section 4 gives the following large-ρ asymptotics for the scaled normal-state coefficient: 
+
+(ρP H )′(t) ∼ ρP H (t) ρP H (t)
+
+cH + 1 + λ
+
+!
+
+− λ cH et−T
+
+1 − et−T , ρP H (t) ∼ cH et−T
+
+1 − et−T .
+
+Similarly, writing δH and δH for the normal and stressed supply components, 
+
+δH (t) = eHH (t)
+
+> T
+
+Z
+
+> t
+
+e−HH (s) 
+
+λδ H (s) + cH m
+
+
+
+ds. 
+
+Here HH (t) ∼ R t 
+
+> 0
+
+(ρP H (s)/c H + 1 + λ)ds . The stress-arrival terms involving λ are precisely what is absent from the deterministic benchmark. Combining the normal-state offshore coefficients with the deterministic onshore coefficients and imposing spot parity gives 
+
+F Y − F H ∼
+
+ cY
+
+eT − 1 − ρP H (0) 
+
+
+
+¯d + δY (0) − δH (0) .
+
+When λ = 0 , the stress state is never reached and ρP H (0) ∼ cH /(eT − 1) , so this expres-sion collapses to the deterministic empirically problematic formula above. For λ > 0, the offshore premium is instead governed by the whole state-contingent hedging technology. The offshore forward can therefore be expensive today because dealers price the expected cost of hedging through a market that may become illiquid before maturity. 
+
+> 12
+
+The calibration treats this mechanism as an inverse pricing problem. For fixed m, cY ,and normal offshore cost cH , each target level differential x determines stress parameters through 
+
+SY (0) = SH (0; λ, c H ),  F Y − F H (λ, c H ) = x. 
+
+The intensity λ corresponds to the market-implied stress probability 1 − e−λT over the horizon, while cH measures the market-implied severity of the offshore cost deteriora-tion. These are pricing-implied quantities, not physical estimates of crisis frequency. The introduction reports annualized log forward ratios rY /H T ; the numerical exercise uses nor-malized one-year level targets x = F Y − F H in the model units. Figure 4 and Table 2 report the resulting map x 7 → (λ, c H ). The deterministic benchmark corresponds to λ = 0 
+
+and gives a positive forward differential; negative target wedges require positive stress in-tensity. The calibration summarizes the mechanism: the empirical finding F Y < F H is compatible with spot parity when the offshore forward embeds the risk of future CNH liquidity stress. 
+
+FIGURE 4. Inverse calibration of market-implied offshore stress. For each normalized one-year target level differential F Y − F H , the curve reports the pair (λ, c H ) that restores spot parity, holding fixed the com-mon supply rate m, the onshore cost cY , and the normal-times offshore cost cH . The deterministic benchmark corresponds to λ = 0 .Target F Y − F H Implied λ Implied cH
+
+0.40% 0.000 irrelevant at λ = 0 
+
+0.20% 0.091 11.14% 0.11% 0.142 10.09% 0.01% 0.222 9.42% -0.50% 0.941 7.19% -0.98% 2.286 6.25% TABLE 2. Implied jump beliefs consistent with spot parity and a nor-malized one-year target level differential. The deterministic benchmark corresponds to λ = 0 , in which case cH is irrelevant. 
+
+> 13
+
+4. P ROOFS AND TECHNICAL DERIVATIONS 
+
+This final section is devoted to the proofs of the equilibrium results stated in Section 2 and to the technical derivations used in the CNY/CNH application. We first isolate the retailer’s optimization problem and the equilibrium reduction. We then prove Theorem 2.3, derive the specialized CNY/CNH systems used in Section 3, collect the technical lemmas used for the perturbative argument, and finally prove Theorem 2.2. Assume for now that c ∈ S∞ is strictly positive and bounded away from 0, μ ∈ S∞, and 
+
+σ ∈ HBM O .
+
+Proposition 4.1 (Retailer Optimization and Riccati Representation) . Let be given forward quantity s, forward price F and spot price S with μ in S∞ and σ in HBM O . The retailer’s optimization problem admits a unique optimal strategy q ∈ S∞ if and only if the FBSDE 
+
+(4.1) 
+
+
+
+Q(t) =
+
+> t
+
+Z
+
+> 0
+
+qds c(t)q(t) = −ρ(Q(T ) − s) + 
+
+> T
+
+Z
+
+> t
+
+ μ − ϕσ 2Q ds −
+
+> T
+
+Z
+
+> t
+
+ZdX 
+
+has a unique solution with q in S∞ and Z in HBM O . Moreover, this solution admits the Riccati representation 
+
+cq = ρ(Λ − P Q )
+
+where (P, Z P ) and (Λ , Z Λ) are the unique solutions in S∞ × HBM O of the BSDEs 
+
+(4.2) 
+
+
+
+P (t) = 1 −
+
+> T
+
+Z
+
+> t
+
+ ρP 2
+
+c − ϕσ 2
+
+ρ
+
+
+
+ds −
+
+> T
+
+Z
+
+> t
+
+ZP dX 
+
+Λ( t) = s −
+
+> T
+
+Z
+
+> t
+
+ ρP c Λ( s) − μρ
+
+
+
+ds −
+
+> T
+
+Z
+
+> t
+
+ZΛdX. 
+
+Proof. Since the objective function J is strictly convex in q, there exists a unique solution if and only if there exists q setting the Gâteaux derivative in any direction to 0. Computing the Gâteaux derivative of J in the direction q′ yields 
+
+lim 
+
+> ε↘0
+
+J (q + εq ′, s) − J (q, s)
+
+ε
+
+= E
+
+−ρ (Q(T ) − s)
+
+
+
+> T
+
+Z
+
+> 0
+
+q′dt 
+
+ −
+
+> T
+
+Z
+
+> 0
+
+cqq ′dt +
+
+> T
+
+Z
+
+> 0
+
+ μ − ϕ˜σ2Q
+
+> t
+
+Z
+
+> 0
+
+q′ds 
+
+ dt 
+
+
+
+= E
+
+
+
+> T
+
+Z
+
+> 0
+
+Et
+
+−ρ (Q(T ) − s) − cq +
+
+> T
+
+Z
+
+> t
+
+ μ − ϕσ 2Q ds 
+
+ q′dt 
+
+
+
+where the last equality holds by Fubini’s theorem and the tower property of the conditional expectation. Since this has to hold for any perturbation q′, it is therefore equivalent to 
+
+c(t)q(t) = Et
+
+−ρ (Q(T ) − s) + 
+
+> T
+
+Z
+
+> t
+
+ μ − ϕσ 2Q ds 
+
+
+
+> 14
+
+having a unique solution. For such a solution q, martingale representation yields 
+
+c(t)q(t) = −ρ (Q(T ) − s) + 
+
+> T
+
+Z
+
+> t
+
+ μ − ϕσ 2Q ds −
+
+> T
+
+Z
+
+> t
+
+ZdX 
+
+for Z in H2. By the integrability assumptions on the coefficients, it follows that Z is in 
+
+HBM O , yielding the desired FBSDE representation. Conversely, assume that the FBSDE has a unique solution with q and Z in S∞ and HBM O ,respectively; taking conditional expectations and rearranging yields the Gâteaux derivative condition. We divide the proof of Riccati representation into four steps. 
+
+Step 1: Riccati ansatz. We seek a solution of the form cq = ρ(Λ − P Q ) with terminal values P (T ) = 1 and Λ( T ) = s. Applying Itô’s formula to Y = cq and using the forward equation dQ = qdt = ρc (Λ − P Q )dt yields 
+
+dY = ρd Λ − ρQdP − ρ2Pc (Λ − P Q )dt. 
+
+On the other hand, differentiating the backward equation in (4.1) gives 
+
+dY = −(μ − ϕσ 2Q)dt + ZdX. 
+
+Identifying the drifts and martingale parts yields the system (4.2). 
+
+Step 2: Existence for P . The BSDE for P has terminal condition P (T ) = 1 and driver 
+
+f P (P, Z P ) = ρP 2
+
+c − ϕσ 2
+
+ρ .
+
+Since c is uniformly bounded away from zero, f P has quadratic growth in P . Moreover, 
+
+σ ∈ HBM O provides the required BMO integrability control for the quadratic term. By the same truncation and comparison argument used in Lemma 4.4, there exists a unique solution (P, Z P ) in S∞ × HBM O .
+
+Step 3: Existence for Λ and construction of Q. Given P from Step 2, the BSDE in Λ
+
+is linear with bounded coefficients since P is in S∞ and c is bounded away from zero. By standard linear BSDE theory with bounded coefficients, there exists a unique solution 
+
+(Λ , Z Λ) in S∞ × HBM O .With P and Λ determined, define Q by the linear stochastic ODE 
+
+Q(t) = ρ
+
+> t
+
+Z
+
+> 0
+
+Λ − P Q c ds. 
+
+This has the explicit solution 
+
+Q(t) = ρ
+
+> t
+
+Z
+
+> 0
+
+exp 
+
+−ρ
+
+> t
+
+Z
+
+> s
+
+Pc du 
+
+ Λ
+
+c ds, 
+
+which belongs to S∞ since P and Λ are in S∞ and c is bounded away from zero. 
+
+Step 4: Verification and uniqueness. Set q = ρ(Λ −P Q ) 
+
+> c
+
+and Z = ρ(ZΛ − QZ P ). Adirect computation using Itô’s formula shows that (Q, q, Z ) satisfies (4.1). The terminal condition follows from P (T ) = 1 and Λ( T ) = s.For uniqueness, suppose (Q, q, Z ) and ( ˜Q, ˜q, ˜Z) are two solutions. By the converse direc-tion of Proposition 4.1, both q and ˜q are optimal strategies for the retailer’s problem. Since the objective J is strictly convex, the optimal strategy is unique, hence q = ˜ q. This implies 
+
+Q = ˜Q and, by the backward equation, Z = ˜Z. □
+
+Remark 4.2. Although the retailer’s FBSDE is now characterized for a given spot price, the full equilibrium system is substantially more difficult. Indeed, the coefficients μ and σ
+
+> 15
+
+are now coupled back into the spot-price BSDE, while the retailer equation itself remains quadratic through the term ϕσ 2Q.Even if the dynamic problem were solved for a prescribed forward supply s = d(F ),one would still need to solve the static clearing condition. This introduces the additional constraint E[Q(T )] = s−(F −E[G]) /ρ , so the forward price must be determined through the law of the dynamic solution. The strategy is therefore to first solve the case ϕ = 0 , where the quadratic coupling disap-pears, and then use the resulting estimates in a perturbative argument for small ϕ.
+
+4.1. Proof of Theorem 2.3. Throughout this subsection, we assume that ϕ = 0 and prove the no-risk-aversion equilibrium theorem. 
+
+Proof. In the case where ϕ = 0 , imposing the arbitrageur condition and market clearing on the retailer problem yields the coupled equilibrium system 
+
+
+
+S(t) = G −
+
+> T
+
+Z
+
+> t
+
+μds −
+
+> T
+
+Z
+
+> t
+
+σdX Q(t) =
+
+> t
+
+Z
+
+> 0
+
+qds c(t)q(t) = −ρ (Q(T ) − s) + 
+
+> T
+
+Z
+
+> t
+
+μds −
+
+> T
+
+Z
+
+> t
+
+ZdX μ = c(m − q)
+
+E[Q(T )] = s − 1 
+
+> ρ
+
+(F − E[G]) 
+
+s = d(F ),
+
+where the arbitrageur condition gives ˜q = m − q.We make the separation of variables ansatz cq = ρ(Λ − P Q ) where P and Λ are Itô processes with terminal values P (T ) = 1 and Λ( T ) = s. From Itô’s lemma, and since 
+
+dQ = q dt = ρc (Λ − P Q ) dt is of bounded variation, it holds 
+
+d(Λ − P Q ) = dΛ − Q dP − P dQ 
+
+=
+
+
+
+EΛ − QE P − ρ Pc Λ + ρ P 2
+
+c Q
+
+
+
+dt +  ZΛ − ZP Q dX 
+
+On the other hand, differentiating the backward equation and using μ = c(m − q) yields 
+
+d(Λ − P Q ) = − μρ dt + Zρ dX 
+
+=
+
+
+
+(Λ − P Q ) − cρ m
+
+
+
+dt + Zρ dX 
+
+Identifying the drifts and martingale parts while collecting terms by powers of Q gives 
+
+
+
+EP = P
+
+ ρP c + 1 
+
+
+
+EΛ = Λ 
+
+ ρP c + 1 
+
+
+
+− cρ mZρ = ZΛ − ZP Q
+
+> 16
+
+Showing that P , Λ and Q satisfy 
+
+
+
+P (t) = 1 −
+
+> T
+
+Z
+
+> t
+
+P
+
+ ρP c + 1 
+
+
+
+ds −
+
+> T
+
+Z
+
+> t
+
+ZP dX 
+
+Λ( t) = s −
+
+> T
+
+Z
+
+> t
+
+
+
+Λ
+
+ ρP c + 1 
+
+
+
+− cm ρ
+
+
+
+ds −
+
+> T
+
+Z
+
+> t
+
+ZΛ dX Q(t) = ρ
+
+> t
+
+Z
+
+> 0
+
+ Λ
+
+c − Pc Q
+
+
+
+ds 
+
+Since c is bounded away from zero and ρ > 0, the driver of the BSDE for P has quadratic growth in P . By the ϕ = 0 case of Lemma 4.4, there exists a unique solution P ∈ S∞
+
+with 0 < P < 1 on [0 , T ). Given P , the BSDE for Λ is linear with bounded coefficients, hence admits a unique solution Λ ∈ S∞. Finally, Q is obtained from the linear ODE above, which has the explicit solution 
+
+Q(t) = ρ
+
+> t
+
+Z
+
+> 0
+
+exp 
+
+−ρ
+
+> t
+
+Z
+
+> s
+
+Pc du 
+
+ Λ
+
+c ds. 
+
+The quantity 
+
+H(t) = 
+
+> t
+
+Z
+
+> 0
+
+ ρP c + 1 
+
+
+
+ds 
+
+plays a central role. Denoting Y (t) = Et[e−(H(T )−H(t)) ] it follows that dY = Y (ρP/c +1) dt + Z dX with Y (T ) = 1 , showing that Y = P and therefore 
+
+P (t) = eH(t)Et
+
+h
+
+e−H(T )i
+
+.
+
+Furthermore, by Itô’s lemma it follows that d(e−tP ) = ρe −tP 2/c dt + e−tZ dX showing that 
+
+ρE t
+
+
+
+> T
+
+Z
+
+> t
+
+e−s
+
+c P 2ds 
+
+ = e−T − e−tP (t).
+
+Since P is uniformly bounded and Λ is an affine BSDE, it has the explicit solution 
+
+Λ( t) = eH(t)Et
+
+se−H(T ) +
+
+> T
+
+Z
+
+> t
+
+e−H cm ρ ds 
+
+ = P (t)s + δ(t)
+
+ρ
+
+where 
+
+δ(t) = eH(t)Et
+
+
+
+> T
+
+Z
+
+> t
+
+e−H cm ds 
+
+ .
+
+With Q(0) = 0 , given that P and Λ are uniformly bounded, it follows that 
+
+Q(t) = ρe −H(t)+ ttZ
+
+> 0
+
+eH−s Λ
+
+c ds = ρα (t)s + β(t)
+
+where 
+
+α(t) = e−H(t)+ ttZ
+
+> 0
+
+e−s
+
+c eH P ds β(t) = e−H(t)+ ttZ
+
+> 0
+
+e−s
+
+c eH δ ds. 
+
+> 17
+
+In particular, given that P only depends on ρ and c, the function Λ depends on c, ρ and m
+
+and is affine in s, and so is Q. Since 
+
+E[Q(T )] = s − F − E[G]
+
+ρ = ρE [α(T )] s + E[β(T )] 
+
+it follows that 
+
+s (1 − ρE [α(T )]) = E[β(T )] + F − E[G]
+
+ρ .
+
+However 
+
+1 − ρE [α(T )] = 1 − ρe T E
+
+
+
+> T
+
+Z
+
+> 0
+
+e−s
+
+c Es
+
+h
+
+e−(H(T )−H)i
+
+P ds 
+
+
+
+= 1 − ρe T E
+
+
+
+> T
+
+Z
+
+> 0
+
+e−s
+
+c P 2ds 
+
+ = eT P (0) > 0
+
+Hence, we deduce that 
+
+s(F ) = e−T E[β(T )] 
+
+P (0) + e−T
+
+ρP (0) (F − E[G]) 
+
+which is a strictly increasing linear function of F . According to the assumptions on d(F )
+
+which is strictly decreasing, there exists a unique F satisfying d(F ) = s(F ).As for the spot and forward together we have 
+
+S(t) = G −
+
+> T
+
+Z
+
+> t
+
+μds −
+
+> T
+
+Z
+
+> t
+
+σdX 
+
+= G + ρ
+
+> T
+
+Z
+
+> t
+
+d(Λ − P Q ) −
+
+> T
+
+Z
+
+> t
+
+(σ − Z) dX 
+
+= G + ρ (s − Q(T )) − ρ (Λ( t) − P (t)Q(t)) −
+
+> T
+
+Z
+
+> t
+
+(σ − Z)dX 
+
+where we used P (T ) = 1 and Λ( T ) = s. In particular, 
+
+S(0) = E[G] + ρ (s − E[Q(T )]) − ρΛ(0) = F − ρΛ(0) 
+
+showing that 
+
+F − S(0) = ρΛ(0) = ρP (0) s + δ(0) = ρP (0) s + E
+
+
+
+> T
+
+Z
+
+> 0
+
+e−H cmds 
+
+ .
+
+□
+
+This completes the proof of the benchmark theorem. The semi-explicit formulas for H,
+
+δ, α, β, as well as the affine supply curve s(F ), were stated already in Section 2 and are exactly the objects identified in the argument above. 4.2. Derivation of the CNY/CNH Special Case. We collect the deterministic formulas and the regime-switching reduction used in Section 3. 
+
+Deterministic benchmark. With constant transaction cost c and constant supply rate m, the no-risk Riccati system is deterministic and reduces to 
+
+P ′(t) = P (t)
+
+ ρP (t)
+
+c + 1 
+
+
+
+, P (T ) = 1 ,
+
+> 18
+
+whose solution is 
+
+P (t) = ce t−T
+
+c + (1 − et−T )ρ .
+
+Using Λ = P ¯d + δ/ρ and Q = ρα ¯d + β, direct integration yields 
+
+δ(t) = cm (c + ρ)(1 − et−T ) − ρe t−T (T − t)
+
+c + (1 − et−T )ρ ,β(t) = m
+
+
+
+t − (c + ρT ) ( et − 1) (c + ρ)eT − ρ
+
+
+
+.
+
+Therefore, as ρ → ∞ ,
+
+ρe T P (0) = c
+
+(1 − e−T ) + c/ρ ∼ c
+
+1 − e−T ,ρβ (T ) = ρcm c + (1 − e−T )ρ
+
+T − (1 − e−T ) ∼ cm 
+
+1 − e−T
+
+T − (1 − e−T ) ,δ(0) = cm (c + ρ)(1 − e−T ) − ρe −T Tc + (1 − e−T )ρ ∼ cm 
+
+1 − e−T
+
+1 − e−T − T e −T  .
+
+These are the asymptotic formulas used in Section 3. 
+
+Jump specialization. Set It := 1{τ ≤t} and write 
+
+P (t) = (1 − It)P H (t) + ItP H (t), Λ( t) = (1 − It)Λ H (t) + ItΛH (t),
+
+with c(t) = cH (1 − It) + cH It. Since dI t = λ(1 − It)dt + dM t for a martingale M ,applying Itô’s formula to the no-risk equations for P and Λ yields the stress-state equations 
+
+(P H )′(t) = P H (t) ρP H (t)
+
+cH + 1 
+
+!
+
+, (Λ H )′(t) = Λ H (t) ρP H (t)
+
+cH + 1 
+
+!
+
+− cH mρ ,
+
+and the normal-state equations 
+
+(P H )′(t) + λ P H (t) − P H (t) = P H (t) ρP H (t)
+
+cH + 1 
+
+!
+
+,
+
+(Λ H )′(t) + λ ΛH (t) − ΛH (t) = Λ H (t) ρP H (t)
+
+cH + 1 
+
+!
+
+− cH mρ .
+
+Multiplying by ρ gives the equation for the scaled coefficient ρP H ; together with ρP H (t) ∼
+
+cH et−T /(1 − et−T ), this yields the normal-state asymptotic relation used in Section 3. Now write ΛH = P H ¯d + δH /ρ and ΛH = P H ¯d + δH /ρ . Substituting this decomposition into the equations for ΛH and ΛH and using the equations for P H and P H gives 
+
+(δH )′(t) = δH (t) ρP H (t)
+
+cH + 1 
+
+!
+
+− cH m, 
+
+and 
+
+(δH )′(t) = δH (t) ρP H (t)
+
+cH + 1 + λ
+
+!
+
+− λδ H (t) − cH m. 
+
+Solving the linear normal-state equation by variation of constants yields the expression for 
+
+δH used in Section 3. 
+
+Remark 4.3. At time 0 the offshore market is in the normal state. Since Corollary 2.4 gives F − S(0) = ρΛ(0) , the decomposition 
+
+ΛH (0) = P H (0)¯ d + δH (0) 
+
+ρ
+
+> 19
+
+implies 
+
+F H − SH (0) = ρP H (0)¯ d + δH (0) .
+
+4.3. Technical Lemmas for Small Risk Aversion. Throughout this subsection we as-sume c ∈ S∞ is strictly positive and bounded away from zero, and σ ∈ HBM O .
+
+Lemma 4.4 (Existence, Uniqueness and Bounds for the Riccati System) . Fix ˜ϕ ≥ 0 and 
+
+Rσ < ∞. For every ϕ ∈ [0 , ˜ϕ] and every σ ∈ HBM O with ∥σ∥HBM O ≤ Rσ , the system 
+
+(4.3) 
+
+
+
+P (t) = 1 −
+
+> T
+
+Z
+
+> t
+
+
+
+P
+
+ ρP c + 1 
+
+
+
+− ϕρ σ2
+
+
+
+ds −
+
+> T
+
+Z
+
+> t
+
+ZP dX 
+
+Λ( t) = s −
+
+> T
+
+Z
+
+> t
+
+
+
+Λ
+
+ ρP c + 1 
+
+
+
+− cm ρ
+
+
+
+ds −
+
+> T
+
+Z
+
+> t
+
+ZΛ dX Q(t) = ρ
+
+> t
+
+Z
+
+> 0
+
+ Λ
+
+c − Pc Q
+
+
+
+ds, Q(0) = 0 
+
+has a unique solution (P, Z P , Λ, Z Λ, Q ) ∈ (S∞ × HBM O )2 × S∞. Moreover, if ¯P denotes the corresponding ϕ = 0 solution, then 
+
+0 < ¯P (t) ≤ P (t) ≤ CP ( ˜ϕ, R σ ) := 1 + ˜ϕρ R2 
+
+> σ
+
+,
+
+and 
+
+∥Λ∥S∞ ≤ CΛ := 2 |s| + 4 ∥cm ∥∞Tρ , ∥Q∥S∞ ≤ hQ := ρc ∞
+
+CΛT. 
+
+Proof. Existence and bounds for P . For K > 0, consider the Lipschitz-truncated driver 
+
+fK (P ) :=  P + ∧ K  ρ(P + ∧ K)
+
+c + 1 
+
+
+
+− ϕρ σ2.
+
+Since fK is uniformly Lipschitz in P and σ ∈ HBM O , the BSDE 
+
+P K (t) = 1 −
+
+> T
+
+Z
+
+> t
+
+fK (P K ) ds −
+
+> T
+
+Z
+
+> t
+
+ZP,K dX 
+
+has a unique solution (P K , Z P,K ) ∈ S∞ × HBM O by standard Lipschitz BSDE theory. 
+
+Lower bound and comparison direction. Let ¯P be the ϕ = 0 solution. By the exponential transform and the same truncation method, 0 < ¯P ≤ 1. The BSDE is written in the convention Yt = ξ − R Tt fs ds − R Tt Zs dX s. Thus a smaller driver produces a larger solution. Since, along ¯P and for K ≥ 1,
+
+fK ( ¯P ) = ¯P
+
+ ρ ¯Pc + 1 
+
+
+
+− ϕρ σ2 ≤ ¯P
+
+ ρ ¯Pc + 1 
+
+
+
+,
+
+the comparison theorem gives P K ≥ ¯P > 0.
+
+Upper bound. Since P K is positive, the truncated positive part is non-negative and condi-tional expectation in the BSDE gives 
+
+P K (t) ≤ Et
+
+1 + ϕρ
+
+> T
+
+Z
+
+> t
+
+σ2ds 
+
+ ≤ 1 + ˜ϕρ R2 
+
+> σ
+
+=: CP ( ˜ϕ, R σ ).
+
+Passage to the limit. For K > C P ( ˜ϕ, R σ ), since P K ∈ (0 , C P ( ˜ϕ, R σ )] , the truncation 
+
+(P K )+ ∧ K = P K is inactive. Therefore (P K , Z P,K ) solves the original (untruncated) BSDE. Setting (P, Z P ) := ( P K , Z P,K ) for any K > C P ( ˜ϕ, R σ ) yields the solution with 
+
+0 < ¯P ≤ P ≤ CP ( ˜ϕ, R σ ).
+
+> 20
+
+Uniqueness. If (P1, Z 1) and (P2, Z 2) are two bounded solutions, comparison with ¯P and the conditional-expectation estimate above imply 0 < ¯P ≤ Pi ≤ CP ( ˜ϕ, R σ ). Set δP =
+
+P1 − P2 and δZ = Z1 − Z2. Then δP satisfies 
+
+δP (t) = −
+
+> T
+
+Z
+
+> t
+
+δP 
+
+ ρ(P1 + P2)
+
+c + 1 
+
+
+
+ds −
+
+> T
+
+Z
+
+> t
+
+δZ dX, δP (T ) = 0 .
+
+This is a linear BSDE with bounded coefficient α(s) = ρ(P1 + P2)/c + 1 . Multiplying by the integrating factor eR Tt α(s) ds gives 
+
+δP (t) eR Tt α ds = −
+
+> T
+
+Z
+
+> t
+
+eR Ts α du δZ dX. 
+
+Taking conditional expectations and using the martingale property, δP (t) = 0 for all t,hence P1 = P2 and Z1 = Z2.
+
+Existence and bounds for Λ. Since P ∈ S∞ and c is bounded away from zero, the coeffi-cient ρP/c + 1 is bounded. By standard linear BSDE theory, there exists a unique solution 
+
+(Λ , Z Λ) ∈ S∞ × HBM O . Applying Itô’s formula to |Λ( τ )|2 for any stopping time τ ≤ T ,
+
+|Λ( τ )|2 + Eτ
+
+
+
+> T
+
+Z
+
+> τ
+
+|ZΛ|2 ds 
+
+ = |s|2 + 2 Eτ
+
+
+
+> T
+
+Z
+
+> τ
+
+Λ
+
+
+
+−Λ
+
+ ρP c + 1 
+
+
+
++ cm ρ
+
+
+
+ds 
+
+ .
+
+Dropping the non-negative term Eτ [R Tτ |ZΛ|2 ds ] and using −Λ2(ρP/c + 1) ≤ 0,
+
+|Λ( τ )|2 ≤ | s|2 + 2 ∥cm ∥∞
+
+ρ ∥Λ∥S∞ T. 
+
+Applying 2ab ≤ a2/2 + 2 b2 with a = ∥Λ∥S∞ and b = ∥cm ∥∞T /ρ ,
+
+∥Λ∥2 
+
+> S∞
+
+≤ | s|2 + 12 ∥Λ∥2 
+
+> S∞
+
++ 2 ∥cm ∥2
+
+> ∞
+
+T 2
+
+ρ2 .
+
+Rearranging gives ∥Λ∥2 
+
+> S∞
+
+≤ 2|s|2 + 4 ∥cm ∥2
+
+> ∞
+
+T 2/ρ 2 ≤ C2Λ.
+
+Bounds for Q. The ODE for Q has the explicit solution 
+
+Q(t) = ρ e −O(t)
+
+> t
+
+Z
+
+> 0
+
+eO(s) Λ( s)
+
+c(s) ds, O(t) = ρ
+
+> t
+
+Z
+
+> 0
+
+P (u)
+
+c(u) du. 
+
+Since P > 0, the function O is increasing, and therefore for 0 ≤ s ≤ t we have 
+
+e−O(t)eO(s) ≤ 1. Hence 
+
+|Q(t)| ≤ ρ
+
+> t
+
+Z
+
+> 0
+
+|Λ( s)|
+
+c(s) ds ≤ ρc ∞
+
+∥Λ∥S∞ T, 
+
+which gives ∥Q∥S∞ ≤ hQ. □
+
+Lemma 4.5 (Stability of the Riccati System) . Fix ˜ϕ > 0 and Rσ < ∞. For ϕ ∈ [0 , ˜ϕ]
+
+and σ1, σ 2 ∈ HBM O with ∥σi∥HBM O ≤ Rσ , denote by (Pi, Λi, Q i) the corresponding solutions to (4.3) . Then 
+
+∥δP ∥2 
+
+> S∞
+
+≤ g2 ∥σ1 − σ2∥2
+
+> HBM O
+
+where g = 2 3/2(ϕ/ρ )( ∥σ1∥2 
+
+> HBM O
+
++ ∥σ2∥2 
+
+> HBM O
+
+)1/2. Furthermore, 
+
+∥δΛ∥2 
+
+> S∞
+
+≤ ˜C g 2 ∥σ1 − σ2∥2
+
+> HBM O
+
+with ˜C = 4 C2Λ∥ρ/c ∥2 
+
+> ∞
+
+T 2, and 
+
+∥δQ ∥2 
+
+> S∞
+
+≤ ¯C g 2 ∥σ1 − σ2∥2
+
+> HBM O
+> 21
+
+with ¯C = 2 ∥ρ/c ∥2
+
+> ∞
+
+T 2
+
+ ˜C + ∥ρ/c ∥2
+
+> ∞
+
+T 2C2Λ
+
+
+
+. Moreover, on this BMO ball, g ≤ 4( ϕ/ρ )Rσ ,and therefore g → 0 as ϕ → 0.Proof. Stability of P . Set δP = P1 − P2 and δZ = ZP, 1 − ZP, 2. Applying Itô’s formula to |δP (t)|2 for any stopping time τ ≤ T ,
+
+|δP (τ )|2 + Eτ
+
+
+
+> T
+
+Z
+
+> τ
+
+|δZ |2 ds 
+
+
+
+= Eτ
+
+2
+
+> T
+
+Z
+
+> τ
+
+δP 
+
+
+
+−δP 
+
+ ρ(P1 + P2)
+
+c + 1 
+
+
+
++ ϕρ (σ21 − σ22 )
+
+
+
+ds 
+
+
+
+≤ 2 ϕρ Eτ
+
+
+
+> T
+
+Z
+
+> τ
+
+|δP | | σ21 − σ22 | ds 
+
+
+
+where we used P1, P 2 ≥ 0 so (δP )2ρ(P1 + P2)/c ≥ 0 and dropped the corresponding non-positive term. By the Cauchy–Schwarz inequality, 
+
+Eτ
+
+
+
+> T
+
+Z
+
+> τ
+
+|σ21 − σ22 | ds 
+
+ ≤ √2  ∥σ1∥2 
+
+> HBM O
+
++ ∥σ2∥2
+
+> HBM O
+
+1/2 ∥σ1 − σ2∥HBM O .
+
+Define Γ := √2( ∥σ1∥2 
+
+> HBM O
+
++∥σ2∥2 
+
+> HBM O
+
+)1/2, so that g = 2( ϕ/ρ )Γ . Then for any stopping time τ ,
+
+|δP (τ )|2 ≤ 2 ϕρ ∥δP ∥S∞ Γ ∥σ1 − σ2∥HBM O = g ∥δP ∥S∞ ∥σ1 − σ2∥HBM O .
+
+Taking the supremum over all stopping times τ ≤ T ,
+
+∥δP ∥2 
+
+> S∞
+
+≤ g ∥δP ∥S∞ ∥σ1 − σ2∥HBM O .
+
+Dividing by ∥δP ∥S∞ (or treating δP ≡ 0 trivially), 
+
+∥δP ∥S∞ ≤ g ∥σ1 − σ2∥HBM O ,
+
+which gives ∥δP ∥2 
+
+> S∞
+
+≤ g2∥σ1 − σ2∥2 
+
+> HBM O
+
+.
+
+Stability of Λ. Set δΛ = Λ 1 − Λ2 and δZ Λ = ZΛ,1 − ZΛ,2. The linearity of the driver in 
+
+Λ yields 
+
+δΛ( τ ) = −
+
+> T
+
+Z
+
+> τ
+
+
+
+δΛ
+
+ ρP 1
+
+c + 1 
+
+
+
++ Λ 2
+
+ρ δP c
+
+
+
+ds −
+
+> T
+
+Z
+
+> τ
+
+δZ Λ dX. 
+
+Applying Itô’s formula to |δΛ( τ )|2 yields an identity. Dropping the non-positive term 
+
+−2 R Tτ |δΛ|2(ρP 1/c + 1) ds and the martingale integral, we obtain 
+
+|δΛ( τ )|2 ≤ 2 ∥δΛ∥S∞
+
+ρc ∞
+
+CΛ T ∥δP ∥S∞ .
+
+By the stability of P , ∥δP ∥S∞ ≤ g ∥σ1 − σ2∥HBM O . Taking the supremum over τ and dividing by ∥δΛ∥S∞ ,
+
+∥δΛ∥S∞ ≤ 2 ρc ∞
+
+CΛ T g ∥σ1 − σ2∥HBM O ,
+
+so ∥δΛ∥2 
+
+> S∞
+
+≤ ˜C g 2∥σ1 − σ2∥2 
+
+> HBM O
+
+with ˜C = 4 ∥ρ/c ∥2
+
+> ∞
+
+C2ΛT 2.
+
+Stability of Q. From the ODE for Q, the explicit solution gives 
+
+Qi(t) = ρ
+
+> t
+
+Z
+
+> 0
+
+e− R ts ρP i/c du Λi
+
+c ds. 
+
+> 22
+
+Using |e−a − e−b| ≤ | a − b| for a, b ≥ 0 (by the mean value theorem) and Pi ≥ 0,
+
+|Q1(t) − Q2(t)| ≤ ρ
+
+> t
+
+Z
+
+> 0
+
+Λ1
+
+c − Λ2
+
+c ds + ρ
+
+> t
+
+Z
+
+> 0
+
+|Λ1|
+
+c
+
+> t
+
+Z
+
+> s
+
+ρ|δP |
+
+c du ds 
+
+≤ ∥ ρ/c ∥∞T ∥δΛ∥S∞ + ∥ρ/c ∥2
+
+> ∞
+
+CΛ T 2 ∥δP ∥S∞ .
+
+Taking the square and using (a + b)2 ≤ 2a2 + 2 b2,
+
+∥δQ ∥2 
+
+> S∞
+
+≤ 2∥ρ/c ∥2
+
+> ∞
+
+T 2 ∥δΛ∥2 
+
+> S∞
+
++ 2 ∥ρ/c ∥4
+
+> ∞
+
+C2ΛT 4 ∥δP ∥2 
+
+> S∞
+
+.
+
+Substituting the stability estimates for P and Λ yields ∥δQ ∥2 
+
+> S∞
+
+≤ ¯C g 2∥σ1 − σ2∥2 
+
+> HBM O
+
+.Finally, g = 2 3/2(ϕ/ρ )( ∥σ1∥2 
+
+> HBM O
+
++ ∥σ2∥2 
+
+> HBM O
+
+)1/2 ≤ 4( ϕ/ρ )Rσ , so g → 0 as ϕ → 0
+
+on the fixed BMO ball. □
+
+4.4. Proof of Theorem 2.2. Under the smallness condition of Theorem 2.2, we now prove existence and uniqueness near the benchmark ϕ = 0 equilibrium. 
+
+Remark 4.6. The Riccati system is now coupled with S through the quadratic term ϕσ 2 in the equation for P . Within the present fixed-point argument in S∞ × HBM O , the condition 
+
+ρ2T 2∥1/c ∥2 
+
+> ∞
+
+< 1
+
+is structural. Indeed, the terminal term ρ2 ˆQ(T )2 is controlled through 
+
+∥ ˆQ∥S∞ ≤ T ∥1/c ∥∞∥ˆμ∥S∞ ,
+
+so the coefficient in front of ∥ˆμ∥2 
+
+> S∞
+
+becomes ρ2T 2∥1/c ∥2
+
+> ∞
+
+. The strict inequality is exactly what allows this term to be absorbed in the self-mapping estimate. Proof. Fix ˜ϕ > 0; the final smallness threshold for ϕ will be chosen not to exceed ˜ϕ.
+
+Step 1: Riccati characterization and solution. The derivation of the Riccati system follows the same ansatz as in the proof of Theorem 2.3. Unlike the case ϕ = 0 , the equation for 
+
+P now depends on σ through the coupling term ϕσ 2, so the Riccati system is no longer decoupled from the spot dynamics. By Lemma 4.4, on every bounded BMO ball for σ and for every fixed upper bound ˜ϕ on ϕ, the resulting Riccati system has a unique solution with 
+
+0 < ¯P ≤ P ≤ CP ( ˜ϕ, R σ ). The estimates used below require only the positivity of P
+
+and the bounds ∥Λ∥S∞ ≤ CΛ and ∥Q∥S∞ ≤ hQ, which remain independent of ϕ once the BMO ball is fixed. 
+
+Step 2: Perturbation system. Let ( ¯S, ¯σ, ¯P, ¯Λ, ¯Q, ¯μ) denote the ϕ = 0 solution from The-orem 2.3. From the equilibrium system (2.1), μ = c(m − q) and therefore dQ = q dt =(m − μ/c ) dt with corresponding backward equation d(cq ) = −(μ − ϕσ 2Q) dt + Z dX .For ϕ = 0 , ¯μ = c(m − ¯q) satisfies d(c¯q) = −¯μ dt + ¯Z dX . Setting ˆl := l − ¯l for 
+
+l = S, σ, Q, μ, Z and subtracting, we obtain ˆμ = −cˆq and 
+
+c(t)ˆ q(t) = −ρ ˆQ(T ) + 
+
+> T
+
+Z
+
+> t
+
+(ˆ μ − ϕσ 2Q) ds −
+
+> T
+
+Z
+
+> t
+
+ˆZ dX. 
+
+Replacing σ = ˆ σ + ¯ σ, Q = ˆQ + ¯Q, and ˆμ = −cˆq, the perturbation system is (4.4) 
+
+
+
+ˆS(t) = −
+
+> T
+
+Z
+
+> t
+
+ˆμ ds −
+
+> T
+
+Z
+
+> t
+
+ˆσ dX 
+
+ˆQ(t) = −
+
+> t
+
+Z
+
+> 0
+
+ˆμc ds 
+
+ˆμ(t) = ρ ˆQ(T ) −
+
+> T
+
+Z
+
+> t
+
+
+
+ˆμ − ϕ (ˆ σ + ¯ σ)2  ˆQ + ¯Q
+
+ 
+
+ds +
+
+> T
+
+Z
+
+> t
+
+ˆZ dX 
+
+> 23
+
+For n ≥ 1, given ( ˆSn−1, ˆσn−1) ∈ S∞ × HBM O , define ( ˆQn, ˆμn) as the solution to (4.5) 
+
+
+
+ˆQn(t) = −
+
+> t
+
+Z
+
+> 0
+
+ˆμn
+
+c ds 
+
+ˆμn(t) = ρ ˆQn(T ) −
+
+> T
+
+Z
+
+> t
+
+
+
+ˆμn − ϕ (ˆ σn−1 + ¯ σ)2  ˆQn + ¯Q
+
+ 
+
+ds +
+
+> T
+
+Z
+
+> t
+
+ˆZn dX 
+
+which exists by the same Riccati construction as in Step 1, since ˆσn−1 is fixed and the iteration is performed on a bounded BMO ball. Then define ( ˆSn, ˆσn) as the solution to 
+
+ˆSn(t) = −
+
+> T
+
+Z
+
+> t
+
+ˆμn ds −
+
+> T
+
+Z
+
+> t
+
+ˆσn dX 
+
+with ˆσ0 := 0 .
+
+Step 3: Self-mapping and contraction. Let BR := {( ˆS, ˆσ) : ∥ ˆS∥2 
+
+> S∞
+
++ ∥ˆσ∥2 
+
+> HBM O
+
+≤ R2}
+
+and assume that ( ˆSn−1, ˆσn−1) is in BR. For brevity, set 
+
+¯R2 := ∥¯σ∥2 
+
+> HBM O
+
++ R2, ˜R := R + ∥¯σ∥HBM O .
+
+Applying Itô’s formula to |ˆμn(τ )|2 for any stopping time τ ,
+
+|ˆμn(τ )|2 + Eτ
+
+
+
+> T
+
+Z
+
+> τ
+
+| ˆZn|2 ds 
+
+
+
+= Eτ
+
+ρ2 ˆQn(T )2 + 2 
+
+> T
+
+Z
+
+> τ
+
+ˆμn 
+
+−ˆμn + ϕ (ˆ σn−1 + ¯ σ)2  ˆQn + ¯Q
+
+ 
+
+ds 
+
+ .
+
+Dropping the non-positive terms −2 R Tτ |ˆμn|2 ds and Eτ [R Tτ | ˆZn|2 ds ] from both sides gives 
+
+|ˆμn(τ )|2 ≤ ρ2∥ ˆQn∥2 
+
+> S∞
+
++ 2 ϕ ∥ˆμn∥S∞ Eτ
+
+
+
+> T
+
+Z
+
+> τ
+
+(ˆ σn−1 + ¯ σ)2 ˆQn + ¯Q ds 
+
+ .
+
+Using ∥ ˆQn∥S∞ ≤ T ∥1/c ∥∞∥ˆμn∥S∞ ,
+
+|ˆμn(τ )|2 ≤ ρ2T 2∥1/c ∥2
+
+> ∞
+
+∥ˆμn∥2 
+
+> S∞
+
++ 2 ϕ ∥ˆμn∥S∞ Eτ
+
+
+
+> T
+
+Z
+
+> τ
+
+(ˆ σn−1 + ¯ σ)2 ˆQn + ¯Q ds 
+
+ .
+
+From ∥ ˆQn∥S∞ ≤ T ∥1/c ∥∞∥ˆμn∥S∞ and ∥ ¯Q∥S∞ ≤ h0 
+
+> Q
+
+:= ∥ρ/c ∥∞∥¯Λ∥S∞ T from the 
+
+ϕ = 0 analysis, together with 
+
+Eτ
+
+
+
+> T
+
+Z
+
+> τ
+
+(ˆ σn−1 + ¯ σ)2 ds 
+
+ ≤ 2 ¯R2,
+
+it follows that 
+
+∥ˆμn∥2 
+
+> S∞
+
+≤ ρ2T 2∥1/c ∥2
+
+> ∞
+
+∥ˆμn∥2 
+
+> S∞
+
++ 4 ϕ ∥ˆμn∥S∞
+
+ T ∥1/c ∥∞∥ˆμn∥S∞ + h0
+
+> Q
+
+ ¯R2.
+
+Define η := 1 − ρ2T 2∥1/c ∥2 
+
+> ∞
+
+and assume η > 0. Then 
+
+η ∥ˆμn∥2 
+
+> S∞
+
+≤ 4ϕ ∥ˆμn∥S∞
+
+ T ∥1/c ∥∞∥ˆμn∥S∞ + h0
+
+> Q
+
+ ¯R2.
+
+Dividing both sides by ∥ˆμn∥S∞ (or treating ˆμn ≡ 0 trivially), 
+
+∥ˆμn∥S∞
+
+ η − 4ϕ T ∥1/c ∥∞ ¯R2 ≤ 4ϕ h 0 
+
+> Q
+
+¯R2.
+
+> 24
+
+For ϕ small enough so that 4ϕ T ∥1/c ∥∞ ¯R2 ≤ η/ 2,
+
+∥ˆμn∥2 
+
+> S∞
+
+≤ 64 
+
+η2 ϕ2  h0
+
+> Q
+
+2 ¯R4.
+
+Applying Itô’s formula to | ˆSn|2 then yields 
+
+∥ ˆSn∥2 
+
+> S∞
+
++ ∥ˆσn∥2 
+
+> HBM O
+
+≤ 4T 2∥ˆμn∥2 
+
+> S∞
+
+≤ 256 
+
+η2 ϕ2T 2  h0
+
+> Q
+
+2 ¯R4.
+
+For this to be bounded by R2, it suffices to take 
+
+ϕ ≤ ηR 
+
+16 T h 0 
+
+> Q
+
+¯R2 =: ϕ1.
+
+For the contraction, consider (s1, Σ1) and (s2, Σ2) in BR, and denote by ( ˆS1, ˆσ1) and 
+
+( ˆS2, ˆσ2) their respective images under the iteration, and by Q1, Q 2 the corresponding full 
+
+Q-processes. Applying Itô’s formula to | ˆS1(τ ) − ˆS2(τ )|2 for any stopping time τ ,
+
+| ˆS1(τ ) − ˆS2(τ )|2 + Eτ
+
+
+
+> T
+
+Z
+
+> τ
+
+|ˆσ1 − ˆσ2|2 ds 
+
+ = Eτ
+
+−2
+
+> T
+
+Z
+
+> τ
+
+( ˆS1 − ˆS2)(ˆ μ1 − ˆμ2) ds 
+
+ .
+
+Using Cauchy–Schwarz and 2ab ≤ 14 a2 + 4 b2,
+
+∥ ˆS1 − ˆS2∥2 
+
+> S∞
+
++ ∥ˆσ1 − ˆσ2∥2 
+
+> HBM O
+
+≤ 12 ∥ ˆS1 − ˆS2∥2 
+
+> S∞
+
++ 8 T 2∥ˆμ1 − ˆμ2∥2 
+
+> S∞
+
+,
+
+hence, after rearranging, (4.6) ∥ ˆS1 − ˆS2∥2 
+
+> S∞
+
++ ∥ˆσ1 − ˆσ2∥2 
+
+> HBM O
+
+≤ 16 T 2∥ˆμ1 − ˆμ2∥2 
+
+> S∞
+
+.
+
+Applying Itô’s formula to |ˆμ1(τ ) − ˆμ2(τ )|2 and taking conditional expectation, dropping the non-positive term −2 R Tτ |ˆμ1 − ˆμ2|2 ds , we obtain 
+
+|ˆμ1(τ ) − ˆμ2(τ )|2 ≤ ρ2∥Q1 − Q2∥2
+
+> S∞
+
++ 2 ϕ ∥ˆμ1 − ˆμ2∥S∞ Eτ
+
+
+
+> T
+
+Z
+
+> τ
+
+(Σ 1 + ¯ σ)2Q1 − (Σ 2 + ¯ σ)2Q2 ds 
+
+ .
+
+By Lemma 4.5, ∥Q1 − Q2∥S∞ ≤ √ ¯C g ∥Σ1 − Σ2∥HBM O with g ≤ 4( ϕ/ρ ) ˜R. We decom-pose the integrand using a2b − c2d = ( a2 − c2)b + c2(b − d):
+
+(Σ 1 + ¯ σ)2Q1 − (Σ 2 + ¯ σ)2Q2 = (Σ 1 + ¯ σ)2 − (Σ 2 + ¯ σ)2 Q2 + (Σ 1 + ¯ σ)2(Q1 − Q2).
+
+For the first term, note that (Σ 1 + ¯ σ)2 − (Σ 2 + ¯ σ)2 = (Σ 1 − Σ2)(Σ 1 + Σ 2 + 2¯ σ), so by the Cauchy–Schwarz inequality and ∥Q2∥S∞ ≤ hQ,
+
+Eτ
+
+
+
+> T
+
+Z
+
+> τ
+
+|(Σ 1 − Σ2)(Σ 1 + Σ 2 + 2¯ σ)| | Q2| ds 
+
+
+
+≤ 2hQ ˜R ∥Σ1 − Σ2∥HBM O .
+
+where we used ∥Σ1 + Σ 2 + 2¯ σ∥HBM O ≤ 2 ˜R. For the second term, ∥(Σ 1 + ¯ σ)2∥HBM O ≤
+
+4 ˜R2 and by the same stability estimate, ∥Q1 − Q2∥S∞ ≤ √ ¯C g ∥Σ1 − Σ2∥HBM O , hence 
+
+Eτ
+
+
+
+> T
+
+Z
+
+> τ
+
+(Σ 1 + ¯ σ)2|Q1 − Q2| ds 
+
+ ≤ 16 
+
+p ¯C ϕρ ˜R3 ∥Σ1 − Σ2∥HBM O .
+
+> 25
+
+Combining both terms and taking the supremum over τ ,
+
+∥ˆμ1 − ˆμ2∥2 
+
+> S∞
+
+≤ ρ2 ¯C g 2
+
+| {z }  
+
+> =: B2
+
+∥Σ1 − Σ2∥2
+
+> HBM O
+
++ 2 ∥ˆμ1 − ˆμ2∥S∞ 2ϕ ˜R
+
+
+
+hQ + 4 
+
+p ¯C ϕρ ˜R2
+
+| {z } 
+
+> =: C
+
+∥Σ1 − Σ2∥HBM O .
+
+Setting A = ∥ˆμ1 − ˆμ2∥S∞ , we have 
+
+A2 ≤ B2∥Σ1 − Σ2∥2 + 2 AC ∥Σ1 − Σ2∥,
+
+which implies 
+
+(A − C∥Σ1 − Σ2∥)2 ≤ (B2 + C2)∥Σ1 − Σ2∥2,
+
+and hence 
+
+∥ˆμ1 − ˆμ2∥S∞ ≤ (B + 2 C) ∥Σ1 − Σ2∥HBM O =: κ ∥Σ1 − Σ2∥HBM O .
+
+Combined with (4.6), the iteration satisfies 
+
+∥ ˆS1 − ˆS2∥2 
+
+> S∞
+
++ ∥ˆσ1 − ˆσ2∥2 
+
+> HBM O
+
+≤ 16 T 2κ2∥Σ1 − Σ2∥2 
+
+> HBM O
+
+.
+
+Since κ = O(ϕ) is continuous in ϕ with κ(0) = 0 , there exists ϕ2 > 0 such that 16 T 2κ2 <
+
+1 for all ϕ ∈ [0 , ϕ 2], making the iteration a contraction on BR.
+
+Step 4: Forward price determination. For ϕ < min( ˜ϕ, ϕ 1, ϕ 2), the Banach fixed-point theorem yields a unique fixed point ( ˆS∗, ˆσ∗) ∈ B R. This determines ˆμ∗, ˆQ∗ and hence the full solution (S∗, σ ∗, Q ∗, μ ∗). Decomposing Q∗ = ˆQ∗ + ¯Q, the market clearing condition 
+
+E[Q∗(T )] = s − (F − E[G]) /ρ with s = d(F ) reads 
+
+ρE [α(T )] d(F ) + E[β(T )] + E[ ˆQ∗(T )] = d(F ) − F − E[G]
+
+ρ
+
+where α, β are defined in the proof of Theorem 2.3 and satisfy ρE [α(T )] = 1 − eT P (0) 
+
+in (0 , 1) . From the self-mapping estimate, 
+
+∥ ˆQ∗∥S∞ ≤ T ∥1/c ∥∞∥ˆμ∗∥S∞ ≤ 8
+
+η T ∥1/c ∥∞ϕ h 0 
+
+> Q
+
+¯R2
+
+where h0 
+
+> Q
+
+= ∥ρ/c ∥∞∥¯Λ∥S∞ T . In particular, for fixed data near the reference equilibrium 
+
+¯s = d( ¯F ), we have E[ ˆQ∗(T )] = O(ϕ). Define 
+
+Φ( F ) := ( ρE [α(T )] − 1) d(F ) + ( F − E[G]) /ρ + E[β(T )] + E[ ˆQ∗(d(F ))( T )] .
+
+For ϕ = 0 , Φ0( ¯F ) = 0 and Φ0 is strictly increasing because (ρE [α(T )] − 1) < 0, d is strictly decreasing, and (F − E[G]) /ρ is strictly increasing. For ϕ > 0 small enough, the fixed point depends continuously on the parameter s. Moreover, the contraction estimate implies that the map 
+
+s 7 −→ E[ ˆQ∗(s)( T )] 
+
+is Lipschitz with some constant Lϕ = O(ϕ). Therefore, for F1 < F 2,
+
+Φ( F2) − Φ( F1) ≥ (1 − ρE [α(T )] − Lϕ) ( d(F1) − d(F2)) + F2 − F1
+
+ρ .
+
+Since 1 − ρE [α(T )] = eT P (0) > 0, we may choose ϕ small enough so that Lϕ <
+
+1 − ρE [α(T )] . Then Φ is strictly increasing. Furthermore, as F → ±∞ , d(F ) → ∓∞ 
+
+and 
+
+E[ ˆQ∗(d(F ))( T )] = O (ϕ|d(F )|) ,
+
+so the dominant part of Φ( F ) remains the increasing deterministic contribution. Therefore 
+
+Φ( F ) → ±∞ as F → ±∞ . By the intermediate value theorem there exists a unique 
+
+F ∗ with Φ( F ∗) = 0 . Choosing ϕ0 > 0 smaller than the thresholds above completes the proof. □
+
+> 26
+
+REFERENCES 
+
+[1] R. Almgren and T. M. Li. Option hedging with smooth market impact. Market Microstructure and Liquidity , 2(1):1650002, 2016. [2] C. Borio, M. Iqbal, R. N. McCauley, P. McGuire, and V. Sushko. The failure of covered interest parity: FX hedging demand and costly balance sheets. BIS Working Paper 590, Bank for International Settlements, 2016. [3] B. Bouchard, M. Fukasawa, M. Herdegen, and J. Muhle-Karbe. Equilibrium returns with transaction costs. Finance and Stochastics , 22(3):569–601, 2018. [4] A. Buss and B. Dumas. The dynamic properties of financial-market equilibrium with trading fees. The Journal of Finance , 74(2):795–844, 2019. [5] Y.-W. Cheung and D. Rime. The offshore renminbi exchange rate: Microstructure and links to the onshore market. Journal of International Money and Finance , 49: 170–189, 2014. [6] Y.-W. Cheung, L. Grimm, and F. Westermann. The evolution of offshore renminbi trading: 2016 to 2019. Journal of International Money and Finance , 113:102369, 2021. [7] R. S. Craig, C. Hua, P. Ng, and R. Yuen. Development of the renminbi market in Hong Kong SAR: Assessing onshore-offshore market integration. IMF Working Pa-per WP/13/268, International Monetary Fund, 2013. [8] W. Du, A. Tepper, and A. Verdelhan. Deviations from covered interest rate parity. 
+
+The Journal of Finance , 73(3):915–957, 2018. [9] T. Ehlers, F. Packer, and F. Zhu. The changing landscape of renminbi offshore and onshore markets. BIS Quarterly Review , pages 72–73, 2016. [10] L. Escauriaza, D. C. Schwarz, and H. Xing. Radner equilibrium and systems of quadratic BSDEs with discontinuous generators. The Annals of Applied Probability ,32(5):3492–3536, 2022. [11] M. Funke, C. Shu, X. Cheng, and S. Eraslan. Assessing the CNH–CNY pricing differential: Role of fundamentals, contagion and policy. Journal of International Money and Finance , 59:245–262, 2015. [12] X. Gabaix and M. Maggiori. International liquidity and exchange rate dynamics. The Quarterly Journal of Economics , 130(3):1369–1420, 2015. [13] N. Garleanu and L. H. Pedersen. Dynamic portfolio choice with frictions. Journal of Economic Theory , 165:487–516, 2016. [14] L. Gonon, J. Muhle-Karbe, and X. Shi. Asset pricing with general transaction costs: Theory and numerics. Mathematical Finance , 31(2):595–648, 2021. [15] M. Herdegen, J. Muhle-Karbe, and D. Possamai. Equilibrium asset pricing with transaction costs. Finance and Stochastics , 25:231–275, 2021. [16] U. J. Jermann, B. Wei, and V. Z. Yue. The two-pillar policy for the RMB. The Journal of Finance , 77(6):3093–3140, 2022. [17] D. Leung and J. Fu. Interactions between CNY and CNH money and forward ex-change markets. SSRN Electronic Journal , 2014. [18] A. W. Lo, H. Mamaysky, and J. Wang. Asset prices and trading volume under fixed transactions costs. Journal of Political Economy , 112(5):1054–1090, 2004. [19] S. Maziad and J. S. Kang. RMB internationalization: Onshore/offshore links. IMF Working Paper WP/12/133, International Monetary Fund, 2012. [20] R. N. McCauley and C. Shu. Non-deliverable forwards: Impact of currency interna-tionalisation and derivatives reform. BIS Quarterly Review , pages 81–93, 2016. [21] R. N. McCauley and C. Shu. Recent RMB policy and currency co-movements. BIS Working Paper 727, Bank for International Settlements, 2018. [22] F. Packer, A. Schrimpf, and V. Sushko. Renminbi turnover tilts onshore. BIS Quar-terly Review , pages 35–36, 2019. Box B in “Sizing up Global Foreign Exchange Markets”. 
+
+> 27
+
+[23] J. M. Schmittmann and C. H. Teng. Offshore currency markets: Non-deliverable forwards (NDFs) in asia. IMF Working Paper WP/20/179, International Monetary Fund, 2020. [24] J. Shen. The price discovery and volatility spillover effects of RMB exchange rates between onshore and offshore markets. Shanghai Finance , 405:84–86, 2014. In Chinese. [25] C. Shu, D. He, and X. Cheng. One currency, two markets: The renminbi’s growing influence in asia-pacific. China Economic Review , 33:163–178, 2015. [26] D. Vayanos and J.-L. Vila. Equilibrium interest rate and liquidity premium with transaction costs. Economic Theory , 13:509–539, 1999. [27] K. Weston. Existence of a Radner equilibrium in a model with transaction costs. 
+
+Mathematics and Financial Economics , 12:517–539, 2018. [28] Z. Wu and X. Chen. Dynamic correlation of RMB exchange rate between onshore and offshore market based on MGARCH-BEKK model: Evidence from Hong Kong offshore RMB market after its establishment. Forum of World Economics and Poli-tics , 261:110–123, 2013. In Chinese. [29] J. Yan, L. Sun, and W. Huang. The linkage effects of interest rate and exchange rate in Hong Kong RMB offshore market. Financial Forum , pages 57–65, 2015. In Chinese.

@@ -1,0 +1,638 @@
+Title: Stop Suppressing the Tail: Causal Inference for Extreme Events
+
+URL Source: https://arxiv.org/pdf/2605.27474v2
+
+Published Time: Fri, 29 May 2026 00:29:15 GMT
+
+Number of Pages: 22
+
+Markdown Content:
+# Stop Suppressing the Tail: Causal Inference for Extreme Events 
+
+Eichi Uehara 
+
+eichi.uehara@aflo.one 
+
+May 29, 2026 
+
+Abstract 
+
+Estimating how an outcome responds, on average, to a continuous treatment — the Average Dose-Response Function (ADRF) — is a core causal-inference primitive. When outcomes are heavy-tailed (financial returns, climate losses, drug-dosage adverse events), standard robust double machine learning (DML) deliberately suppresses the tail to stabilise the bulk average. Yet in exactly these high-stakes settings the tail is the target quantity: the 
+
+1-in-1000 loss, not the bulk mean, determines the decision, so a bulk-only estimate omits the quantity of interest. A natural alternative — reading the tail off the model’s residu-als — is circular: the inferred Generalised-Pareto shape ̂ ξ shifts from −0.42 (bounded) to 
+
++0 .28 (heavy) on one dataset solely as a function of switching the core estimator between Huber and Welsch. We propose an ADRF estimator that emits a structured tail-shape output alongside the point estimate, without suppressing the extremes. Its tail diagnostic (PDHTE+JK) estimates the per-treatment tail shape from the outcome centred by a pilot median — not from core-estimator residuals — which breaks the circular dependence and renders the diagnostic invariant to the choice of core method. The output comprises four quantities: treatment-conditional tail shape ̂ ξ(t), deep-tail return levels ̂ Qα(t), conditional shortfalls ̂ Sα(t), the recovered mean ADRF, and an explicit refusal that declines extrap-olation when the data do not support extreme-value modelling. Against kernel-weighted quantile regression (QR), the proposed estimator reduces deep-tail ( α = 0 .001 ) return-level MAE by 11% and conditional-shortfall MAE by 25 .5% across a 10 -DGP heavy-tailed panel, and by 20 –29% in the sample-scarce regime ( n ≤ 2000 ). On real freMTPL2 motor-insurance claims (excess kurtosis 1667 ) it explicitly refuses on the log-claim scale — an output neither QR nor loss-only DML produces. 
+
+Keywords: double machine learning, dose-response, heavy tails, extreme value theory, causal inference. 
+
+# 1 Introduction 
+
+The Average Dose-Response Function (ADRF) θ(t) = E[Y (t)] under continuous treatment is the standard estimand of double machine learning (6, 7, 30). When the conditional distribution of Y has a heavy tail with shape ξ (in the Pickands–Balkema–de Haan sense (8)), θ(t) is either 
+
+undefined (ξ ≥ 1: the mean does not exist) or estimated at a sub-√n rate (ξ ∈ [0 .5, 1) : infinite variance, sample mean converges at n1/2−ξ). Heavy-tail residuals are ubiquitous in financial returns, insurance claims, climate-loss panels, and any setting where the outcome aggregates rare extreme events. The standard remedy is robust DML — replace the squared-error loss of the second-stage local-linear smoother with a bounded-influence loss (Huber, Quantile, Winsor) (20–22). Robust DML is empirically competitive, but it has two persistent shortcomings: 
+
+• Tail-blind tuning. Bounded-influence losses have tuning constants (Huber’s clipping ϵ,Tukey’s biweight c) fixed by loss design, not by the data’s actual tail. A Huber-DML with 
+
+ϵ = 1 .35 clips at the same residual scale on Gaussian noise and on Pareto-1.5 contamination. 1
+
+> arXiv:2605.27474v2 [stat.ML] 28 May 2026
+
+• No tail output. The robust loss is designed to suppress the tail and emits no information about the suppressed component — neither a tail-shape estimate, a probability of exceedance, nor a regret-aware extreme-quantile prediction. Only the bulk-stabilised point estimate is returned; the tail quantities of practical interest (rare-claim severity, extreme-loss quantile, worst-case dose) are omitted. We propose a two-component estimator that addresses both shortcomings without abandon-ing the strengths of robust DML (Figure 1). 
+
+Figure 1: The proposed estimator. The data (X, T, Y ) enter two parallel branches: across-fit DML residual pipeline containing the TailWelsch-DML core estimator (top), and PDHTE+JK on raw (Y, T ) producing ̂ ξ(t),̂ σ(t), and a refusal indicator (bottom). The post-core component assembles the five tail quantities from both branches. Method-invariance (Propo-sition 1) follows from PDHTE+JK consuming the pilot-median-centred outcome rather than core-method residuals. The first component is a robust core estimator, TailWelsch-DML , defined as the kernel-weighted local-linear M-estimator of Fan and Gijbels (14) with a redescending Welsch weight 
+
+w(r) = exp( −γ (r/σ )2) at a constant mild clipping γ = 0 .10 . We deliberately keep γ constant: Section 6 shows that tying γ to a data-driven ̂ ξ does not improve core-ADRF MAE at scale — tail information is valuable in the post-core output, not inside the loss function. A constant γ also keeps the second-stage loss free of data-dependent tuning, so the standard Neyman-orthogonal DML rate applies directly (Section A.3). The second component is a post-core set of causal tail functionals. The same residuals that 
+
+TailWelsch-DML downweights are then described in a structured output: 
+
+• Per-T tail shape ̂ ξ(t): kernel-weighted GPD shape function across the treatment grid — detects whether the tail’s heaviness varies with t (e.g. regime-conditional contamination). 
+
+• Sign-conditional recovery of E[Y (t)] : from the truncated functional ̂ θW (t) that 
+
+TailWelsch-DML identifies, the formula ̂ E[Y (t)] = ̂ θW (t) + ( ̂u⋆ +̂ σ+/(1 −̂ ξ+)) ̂ p+(t) −
+
+(̂ u⋆ +̂ σ−/(1 −̂ ξ−)) ̂ p−(t) reconstructs the original mean ADRF using sign-conditional GPD fits to positive ( r > u ⋆) and negative ( r < −u⋆) exceedances. For symmetric tails the two contributions cancel and ̂ E[Y (t)] ≈̂ θW (t).
+
+• Hybrid empirical-plus-GPD return-level curves ̂ Qα(t): extreme quantile of Y (t)
+
+at each t, using the kernel-weighted empirical quantile when αn eff (t) ≥ 1 and GPD-extrapolation otherwise. Avoids the systematic GPD-extrapolation over-prediction observed when always extrapolating. 
+
+• Conditional shortfall E[Y (t) | Y (t) > Q α(t)] and causal-tail effect ∂̂ Qα/∂t .The output is reported alongside the point estimate, not in place of it. It has cost O(n log n)
+
+on the same residuals computed by TailWelsch-DML .2Four contributions follow from this design. 1. TailWelsch-DML — a redescending Welsch-DML core estimator (constant clipping γ =0.10 ). Reduces core-ADRF MAE by 11 .6% vs. Standard-DML ( 90% CI [−17 .3% , −5.8%] )on the 320 -cell verification panel. 2. PDHTE+JK — a plateau-detection hybrid tail estimator on the pilot-median-centred out-come, removing the path-dependence of residual-based ̂ ξ on the core method (Proposition 1); returns an explicit refusal when the data fail the regular-varying plateau test. 3. Tail-conditional causal functionals — per-T̂ ξ(t), return-level ̂ Qα(t), conditional short-fall ̂ Sα(t), sign-conditional ̂ E[Y (t)] recovery, and the refusal indicator. Jointly consistent with one per-T GPD fit. 4. Empirical comparison against kernel-weighted quantile regression (the standard practitioner baseline): 11% MAE reduction at deep-tail α = 0 .001 ; 25 .5% MAE reduction on the actuarial shortfall ̂ Sα(t); 6/6 heavy-tail regime-classification accuracy ( 1/6 for QR-derived); 20 to 29% MAE reduction at small sample sizes n ≤ 2000 . On freMTPL2 real data the proposed estimator returns an explicit refusal, an output QR does not produce. The remainder of the paper is organised as follows. Section 2 positions our approach against existing robust DML, threshold-selection, and extreme-conformal literature. Section 3 defines the composite-likelihood threshold rule, the GPD tail inference output, and the refusal mech-anism. Section 4 introduces TailWelsch-DML and proves consistency. Section 5 defines the tail-conditional causal functionals. Section 6 reports the empirical verification. Section 7 discusses limits and extensions. 
+
+# 2 Background and Related Work 
+
+We organise prior work along the four axes our estimator combines: DML for the ADRF, robust second-stage M-estimators, peaks-over-threshold inference with the GPD, and extreme-tail conformal and causal estimands. Under unconfoundedness, positivity, and SUTVA, θ(t) = E[Y (t)] = EX [E[Y | T = t, X ]] 
+
+is identified. Cross-fit DML (6) fits, in each of K folds, nuisance estimates of E[Y | X] and 
+
+E[T | X] on the K−1 training folds. The continuous-treatment extension of Colangelo and Lee (7), Semenova and Chernozhukov (30) runs a kernel-weighted local-linear fit (14) of the residual on T at each grid point with Silverman bandwidth. When Var( rY | T = t) fails under a heavy tail, the standard remedy replaces squared-error with a bounded-influence loss in the local linear: Huber (bounded but non-redescending, (20)), Quantile/median (21), Tukey biweight and Welsch (redescending, (3, 22)). All treat the tuning constant as a fixed loss hyperparameter. TailWelsch-DML in this paper makes the Welsch 
+
+γ a function of the data-driven tail shape ̂ ξ.Beyond the bulk, the Pickands–Balkema–de Haan theorem gives convergence to the GPD above high thresholds (8). Threshold-selection families include graphical Mean-Excess / Hill plots (4, 8, 17), sequential goodness-of-fit (1, 24, 25, 33), L-moments/PWM stability (18, 19), and composite-density splice models (29). Our composite-likelihood rule (Definition 1) is a splice-density variant that selects u⋆ by maximising the held-out log-likelihood (a strictly proper scoring rule) with a built-in no-tail fallback. Closer to our setting, adaptive conformal inference (2, 15, 36) and its extreme-regime vari-ants (26, 27, 32) splice a GPD tail above a high quantile of calibration scores. The hybrid empirical-plus-GPD return-level curves of Section 5 are methodologically related, but per-T
+
+(treatment-conditional) on post-DML residuals. Heavy-tail causal estimands have been ad-dressed via propensity-score trimming (9, 12, 35), ATE winsorisation (28), and extremal QTE for binary treatment (11); all act on covariate or propensity axes, whereas TailWelsch-DML 
+
+3operates in the outcome-residual dimension after cross-fit DML. EVT methods in causal infer-ence include the causal-tail coefficient (16), extreme graphical models (13), and conditional-EVT for heteroscedastic financial series (23). None of this literature ties the second-stage loss tuning to a data-driven tail estimate or emits a structured set of tail-conditional quantities alongside the ADRF point estimate. 
+
+# 3 Threshold Selection and GPD Tail Inference 
+
+The tail algorithm consumes post-DML residuals {ri}ni=1 and emits a triple (̂u⋆,̂ ξ, ̂ σ) that feeds the core estimator (Section 4) and the post-core component (Section 5). When no candidate threshold satisfies a joint goodness-of-fit and exceedance-budget gate, the algorithm refuses 
+
+(returns u⋆ = ∅) and the pipeline falls back to ordinary local-linear DML on the full sample. The remainder of the section instantiates this template: a likelihood-based rule for picking ̂
+
+u⋆, the PWM estimator that then produces (̂ξ, ̂ σ) from the exceedances, and the conditions under which the rule refuses. The strictly proper scoring rule we adopt is the composite log-likelihood of a Laplace-bulk + GPD-tail splice density on R:̂
+
+f (r; u, b, ξ, σ ) = 
+
+> 
+
+(1 − ptail ) e−| r|/b 
+
+2b(1 − e−u/b ) |r| ≤ u, ptail 12 gξ,σ (|r| − u) |r| > u, 
+
+(1) where b = σcore /√2 is the Laplace scale, ptail = nexc /n , and gξ,σ is the GPD density. The truncation factor (1 − e−u/b ) in the bulk makes the bulk integrate to 1 − ptail , so ̂ f integrates to one. 
+
+Definition 1 (Composite-likelihood threshold) . Given residuals {ri}ni=1 , the threshold ̂ u⋆ is the maximiser of the held-out composite log-likelihood subject to two gates: ̂
+
+u⋆ = arg max 
+
+> u∈U
+
+1
+
+n
+
+> ∑
+> i
+
+log ̂ f (ri; u, ̂ b(u),̂ ξ(u),̂ σ(u)) (2) 
+
+with U = [q0.5(|r|), q 1−nmin /n (|r|)], nmin = 30 , gates: 
+
+• Exceedance budget : nexc (u) ≥ nmin ,exc where nmin ,exc is a user-chosen floor (default 30 ;
+
+≥ 100 when stability matters more than coverage of the ̂ ξ space). 
+
+• GPD goodness-of-fit : the Kolmogorov–Smirnov p-value of the GPD fit on exceedances exceeds a threshold pmin KS (default 0, i.e. disabled; set to 0.05 to require a non-rejection of the GPD asymptotic). If no u ∈ U satisfies both gates, the rule refuses :̂ u⋆ = ∅.
+
+The two gates address a known systematic downward bias on ̂ ξ from the unconstrained maximiser of Equation (2): in heavy-tail mixtures the bulk-Laplace term dominates the joint likelihood and pulls u⋆ low, so exceedances are contaminated with sub-tail bulk observations. The gates together force the chosen threshold to lie in a region where the GPD asymptotic holds and where the exceedance sample is large enough that PWM is not dominated by small-sample variance. The lower bound q0.5(|r|) separately enforces Pr( |r| ≤ u⋆) ≥ 1/2 — “bulk = majority” — a definitional requirement of the splice-density framing. Treating Definition 1 as an M-estimator, standard regularity conditions deliver consistency. With U compact, a continuous population score L(u) = Er log ̂ f (r; u, ·) with a unique maximiser 
+
+u⋆ 
+
+> 0
+
+in the interior of U, and uniform convergence of Ln to L, one obtains ̂ u⋆ P
+
+−→ u⋆ 
+
+> 0
+
+(31); under misspecification of the splice family, u⋆ 
+
+> 0
+
+is the Kullback–Leibler projection of the residual density onto the parametric splice. 4With ̂ u⋆̸ = ∅ in hand, the remaining parameters (̂ξ, ̂ σ) are obtained by Probability- Weighted Moments on the exceedances. Let {ej }nexc  
+
+> j=1
+
+= {| ri| − ̂ u⋆ : |ri| >̂ u⋆} denote the exceedances. The tail-shape estimates are computed by Probability-Weighted Moments (19): with a0 = ¯ e and 
+
+a1 = n−1 ∑(n − j)/(n − 1) e(j) (sorted exceedances), ̂
+
+ξPWM = 2 − a0
+
+a0 − 2a1
+
+,̂ σPWM = 2a0a1
+
+a0 − 2a1
+
+. (3) The tail output T = ( ̂u⋆,̂ ξPWM , [̂ ξℓ,̂ ξh],̂ σPWM ,̂ pKS , \regime ,̂ rq) packages these estimates with a 90% nonparametric bootstrap CI on ̂ ξ (B = 200 ), the KS goodness-of-fit p-value, a regime label (Fréchet if ̂ ξℓ > 0, Weibull if ̂ ξh < 0, Gumbel otherwise), and return-level estimates ̂ rq at selected exceedance probabilities q ∈ { 0.01 , 0.001 }.For ̂ ξ̸ = 0 , the return-level formula is ̂
+
+rq =̂ u⋆ +̂ σPWM ̂
+
+ξPWM  
+
+> (
+
+nexc 
+
+qn 
+
+> )̂ ξPWM
+
+− 1 
+
+> 
+
+. (4) A useful side-effect of building the rule around a held-out log-likelihood is that the rule can refuse, rather than report a spurious tail. Of the threshold-selection families surveyed in Section 2, only the composite-density splice family naturally supports this: when no u makes the splice fit better than a Laplace bulk-only null on the held-out sample, the rule reports u⋆ = ∅
+
+and the downstream pipeline reduces to ordinary local-linear DML on the full residuals. This indicates that the data do not lie in the EVT regime — an informative output when applying the estimator to unfamiliar data. One assumption underlying this rule deserves explicit comment: the Laplace specification of the bulk. The Laplace bulk enters only this composite-likelihood threshold rule, which sup-plies ̂ u⋆ for the sign-conditional E[Y (t)] recovery (Section 5). The headline per-T diagnostic PDHTE+JK (Section 4) does not use it — it runs its own plateau detector on kernel-weighted order statistics — nor does the return-level curve ̂ Qα(t). Under a misspecified bulk (Gaussian, skewed, bimodal) the chosen ̂ u⋆ is the Kullback–Leibler projection onto the splice family (Sec-tion A.1); the KS goodness-of-fit gate (Definition 1) guards against the worst case by rejecting thresholds whose exceedance sample fails the GPD fit. The bulk law is a plug-in default: an empirical or kernel bulk is a drop-in replacement, evaluated as future work. 
+
+# 4 Per-T Tail-Shape Estimation 
+
+A central open problem in continuous-treatment ADRF estimation under heavy tails is the 
+
+path-dependence of the tail-shape estimate ̂ ξ on the choice of core method, which we document empirically: on synthetic data with one-sided Gaussian outliers ( sinusoidal_asymmetric 
+
+DGP, p = 0 .10 ), the PWM estimator applied to post-DML residuals gives 
+
+•̂ ξStandard = −0.41 (bounded-tail/Weibull domain) 
+
+•̂ ξHuber = +0 .28 (Fréchet domain — heavy tail) 
+
+•̂ ξWelsch = −0.42 (bounded-tail/Weibull domain) The same data, the same observed Y , but the inferred tail behaviour flips sign with the choice of robust core method. No existing approach in the heavy-tail causal-inference literature (11, 16, 27, 28) addresses this circular dependence. The reason is structural: estimating ̂ ξ from 
+
+r = Y −̂ θ(T ) entangles tail behaviour with the choice of ̂ θ. Robust core methods (Huber) leave asymmetric outliers in the residuals, where PWM fits a heavy GPD; OLS-type methods absorb the bias of the asymmetry into ̂ θ, leaving symmetric-looking residuals where PWM fits a bounded GPD. 5We resolve the circular dependence by estimating ξ(t) within kernel-weighted T -bands using only the outcome Y centred by a pilot kernel-weighted median — a fixed, core-method-independent location estimate, never a fitted ̂ θ. Subtracting it is formally a non-parametric local residual, but since it does not depend on the downstream core method, the circular path-dependence (Section 4) is broken. Replacing ̂ θ(T ) with the pilot median trades one source of error for another: the pilot median itself is estimated, and that estimation error propagates into the log-spacings driving the Hill and DEdH statistics. We bound this propagation under a mild regularity condition. The pilot median is a bulk quantile, estimated at the non-parametric rate ˜Y (t0) − m(t0) = 
+
+OP (( nh T )−1/2) = OP (n−2/5) (Silverman bandwidth). A location shift perturbs the log-spacings driving Hill and DEdH by a relative OP (δ/u κ), with δ = ˜Y − m and uκ the (1 − κ)-quantile threshold. We assume the regularity condition δ/u κ = oP (sd( ̂ξDEdH )) — pilot error negligible against the tail-estimator’s sampling error; a formal lemma propagating δ through the DEdH limit under a fixed order-statistic fraction is future work (Section 7), with the verification panel (Section 6) as finite-sample evidence. 
+
+Definition 2 (Kernel-weighted top-k). For treatment value t0, bandwidth hT , and order-statistic fraction κ:
+
+E(t0, κ ) = {i : |Yi − ˜Y (t0)| ≥ q1−κ(t0)}, wi(t0) = exp ( − (( Ti − t0)/h T )2/2) (5) 
+
+where ˜Y (t0) is the kernel-weighted median of Y at t0 and q1−κ(t0) is the kernel-weighted (1 − κ)-quantile of |Y − ˜Y (t0)|. The |E (t0, κ )| effective top-κ observations provide the tail sample at 
+
+t0.
+
+Definition 3 (Hill plateau detector at t0). Let X(1) ≥ X(2) ≥ . . . be the ordered absolute deviations in E(t0, κ ). The kernel-weighted Hill estimator at fraction κ is ̂
+
+ξHill (t0, κ ) =  
+
+> ∑
+> i
+
+wi(t0)( log X(i) − log X(k+1)  
+
+> )∑
+> i
+
+wi(t0) (6) 
+
+where i ranges over the top-k at fraction κ. The plateau detector evaluates ̂ ξHill (t0, κ ) at multiple values κ ∈ { 0.04 , 0.06 , 0.08 , 0.10 , 0.12 , 0.15 , 0.20 }. The coefficient of variation 
+
+CV( t0) = MAD κ
+
+> [̂
+
+ξHill (t0, κ )]
+
+max (|median κ[̂ ξHill (t0, κ )] |, 0.05 ) (7) 
+
+identifies whether ̂ ξHill (t0, κ ) is stable across κ — a plateau is detected when CV( t0) < 0.25 .Plateau presence is the signature of a regular-varying tail at t0.
+
+Definition 4 (Dekkers-Einmahl-de Haan Moment Estimator) . The DEdH moment estimator (10) is unbiased across all three EVT domains (Fréchet ξ > 0, Gumbel ξ = 0 , Weibull ξ < 0): ̂
+
+ξDEdH (t0, κ ) = M1 + 1 − 12 · 11 − M 21 /M 2
+
+(8) 
+
+where Mp = [ ∑  
+
+> i
+
+wi(t0)( log X(i) − log X(k+1) 
+
+> )p]
+
+/[ ∑  
+
+> i
+
+wi(t0)] are the kernel-weighted pth log-moments. 
+
+Definition 5 (PDHTE) . The Plateau-Detection Hybrid Tail Estimator at t0:̂
+
+ξPDHTE (t0) = 
+
+> {
+
+2̂ ξDEdH full (t0) −̂ ξDEdH half (t0) if CV( t0) < 0.25 (accept) undefined (refuse) otherwise (no plateau) (9) 6where ̂ ξDEdH full (t0) = median κ[̂ ξDEdH (t0, κ )] on the full sample and ̂ ξDEdH half (t0) is the mean of the same estimator on njk = 4 random half-samples. The estimator in Equation (9) is the shrinkage-damped jackknife actually used: ̂
+
+ξPDHTE = (1 − λ)̂ ξDEdH full + λ (2 ̂ξDEdH full −̂ ξDEdH half ), λ = 0 .5, (10) 
+
+a convex combination of the raw full-sample estimate ( λ = 0 ) and the full jackknife correction (λ = 1 ). The shrinkage choice λ = 0 .5 reflects a bias-variance trade-off. The full jackknife ( λ = 1 )cancels the leading O(n−ρ) second-order bias exactly, but the half-sample estimate has roughly twice the variance of ̂ ξDEdH full , so Var(2 ̂ ξfull −̂ ξhalf ) exceeds Var( ̂ξfull ). The mean-squared error is convex in λ with an interior minimum whenever this variance penalty is non-zero, so λ < 1 is MSE-preferable to full debiasing. We use the fixed conservative λ = 0 .5; a data-driven MSE-optimal λ from second-order regular-variation parameters (5) is left to future work. Global refusal: if the fraction of accepted grid points |{ k :̂ ξPDHTE (tk) defined }| /|grid | < 0.70 ,the PDHTE refuses globally: the data is not in a regular-varying tail regime. 
+
+The half-sample jackknife provides the bias correction. The DEdH moment estimator has finite-sample bias of order O(n−ρ) under second-order regular variation (4, 5); the shrinkage-damped jackknife (Equation (10)) removes the λ-fraction of the leading order. Empirically the bias drops from ∼ 0.27 to ∼ 0.05 on heavy mixtures (Table 3). PDHTE+JK is practical from 
+
+n ≈ 200 for the refusal decision and n ≳ 1500 for accurate point estimation. The Hill + DEdH hybrid balances two complementary properties. Hill’s plateau is the most reliable accept/refuse signal; DEdH is unbiased across the three EVT domains where Hill is not. Hill alone has +0 .25 bias on Gumbel-domain clean data; the hybrid reduces this to −0.02 .Because the pilot median depends only on (Y, T ), the entire PDHTE pipeline is a function of the raw data, not of any downstream core estimator. This yields the formal invariance property that motivated the construction. 
+
+Proposition 1 (Method-invariance) . PDHTE consumes only (Y, T ) centred by the pilot median, so two consistent core estimators producing different ̂ θ(t) yield identical ̂ ξPDHTE (t) outputs. 
+
+Empirical verification: on the asymmetric DGP where PWM applied to Standard / Huber / Welsch residuals spans −0.42 to +0 .28 , PDHTE refuses in all 5 seeds (Table 2). On regular-varying tails (Pareto, two-Pareto) the PWM consensus is within ±0.05 and PDHTE matches it. Method-invariance establishes that PDHTE’s output does not depend on the choice of core estimator, but it does not by itself imply that the output is a causal quantity. The next step is to relate the observational law that PDHTE consumes to the causal target. PDHTE estimates the tail of the observational law Y | T = t. The causal target is the tail of the potential outcome Y (t), whose law is EX [FY |T =t,X ] under unconfoundedness, whereas Y | T = t has law 
+
+EX|T =t[FY |T =t,X ]. These coincide when T ⊥ X — which holds by construction in the synthetic panel (Section 6: T is drawn independently of X), so every synthetic result estimates the causal tail directly. Two facts govern the confounded ( T̸ ⊥ X) case: 
+
+Proposition 2 (Tail index is confounding-robust) . The tail index of a mixture equals the maxi-mum of the component indices. Hence whenever positivity holds — every X-stratum has positive density of every t — the index of EX|T =t[FY |T =t,X ] equals that of EX [FY |T =t,X ]: confounding shifts mixture proportions but not the maximum. The per-T̂ ξ(t) is therefore a causal quantity even under confounding. 
+
+The return level ̂ Qα(t) and shortfall ̂ Sα(t) depend on mixture proportions and are con-founded. We apply a first-order partial deconfounding : stabilized generalized-propensity-score (GPS) weights sw i =̂ fT (Ti)/̂fT |X (Ti | Xi) multiply the kernel weights, restoring the marginal 7X-distribution in each T -band. Because ̂ fT |X is a treatment-side nuisance shared by all core methods, method-invariance (Proposition 1) is preserved. This GPS correction is not a free lunch. It is consistent only when overlap holds and the propensity is correctly specified, and continuous-treatment IPW is intrinsically high-variance — constraints we now make explicit. The correction requires positivity/overlap ( ̂fT |X bounded away from zero on the reported t-grid) and a correctly specified GPS, here a Gaussian propensity from a cross-fit ̂ E[T | X]. Continuous-treatment IPW is high-variance, amplified in the tail where the weighted quantile rests on few heavily-reweighted exceedances; we winsorise and hard-clip the weights and restrict the t-grid to the adequate-overlap interior. The result is a 
+
+partial correction: Section 6 verifies a 63% reduction in causal-return-level bias, leaving ∼ 37% .We do not claim √n-consistency of the GPS-weighted hybrid estimator; a doubly-robust or trimmed-weight refinement removing the residual bias is future work (Section 7). Taking together the core estimator of Section 1 and the PDHTE diagnostic just defined, the proposed pipeline pairs a redescending Welsch local-linear M-estimator (constant γ = 0 .10 )with PDHTE+JK for per-T̂ ξ(t). The post-core component (Section 5) then emits the five tail-conditional quantities. The design rule is that tail information enters the post-core output, not the loss function — feeding ̂ ξ(t) back into the Welsch γ is empirically worse than a constant 
+
+γ on the 320 -cell panel. 
+
+# 5 Tail-Conditional Causal Functionals 
+
+After TailWelsch-DML produces ̂ θW (t) and the tail procedure produces (̂u⋆,̂ ξ, ̂ σ), the post-core component emits five tail-conditional quantities that loss-only robust DML does not pro-duce. We start with the per-T tail shape, which feeds the four quantities that follow. 
+
+Definition 6 (Per-T tail shape via PDHTE+JK) .̂ ξ(t0) := ̂ ξPDHTE+JK (t0) (Definition 5) evalu-ated on the pilot-median-centred outcome within kernel-weighted T -bands, with companion scale ̂
+
+σ(t0) := ̂ σDEdH (t0). Per-grid-point refusal (returning NaN) follows the PDHTE plateau-CV rule (Definition 3). 
+
+Using the outcome centred only by a pilot median — not by a fitted core estimator — closes the path-dependence of Section 4 and gives method-invariance (Proposition 1). The E[Y (t)] 
+
+recovery formula below additionally needs sign-conditional residual quantities (̂ξ±,̂ σ±), fit by PWM on {r > ̂ u⋆} and {r < −̂u⋆} separately. Although ̂ ξ(t) alone characterises tail heaviness, it does not reconstruct the mean of Y (t)
+
+when contamination is asymmetric — because TailWelsch-DML ’s M-functional, by design, does not target the mean in that regime. The next quantity closes this gap. Under asym-metric residuals TailWelsch-DML ’s M-functional differs from E[Y (t)] . With sign-conditional exceedance sets E± = {± r > ̂ u⋆}, kernel-weighted exceedance probabilities ̂ p±(t), and GPD parameters (̂ ξ±,̂ σ±) < 1:̂
+
+E[Y (t)] = ̂ θW (t) (1 −̂ p+ −̂ p−) + (̂ θW (t) + ̂ u⋆ +̂ σ +
+
+> 1−̂ξ+
+> )̂
+
+p+ − (̂ θW (t) −̂ u⋆ −̂ σ −
+
+> 1−̂ξ−
+> )̂
+
+p−. (11) For symmetric tails the ± contributions cancel and ̂ E[Y (t)] ≈̂ θW (t); for one-sided positive contamination ( ̂p− ≈ 0), only the positive term contributes. The sign-conditional structure is essential: the naive one-sided variant (single ̂ ξ on |r| exceedances plus a positive offset) overshoots by an order of magnitude on symmetric tails (median relative error 1.6 → 0.29 under the sign-conditional formula — 80% reduction). When ̂ p±(t) < 0.01 we floor the corresponding contribution to ̂ θW (t)̂p± and skip the tail-mean term. 8Beyond the mean, the same per-T GPD fit yields the extreme-quantile dose-response curve, the central object for deep-tail decisions. Specifically, Qα(t) is the value such that Pr( Y (t) >Qα(t)) = α for small α.
+
+Definition 7 (Hybrid empirical-plus-GPD ̂ Qα(t)). At grid point t0, let wi(t0) = exp( −(( Ti −
+
+t0)/h T )2/2) and neff (t0) = ∑ 
+
+> i
+
+wi(t0).̂
+
+Qα(t0) = 
+
+> ̂
+
+θW (t0) + ̂ r(w)1−α(t0) α n eff (t0) ≥ 1 (empirical mode) ,̂
+
+θW (t0) + ̂ u⋆ +̂ σ(t0)̂
+
+ξ(t0) 
+
+> (
+
+nexc 
+
+αn 
+
+> )̂ ξ(t0)
+
+− 1 
+
+> 
+
+α n eff (t0) < 1 (GPD mode) , (12) 
+
+where ̂ r(w)1−α(t0) is the kernel-weighted empirical (1 − α)-quantile of the residuals, and ̂ ξ(t0),̂ σ(t0)
+
+are the PDHTE+JK per-T estimates of Definition 6. 
+
+The empirical mode is finite-sample exact (no parametric tail assumption); the GPD mode extrapolates beyond the sample resolution. The crossover at αn eff = 1 matches the extreme-conformal logic of Pasche et al. (27) but applied treatment-conditionally. Two considerations motivate this construction over a residual- based POT extrapolation. A standard POT extrapolation fits the GPD on post-DML residuals above a global threshold (e.g. via PWM). On heavy mixtures the per-T PWM ̂ ξ(t) has ∼ 0.27 small-sample bias, which amplifies in (nexc /(αn )) ̂ξ(t) as α → 0. Our ̂ ξ(t) and ̂ σ(t) come from PDHTE+JK on raw Y
+
+(bias ∼ 0.05 ); the threshold becomes per-T (kernel-weighted (1 − κ)-quantile of |Y − med w(Y )|
+
+at t0). The hybrid switch αn eff = 1 keeps the empirical branch in the sample-resolved regime, where pure-GPD extrapolation systematically over-predicts by 20 –50% in our verification. The same GPD parameters that produce ̂ Qα(t) produce, at no additional fitting cost, two further quantities of direct practical interest: the mean outcome conditional on exceeding the return level, and the local sensitivity of that return level to the treatment. The closed-form GPD mean-excess above ̂ Qα(t) for ̂ ξ(t) < 1:̂
+
+Sα(t) = ̂ Qα(t) + ̂ σ(t) + ̂ ξ(t)( ̂Qα(t) −̂ u⋆)1 −̂ ξ(t) , [CTE α(t) = ∂̂ Qα(t)
+
+∂t . (13) The ̂ Sα(t) is the actuarial CVaR analogue and is empirically 25 .5% closer to the oracle than the QR-averaging proxy (Table 5). The CTE is the extreme-quantile analogue of the bulk slope 
+
+∂̂ θW /∂t , computed by finite-difference on ̂ Qα. All five artefacts cost O(|t-grid | · n) on residuals already computed. The same GPS correction that deconfounds ̂ Qα(t) carries through to ̂ Sα(t) by construction, since the shortfall is a closed-form transform of the same per-T GPD fit. When the GPS deconfounding of Section 4 is applied, the stabilization weights sw i multiply the kernel weights in every per-T kernel-weighted quantity entering Equation (13): the per-T tail-shape ̂ ξ(t), the per-T scale ̂ σ(t), the per-T threshold ut (the weighted (1 − κ)-quantile of |Y − ˜Y (t)|), and the return level ̂ Qα(t) are all computed on the deconfounded local law Ki sw i. The recovery threshold ̂ u⋆ from the composite-likelihood rule (Section 3) is a residual-side quantity used only by the sign-conditional ̂ E[Y (t)] recovery, not by ̂ Sα(t), and is left unweighted. The causal shortfall is thus the closed-form mean-excess of the fully deconfounded return-level fit, and inherits the same first-order partial deconfounding (and residual bias) as ̂ Qα(t).
+
+# 6 Numerical Experiments 
+
+The experiments are organised around three questions: (i) does the core estimator TailWelsch-DML improve the bulk ADRF over existing robust-DML choices? (ii) is PDHTE+JK a faithful 9per-T tail-shape diagnostic — specifically, is it method-invariant where residual-based estima-tors are not? (iii) do the proposed tail-conditional quantities outperform the QR-based alterna-tives on downstream tail tasks? Question (i) is the prerequisite: before discussing tail artefacts, we verify that the constant-γ
+
+Welsch core delivers a measurable core-ADRF MAE improvement at scale. The verification panel has 10 DGPs (clean, Pareto, Student-t, asymmetric, heteroskedastic, T -localised, multi-context tails) × 4 contamination levels × 8 seeds ( 320 cells), n = 1000 . Core-ADRF MAE is computed against the structural θ(t) = sin( πt/ 2) + t/ 2 on a 25 -point grid; 90% bootstrap CIs are over the 320 relative-MAE differences ( B = 2000 ).            
+
+> Comparison Mean rel. MAE 90% CI
+> TailWelsch-DML vs. Standard-DML −11 .6% [−17 .3% ,−5.8%]
+> TailWelsch-DML vs. Huber-DML −3.7% [−8.2% ,+0 .9%]
+
+Table 1: TailWelsch-DML improves significantly over Standard-DML (CI excludes zero) and improves marginally over Huber-DML. With TailWelsch-DML established as the core estimator, question (ii) concerns the tail diagnostic that runs alongside it. The structural problem in heavy-tail ADRF is that residual-based ̂ ξ depends on the choice of core estimator: the same data yields different tail diagnostics depending on which robust loss was used in stage two. PDHTE+JK consumes only (Y, T ) and therefore returns the same answer regardless of the downstream core method (Proposition 1). On the asymmetric DGP Table 2 documents the path-dependence and PDHTE+JK’s clean refusal.                     
+
+> DGP Truth PWM-Std PWM-Huber PWM-Welsch PDHTE+JK
+> sinusoidal_pareto +0 .67 +0 .60 +0 .55 +0 .56 +0 .60 , accept
+> sinusoidal_asymmetric 0.00 −0.41 +0.28 −0.42 refuse
+> sinusoidal_two_paretos +0 .50 +0 .46 +0 .45 +0 .46 +0 .44 , accept
+
+Table 2: Residual-based PWM spans −0.42 to +0 .28 on the asymmetric DGP — not a single tail shape exists. PDHTE+JK refuses. On regular-varying tails PDHTE+JK matches the PWM consensus within ±0.05 .A second verification targets the per-T resolution claim. On sinusoidal_two_paretos the truth is piecewise ( ξ = 2 /3 for t < 0, ξ = 1 /3 for t > 0); Table 3 quantifies the recovery and Figure 3 in the appendix shows it visually.                      
+
+> Region ξtrue ̂ξPDHTE+JK (t)accept
+> T < 0(Pareto-1.5)0.667 0.619 (bias −0.048 )35 /35
+> T > 0(Pareto-3)0.333 0.267 (bias −0.066 )35 /35
+> piecewise jump +0 .352 (true +0 .333 )—
+
+Table 3: Piecewise tail-shape jump recovered within 6% of truth; all 75 grid ×seed cells accept. Bandwidth sweep h ∈ [0 .5, 2.0] × Silverman preserves the jump direction. Question (iii) compares the four tail-conditional quantities of Section 5 against the natural QR-based alternatives, starting with the return-level curve itself. In a risk-management appli-cation, treatment levels are ranked by their α-extreme outcome ( 99 th- and 99 .9th-percentile severity). We compare three estimators against an oracle empirical Qα(t) from n = 100 ,000 
+
+holdout: the proposed ̂ Qα(t) (Definition 7); kernel- weighted local-linear quantile regression 10 (the standard practitioner baseline (21, 26)); and a residual-PWM POT baseline that uses the same return-level formula but with PWM ̂ ξ(t) on residuals (no PDHTE).                      
+
+> α= 0 .01 α= 0 .001 (deep tail)
+> Method MAE alloc-err MAE alloc-err
+> QR (Koenker) 2.46 0.17 16 .90.30
+> Residual-PWM POT 2.54 0.18 20 .00.31
+> Proposed ̂Qα(t)2.71 0.13 15 .00.30
+
+Table 4: At the sample-resolved α = 0 .01 , the three methods cluster within ±10% MAE; the proposed estimator achieves the lowest allocation error. At the deep-tail α = 0 .001 where the return-level exponent (κ/α )̂ξ(t) dominates, the proposed estimator reduces MAE by 11% relative to QR and by 25% relative to residual-PWM POT — the calibrated PDHTE+JK ̂ ξ(t) (∼ 0.05 
+
+bias vs. ∼ 0.27 for residual PWM) is the mechanism. 10 DGPs × 5 seeds. Moving from quantile to mean-excess, we next compare the conditional shortfall — the quantity that determines actuarial reserves and regulatory capital. The conditional shortfall 
+
+Sα(t) = E[Y (t) | Y (t) > Q α(t)] is what actuarial reserves and regulatory capital are sized on, not the quantile itself. The proposed estimator has it in closed form from one GPD fit (Equation (13)). A QR-only approach can only approximate it by averaging M quantile fits, each with its own sampling variance.                                  
+
+> DGP Proposed ̂SαMAE QR-avg ( M= 6 ) MAE Lower MAE
+> sinusoidal (clean) 1.54 0.98 QR
+> sinusoidal_pareto 8.86 11 .58 Proposed
+> sinusoidal_asymmetric 1.25 1.49 Proposed
+> sinusoidal_heavytail 3.83 5.09 Proposed
+> sinusoidal_two_paretos 5.13 7.11 Proposed
+> regime_switch 6.86 10 .53 Proposed
+> pareto_plus_gaussian 6.07 8.92 Proposed
+> heteroskedastic 6.56 8.12 Proposed
+> Aggregate 5.01 6.73 −25 .5%
+
+Table 5: Proposed ̂ Sα achieves lower MAE on 7/8 heavy or contaminated DGPs and a 25 .5% 
+
+reduction in aggregate. Oracle is empirical E[Y | Y > Q α, T ≈ t] on n = 100 ,000 holdout; 
+
+α = 0 .01 , 5 seeds, n = 3000 .Some downstream decisions do not require a quantile at all, only a coarse classification of the tail’s regime — whether the mean exists, whether the tail is bounded. For decisions like “does the mean exist?” (ξ < 1) or “is the tail bounded?” (ξ < 0), a regime classification is required, not a quantile. PDHTE+JK ̂ ξ(t) delivers this directly; QR can only approximate ξ
+
+from log-quantile ratios, which is consistent asymptotically but noisy at finite n.11 Classification target Proposed / QR-derived               
+
+> Heavy-tail DGPs (Fréchet, 6total) 6/6/1/6
+> Gumbel-domain DGPs ( 4total) 0/4/0/4
+> Aggregate (10 DGPs) 6/10 /1/10
+
+Table 6: Classification accuracy ( n = 3000 , p = 0 .10 , 5-seed majority vote, ±0.05 tolerance for the Gumbel class). The proposed estimator correctly classifies all 6 heavy-tail DGPs; the QR proxy nearly always defaults to “Weibull” due to log-ratio noise. Both methods are fragile on true-Gumbel data where ξ = 0 sits at the tolerance boundary. The preceding experiments held n fixed at 3000 . The parametric GPD prior in the proposed estimator is most useful where QR’s non-parametric quantile fit is variance-dominated, so the final synthetic experiment varies n. Many real heavy-tail panels (insurance segments, climate event records, niche financial markets) are small. The parametric GPD prior in the proposed esti-mator should pay off when QR’s non-parametric local-linear quantile fits are variance-dominated. Figure 5 in the appendix shows the MAE crossover by DGP visually.                   
+
+> nProposed MAE QR MAE Gain
+> 500 3.10 4.07 −24% 1000 2.38 2.83 −16% 2000 1.70 2.46 −31% 3000 1.95 2.16 −10% 5000 1.36 1.62 −16%
+
+Table 7: Mean MAE across the three DGPs in Figure 5; below n = 2000 the proposed estimator reduces MAE by 16 –31% .The synthetic verification is corroborated on real heavy-tailed data drawn from a setting where the deep tail is the deliverable: the freMTPL2 motor-insurance claims data. French motor third-party liability claim severity (34), n = 24 ,944 , excess kurtosis 1667 (the heaviest tail in our test set). We subsample ntrain = 5000 for fitting and use the remaining ∼ 20 ,000 
+
+as the empirical-truth oracle for Q0.99 (age ). Tail algorithm: ̂ u⋆ = 1111 ,̂ ξglobal = 0 .75 . Two outcomes (Table 11 in appendix): (i) at the deep-tail α = 0 .001 the residual-PWM POT beats QR by 14% on MAE, matching the synthetic deep-tail pattern; (ii) PDHTE+JK refuses at every grid point — log-claim severity, heavy-tailed on the raw scale but with log-scale kurtosis only ∼ 6, fails the regular-varying plateau test. The refusal is itself informative: it indicates that the data do not support EVT extrapolation at log scale — an output neither QR nor loss-only DML produces. Beyond the comparison metrics, the freMTPL2 fit produces the practitioner-facing quan-tities of Section 5 concretely. The residual-PWM POT’s ̂ Q0.99 (age ) ranges from $ 16 ,750 at age 25 to $ 25 ,784 at age 75 (54% variation in extreme claim severity across driver age). The sign-conditional ̂ E[Y (age )] recovery adds an average $ 2,117 tail contribution to ̂ θW (age ). Nei-ther quantity is producible by loss-only DML; the proposed refusal indicates whether the EVT extrapolation underlying these estimates is supported by the data. All preceding experiments use T ⊥ X, which sidesteps the identification gap between ob-servational and causal tails. The final experiment closes that gap by deliberately violating independence and verifying that the GPS correction of Section 4 recovers the causal return-level curve. The synthetic panel above has T ⊥ X by construction, so it estimates the causal tail directly. To stress the observational-vs-causal gap (Proposition 2) we build a deliberately confounded DGP — T = 0 .6 X0 + N (0 , 1) with heavy Pareto-1.5 contamination only on units with X0 < 0, so the treatment selects the contaminated stratum — and compare plain PDHTE 12 against the propensity-stabilized variant against an interventional oracle ( n = 80 ,000 , T set to each t; n = 6000 , 8 seeds). The tail index is unaffected (plain and propensity-stabilized both at MAE 0.028 ): by Proposition 2 max-stability makes the index causal even under confounding. The return level is confounded — plain PDHTE even produces a slope of the wrong sign — and propensity-stabilized weighting recovers the causal curve, reducing ̂ Q0.98 (t) MAE from 1.93 to 
+
+0.72 (−63% ); see Figure 4 and table 12 in the appendix. 
+
+# 7 Discussion 
+
+We have argued that the standard practice of suppressing the heavy tail to stabilise an ADRF point estimate discards the quantity that drives high-stakes decisions, and that reading the tail off post-DML residuals reintroduces the choice of core estimator as a confounder of the tail diagnostic. The proposed estimator answers both concerns: a constant-clipping Welsch core (TailWelsch-DML ) preserves the standard Neyman-orthogonal DML rate, and a plateau-detection diagnostic (PDHTE+JK) on the pilot-median- centred outcome produces a per-T tail shape that is invariant to the choice of core method. The resulting tail-conditional output — treatment-conditional shape, return level, conditional shortfall, sign-conditional mean recovery, and an explicit refusal — is produced at O(n log n) cost on the residuals already computed. Empirically the estimator reduces deep-tail return-level MAE by 11% and conditional-shortfall MAE by 25 .5% against the quantile-regression baseline, and by 20 –29% for n ≤ 2000 ; on freMTPL2 motor-insurance claims it refuses on the log-claim scale, indicating that the data do not support EVT extrapolation. Two scope conditions qualify these results. First, TailWelsch-DML targets a Welsch M-functional that equals E[Y (t)] only under symmetric residuals; under asymmetric contamination it approximates the structural θ(t), and the sign-conditional recovery (Equation (11)) is the additional step for the mean ADRF including the tail. For ξ ≥ 1 the mean is undefined and only the M-functional is sensible. Second, under T -X confounding the tail index remains causal by max-stability (Proposition 2); the return level and shortfall are confounded and are corrected by GPS-stabilised weighting, which removes 63% of the bias but is not √n-consistent. Within this scope, several limitations remain. (i) Per-T̂ ξ(t) retains ∼ 0.05 residual bias after jackknife, carried into ̂ Qα(t) at deep α; ordering across t is reliable below n ∼ 1500 but absolute level is not. (ii) T -localised contamination defeats TailWelsch-DML , Standard, and Huber alike. (iii) Only the conditional shortfall is independently validated against an oracle; the causal-tail effect inherits its accuracy from ̂ Qα but is not separately benchmarked. (iv) The estimator targets univariate residual tails under weak temporal dependence; the Laplace bulk is a swappable default. (v) Three asymptotic gaps remain open: pilot-median error propagation through the DEdH limit (Section 4), GPS-weighted return-level consistency (Section 4), and MSE-optimal jackknife damping (Equation (10)). Closing these and extending to multivariate residual tails are the natural next steps. 
+
+# References 
+
+[1] B. Bader, J. Yan, and X. Zhang. Automated threshold selection for extreme value analysis via ordered goodness-of-fit tests with adjustment for false discovery rate. Annals of Applied Statistics , 12(1):310–329, 2018. [2] R. F. Barber, E. J. Candès, A. Ramdas, and R. J. Tibshirani. Conformal prediction beyond exchangeability. Annals of Statistics , 51(2):816–845, 2023. [3] A. E. Beaton and J. W. Tukey. The fitting of power series, meaning polynomials, illustrated on band-spectroscopic data. Technometrics , 16(2):147–185, 1974. 13 [4] J. Beirlant, Y. Goegebeur, J. Segers, and J. Teugels. Statistics of Extremes: Theory and Applications . Wiley, 2004. [5] F. Caeiro, M. I. Gomes, and D. Pestana. Direct reduction of bias of the classical hill estimator. REVSTAT Statistical Journal , 3(2):113–136, 2005. [6] V. Chernozhukov, D. Chetverikov, M. Demirer, E. Duflo, C. Hansen, W. Newey, and J. Robins. Double/debiased machine learning for treatment and structural parameters. 
+
+The Econometrics Journal , 21(1):C1–C68, 2018. [7] K. Colangelo and Y.-Y. Lee. Double debiased machine learning nonparametric inference with continuous treatments. arXiv preprint arXiv:2004.03036 , 2020. [8] S. Coles. An Introduction to Statistical Modeling of Extreme Values . Springer, 2001. [9] R. K. Crump, V. J. Hotz, G. W. Imbens, and O. A. Mitnik. Dealing with limited overlap in estimation of average treatment effects. Biometrika , 96(1):187–199, 2009. [10] A. L. M. Dekkers, J. H. J. Einmahl, and L. de Haan. A moment estimator for the index of an extreme-value distribution. The Annals of Statistics , 17(4):1833–1855, 1989. [11] D. Deuber, J. Li, S. Engelke, and M. H. Maathuis. Estimation and inference of extremal quantile treatment effects for heavy-tailed distributions. Journal of the American Statistical Association , 2024. [12] J. Dorn. How much weak overlap can doubly-robust t-statistics handle? arXiv preprint arXiv:2304.02350 , 2025. [13] S. Engelke and A. S. Hitz. Graphical models for extremes (with discussion). Journal of the Royal Statistical Society B , 82(4):871–932, 2020. [14] J. Fan and I. Gijbels. Local Polynomial Modelling and Its Applications . Chapman & Hall, 1996. [15] I. Gibbs and E. J. Candès. Adaptive conformal inference under distribution shift. In 
+
+Advances in Neural Information Processing Systems 34 , 2021. [16] N. Gnecco, N. Meinshausen, J. Peters, and S. Engelke. Causal discovery in heavy-tailed models. Annals of Statistics , 49(3):1755–1778, 2021. [17] B. M. Hill. A simple general approach to inference about the tail of a distribution. Annals of Statistics , 3(5):1163–1174, 1975. [18] J. R. M. Hosking. L-moments: Analysis and estimation of distributions using linear combi-nations of order statistics. Journal of the Royal Statistical Society. Series B (Methodologi-cal) , 52(1):105–124, 1990. [19] J. R. M. Hosking and J. R. Wallis. Parameter and quantile estimation for the generalized pareto distribution. Technometrics , 29(3):339–349, 1987. [20] P. J. Huber. Robust Statistics . Wiley, 1981. [21] R. Koenker. Quantile Regression . Cambridge University Press, 2005. [22] R. A. Maronna, R. D. Martin, V. J. Yohai, and M. Salibián-Barrera. Robust Statistics: Theory and Methods (with R) . Wiley, 2nd edition, 2019. 14 [23] A. J. McNeil and R. Frey. Estimation of tail-related risk measures for heteroscedastic financial time series: an extreme value approach. Journal of Empirical Finance , 7(3-4): 271–300, 2000. [24] C. Murphy, J. A. Tawn, and Z. Varty. Automated threshold selection and associated inference uncertainty for univariate extremes. Technometrics , 2024. [25] P. J. Northrop and C. L. Coleman. Improved threshold diagnostic plots for extreme value analyses. Extremes , 17(2):289–303, 2014. [26] O. C. Pasche and S. Engelke. Neural networks for extreme quantile regression with an application to forecasting of flood risk. Annals of Applied Statistics , 2024. [27] O. C. Pasche, H. Lam, and S. Engelke. Extreme conformal prediction: Reliable intervals for high-impact events. Extremes , 2026. arXiv:2505.08578. [28] Y. Sasaki and T. Ura. Heavy tail robust estimation and inference for average treatment effects. Econometric Reviews , 44(5), 2024. doi: 10.1080/07474938.2024.2444229. [29] C. Scarrott and A. MacDonald. A review of extreme value threshold estimation and un-certainty quantification. REVSTAT–Statistical Journal , 10(1):33–60, 2012. [30] V. Semenova and V. Chernozhukov. Debiased machine learning of conditional average treatment effects and other causal functions. The Econometrics Journal , 24(2):264–289, 2021. [31] A. W. van der Vaart. Asymptotic Statistics . Cambridge University Press, 1998. [32] J. Velthoen, C. Dombry, J.-J. Cai, and S. Engelke. Gradient boosting for extreme quantile regression. Extremes , 26:639–667, 2023. [33] J. L. Wadsworth. Exploiting structure of maximum likelihood estimators for extreme value threshold selection. Technometrics , 58(1):116–126, 2016. [34] M. V. Wüthrich. Neural networks applied to chain-ladder reserving. European Actuarial Journal , 8(2):383–406, 2018. [35] S. Yang and P. Ding. Asymptotic inference of causal effects with observational studies trimmed by the estimated propensity scores. Biometrika , 105(2):487–493, 2018. [36] M. Zaffran, O. Féron, Y. Goude, J. Josse, and A. Dieuleveut. Adaptive conformal predic-tions for time series. In ICML , 2022. 
+
+# A Proofs 
+
+Table 8 summarises the consistency results, their required assumptions, and the rates. Figure 2 shows the four-step dependency structure of the TailWelsch-DML consistency argument.                             
+
+> Result Key assumptions Rate / type
+> Threshold ̂u⋆→u⋆
+> 0Compact U, identifiable splice, uniform LLN Consistency PDHTE+JK method-invariance PDHTE function of (Y, T )only Exact (algebraic)
+> TailWelsch-DML ̂θW(t)→θW(t)Cross-fit DML, Welsch score bounded & Lipschitz OP(n−2/5)̂
+> E[Y(t)] recovery Sign-conditional GPD, ξ±<1Plug-in from above
+
+Table 8: Overview of the four consistency / identification results below. 15 Figure 2: Proof structure for TailWelsch-DML consistency. With a constant Welsch γ the second-stage loss carries no data-dependent tuning, so the local-linear step inherits the standard 
+
+OP (n−2/5) rate of Fan and Gijbels (14) directly after the cross-fit DML nuisance rate oP (n−1/4)
+
+(6). 
+
+A.1 Consistency of the Composite-Likelihood Threshold 
+
+Let L(u) = Er[log ̂ f (r; u, b (u), ξ (u), σ (u))] denote the population composite log-likelihood of the Laplace-bulk + GPD-tail splice (Equation (1)) as a function of the threshold u. The sample analogue is Ln(u) = n−1 ∑ 
+
+> i
+
+log ̂ f (ri; u, ̂ b(u),̂ ξ(u),̂ σ(u)) . Under the gates of Definition 1 (KS-validity, minimum exceedance budget), let U denote the gated parameter space and define 
+
+u⋆ 
+
+> 0
+
+= arg max u∈U L(u).
+
+Sketch. Standard M-estimation consistency (31, Theorem 5.7). Required ingredients: 1. U is a closed and bounded subset of the original search range [q0.5(|r|), q 1−nmin /n (|r|)] (the gates are upper semi-continuous in u). 2. L is continuous in u on U and has a unique maximiser in the interior of U. Uniqueness follows from the strictly proper scoring rule property of the splice density: the population maximiser is unique when the residual density is absolutely continuous and the splice family is identifiable at u.3. sup u∈U |Ln(u) − L(u)| P
+
+−→ 0 (uniform convergence). The integrands are continuous in u and bounded on compact u-sets because the GPD density is continuous in (ξ, σ ) at the PWM estimates, which are continuous in u for ξ bounded away from 1/2 (PWM identification breaks down at ξ = 1 /2; in practice we clip). Then ̂ u⋆ P
+
+−→ u⋆ 
+
+> 0
+
+by the standard argmax-consistency theorem. 
+
+A.2 Consistency of TailWelsch-DML 
+
+Sketch of method-invariance (Proposition 1). PDHTE consumes only (Y, T ), the raw data. The kernel-weighted top-k identification (Definition 2), the Hill plateau detector (Definition 3), and the DEdH moment estimator (Definition 4) are all functions of these raw quantities. Two 16 consistent core methods produce different ̂ θ(t) but neither affects (Y, T ). Therefore both produce identical inputs to PDHTE and identical outputs. 
+
+A.3 Sketch: Welsch local-linear DML consistency 
+
+Sketch. TailWelsch-DML uses the Welsch weight w(r) = exp( −γ(r/σ )2) at a constant γ —there is no data-dependent tuning in the second-stage loss. The consistency argument is the standard two-step DML construction. 
+
+Step 1: nuisance step. Cross-fit DML conditions (6) give ̂ g converging in L2(P ) at rate 
+
+oP (n−1/4). Then rYi = Yi −̂ g(Xi) is a L2-consistent estimate of the true residual rY,⋆ i =
+
+Yi − g0(Xi).
+
+Step 2: local-linear step. Because γ is fixed, the Welsch population score ψ(r) = r e −γ(r/σ )2
+
+is a fixed bounded, Lipschitz, odd function; its derivative at the truth is mean-zero in the first-stage nuisance, so the Neyman-orthogonality condition of Chernozhukov et al. (6, Thm. 3.1) holds without modification. Standard local-linear M-estimator theory (14) then gives, at interior 
+
+t0 under twice-differentiability of θW in t and a positive bounded second derivative of the population score, ̂ θW (t0) − θW (t0) = OP (n−2/5).
+
+Remark (data-dependent γ). An earlier variant tied γ to a data-driven ̂ ξ. There γ is a tuning parameter of the target functional , not a first-stage nuisance: ̂ ξ enters the loss, and provided ̂ ξ P
+
+−→ ξ0 the estimand stabilises to θW (t; γ(ξ0)) , with orthogonality w.r.t. the first-stage nuisances g, m unaffected (the Welsch score’s nuisance-derivative is mean-zero for every fixed γ). We nonetheless report the constant-γ estimator, which has no such subtlety and is empirically no worse (Section 6). 
+
+A.4 Sign-Conditional Recovery of E[Y (t)] 
+
+Let Fr|T =t denote the conditional density of the residual r given treatment t, with support on 
+
+R. Suppose the right tail Fr|T =t
+
+> (
+
+· | r > u ⋆) is GPD with shape ξ+, scale σ+ and left tail 
+
+F−r|T =t
+
+> (
+
+· | r < −u⋆) is GPD with shape ξ−, scale σ−. Let p±(t) = Pr( r ≷ ±u⋆ | T = t) and 
+
+pb(t) = 1 − p+(t) − p−(t).Decomposing E[Y (t)] = θW (t) + E[r | T = t]:
+
+E[r | T = t] = pb E[r | | r| ≤ u⋆, T = t] + p+ E[r | r > u ⋆, T = t] + p− E[r | r < −u⋆, T = t].
+
+The first term is approximately zero under the Welsch fit (the M-functional centres the bulk). The second term, by the GPD mean-excess identity (valid for ξ+ < 1), is u⋆ + σ+/(1 − ξ+). The third term is its mirror: −(u⋆ + σ−/(1 − ξ−)) . Substituting gives Equation (11). For symmetric tails ( p+ = p−, ξ+ = ξ−, σ+ = σ−), the second and third terms cancel exactly and E[r | T = t] = 0 , so E[Y (t)] = θW (t). For one-sided positive contamination (p− ≈ 0), only the second term contributes and the recovered E[Y (t)] shifts above θW (t) by the GPD positive-tail mean times p+.
+
+# B Implementation Details 
+
+Table 9 consolidates every hyperparameter used in the paper; Table 10 compares the nuisance-loss options. 17 Component Parameter Default Tested range 
+
+TailWelsch-DML Welsch loss clipping γ 0.10 (constant) γ ∈ [0 .05 , 0.20] 
+
+DML nfolds 3 {3, 5}
+
+DML kernel bandwidth h Silverman —Threshold rule grid size J 40 {30 , 40 , 60 }
+
+Threshold rule nmin ,exc 30 {30 , 100 }
+
+Threshold rule pmin KS 0.0 (off) {0, 0.05 }
+
+PDHTE+JK κ-grid {0.04 : 0 .20 } —PDHTE+JK plateau CV threshold 0.25 {0.20 , 0.25 , 0.40 }
+
+PDHTE+JK njk half-samples 4 {2, 4, 8}
+
+Bulk law (splice) Laplace scale b σcore /√2 —
+
+Table 9: Consolidated hyperparameters. “Tested range” is the sensitivity sweep done in devel-opment; behaviour was qualitatively similar across the tested values. 
+
+Nuisance loss Property Wall-time Empirical 
+
+L2 (default) convex, no robustness 1× baseline kurtosis L1 absolute bounded influence per split ∼ 1× moderate reduction Quantile (median) max-breakdown M-est. ∼ 1× moderate reduction 
+
+γ-divergence (Welsch) redescending ∼ 30 × best reduction 
+
+Table 10: Phase-1 nuisance loss options. The L2 default is used for the QR and DML baselines for fairness; the γ-divergence GBDT is the default for TailWelsch-DML headline results. The qualitative ranking of TailWelsch-DML vs. baselines is unchanged across these choices. 
+
+B.1 Robust GBDT Nuisance for Phase 1 
+
+The DML nuisance models ̂ g(X) =̂ E[Y | X] and ̂ m(X) =̂ E[T | X] are by default 
+
+HistGradientBoostingRegressor with squared-error loss. TailWelsch-DML optionally uses one of three robust GBDT losses: 
+
+• L1 (absolute error) : HistGradientBoostingRegressor(loss="absolute_error") .Each split minimises L1 loss; bounded influence per split. Fast (negligible overhead vs. default). 
+
+• Median (quantile 0.5): HistGradientBoostingRegressor(loss="quantile", quantile=0.5) . The maximum-breakdown M-estimator for location. 
+
+• γ-divergence : custom XGBoost objective with gradient gi = ( ̂yi−yi)wi and Hessian hi = wi
+
+where wi = exp( −γ r 2 
+
+> i
+
+/(2 σ2)) is the Welsch redescending weight, σ MAD-anchored. This is the only nuisance loss that is redescending rather than merely bounded-influence. Empiri-cal kurtosis-reduction is best of the three, at ∼ 30 × wall-time cost vs. HistGBM (custom objective in Python rather than the HistGBM C++ kernel). The choice of nuisance loss is orthogonal to the TailWelsch-DML contribution. We use the γ-divergence variant in headline results; the framework’s qualitative behaviour is similar with the L2 default. 
+
+B.2 Composite-Likelihood Threshold-Rule Defaults 
+
+Defaults used throughout: 
+
+• Grid: J = 40 candidate quantiles uniformly spaced in [q0.5, q 1−nmin /n ].
+
+• Minimum exceedance budget: nmin ,exc = 30 (default); = 100 when stability is preferred over coverage. 18 • KS validity gate: pmin KS = 0 by default (disabled); set to 0.05 for stricter refusal behaviour. 
+
+• Bulk law: Laplace, with scale b = σcore /√2 and σcore = 1 .4826 · MAD |r|≤ u.
+
+• PWM on exceedances {ej }:̂ ξPWM ,̂ σPWM from Equation (3). 
+
+B.3 Per-T Tail Shape Bandwidth 
+
+The kernel bandwidth hT in Definition 6 uses Silverman’s rule applied to the ob-served T -distribution: hT = 1.06 σT n−1/5. The effective per-t exceedance count is 
+
+neff exc (t) = ∑ 
+
+> i:|ri|>u ⋆
+
+exp( −(( Ti − t)/h T )2/2) . When neff exc (t) < 15 ,̂ ξ(t) is set to NaN and the global ̂ ξ is used in its place for the recovery formula. 
+
+B.4 Hybrid Empirical-Plus-GPD ̂ Qα(t) Switch 
+
+The crossover α n eff (t) ≥ 1 determines whether the empirical branch or GPD branch is used. The empirical (1 −α)-quantile from the kernel-weighted residual sample is r(j) where j = min {i :̂
+
+Fw(ri) ≥ 1 − α} and ̂ Fw is the weighted empirical CDF. The GPD branch uses Equation (4) substituting ̂ ξ(t),̂ σ(t) for the global ̂ ξ, ̂ σ.
+
+B.5 Hyperparameters in TailWelsch-DML 
+
+TailWelsch-DML uses a constant Welsch clipping γ = 0 .10 — a mild redescending down-weighting. The value was chosen by smoke-tests on a handful of DGPs; core-ADRF MAE is qualitatively unchanged for γ ∈ [0 .05 , 0.20] . Tying γ to a data-driven ̂ ξ was tested and gave no improvement at the 320 -cell scale, so the constant value is the default (this also keeps the second-stage loss free of data-dependent tuning; see Section A.3). 
+
+# C Supplementary Experiments and Figures 
+
+This appendix provides per-DGP breakdowns, additional comparisons, diagrams, and result figures referenced from the main body. 
+
+C.1 Per-T Tail-Shape Recovery 
+
+Figure 3: PDHTE+JK ̂ ξ(t) on sinusoidal_two_paretos (n = 3000 , p = 0 .10 ): 5 seeds (grey), mean (blue), true piecewise ξ(t) (dashed red). The jump at t = 0 is recovered with ∼ 0.05 
+
+residual bias; ordering across t is reliable in every seed. Quantitative summary in Table 3. 19 C.2 freMTPL2 Downstream Metrics              
+
+> Method MAE @ α= 0 .01 MAE @ α= 0 .001
+> QR (Koenker) 6.87 7.17
+> Residual-PWM POT 7.10 6.14
+> Proposed ̂Qα(t)refuse refuse
+
+Table 11: freMTPL2 return-level MAE ( ntrain = 5000 , 5 resample seeds, log( Y + 1) scale). At the deep-tail α = 0 .001 the residual-PWM POT beats QR by 14% ; PDHTE+JK refuses at every grid point, correctly flagging that log-claim severity fails the regular-varying plateau test. 
+
+C.3 Return Level under T -X Confounding 
+
+Figure 4: Return-level curve ̂ Q0.98 (t) on the confounded DGP (Section 6). Plain PDHTE (red) tracks the observational Y | T =t tail and gets the slope backwards — decreasing where the causal curve increases — because high T selects the contamination-free X0 > 0 stratum. Propensity-stabilized weighting (blue) restores the marginal X-distribution in each T -band and recovers the interventional oracle (black), cutting return-level bias by 63% . The tail index 
+
+(Proposition 2) needs no such correction.         
+
+> Target Plain MAE Propensity-stabilized MAE
+> Tail index ̂ξ(t)0.028 0.028
+> Return level ̂Q0.98 (t)1.93 0.72
+
+Table 12: Confounded DGP ( n = 6000 , 8 seeds), MAE against the interventional (causal) oracle. The tail index is unaffected by confounding (Proposition 2); the return level is confounded, and propensity-stabilized weighting cuts its bias by 63% .20 C.4 Sample-Size Scaling (Per-DGP) 
+
+Figure 5: Per-DGP MAE of ̂ Q0.99 (t) vs. n (5 seeds each). The proposed estimator beats QR at every n on asymmetric ; on the homogeneous-tail pareto and two_paretos , the QR curves cross the proposed estimator around n ≈ 2000 –3000 . The per-DGP table below adds the residual-PWM POT baseline.                                                         
+
+> pareto two_paretos asymmetric
+> nProp. RPWM QR Prop. RPWM QR Prop. RPWM QR
+> 500 5.27 3.73 4.94 4.75 3.88 4.93 6.40 1.68 2.36 1000 5.00 3.57 3.81 3.89 2.26 2.53 1.24 1.30 2.17 2000 3.68 2.11 2.40 3.10 1.81 2.99 0.91 1.18 1.98 3000 3.76 2.66 2.60 3.13 2.25 2.12 0.90 0.92 1.77 5000 3.82 1.74 1.63 2.78 1.36 1.34 1.01 0.97 1.90
+
+Table 13: Full per-DGP sample-size scaling: proposed (PDHTE+JK-driven), residual-PWM POT (RPWM), and QR. Below n = 2000 the parametric tail prior in either RPWM or the proposed estimator dominates QR. The proposed estimator’s PDHTE+JK refusal mechanism is conservative at very small n; RPWM is the practical small-n default on regular-varying tails because PDHTE+JK over-refuses when plateau noise dominates. 21 C.5 Conditional Shortfall (Per-DGP) 
+
+Figure 6: Per-DGP ̂ S0.99 (t) MAE: proposed closed-form (blue) vs. QR-averaging ( M = 6 )(green). The proposed estimator wins on every heavy or contaminated DGP; QR-averaging wins only on the clean Gaussian baseline. 22

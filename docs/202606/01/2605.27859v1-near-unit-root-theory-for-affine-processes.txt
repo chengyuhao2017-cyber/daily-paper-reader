@@ -1,0 +1,4183 @@
+Title: Near-Unit-Root Theory for Affine Processes
+
+URL Source: https://arxiv.org/pdf/2605.27859v1
+
+Published Time: Thu, 28 May 2026 00:32:05 GMT
+
+Number of Pages: 71
+
+Markdown Content:
+# Near-Unit-Root Theory for Affine Processes 
+
+## Gaël Anne 1 and Yang Lu 2 and Xuewen Yu 3 and Xiaowen Zhou 4
+
+## May 28, 2026 
+
+Abstract: Discrete-time affine processes are widely used in finance and economics and encompass count, positive, and nonnegative-valued processes. This paper develops near-unit-root asymptotic theory for this class of models. Unlike linear AR(1) processes, affine processes exhibit time-varying conditional variance that remains asymptotically non-negligible near unity, leading to qualitatively different scaling limits and estimator be-havior. We show that the local-to-unity regime suffers from the usual nuisance-parameter problem, whereas the mildly explosive regime, while free of it, still does not allow con-sistent estimation of the intercept. By contrast, the mildly stationary framework is more tractable: the OLS estimator is asymptotically normal, the resulting trajectories are more realistic than those of linear AR(1) models, and inference is possible through both a plug-in method or bootstrap. The theoretical results are supported by simulation evidence and illustrated through applications to insurance and financial data. 
+
+Acknowledgments: Lu thanks Université Laval/Autorité des marchés financiers (fonds AMF-GIRIF), NSERC (through grant RGPIN-2021-04144), FRQNT (STRATEGIA grant) and SSHRC (grant 430-2024-01325) and for financial support. 
+
+Keywords: Mildly stationary, affine process, local-to-unity, random-weighted bootstrap. 
+
+> 1
+
+Department of Mathematics and Statistics, Concordia University, Montréal, Canada. Email: gael.anne@concordia.ca 
+
+> 2
+
+Department of Mathematics and Statistics, Concordia University, Montréal, Canada. Email: yang.lu@concordia.ca 
+
+> 3
+
+School of Management, Fudan University, Shanghai, China. Email: xuewenyu@fudan.edu.cn 
+
+> 4
+
+Department of Mathematics and Statistics, Concordia University, Montréal, Canada. Email: xi-aowen.zhou@concordia.ca 
+
+1
+
+> arXiv:2605.27859v1 [math.ST] 27 May 2026
+
+# 1 Introduction 
+
+In several emerging applications, there is a need to model count, positive, or nonnegative-valued processes that may be close to unit root. For example, the annual number of dis-asters (count valued) may be increasing due to climate change. Similarly, both long-run and short-run interest rates can exhibit strong persistence (Gouriéroux and Jasiak, 2022; Gouriéroux et al., 2026; Gouriéroux and Jasiak, 2025). 1
+
+Discrete-time affine processes, also known as compound autoregressive processes (Darolles et al., 2006), are Markov processes whose conditional Laplace transform (LT) is exponential-affine in the previous state variable. This class encompasses count, positive, and nonnegative-valued processes, and has been widely used in finance and economics. Prominent count-valued examples include the INARCH (or Poisson autoregressive) model (Agosto et al., 2016) and the negative binomial autoregressive model (Gouriéroux and Lu, 2019; Gouriéroux and Lu, 2023). A prime example of a positive affine process is the autoregressive gamma process, which arises as the exact discretization of the continuous-time Cox-Ingersoll-Ross process. This property makes it particularly suitable for financial applications such as credit risk, term structure modeling, and stochastic volatility (Overbeck and Ryden, 1997; Gouriéroux et al., 2006; Le et al., 2010; Creal, 2017; Gouriéroux and Lu, 2023; Mendes et al., 2025). More recently, Monfort et al. (2017) introduced a nonnegative affine process that allows for a positive probability of reaching the zero lower bound (ZLB). Despite these developments, little attention has been paid to near-unit-root affine pro-cesses. However, such a framework could be quite useful from a macroprudential per-spective. For instance, there is a recent surge of interest in models capable of capturing long-run uncertainty in long-run interest rates (Gouriéroux and Jasiak, 2022, 2025), with near-unit-root linear models often proposed as candidates. However, these models are generally incompatible with positivity or nonnegative constraints, which are important in many regulatory contexts. Such near-unit-root models are also relevant for long-horizon 
+
+> 1Depending on the application, the short-run interest rate may be positive or nonnegative if the zero lower bound is attainable. In some cases, it may even be count-valued. For instance, the Federal Reserve’s policy rate (target range) is typically set in multiples of a minimum tick (25 basis points). In contrast, market-based interest rates, such as the effective federal funds rate, are usually continuous and positive-valued.
+
+2prediction: persistent changes in disaster frequencies and losses matter directly for insur-ance pricing and, more broadly, for evaluating the costs and benefits of the green transition. In this paper, we address this gap by developing a near-unit-root asymptotic theory for a class of Markov affine processes taking count, positive or nonnegative values. We show that these processes exhibit unit root behavior that differs substantially from that of the linear AR(1) model. We begin by analyzing the local-to-unity affine model, in which the autoregressive coefficient is αn = 1 + γn 
+
+> n
+
+. The paper that is closest to this framework is Barreto-Souza and Chan (2024), who study a local-to-unity INARCH model, under the strong assumption that the intercept parameter is fixed a priori . We extend their analysis to a class of Markov affine processes taking count, positive, or nonnegative values, in-cluding INARCH as a special case, and allow the intercept to be estimated jointly with the autoregressive parameter. This extension reveals a fundamental nuisance parameter issue of the local-to-unity model: while the autoregressive coefficient remains estimable at rate n, neither the intercept parameter of the conditional expectation equation nor the lo-calization parameter γn is consistently estimable, and the limiting distribution of the OLS estimator depends on these parameters, which makes inference difficult. Our framework is also distinct from two adjacent near-unit-root literatures: the linear AR(1) (Phillips and Magdalinos, 2007; Fei, 2018; Yu and Kejriwal, 2025) and the INAR(1) (Ispány et al., 2003; Peng et al., 2024). In both of these existing literatures, the conditional variance is bounded in expectation. In our setting, the conditional variance grows with the state and is therefore unbounded, producing qualitatively different asymptotics. We then extend the unit root analysis to mildly integrated affine processes, which bridge the gap between the stationary and local-to-unity regimes. The main finding of the paper is that mildly integrated affine processes, particularly its mildly stationary version with 
+
+αn = 1 − 1 
+
+> kn
+
+, is more convenient for inference than the local-to-unity model for several reasons. First, we show that they avoid the nuisance-parameter problem and we develop a block local-to-unity interpretation for mildly stationary processes to explain this prop-erty. Indeed, such a process behaves like ⌊n/kn⌋ → ∞ consecutive local-to-unity blocks, and although each block inherits the non-Gaussian, non-pivotal limit, averaging across the diverging number of asymptotically stationary blocks restores normality and solves 3the nuisance parameter problem. Second, unlike both local-to-unity and mildly explosive regimes, in which the OLS estimator of the intercept is inconsistent, the mildly stationary model admits feasible inference: the OLS estimator is consistent and jointly asymptot-ically normal, valid inference can be conducted without prior knowledge of kn, and a randomly weighted bootstrap is asymptotically valid. Third, it generates more plausible dynamics than the mildly integrated AR(1) models with intercept, as the affine structure preserves nonnegativity and supports richer stochastic variation after rescaling. Fourth, in-terestingly, this framework can also generate bubble-like paths, without producing a glob-ally explosive pattern associated with the mildly explosive regime, a pattern not suitable for several types of data, such as interest rates. The paper is organized as follows. Section 2 introduces the affine process within the unit root framework. Section 3 shows that the local-to-unity affine model converges to a CIR diffusion and inherits the nuisance-parameter problem. Section 4 studies the properties of mildly integrated affine processes, and Section 5 focuses on inference of such processes. Section 6 presents simulation results. Section 7 proposes applications to three economic datasets. Section 8 concludes. All proofs are gathered in Appendix A. We also include a short benchmark comparison with the INAR(1) analysis of Peng et al. (2024) using their crime data in Appendix B. 
+
+# 2 The setting 
+
+In this section, we briefly review the class of Markov affine processes and introduce the local-to-unity and mildly integrated assumptions used throughout the paper. 
+
+## 2.1 Affine processes 
+
+Let (Xt ) be a Markov chain taking values in the nonnegative integers, the nonnegative reals, or the positive reals. Its conditional distribution is fully characterized by the con-ditional Laplace transform (LT), and (Xt ) is said to be affine when this conditional LT is 4exponential-affine in the conditioning variable: 
+
+E[e−uX t | Xt−1] = e−a(u)Xt−1−b(u), ∀u ≥ 0, (1) where e−a(u) and e−b(u) are LT’s of probability distributions such that the conditional LT is well defined. More precisely, • if (Xt ) is count-valued, then e−a(u) and e−b(u) are the LT of count distributions, and equation (1) implies the following stochastic representation: 
+
+Xt =
+
+> Xt−1
+
+# ∑
+
+> k=1
+
+Yk,t + εt (2) where the sequences (Yk,t )k,t≥1 and (εt )t≥1 are mutually independent i.i.d. sequences with LT E[e−uY k,t ] = e−a(u) and E[e−uεt ] = e−b(u), respectively (Lu, 2021). • if (Xt ) is positive (resp. nonnegative-valued), then the LT e−a(u) must be infinitely divisible in order for (1) to be well-defined for all values of Xt−1, whereas e−b(u)
+
+may be the LT of any positive (resp. nonnegative) variable. Throughout the paper, we impose the following regularity condition: 
+
+Assumption 1. The first two derivatives of the LTs e −a(u) and e −b(u) exist and are finite at u = 0.
+
+This assumption ensures that the associated conditional distributions have finite means and variances. Indeed, by successive differentiation of eq.(1) at u = 0, we get: 
+
+E[Xt | Xt−1] = a′(0)Xt−1 + b′(0), (3) 
+
+V[Xt | Xt−1] = −a′′ (0)Xt−1 − b′′ (0). (4) 
+
+## 2.2 Unit root affine processes 
+
+So far, the affine process has been assumed to be time-homogeneous. To accommodate the behavior near the unit root, we now allow functions a and b to depend on the sample 5size n as follows: 
+
+E[Xt | Xt−1] = αnXt−1 + μn, t = 1, . . . , n, (5) 
+
+V[Xt | Xt−1] = βnXt−1 + δn, t = 1, . . . , n, (6) where the coefficients αn, μn, βn, δn are positive and satisfy the following: 
+
+Assumption 2. The sequences (βn), (μn), and (δn) converge, as n increases to infinity, to positive constants σ 2, μ, and δ , respectively. 
+
+We consider both the local-to-unity and mildly integrated regimes for αn:
+
+Assumption 3 (Local-to-unity, or nearly unstable case) .
+
+αn = 1 + γn
+
+n , (7) 
+
+where γn converges to a real constant γ. If γ < 0, the process (Xt ) is locally stationary, whereas if γ > 0, it is locally explosive. 
+
+Alternatively, αn may follow a mildly integrated specification, in which Assumption 2 is maintained, but Assumption 3 is replaced by the following: 
+
+Assumption 4 (Mildly integrated case) .
+
+αn = 1 + γ
+
+kn
+
+, (8) 
+
+where the constant γ̸ = 0, and the sequence k n is positive and diverges to infinity at a rate slower than n. That is, kn → ∞, kn
+
+n → 0. (9) 
+
+The process is mildly stationary when γ < 0, and mildly explosive when γ > 0.
+
+## 2.3 Examples 
+
+We now present three canonical examples. 6Example 1 (INARCH process, or Poisson autoregression) . If the conditional distribution of X t given X t−1 is Poisson, Xt | Xt−1 ∼ Pois (αnXt−1 + μ), t = 1, 2, . . . , n, (10) 
+
+then a n(u) = αn(1 − e−u) and b (u) = μ(1 − e−u). Equations (5) -(6) are satisfied with 
+
+βn = αn → 1, so that σ 2 = 1, and δ = μ.
+
+Example 2 (ARG and NBAR processes) . The count-valued negative binomial autoregres-sive (NBAR) process (Gouriéroux and Lu, 2019) and the positive-valued autoregressive gamma (ARG) process (Pitt and Walker, 2005; Gouriéroux and Jasiak, 2006) are both based on the Poisson-gamma conjugacy and can alternately be defined using the follow-ing Markov chain: 
+
+• given X t , count variable Z t follows a Poisson distribution with parameter θnXt ,
+
+• given Z t , positive variable X t+1 follows a gamma distribution with shape parameter 
+
+κ + Zt and scale parameter c, where parameters c, θn, and κ are positive. In this construction, the process (Xt ) is an ARG process and satisfies (Gouriéroux and Lu, 2019, eq.(2.4)): 
+
+E e−uX t |Xt−1
+
+ = 1
+
+(1 + cu )κ e− θncu   
+
+> 1+cu Xt−1
+
+, ∀u > 0,
+
+and 
+
+E[Xt |Xt−1] = αnXt−1 + cκ,
+
+V[Xt |Xt−1] = 2αncX t−1 + c2κ,
+
+where αn = θnc. Thus, (Xt ) satisfies (5) -(6) with σ 2 = 2c, μ = cκ, and δ = c2κ. The conditional distribution of X t given X t−1 is noncentral gamma, and is therefore strictly positive. 
+
+7On the other hand, the process (Zt ) is an NBAR process, with conditional LT (Gouriéroux and Lu, 2019, eq.(2.3)): 
+
+E e−uZ t |Zt−1
+
+ = 1
+
+[1 + αn(1 − e−u)] κ+Zt−1 , ∀u > 0,
+
+and 
+
+E[Zt+1|Zt ] = αn(Zt + κ),
+
+V[Zt+1|Zt ] = ( 1 + αn)( αnZt + αnκ).
+
+As αn → 1, βn → 2, so σ 2 = 2. The conditional distribution of Z t given Z t−1 is negative binomial. 
+
+Example 3 (ARG0 process) . Over the past two decades, short-term interest rates in sev-eral economies (notably Japan, the Eurozone, and the US) have spent extended periods at or near the zero lower bound. To accommodate the resulting nonzero probability that the rate attains (or approaches) this bound, Monfort et al. (2017) introduce the ARG0 process as a variant of the standard ARG model. Given X t−1, variable Z t follows a Poisson distri-bution with parameter aX t−1 + b, and conditional on Z t , X t follows a gamma distribution with shape parameter Z t and scale parameter θ . By convention, X t = 0 when Z t = 0. The resulting conditional distribution of X t given X t−1 is a special case of the Tweedie family. We have: 
+
+E[Xt | Xt−1] = θ (aX t−1 + b),
+
+V[Xt | Xt−1] = 2θ 2(aX t−1 + b).
+
+If θ remains constant while a = an varies with n such that a nθ converges to 1, then σ 2 =
+
+2θ .
+
+82.4 Connection with other near-unit-root frameworks 
+
+Affine models outside our framework. The affine framework offers a natural extension of the existing unit root literature: the two classical models for which a unit root theory is well-established both belong to the affine family. However, neither satisfies Assumption 2. More precisely: • the linear AR(1) model with intercept Xt = αnXt−1 + μ + εt , with i.i.d. innovations 
+
+εt , is affine with a(u) given by a(u) = uαn, and b(u) = μu − log E[e−uεt ]. Its limit theory has recently been developed by Fei (2018); Liu and Peng (2019); Guo et al. (2019); Liu et al. (2025); Yu and Kejriwal (2025). In this case, βn = −a′′ (0) = 0. • the INAR(1) model is a special case of (2), obtained when (Yk,t ) is Bernoulli with parameter αn, in which case a(u) = − ln (αne−u +1−αn). Local-to-unity and mildly integrated INAR(1) models have been studied by Ispány et al. (2003) and Peng et al. (2024), respectively, and exhibit convergence rates similar to those of the linear AR(1) model. 2 The conditional variance is αn(1 − αn)Xt−1 + V[εt ], so βn = αn(1 −
+
+αn) → 0 as αn increases to 1. Because βn converges to zero in both models, the conditional variance is bounded in expectation: it is constant in the linear AR(1) model. In the INAR(1) model, since 
+
+E[Xt−1] = O( 11−αn ), it follows that αn(1 − αn)Xt−1 is bounded in expectation. By contrast, under Assumption 2, the conditional variance βnXt−1 + δn has an unbounded expectation. In this paper, we show that this “explosive” feature leads to fundamentally different asymp-totic properties for the near-unit-root affine processes considered here, compared with the linear AR(1) and INAR(1) models. 
+
+Non-affine nonlinear near-unit-root models. Other nonlinear near-unit-root models pursue similar goals through different mechanisms. The hybrid stochastic local unit root     
+
+> 2For example, in the local-to-unity case, both models have convergence rates of n3/2for ˆ αn, and n1/2for ˆμn.
+
+9with drift (STURWD) of Lieberman and Phillips (2020); Liu and Phillips (2023) 
+
+Yt =
+
+
+
+1 + γ
+
+n
+
+
+
+Yt−1 + μ + ut
+
+√nYt−1 + εt , (11) where (ut , εt ) is a stationary error sequence, has quadratic (rather than affine) conditional variance, observable (rather than latent) shocks, and does not naturally accommodate count-valued data. On the other hand, the limited autoregressive (Cavaliere, 2004) and dynamic Tobit (Bykhovskaya and Duffy, 2024) processes enforce nonnegativity by truncating a linear process at zero. It is well documented (Monfort et al., 2017) in the term structure literature that this ap-proach, also referred to as the shadow rate , can lead to reduced analytical tractability, for example, in pricing and risk prediction applications. 3
+
+## 2.5 Ordinary Least Squares estimator 
+
+For an affine process satisfying Assumptions 1, 2, 3 (or 4), we study the scaling limit of 
+
+(Xt ) and the asymptotic distribution of the estimators of αn and μn in (5). We mainly focus on the ordinary least squares (OLS) estimator, given by: 
+
+( ˆαn, ˆμn)′ := arg min 
+
+> (α,μ)′
+> n
+
+# ∑
+
+> t=1
+
+(Xt − αXt−1 − μ)2. (12) Two considerations motivate this choice. First, it facilitates comparison with the existing unit root literature. Second, its expression is considerably simpler than that of alternatives such as the (quasi-)maximum likelihood estimator. Weighted least squares and maximum likelihood are discussed in Section 5. Table 1 previews the main results of the next two sections. 
+
+> 3For instance, bond pricing formulas when the interest rate is the underlying process.
+
+10 Table 1: Summary of the three near-unit-root regimes and their inferential implications. The symbol ⇒ denotes weak convergence of stochastic processes. 
+
+Regime Scaling limit Rate of ˆ αn Rate of ˆ μn Identifiability/Estimability of γ
+
+Local-to-unity 
+
+αn = 1 + γ/n
+
+(X⌊ns ⌋/n) ⇒ (ϒs),a CIR process 
+
+n inconsistent Nuisance parameter Mildly stationary 
+
+αn = 1+γ/kn,
+
+γ < 0, 
+
+(X⌊kns⌋/kn) ⇒
+
+(ϒs), stationary in the long-run 
+
+√nk n
+
+pn/kn Non-identifiable; normalized to γ = −1Mildly explosive 
+
+αn = 1+γ/kn,
+
+γ > 0, 
+
+(X⌊kns⌋/kn) ⇒
+
+(ϒs), explosive in the long-run 
+
+knαn/2 
+
+> n
+
+inconsistent Non-identifiable; Normal-ized to 
+
+γ = 1
+
+# 3 The local-to-unity model 
+
+This section studies the local-to-unity regime. Throughout, we maintain Assumptions 1– 3 and impose the following additional moment condition, which is used to obtain the diffusion approximation and the subsequent limit theory for the OLS estimator. 
+
+Assumption 5 (Finite conditional moment of order p). There exists p > 2 such that 
+
+sup 
+
+> n
+
+E[Y pn ] < ∞, sup 
+
+> n
+
+E[η pn ] < ∞,
+
+where Y n and ηn denote random variables with LT’s E[e−uY n ] = e−an(u) and E[e−uηn ] = 
+
+e−bn(u), respectively. 
+
+11 3.1 Scaling limit 
+
+Theorem 1. Consider an affine model satisfying (5) -(6) with initial value X 0 = o(n), as well as Assumptions 1, 2, 3 and 5. Then the rescaled process (Ys := X⌊ns ⌋ 
+
+> n
+
+, s > 0) converges weakly to the CIR process (ϒs, s > 0) defined by 
+
+dϒs = ( μ + γϒs)ds + σ pϒsdBs, ϒ0 = 0, (13) 
+
+where (Bs) is a standard Brownian motion. 
+
+Theorem 1 shows that local-to-unity affine processes admit a continuous-time limit of CIR type, rather than the Ornstein–Uhlenbeck limit familiar from linear AR(1) models. This difference reflects the fact that the conditional variance grows proportionally with the current state. The limiting CIR process, which is itself an affine process in continuous time 4, is the benchmark model in the term structure of interest rates (Duffie et al., 2000). The intuition behind this convergence result is as follows. The conditional expectation of the rescaled process satisfies 
+
+E
+
+h
+
+Ys+ 1
+
+> n
+
+|Ys
+
+i
+
+= 1
+
+nE
+
+h
+
+X⌊n(s+ 1 
+
+> n)⌋
+
+|X⌊ns ⌋
+
+i
+
+= 1
+
+n(αnX⌊ns ⌋ + μn) = αnYs + μn
+
+n ,
+
+so that 
+
+E
+
+h
+
+Ys+ 1
+
+> n
+
+−Ys|Ys
+
+i
+
+= 1
+
+n(γYs + μn) = 1
+
+n(γYs + μ) + o(1/n).
+
+Similarly, the conditional variance is given by 
+
+V
+
+h
+
+Ys+ 1
+
+> n
+
+−Ys|Ys
+
+i
+
+= 1
+
+n
+
+
+
+βnYs + δn
+
+n
+
+
+
+= 1
+
+nσ 2Ys + o(1/n),
+
+hence the linear drift and volatility functions in (13). 
+
+Proof. See Appendix A.1. Finally, note that the diffusion process defined in (13) is well-defined (i.e., nonnegative)             
+
+> 4That is, its conditional LT Ee−uX t+h|Xt
+> is exponential-affine in Xtfor any t≥0 and h>0.
+
+12 for any positive time s, and not only for s ∈ [0, 1]. This diffusion may or may not reach 0 again after the starting time s = 0, depending on the relation between μ and σ 2, we have (Cox et al., 1985, p.391): • If 2 μ ≥ σ 2, then the process (ϒs) remains strictly positive almost surely. This is known as the Feller condition .• If 2 μ < σ 2, then zero will be revisited almost surely. This feature is particularly relevant in applications where the initial process (Xs) frequently takes small or zero values, such as the short-term risk-free interest rate. Because of the time and scale normalization, Theorem 1 can be interpreted as providing a macroscopic description of the process (Xt ). In contrast, Theorem 2 provides a high-frequency counterpart. 
+
+Theorem 2. For any affine process (Xt ) satisfying (5) -(6) , and given t, n, the conditional distribution of X t given X t−1 = x is approximately normal for large x: 
+
+Xt − E[Xt | Xt−1 = x]
+
+pV[Xt | Xt−1 = x] |Xt−1 = x
+
+!
+
+> w
+
+−→ N (0, 1) (14) 
+
+as x increases to infinity, where w
+
+−→ denotes weak convergence of a distribution. Proof. See Appendix A.2. Theorem 2 can also be interpreted through the lens of the central limit theorem (CLT). For expository purposes, consider the case where the functions a and b satisfy a = b and 
+
+x is an integer. In this setting, E e−uX t+1 |Xt = x = e−(x+1)a(u), which implies that Xt+1,conditional on Xt = x, can be represented as the convolution of (x + 1) i.i.d. random variables with LT e−a(u). Therefore, the normalized quantity in (14) corresponds directly to the classical CLT. 13 3.2 Large sample theory for the OLS estimator 
+
+The diffusion limit in Theorem 1 yields the following large-sample distribution for the OLS estimator. 
+
+Theorem 3. Consider Model (5) -(6) , with initial condition X 0 = o(n), and suppose As-sumptions 1, 2, 3 and 5 hold. Then, as n increases to infinity, the joint distribution of "
+
+n( ˆαn − αn)
+
+ˆμn − μn
+
+#
+
+converges weakly: 
+
+"
+
+n( ˆαn − αn)
+
+ˆμn − μn
+
+#
+
+> w
+
+−→ 
+
+"R 10 ϒ2 
+
+> s
+
+ds R 10 ϒsds  
+
+> R10
+
+ϒsds 1
+
+#−1 "
+
+σ R 10 ϒ3/2 
+
+> s
+
+dBs
+
+σ R 10 ϒ1/2 
+
+> s
+
+dBs
+
+#
+
+. (15) Note that if the process (Xt ) starts from X0 = cn instead, the result still holds, except that the limiting diffusion process in (13) starts from ϒ0 = c.
+
+Proof. See Appendix A.3. This rate is slower than in the local-to-unity INAR(1) (Ispány et al., 2003) and linear AR(1) models with intercept (Fei, 2018), where the slope and intercept estimators typically converge at rates n3/2 and n1/2, respectively. The difference is due to the state-dependent affine variance: when Xt−1 is of order n, the conditional innovation variance is also of order n, reducing the effective information about the conditional mean parameters. Theorem 3 also shows that local-to-unity affine models inherit the main inferential draw-back of local-to-unity linear AR(1) models. Indeed, the natural estimator of parameter γ is ˆγn = −n(1 − ˆα), which is inconsistent, since ˆ αn is only n-consistent. Moreover, the inter-cept estimator ˆ μn is also inconsistent. Because the asymptotic distribution of ˆ αn depends on both γ and μ, the asymptotic distribution derived in Theorem 3 is not directly usable for inference. These limitations motivate the alternative, mildly integrated framework. 14 4 Probabilistic properties under mild integration 
+
+This section studies the probabilistic implications of the mildly integrated specification in Assumption 4. The key difference from the local-to-unity framework is that the relevant time horizon is n/kn, which diverges. As a result, the long-run behavior of the limiting CIR diffusion determines the large-sample properties of the triangular array. First, note that the parameterization in (8) identifies the sign of γ, but not its magnitude. Indeed, replacing (γ, kn) by (cγ, ck n), for any c > 0, leaves αn unchanged. We therefore impose the following normalization. 
+
+Proposition 1. Under Assumption 4, without loss of generality, we may set γ = 1 if γ > 0
+
+and γ = −1 if γ < 0.
+
+The values 1 and −1 are referred to as pseudo-true values (Phillips, 2023). This normaliza-tion serves as an identification condition and will be maintained throughout the remainder of the paper. Accordingly, we adopt the following convention: 
+
+γ =
+
+(
+
+1, if γ > 0,
+
+−1, if γ < 0. 
+
+## 4.1 Scaling properties 
+
+We have the following analog of Theorem 1: 
+
+Proposition 2. Under Assumptions 1, 2, 4 and 5, as well as the initial value condition X0 = o(kn), the rescaled process (Ys, s > 0) = 
+
+X⌊kns ⌋ 
+
+> kn
+
+, s > 0
+
+
+
+converges weakly in D ([ 0, ∞[) 
+
+to the diffusion process defined in (13) , with parameter γ = 1 if γ > 0, and γ = −1 if γ < 0.
+
+In other words, a mildly stationary process (Xt ) behaves like a local-to-unity affine pro-cess, up to both a time and scale transformation. This result is a direct consequence of Theorem 1. Indeed, restricting attention to the first ⌊kn⌋ observations of (Xt ) yields a local-to-unity system, to which Theorem 1 applies. 5 Therefore, the entire sample Xt ,t = 1, . . . , n
+
+> 5This interpretation of the mildly integrated model as a sequence of local-to-unity blocks originates from
+
+15 can be viewed as a local-to-unity model with autoregressive coefficient 1 ± 1 
+
+> kn
+
+, but with n
+
+observations instead of kn observations. By Proposition 2, the analysis of Xt ,t = 1, . . . , n, now involves the behavior of the diffusion (13) over the interval [0, n/kn], whose upper bound increases to infinity as n increases. This contrasts with the previous local-to-unity case, for which the rescaled process only depends on the trajectory of the diffusion on [0, 1]. Therefore, we study the long-run behavior (i.e., as s ↑ ∞) of this diffusion. We have the following: 
+
+Proposition 3 (Göing-Jaeschke and Yor (2003)) . i) If γ < 0, that is, if the process (Xt )
+
+is mildly stationary, then the CIR process (ϒs) defined in eq. (13) is asymptotically stationary and nonnegative, with a gamma invariant distribution. ii ) If γ > 0 and is normalized to 1, then (ϒs) is asymptotically explosive at an exponential rate. More precisely, ϒs 
+
+> eγs
+
+converges almost surely to a random variable Z that is gamma distributed with shape parameter 2μσ 2 and scale parameter σ 2 
+
+> 2
+
+. In particular, it has mean μ and variance μσ 2 
+
+> 2
+
+.
+
+## 4.2 Comparison with mildly integrated AR(1) 
+
+Let us now compare the mildly stationary affine model with the mildly stationary AR(1) process with intercept studied in (Fei, 2018): 
+
+Xt = αnXt−1 + μ + εt , t = 1, . . . , n, X0 = 0, (16) where (εt ) is i.i.d. with mean zero and variance σ 2, and αn = 1 − 1 
+
+> kn
+
+, with μ̸ = 0. By iteration (see Fei (2018), Equation (5)), we obtain 
+
+Xt = μkn(1 − αtn) + 
+
+> t
+
+# ∑
+
+> j=1
+
+αt− jn ε j.
+
+The first term is deterministic, while the second term X0,t := ∑tj=1 αt− jn ε j is a mildly stationary AR(1) process without drift in the sense of Phillips and Magdalinos (2007). 
+
+> Phillips et al. (2001, 2010).
+
+16 Equivalently, by the time-change argument following Proposition 2, it can be viewed as a local-to-unity linear AR(1) model with autoregressive coefficient 1 − 1 
+
+> kn
+
+, observed over a horizon of order n. By Lemma 1 of Phillips (1987), we obtain: 
+
+Proposition 4. In model (16) , under the mildly stationary assumption αn = 1 − 1 
+
+> kn
+
+, the rescaled process 
+
+X⌊kns ⌋ 
+
+> kn
+
+, s ≥ 0
+
+
+
+converges weakly to the deterministic process μ(1 − e−s)
+
+as n → ∞.
+
+The deterministic limit converges rapidly to μ as s increases. This feature contrasts with its affine counterpart, whose weak limit is the diffusion process (ϒs)s and thus allows for non-trivial variation. Indeed, even though both models share the same mean dynamics 
+
+(E[Xt ]) t , their asymptotic behaviors differ substantially. For the affine model, Proposi-tions 2 and 3 show that, for both mildly stationary and mildly explosive affine processes, the limiting distribution of 
+
+X⌊kns ⌋
+
+> kn
+
+
+
+is a nondegenerate gamma random variable. In par-ticular, compared to our affine model, the mildly stationary AR(1) model with intercept exhibits substantially lower variability beyond the first few observations. As an illustration, Figure 1 displays sample paths of a mildly stationary INARCH process and a mildly integrated AR(1) process with intercept. For both processes, we set kn =
+
+100 , n/kn = 100, μ = 1, σ = 1, and γ = −1. The mildly integrated AR(1) process quickly rises from 0 toward its long-run mean and subsequently fluctuates only mildly around it. In contrast, the mildly stationary INARCH process exhibits substantially greater variability and explores a much wider range of values. 17 Figure 1: Sample paths: mildly stationary INARCH process (red dashed line) and mildly stationary AR(1) process with intercept (black solid line). The same distinction appears on the mildly explosive side. In the AR(1) model with in-tercept, the first-order explosive limit is deterministic, whereas in the affine model the corresponding limit is random: 
+
+Proposition 5 (Fei (2018), Theorem 2.6 a)) . In model (16) , and under the mildly explosive assumption αn = 1 + 1 
+
+> kn
+
+, the rescaled process X⌊kns ⌋ 
+
+> knes
+
+converges weakly to the deterministic process μ(1 − e−s) as n increases to infinity. 
+
+On the other hand, Propositions 2 and 3 lead to the following property: 
+
+Proposition 6. In the mildly explosive affine process, X⌊kns ⌋ 
+
+> knes
+
+converges, as n increases to infinity, to the process ϒs/es.
+
+Note that this latter process converges, as s increases to infinity, to the random variable Z
+
+with mean μ.To summarize, affine models retain state-dependent stochastic variation after the natural 18 normalization, whereas the linear AR(1) model with intercept is essentially deterministic upon normalization. 
+
+## 4.3 Local bubble-like episodes under mild stationarity 
+
+The mildly explosive AR(1) model is widely used in the empirical literature on (log) asset-price bubbles (Phillips and Yu, 2011; Phillips et al., 2015a,b; Yu and Kejriwal, 2025; Ke-jriwal et al., 2025). However, this modeling framework has limitations for the type of data that we are interested in. In particular, for count data, the log transform might not be well defined; for some positive processes such as interest rates, an explosion might also seem implausible. We argue that for nonnegative affine processes, bubble-like patterns can also arise in the mildly stationary case, that is, even without a locally explosive slope. Rather, when Xt−1
+
+is large, because the conditional variance V[Xt |Xt−1] = βnXt−1 + δn is also large, the next value Xt has a significant probability of exceeding Xt−1. At the same time, since αn <
+
+1 in the mildly stationary case, the level of Xt will eventually decrease. This leads to bubble-like episodes with rise, peak and decline. This is exactly what we observe in Figure 1, in which we see roughly 10 bubbles. A simple simulation shows that for the mildly stationary affine process simulated in Figure 1, if we split the full sample into 10 blocks of 1000 = 10 kn observations each, then the probability that at least one block has a block maximum above 3 times the marginal mean μn 
+
+> 1−αn
+
+is 99.8%. Yet, for blocks whose block maximum exceeds this threshold, 99.6% still have a local OLS estimate ˆ αblock ≤ 1. For the mildly stationary linear AR(1) comparator in Figure 1, which has the same αn but constant innovation variance, the probability of observing at least one block maximum above the same threshold is below 0 .1%. We are not claiming that mildly stationary affine processes should replace mildly explosive linear AR(1) models in applications to asset-price bubbles. The point is instead that the two frameworks are suited to different empirical objects. Mildly explosive models are natural when sustained explosive growth is economically or physically plausible, as in some asset-price applications. By contrast, many nonnegative series considered in this 19 paper, such as short-term interest rates and disaster frequencies, cannot plausibly follow a globally explosive path over long horizons. For such series, the mildly stationary affine model provides a way to generate bubble-like rise–peak–decline episodes while preserving global mean reversion and the relevant state-space constraint. 
+
+# 5 Inference under mild integration 
+
+## 5.1 Large sample theory for the OLS estimator 
+
+Let us now consider the OLS estimators of αn and μn in the mildly integrated case. To establish the analog of Theorem 3, we need to strengthen Assumption 5. 
+
+Assumption 6. Assumption 5 holds with some exponent p > 3.
+
+The stronger moment requirement is needed because, in the mildly stationary regime, the limit theory involves the diffusion on the unbounded time domain [0, ∞) rather than on a compact interval, and uniform-in-time moment control becomes necessary. This leads to the following analog of Theorem 3: 
+
+Theorem 4. Under Assumptions 1, 2, 4, 6 and the initial condition X 0 = o(kn), the follow-ing holds: a) If γ < 0 (hence γ = −1), then the OLS estimator is consistent and asymptotically nor-mal: " √nk n( ˆαn − αn)
+
+pn/kn( ˆμn − μn)
+
+#
+
+> w
+
+−→ N (0, Ω−1ΣΩ −1) (17) 
+
+where matrices Ω and Σ are given by: 
+
+Ω =
+
+"
+
+E[ϒ2
+
+> ∞
+
+] E[ϒ∞]
+
+E[ϒ∞] 1
+
+#
+
+, Σ = σ 2
+
+"
+
+E[ϒ3
+
+> ∞
+
+] E[ϒ2
+
+> ∞
+
+]
+
+E[ϒ2
+
+> ∞
+
+] E[ϒ∞]
+
+#
+
+, (18) 
+
+where E[ϒ∞], E[ϒ2
+
+> ∞
+
+] and E[ϒ3
+
+> ∞
+
+] are the first three moments of the invariant distribution of the diffusion process defined in (13) with γ = −1. This invariant distribution is 
+
+20 gamma with shape parameter 2μσ 2 and rate parameter 2  
+
+> σ2
+
+. Its moments are therefore given by: 
+
+E[ϒ1
+
+> ∞
+
+] = μ, E[ϒ2
+
+> ∞
+
+] = μ
+
+
+
+μ + σ 2
+
+2
+
+
+
+, E[ϒ3
+
+> ∞
+
+] = μ
+
+
+
+μ + σ 2
+
+2
+
+
+
+(μ + σ 2).
+
+In particular, we have: √nk n( ˆαn − αn) w
+
+−→ N
+
+
+
+0, 2
+
+σ 2 
+
+> μ
+
++ 1
+
+ 
+
+.
+
+b) If γ > 0 (hence γ = 1), then ˆαn admits the following non-Gaussian limit: knαn/2 
+
+> n
+
+( ˆαn − αn) w
+
+−→ 2
+
+√3σ Z−1/2Y,
+
+where Y ∼ N (0, 1), Z is the limiting gamma variable in Proposition 3, and Y and Z are independent. By contrast, ˆμn is inconsistent, and V( ˆμn − μn) explodes as n increases to infinity. 
+
+Note that the distribution of Z−1/2Y belongs to the class of normal-inverse-Gaussian mix-tures (Barndorff-Nielsen, 1997). 
+
+Proof. See Appendix A.4 for Part a) and Appendix A.5 for Part b).Theorem 4(a) provides one of the main motivations for the mildly stationary framework. In contrast to the local-to-unity case, both OLS estimators are consistent and jointly asymp-totically normal. As expected, the convergence rates (√nk n, pn/kn) for the two parameters bridge the 
+
+(√n, √n) and (n, 1) rates associated with the stationary and local-to-unity regimes, re-spectively. The former arises as a limiting case when kn diverges slowly, while the latter corresponds to the limiting case when kn grows at a rate close to that of n.
+
+## 5.2 The block local-to-unity interpretation 
+
+To relate the convergence rates obtained in Theorem 4 a) to those in Theorem 3, consider partitioning the sample Xt ,t = 1, . . . , n into non-overlapping 
+
+j nkn
+
+k
+
+blocks, each containing 21 approximately kn observations. Each block then behaves as a local-to-unity model, but with different initial values. 6 Applying Theorem 3 to each block produces 
+
+j nkn
+
+k
+
+estima-tors of (αn, μn). Within each block, the estimator of αn converges at rate kn, while the estimator of μn is inconsistent. Assuming that the CLT can be applied — justified by the stationarity of the process for fixed kn — the sample average of these 
+
+j nkn
+
+k
+
+estimators converges at rate kn ×
+
+rj nkn
+
+k
+
+≈ √nk n (respectively, pn/kn) for the aggregated estimator of αn (respectively, μ). Part a) of Theorem 4 shows that the OLS estimator achieves the same convergence rates as this aggregated estimator. Moreover, although each block esti-mator has a non-Gaussian limiting distribution (by Theorem 3), aggregation across blocks restores Gaussianity. 
+
+## 5.3 Comparison with mildly integrated AR(1) model 
+
+Comparison with mildly stationary AR(1) model. Liu et al. (2025) 7 establish that: 
+
+Proposition 7. In model (16) , suppose that there exist constants h 1, h2 ∈ [0, 1] such that 
+
+lim 
+
+> n→∞
+
+√n
+
+max (√n, kn) = h1, lim 
+
+> n→∞
+
+kn
+
+max (√n, kn) = h2. (19) 
+
+Then 
+
+"√kn max (√n, kn)( ˆαn − αn) 
+
+> max (√n,kn)√kn
+
+( ˆμn − μn)
+
+#
+
+converges weakly to a degenerate bivariate Gaussian vector. 
+
+When kn = √n, the proposition yields a rate √nk n for ˆ αn, the same rate that Phillips and Magdalinos (2007) obtain for the model without intercept. This stands in contrast to the local-to-unity AR(1) model, where introducing a nonzero intercept improves the conver-gence rate from n (Phillips, 1987; Yu and Kejriwal, 2025) to n3/2, see, e.g. (Hamilton, 1994, p. 497) for the exact unit root case and (Liu et al., 2025, Theorem 3) for the local-to-unity case. The block interpretation clarifies this apparent paradox. The OLS estimator computed from the first block of ⌊kn⌋ observations is a local-to-unity AR(1) estimator with  
+
+> 6For the first block, the initial value is 0, while for subsequent blocks, it is of order kn.
+> 7See also (Peng et al., 2024, Theorem 4) for a similar result for a mildly stationary INAR(1) model.
+
+22 intercept and is therefore k3/2 
+
+> n
+
+-consistent. When kn grows faster than √n, k3/2 
+
+> n
+
+coincides with the full-sample rate √kn max (√n, kn) of Proposition 7. That is, the first block alone is essentially as informative as the entire sample. Why are subsequent blocks effectively less informative? For the ith block, whose initial value is X(i−1)kn , we can rewrite the model as 
+
+Xt − X(i−1)kn =
+
+
+
+1 − 1
+
+kn
+
+
+
+(Xt−1 − X(i−1)kn ) + μ − X(i−1)kn
+
+kn
+
++ εt , (i − 1)kn < t ≤ ik n.
+
+Thus, the process (Xt −X(i−1)kn ) is a local-to-unity AR(1) process with initial value 0 and a modified intercept μi = μ − X(i−1)kn  
+
+> kn
+
+. By Proposition 4, as the index of the block i increases from 1 to n/kn, the modified intercept μi converges to 0. Consequently, for large i, the 
+
+ith block behaves like a local-to-unity model without intercept, whose convergence rate is 
+
+kn rather than k3/2 
+
+> n
+
+(Hamilton, 1994). Later blocks therefore contribute disproportionately little to the full-sample estimator. By contrast, for the mildly stationary affine process, the scaling limit is asymptotically stationary, so successive blocks have qualitatively similar trajectories, and each contributes a comparable amount of information. 
+
+Comparison with mildly explosive AR(1) processes. Part b) of Theorem 4 shows that, in contrast to Theorem 3, the asymptotic distribution of the OLS estimator depends on the sign of γ, since the long-run behavior of the CIR process depends on this sign. The diver-gence of ˆ μn for γ = 1 can be read off the first-order condition ˆ μn = 1 
+
+> n
+
+∑nt=1(Xt − ˆαnXt−1).Here, ˆ αn − αn is of order 
+
+
+
+knαn/2
+
+> n
+
+−1
+
+, while ∑nt=1 Xt−1 is of order k2
+
+> n
+
+αnn . Consequently, the term 1 
+
+> n
+
+( ˆαn − αn) ∑nt=1 Xt−1 is of order kn 
+
+> n
+
+αn/2 
+
+> n
+
+, which in turn causes ˆ μn to diverge. Finally, note that these convergence rates differ markedly from those obtained for the mildly ex-plosive AR(1) model with intercept. Indeed, Fei (2018) shows that, in the mildly explosive case, αn is αnn k3/2 
+
+> n
+
+-consistent. Its slightly faster convergence rate can be explained by the fact that, in the affine model, the conditional variance grows with the state and is therefore itself explosive. 23 5.4 Estimation of the variance parameter 
+
+In the mildly stationary case, we may assume without loss of generality that γ = −1. Moreover, μ can be consistently estimated by ˆ μn since 
+
+μ − ˆμn = ( μ − μn) + ( μn − ˆμn),
+
+where the first term converges to zero by Assumption 2, and the second converges to zero in distribution. By Slutsky’s lemma, it follows that ˆ μnp
+
+→ μ.However, for inference purposes, the limiting distribution in Theorem 4 also depends on the parameter σ 2. Two cases arise. (i) the parametric specification of the affine pro-cess pins down σ 2 a priori. This is the case for INARCH and NBAR models, for which 
+
+σ 2 = 1 and σ 2 = 2, respectively. (ii ) More generally, σ 2 is left unspecified — as in the ARG model — and must be estimated. Since the martingale difference sequence Wt has conditional variance βnXt−1 + δn, which is dominated by βnXt−1, a natural estimator of 
+
+σ 2 = lim n→∞ βn is: ˆσ 2 = ∑nt=1 bW 2
+
+> t
+
+∑nt=1 Xt−1
+
+, (20) where bWt = Xt − ˆαnXt−1 − ˆμn denotes the empirical residual. We then have the following result: 
+
+Proposition 8. As n increases to infinity, the estimator ˆσ 2 converges in probability to its true value σ 2.
+
+Note that, by the same argument, this estimator is also consistent in the local-to-unity case. The convergence rate of the parameter σ 2 is more delicate and would require control of conditional moments of order higher than two. We leave it to future research. Also, Proposition 8 does not provide the convergence rate of ˆ σ 2. Finding such a rate would require additional assumptions, in particular the convergence rate of βn → σ 2, as well as possibly higher-order conditional moment conditions. Since the rate of ˆ σ 2 is not necessary for the asymptotic distribution of (bαn, bμn), such an analysis is omitted. 24 5.5 Alternative scaling without kn in the mildly stationary case 
+
+In practice, the functional form of kn is rarely known. However, αn = 1 − 1 
+
+> kn
+
+gives kn = 
+
+> 11−αn
+
+. Can we replace αn by its consistent estimate ˆ αn to obtain ˆ kn = 11− ˆαn , and substitute it into Theorem 4 to get a large sample theory that no longer depends on the unknown kn?The following theorem confirms this intuition. 
+
+Theorem 5. Under Assumptions 1, 2, 4 with γ < 0 and Assumption 6, as n increases to infinity, q n  
+
+> 1−ˆαn
+
+( ˆαn − αn)
+
+pn(1 − ˆαn)( ˆμn − μn)
+
+ w
+
+−→ N (0, Ω−1ΣΩ −1). (21) 
+
+Proof. See Appendix A.6. This result shows that, under the mildly stationary regime ( γ < 0), we can obtain an asymp-totic joint distribution for the true parameters (αn, μn), without specifying the functional form of k n. The normalizing factors in (21) are observable, and the limiting covariance matrix on the right side depends only on μ and σ 2, which is consistently estimated by ˆ μn.This avoids the nuisance parameter problem in γ that hampers inference in the local-to-unity framework of Section 3. Note that Theorem 5 does not extend to the local-to-unity case. Indeed, this theorem is based on the fact that ˆ kn/kn converges to 1 as n increases to infinity. This convergence holds in the mildly stationary case, but breaks down in the local-to-unity case, since in this case, n(1 − αn) = γ is constant by Assumption 3, while n(1 − ˆαn) has a nondegenerate random limit by Theorem 3. Furthermore, even if ˆ kn were consistent, Theorem 3 shows that the limiting distribution is non-Gaussian, so the normal approximation in Theorem 5 would still fail. 
+
+Remark 1 (Toward uniform feasible inference for αn). It is also possible to write a studen-tized version of Theorem 5. 25 More precisely, we define Zt−1 = ( Xt−1, 1)⊤, and ˆMn = 1
+
+n
+
+> n
+
+# ∑
+
+> t=1
+
+Zt−1Z⊤
+
+> t−1
+
+, ˆSn = 1
+
+n
+
+> n
+
+# ∑
+
+> t=1
+
+ˆVt Zt−1Z⊤
+
+> t−1
+
+,
+
+where ˆ Vt = ˆW 2 
+
+> t
+
+, with ˆ Wt the OLS residual. A feasible standard error for ˆ αn is then 
+
+cVar ( ˆαn) = 
+
+h1 
+
+> n
+
+ˆM−1 
+
+> n
+
+ˆSn ˆM−1
+
+> n
+
+i
+
+> 11
+
+,
+
+and we have: ( ˆαn − αn)/ cVar ( ˆαn)1/2 ⇒ N (0, 1).An advantage of such a result would be that in the fixed stationary regime αn = α < 1, one expects the studentized term ( ˆαn − αn)/ cVar ( ˆαn)1/2 to still have a standard normal limit, hence one might get a uniform inferential result in both the fixed stationary and the mildly stationary regimes, in a similar spirit to the uniform inference developed by Giraitis and Phillips (2006) for linear AR(1) models without intercept. We do not pursue the formal derivation of this result, however, since we are not interested in the fixed stationary case. Note also that the local-to-unity regime n(1 − αn) → γ < ∞ is excluded, since there the rescaled design converges to the random functional R 10 ϒ2 
+
+> s
+
+ds and ˆ αn has the non-Gaussian, nuisance-dependent limit of Theorem 3. 
+
+## 5.6 Bootstrap for mildly stationary processes 
+
+For INAR(1) processes, the literature (Chen et al., 2024; Peng et al., 2024) has also adopted the random-weighting bootstrap of Zhu (2016). Although the plug-in method proposed in Theorem 5 already provides a simple tool for inference, we show below that the same bootstrap method is also valid in our framework and can serve as an alternative to the plug-in approach. More precisely, we consider the following bootstrapped OLS estimators: 
+
+( ˆαbn , ˆμbn )′ := arg min 
+
+> α,μ
+> n
+
+# ∑
+
+> t=1
+
+δ bt (Xt −αXt−1 − μ)2 =
+
+"
+
+∑nt=1 δ bt X2 
+
+> t−1
+
+∑nt=1 δ bt Xt−1
+
+∑nt=1 δ bt Xt−1 ∑nt=1 δ bt
+
+#! −1 "
+
+∑nt=1 δ bt Xt−1Xt
+
+∑nt=1 δ bt Xt
+
+#
+
+.
+
+(22) 26 where b = 1, . . . , B, indexes bootstrap replications and (δ bt ), b,t varying, is an i.i.d. se-quence of positive random variables, independent of the process (Xt ), with unit mean and unit variance. We also assume that this sequence is not too heavy-tailed: 
+
+E|δ bt − 1|2+η < ∞
+
+for some η that is positive but close to zero. The following theorem establishes the validity of this bootstrap in the mildly stationary case. 
+
+Theorem 6. Under Assumptions 1, 2, 4 and 6 with γ = −1, conditionally on the data and in probability, " √nk n( ˆαbn − ˆαn)
+
+pn/kn( ˆμbn − ˆμn)
+
+#
+
+> w
+
+−→ N (0, Ω−1ΣΩ −1),
+
+where Ω and Σ are the matrices in Theorem 4. Proof. See Appendix A.7. As a comparison, in the local-to-unity case an analogous conditional CLT shows that, conditionally on the data, the rescaled and centered bootstrap estimator 
+
+"
+
+n( ˆαbn − ˆαn)
+
+ˆμbn − ˆμn
+
+#
+
+converges weakly, in probability, to the conditional law of: 
+
+"R 10 ϒ2 
+
+> s
+
+ds R 10 ϒsds  
+
+> R10
+
+ϒsds 1
+
+#−1 "
+
+σ R 10 ϒ3/2 
+
+> s
+
+d ˜ Bs
+
+σ R 10 ϒ1/2 
+
+> s
+
+d ˜ Bs
+
+#
+
+, (23) where ( ˜Bs) is a standard Brownian motion independent of (Bs). Conditional on the tra-jectory of (ϒs)s∈[0,1], the distribution in (23) is Gaussian, whereas the limit in Theorem 3 becomes deterministic. The reason is that in R 10 ϒ3/2 
+
+> s
+
+dBs, the integrator (Bs) and the inte-grand ϒ3/2 
+
+> s
+
+are correlated, whereas in (23) the bootstrap noise ( ˜Bs) is independent of ϒ3/2 
+
+> s
+
+.The two limits therefore differ, so the random-weighting bootstrap is invalid in the local-to-unity case. By contrast, Theorem 6 shows that the random-weighting bootstrap is valid 27 in the mildly stationary case. Consequently, bootstrap methods can be used to construct confidence intervals, even when the limiting distribution depends on additional parameters such as σ .Taken together, the results of Sections 3–5 show that the mildly stationary framework offers substantial advantages over the local-to-unity framework: consistent estimation of both parameters, joint asymptotic normality, feasible inference without knowledge of kn,as well as bootstrap validity. 
+
+## 5.7 Alternative estimators for mildly stationary processes 
+
+For many stationary time series models, maximum likelihood (ML) and weighted least squares (WLS) estimators are more efficient than OLS, but their properties are much less well understood in nonstationary settings. Let us now briefly discuss two alternative es-timators. Because γ remains a nuisance parameter in the local-to-unity framework, we restrict our attention to the mildly stationary model. 
+
+5.7.1 Weighted Least Squares (WLS) 
+
+This estimator, first introduced by Wei and Winnicki (1990) for exactly integrated affine count processes, solves the following: 
+
+( ˆˆαn, ˆˆμn) := arg min 
+
+> (α,μ)
+> n
+
+# ∑
+
+> t=1
+
+(Xt − αXt−1 − μ)2
+
+1 + Xt−1
+
+. (24) It follows that 
+
+" ˆˆαn − αn
+
+ˆˆμn − μn
+
+#
+
+=
+
+∑nt=1 
+
+> X2
+> t−1
+> Xt−1+1
+
+∑nt=1
+
+> Xt−1
+> Xt−1+1
+
+∑nt=1 
+
+> Xt−1
+> Xt−1+1
+
+∑nt=1 1
+
+> Xt−1+1
+
+ 
+
+> −1
+
+"
+
+∑nt=1 
+
+> WtXt−1
+> Xt−1+1
+
+∑nt=1 Wt
+
+> Xt−1+1
+
+#
+
+:= H−1 
+
+> n
+
+vn.
+
+By analyzing the asymptotic behavior of matrix Hn and vector vn, we obtain the following result. 28 Proposition 9. In the mildly stationary model ( γ = −1), if 2μσ 2 > 1, then 
+
+" √nk n( ˆˆαn − αn)
+
+pn/kn( ˆˆμn − μn)
+
+#
+
+> w
+
+−→ N
+
+0, σ 2
+
+"
+
+E[ϒ∞] 11 E[1/ϒ∞]
+
+#−1 ,
+
+where E[1/ϒ∞] = 
+
+
+
+μ − σ 2
+
+> 2
+
+−1
+
+is finite. In particular, √nk n( ˆˆαn − αn) w
+
+→ N (0, 2).
+
+Proof. See Appendix A.9. Thus, the WLS estimators of both αn and μn achieve the same convergence rates as their OLS counterparts. We now compare their asymptotic covariance matrices. By Theorem 4, the rescaled OLS estimator √nk n( ˆαn − αn) has asymptotic variance 2 
+
+σ 2 
+
+> μ
+
++ 1
+
+
+
+, while Proposition 9 shows that the corresponding WLS estimator √nk n( ˆˆαn − αn) has asymptotic variance equal to 2. Hence, WLS is asymptotically more efficient, with relative efficiency   
+
+> σ2
+> μ
+
++ 1, which is between 1 and 3 under the assumption 2μσ 2 > 1. The main drawback of the WLS estimator is that Proposition 9 requires 2 μ > σ 2, and its properties remain an open question when 2 μ ≤ σ 2. This issue also exists in affine count processes with an exact unit root (αn = 1, βn = σ 2): Wei and Winnicki (1990); Wei (1991) report that, when 2 μ ≤ σ 2, the convergence rate of the WLS estimator (24) is unknown. 
+
+5.7.2 (Quasi) Maximum Likelihood (QML) 
+
+The QML approach consists in using a simple, but potentially misspecified conditional distribution to estimate the parameters. Let Θ denote the vector of all model parameters, and define the log-quasi-likelihood function by 
+
+L(Θ) = 
+
+> n
+
+# ∑
+
+> t=1
+
+l(Xt | Xt−1, Θ),
+
+29 where l(Xt | Xt−1, Θ) is the log of the conditional pmf/pdf. Expanding the score around the true value Θ0, the QML estimator ˜ Θ satisfies the linear system 
+
+ ∂ 2L
+
+∂ Θ∂ Θ′
+
+
+
+( ˜Θ − Θ0) = − ∂ L
+
+∂ Θ. (25) The asymptotic properties of the QML estimator, therefore, depend on the functional form of the conditional distribution. Because we are mainly interested in (αn, μn, σ 2), the misspecified distribution should ide-ally not contain extra parameters. Let us now discuss the Gaussian and the Poisson QML. 
+
+Gaussian QMLE. The WLS in eq.(24) can be viewed as a simplified version of the Gaussian QMLE given by: 
+
+( ˆˆαn, ˆˆμn, ˆˆβn, ˆˆδn) := arg min   
+
+> (α,μ,β,δ)
+> n
+
+# ∑
+
+> t=1
+
+h(Xt − αXt−1 − μ)2
+
+δ + β Xt−1
+
++ ln (δ + β Xt−1)
+
+i
+
+.
+
+The downside of this raw Gaussian QMLE is that it has no closed form expression. This prompts Wei and Winnicki (1990) to replace (Xt −αXt−1−μ)2   
+
+> δ+βXt−1
+
+by (Xt −αXt−1−μ)2   
+
+> β+βXt−1
+
+, the two terms being asymptotically equivalent since Xt−1 is of order kn. Minimizing with respect to α
+
+and μ only leads to the WLS. 
+
+Poisson QMLE. In this case, the conditional log-quasi-likelihood depends only on two parameters αn and μn, and is given by: 
+
+l(Xt | Xt−1, Θ) = −(αnXt−1 + μn) + Xt ln (αnXt−1 + μn) − ln (Xt !).
+
+Then (25) implies 
+
+" ˜αn − αn
+
+˜μn − μn
+
+#
+
+=
+
+∑nt=1  
+
+> XtX2
+> t−1
+> (αnXt−1+μn)2
+
+∑nt=1 
+
+> XtXt−1
+> (αnXt−1+μn)2
+
+∑nt=1  
+
+> XtXt−1
+> (αnXt−1+μn)2
+
+∑nt=1 Xt
+
+> (αnXt−1+μn)2
+
+ 
+
+> −1
+
+"
+
+∑nt=1 
+
+> WtXt−1
+> αnXt−1+μn
+
+∑nt=1 Wt
+
+> αnXt−1+μn
+
+#
+
+30 Since 1 
+
+> αnXt−1+μn
+
+≈ 11+Xt−1 , it follows that the QMLE behaves similarly to the WLS esti-mator under the condition 2 μ > σ 2. That is, in the mildly stationary case, √nk n( ˜αn −
+
+αn), pn/kn( ˜μn − μn)′ converges to the same weak limit as in Proposition 9. In the mildly stationary INARCH regime, the QMLE therefore provides no efficiency gain over the WLS estimator. This is consistent with Theorem 2, which says that the conditional Poisson distribution of Xt given Xt−1 is approximately Gaussian for large Xt−1. Since the WLS estimator (24) effectively acts as a Gaussian QMLE, both have the same asymptotic distribution. 
+
+# 6 Simulations 
+
+## 6.1 Non-normality in the local-to-unity case 
+
+We begin by considering two local-to-unity scenarios αn = 1 ± γ 
+
+> n
+
+, with γ and μn both set to 1. We use the INARCH model (with σ 2 = 1) to simulate M = 50 ,000 independent trajectories of (Xt ), each of length n = 3,000, and compute the OLS estimators of αn and μn.Figure 2 plots the empirical histogram of the scaled and centered estimators (n( ˆαn − αn), ˆμn − μn).For a given trajectory of (Xt ), we also plot the empirical histogram of n( ˆαbn − ˆαn), b =
+
+1, . . . , B = 50 ,000. We see that while the bootstrap distribution is close to normality, the distributions of ˆ αn and ˆ μn are clearly skewed and non-Gaussian, in line with Theorem 3. 31 −15 −10 −5 0 5                
+
+> OLS for alpha alpha = 1 − 1/n
+> 024
+> OLS for mu
+> −8 −4 048
+> Bootstrap (Conditional) for alpha
+> −15 −10 −5 05
+> OLS for alpha alpha = 1 + 1/n
+> 024
+> OLS for mu
+> −8 −4 048
+> Bootstrap (Conditional) for alpha
+
+Figure 2: Empirical distributions of (n( ˆαn − αn)) (left panel) and of ( ˆμn − μn) (mid panel), as well as the bootstrap distribution of n( ˆαbn − ˆαn) for a given trajectory of (Xt ) (right panel). The upper panel corresponds to αn = 1 − 1
+
+n , and the lower panel corresponds to 
+
+αn = 1 + 1
+
+n .We also report below the mean and variance of the sample, and compare them with their theoretical counterparts, obtained by tabulating the limiting distribution in Theorem 3 us-ing 100 ,000 simulated paths of the CIR process and 5 ,000 time steps between 0 and 1. Table 2 shows that the sample and theoretical moments match very well, and as expected, ˆμn is inconsistent. Note that n( ˆαn − αn) and n(1 − ˆαn) share the same sample variance because they only differ by a constant, and this variance is very large (equal to 17.7 in the case where αn = 1−1/n), confirming that γ cannot be consistently estimated by n(1− ˆαn).32 Case n( ˆαn − αn) ˆμn − μn                               
+
+> Sample mean Asymp. mean Sample var. Asymp. var. Sample mean Asymp. mean Sample var. Asymp. var.
+> αn=1−1/n-3.8536 -3.8697 17.7075 18.0376 1.0720 1.0722 1.0037 1.0196
+> αn=1+1/n-2.3838 -2.3600 11.4331 11.3631 1.1476 1.1441 1.4187 1.4136
+
+Table 2: Sample and theoretical mean and variance with n = 3,000 and M = 50 ,000. 
+
+## 6.2 Normality in the mildly stationary case 
+
+We now consider the mildly integrated setting, defined by 
+
+αn = 1 + γ
+
+kn
+
+, kn = nτ , τ ∈ (0, 1), γ = −1, μn = 1.
+
+We generate M = 50 ,000 independent trajectories of length n = 3,000 from the INARCH model. Then we compute: 1. the sample distribution of 
+
+√nk n( ˆαn − αn),
+
+q nkn ( ˆμn − μn)
+
+
+
+, which according to Theorem 4 is asymptotically normal. 2. the plug-in counterpart 
+
+q n  
+
+> 1−ˆαn
+
+( ˆαn − αn), pn(1 − ˆαn)( ˆμn − μn)
+
+
+
+given in Theo-rem 5, in which kn is replaced by 11− ˆαn . We note that this rescaled estimator can only be computed if ˆ αn < 1. Under the parameter setting described above, we find that around 1 percent of the estimates of ˆ αn are greater than 1. 3. the bootstrap distribution of 
+
+√nk n( ˆαbn − ˆαn),
+
+q nkn ( ˆμbn − ˆμn)
+
+
+
+obtained with B =
+
+50 ,000 and an arbitrarily chosen trajectory of (Xt ), whose OLS estimator is denoted by ( ˆαn, ˆμn). The random weights  δ bt
+
+ are drawn from an Exp (1) distribution. Figure 3 plots these histograms and kernel density estimates for τ = 0.4 (upper panel) and 
+
+τ = 0.8 (lower panel), respectively. For τ = 0.4, the six sample distributions are closer to normality, and within the same row, the shapes of the distributions are similar. For τ = 0.8(which is quite close to the local-to-unity case), we see that the sample distributions are still quite far away from normality, except for the bootstrap distribution. 33 (i) τ = 0.4   
+
+> (ii) τ=0.8
+
+Figure 3: Sample distributions of the rescaled OLS estimators in the mildly stationary case for τ = 0.4 (panel (i)) and τ = 0.8 (panel (ii)). In each panel: upper row is √nk n( ˆαn − αn),lower row is pn/kn( ˆμn − μn); the left column shows the sample distribution from M =
+
+50 ,000 trajectories, the middle column the plug-in counterpart (Theorem 5), and the right column the bootstrap counterpart (Theorem 6). All simulations use n = 3,000. 34 We also report the sample mean and covariance matrix of these distributions in Table 3.                          
+
+> τDistribution Mean vector (α,μ)Covariance matrix 0.4 Benchmark (Theorem 4)
+> −0.6376 0.5358
+> 3.5847 −2.5005
+> −2.5005 2.5829
+> 
+> 0.4 Plug-in (Theorem 5)
+> −0.4548 0.6752
+> 3.2947 −2.5351
+> −2.5351 2.9409
+> 
+> 0.4 Bootstrap (Theorem 6)
+> −0.0104 0.0070
+> 3.1076 −1.9999
+> −1.9999 1.9384
+> 
+> 0.8 Benchmark (Theorem 4)
+> −2.3781 1.4943
+> 6.2898 −2.1388
+> −2.1388 2.3414
+> 
+> 0.8 Plug-in (Theorem 5)
+> −1.3482 2.4723
+> 2.2620 −2.3732
+> −2.3732 7.7503
+> 
+> 0.8 Bootstrap (Theorem 6)
+> −0.0062 0.0060
+> 3.5665 −2.5221
+> −2.5221 2.4345
+> 
+
+Table 3: Sample mean and covariance matrix for the sample distributions in Figure 3. As a comparison, the theoretical value of the covariance matrix is 4 −3
+
+−3 3
+
+!
+
+.We see that the OLS estimator has a finite sample bias that is negative for αn, and positive for μn. The negative finite sample bias for αn is consistent with similar results found for linear AR(1) models; see, for example, Marriott and Pope (1954) for the stationary case and Stoykov (2019) for the mildly stationary case, and the positive bias for μn is simply a consequence of the normal equation of the OLS estimator. Furthermore, Table 3 shows that as τ increases from τ = 0.4 to τ = 0.8, the magnitude of the biases increases, and the sample covariance matrices deviate from their common theoretical values. Note that the bootstrap mean vector is smaller in magnitude, but this simply reflects the fact that the bootstrap estimator is centered around ( ˆαn, ˆμn), with the latter being random and biased in 35 finite samples. Note, also, that with τ = 0.8, αn is very close to 1, and both the plug-in and the bootstrap methods estimate quite poorly the asymptotic variance of ˆ μn (last two rows of Table 3), even for a sample size of n = 3, 000. 
+
+## 6.3 Empirical Coverage 
+
+Let us focus on the mildly stationary model and evaluate the empirical coverage of nominal 90% confidence intervals for (αn, μn). We use the simulated trajectories of Section 6.2, and compute the empirical coverage for the parameter αn, defined as: Coverage = 1
+
+N
+
+> N
+
+# ∑
+
+> i=1
+
+1αtrue ∈CI (i) ,
+
+and analogously for μn. Similarly to Section 6.2, we use two methods to compute confi-dence intervals: 1. The Gaussian approximation of Theorem 5, in which kn is replaced by 11− ˆαn . In the following, we call this the plug-in approach. Here, the confidence interval is built using the Gaussian distribution assumption, whose variance parameter de-pends, among others, on σ 2, which is either fixed as in the INARCH specification, or estimated using Proposition 8. Empirically, we find that both approaches lead to almost identical coverage rates and thus we will only report results with fixed 
+
+σ 2 = 1. 2. The bootstrap estimator in Theorem 6, for a given trajectory of (Xt ). In this case, the confidence interval can be computed using either the empirical distribution of the bootstrapped samples, or the Gaussian approximation. Since we have shown in Section 6.2 that the bootstrap distribution is very close to (conditional) normality, the empirical coverage we obtain is almost identical across these two methods. Thus, we retain the normal approximation for simplicity. In particular, for the bootstrap method, we do not use the plug-in estimator ˆ kn of kn.Since the mildly stationary regime imposes αn < 1, the upper end of each confidence interval for αn is capped at unity, analogous to the lower-bound truncation at 1.001 used 36 by Yu and Kejriwal (2025) in the mildly explosive setting. Table 4 reports the empirical coverage. Note, however, that for this simulation exercise, capping does not change the coverage rate, since the true DGP always corresponds to the case where αn < 1.                                       
+
+> nταn
+> αn
+> Plug-in
+> αn
+> Bootstrap
+> μn
+> Plug-in
+> μn
+> Bootstrap 75 0.4 0.822 0.943 0.818 0.955 0.880 75 0.8 0.968 0.863 0.723 0.968 0.745 200 0.4 0.880 0.963 0.875 0.945 0.880 200 0.8 0.986 0.875 0.790 0.960 0.772 2000 0.4 0.952 0.927 0.910 0.940 0.907 2000 0.8 0.998 0.833 0.790 0.925 0.770
+
+Table 4: Empirical coverage probabilities of nominal 90% confidence intervals in Sec-tion 6.3, based on N = 400 Monte Carlo replications and B = 50 ,000 bootstrap draws. The asymptotic intervals use Theorem 5, and the bootstrap-normal intervals replace em-pirical bootstrap quantiles by the Gaussian approximation ˆ θ ± z0.95 bsd boot .We have explained in Section 6.2 that in general, ˆαn (resp. ˆμn) has a negative (resp. positive) finite sample bias. This leads to almost systematic undercoverage of both αn
+
+and μn by the bootstrap method. For the confidence intervals computed using Theorem 5, the situation is more complicated. Indeed, the negative bias on αn also leads to a bias on 
+
+kn = 11−αn . Thus, compared to the true confidence interval, the plug-in confidence interval is on average shifted downwards, but also widened. These two biases imperfectly offset. For instance, for parameter αn, Theorem 5 overcovers when τ = 0.4, but undercovers when τ = 0.8. Overall, the coverage rate is closer to the nominal rate for Theorem 5 than for Theorem 6, because of this partial compensation of the two biases. 
+
+## 6.4 Testing for mild stationarity 
+
+The confidence interval built in Section 6.3 can be used as a preliminary visualization tool for the econometrician to choose between local-to-unity (including exact unit root) and mild stationarity, by simply checking whether 1 belongs to the confidence interval. Nevertheless, because mild stationarity does not contain the exact unit root as a special case, this visual diagnosis should not be regarded as a proper unit root test. Instead, under 37 mild stationarity, one can test: (
+
+H0 : α = α0,
+
+H1 : α̸ = α0
+
+where α0 is strictly smaller than 1 due to the mildly stationary Assumption 4. For each candidate value α0, we define the test statistic 
+
+tn(α0) = ˆαn − α0
+
+SD ( ˆαn) ,
+
+where the denominator SD ( ˆαn) is an estimator of the standard deviation of ˆ αn and can be computed using two different approaches: the plug-in method of Theorem 5, or the bootstrap procedure of Theorem 6. The decision rule at the 10% significance level is to reject the null hypothesis if and only if 2 1 − Φ(|tn(α0)|) < 0.10 ,
+
+where Φ denotes the standard normal CDF. We note that the probability of rejection is a deterministic function of the true value αn
+
+of the DGP, as well as the choice α0. It is equal to the size of the test (when α0 = αn), and to the power of the test (when αn̸ = α0). To compute these probabilities, we carry out the following simulation experiment. We vary the sample size n ∈ { 75 , 200 , 2000 } and the true autoregressive parameter α over an equally spaced grid of 51 points from 0 .80 to 1 .00 (step 0 .004). For each (n, α) cell we generate N = 400 independent trajectories, compute the OLS estimator on each, and apply the plug-in and the weighted bootstrap with B = 5000 replications to test H0 : α = α0 at the two values α0 ∈ { 0.95 , 0.99 }.Figure 4 below reports the size, power, as well as size-corrected powers of the test. 38 Figure 4: Raw (top row) and size-corrected (bottom row) power curves for the two-sided 10% test H0 : α = α0 versus H1 : α̸ = α0, using the plug-in procedure of Theorem 5 and the bootstrap-normal procedure. Left column: α0 = 0.95. Right column: α0 = 0.99. Raw rejection rates use the nominal critical value z0.95 = 1.6449; size-corrected rejection rates use empirical critical values calibrated to give exactly 10% size under H0. The vertical dotted line indicates α0; the horizontal dotted line indicates the nominal 10% level. Based on N = 400 Monte Carlo replications and B = 5000 bootstrap replications per cell, with Poisson INARCH DGP ( μ = 1). From the top two panels on raw power, we see that the bootstrap test is uniformly more over-sized than the plug-in test. This is consistent with the findings of Table 4. Because of the size-distortion, we report in the lower panel the size-corrected power of the test. At 
+
+n = 2000 the size-corrected power is essentially saturated ( ≥ 0.99) once |αn − α0| ≥ 0.04; at n = 200 it exceeds 0 .65 once |αn − α0| ≥ 0.07, regardless of method (plug-in or boot-39 strap). At n = 75, and αn = 0.99, however, the size-corrected power of the plug-in method almost collapses. This can be explained by the fact that in this case, kn = 11−αn = 100 is even larger than n = 75. In other words, for ultra-small sample size and αn very close to 1, the mildly stationary asymptotic approximation may be less accurate than the local-to-unity assumption. Indeed, in this case, we expect ˆ kn to have a large bias, which makes the plug-in method ineffective. The bootstrap method, on the other hand, retains some power since it is not affected by the bias of ˆ kn. Finally, at moderate sample sizes ( n ∈ { 75 , 200 })and for alternatives close to α0, power against alternatives below α0 exceeds power against alternatives the same distance above, reflecting the negative finite sample bias of ˆ αn docu-mented in Section 6.2. At n = 2000 this asymmetry can reverse for intermediate distances, because the standard error of ˆ αn shrinks as α approaches unity, an effect that dominates the diminishing bias. The practical implication is unchanged: non-rejection for values of 
+
+α0 close to one at moderate sample sizes should not be interpreted as evidence for mild sta-tionarity. It mainly reflects limited power to distinguish mildly stationary, local-to-unity, and nearby mildly explosive regimes in the unit-root neighborhood. 
+
+# 7 Applications 
+
+This section applies the inference developed above to three datasets relevant for insurance and finance. The first two are count-valued: annual wind-related event counts in Arizona and quarterly U.S. business bankruptcy filings. The third is the monthly effective federal funds rate, expressed in basis points. This series is positive-valued, but with a significant portion of values near zero due to the ZLB. An additional benchmark comparison with the INAR(1) crime-count analysis of Peng et al. (2024) is deferred to Appendix B. 
+
+## 7.1 Data 
+
+The Arizona data are taken from the Spatial Hazard Events and Losses Database for the United States (SHELDUS) 8, which is a popular dataset in the economic/insurance litera-ture, see e.g. Barrot and Sauvagnat (2016); Bourdeau-Brien and Kryzanowski (2020). We 
+
+> 8https://sheldus.asu.edu
+
+40 use the annual number of wind-related records in Arizona from 1960 to 2022. The series is nonnegative and integer-valued, with n = 63 observations. Modeling natural disaster counts using affine models has a long tradition in the count time series literature, see e.g., Cui and Wu (2016); Pei and Lu (2025). The bankruptcy data are quarterly business bankruptcy filings compiled by the American Bankruptcy Institute from U.S. Courts statistics. 9 Because the Bankruptcy Abuse Preven-tion and Consumer Protection Act (BAPCPA) took effect on October 17, 2005, generating a filing rush followed by a sharp level shift, we use the pre-BAPCPA window from 1980Q1 to 2005Q3 as the main bankruptcy sample. This gives n = 103 quarterly observations. Re-cently, Agosto et al. (2016) apply an INARCH-type model to similar corporate default count data. The interest-rate application uses the monthly effective federal funds rate from FRED 10 ,converted from percentage points to basis points. This series is positive valued, with spells near the zero lower bound. Previously, Monfort et al. (2017) apply the affine ARG0 model to a similar dataset (Japanese government bond yield). Figure 5 plots the paths of these three series.          
+
+> 9The source table is ABI, “Quarterly U.S. Business Filings (1980-present),”
+> https://abi-org.s3.amazonaws.com/Newsroom/Bankruptcy_Statistics/ QUARTERLY-BUSINESS-1980-PRESENT.pdf .
+> 10 https://fred.stlouisfed.org/series/FEDFUNDS
+
+41 Figure 5: Path of the three time series. 
+
+## 7.2 Main Estimates and Persistence Scale 
+
+For this section, we use the specification: 
+
+αn = 1 − 1
+
+kn
+
+, where kn = nτ , 0 < τ < 1.
+
+42 For each dataset, we estimate the model parameters αn, μn and σ 2, and also compute ˆkn = 11− ˆα , ˆkn 
+
+> n
+
+, ˆτ = ln ˆ k  
+
+> ln n
+
+. Table 5 reports these estimates. For FEDFUNDS, ˆ μ and ˆ σ 2 are reported after converting the rate to basis points. Table 5: Main estimates and persistence scales                                  
+
+> Series Type of data/variable nˆαnˆμnˆσ2ˆknˆkn/nˆτ
+> Arizona wind counts natural disaster/count 63 0.941 5.9 16.6 16.9 0.27 0.685 ABI bankruptcies, pre-BAPCPA default/count 103 0.930 973 138.3 14.3 0.14 0.575 FEDFUNDS, monthly interest rate/positive 862 0.990 4.9 5.0 101.7 0.12 0.684
+
+All three series have ˆ αn close to one, suggesting high persistence. At the same time, ˆ k/n
+
+remains below one in each case. This distinction is especially important for FEDFUNDS: although ˆ αn = 0.990 is much closer to one than the two count-series estimates, the corre-sponding scale ˆ k = 101 .7 is still small relative to the full monthly sample size n = 862. Thus the full-sample FEDFUNDS estimate is near-unit in the economically relevant sense, but it remains compatible with the mild stationarity assumption that kn = o(n). We should also keep in mind that although ˆ kn/n is smaller than 1 for all three datasets, its value is fairly large, especially for the Arizona data (0.27). Moreover, the implied value of ˆ τ is also close to the value of 0.8 used in the simulations of section 6. These datasets therefore fall in the regime where, the normal approximation could be only moderately accurate. Note that the estimate of ˆ αn (and ˆ kn) can be sensitive to the choice of the window. For instance, Monfort et al. (2017) focused on the period 1995-2014 for their Zero Lower Bound application since the ultra low interest rate period started in Japan in the mid-1990s. If we follow this approach for FEDFUNDS, and use the period 2005-2026, then we would get an estimate ˆ kn of 440, which is even larger than the sample size n = 255; if instead we use the period 2007-2026, then we would get ˆ kn = 102 against n = 231. This substantial variation of ˆ kn is consistent with the fact that between 2005 and 2007 (pre-subprime crisis period), interest rates in the US increased quickly, leading to a local explosiveness feature of the FED effective rates during this period. This echoes our discussions in section 4.3, that under mild stationarity, a process can feature local explosion. For this reason, for 43 each dataset, we used the maximal window at our disposal (except for ABI bankruptcy count data, for which we removed the post-reform period since the reform led to a regime switch). Finally, a direct diagnostic for the affine variance specification is the slope ba of log bW 2 
+
+> t
+
+on log Xt−1, which estimates the exponent in Var (Xt | Xt−1) ∝ Xat−1 for large values of Xt−1.Under the affine specification, the theoretical value is a = 1. Empirically, we obtain ba =
+
+1.15 ± 0.51 (at 95% confidence interval) for the Arizona wind counts ( n = 62, R2 = 0.25), 
+
+ba = 1.02 ± 1.46 for the ABI pre-BAPCPA bankruptcies ( n = 102, R2 = 0.02), and ba =
+
+0.60 ± 0.13 for the FEDFUNDS monthly series 1954–2026 ( n = 861, R2 = 0.09). The two count-valued series are consistent with the affine value a = 1. The FEDFUNDS estimate is sublinear, but is significantly different from 0 (corresponding to a linear AR(1) model). It might be worthwhile to investigate other non-affine conditional variance specifications of the form Var [Xt |Xt−1] = β Xat−1 + δ , where the exponent a is between 0 and 1 and is an extra parameter. For this data, the affine specification remains a useful benchmark, although the FEDFUNDS diagnostic suggests that sublinear variance specifications may be worth studying in future work. 
+
+## 7.3 Inference Within the Mildly Stationary Family 
+
+Table 6 below reports the confidence interval for αn, obtained either using the plug-in method or the bootstrap method (with B = 50 , 000). Table 6: Plug-in and bootstrap-normal inference for αn                      
+
+> Series Plug-in SE Plug-in 10% region Bootstrap SE Bootstrap 10% region Arizona wind counts 0.0855 [0.800 ,1.000 ]0.1292 [0.728 ,1.000 ]
+> ABI bankruptcies, pre-BAPCPA 0.0396 [0.865 ,0.995 ]0.0687 [0.817 ,1.000 ]
+> FEDFUNDS, monthly 0.0068 [0.979 ,1.000 ]0.0120 [0.970 ,1.000 ]
+
+The plug-in regions are narrower than the bootstrap-normal regions in all three applications because the bootstrap-normal standard errors are larger. For example, in the pre-BAPCPA bankruptcy sample, the plug-in region is [0.865 , 0.995 ], whereas the bootstrap-normal re-44 gion reaches the upper end of the plotted grid. These regions should be interpreted only as compatibility regions within the mildly stationary family: they indicate which candidate values of α are not rejected under that approximation. They do not constitute a formal unit-root test, and the non-rejection of values very close to one should not be read as evidence that the exact unit-root boundary has been ruled out. Figure 6 below reports the p-value functions of the test. 
+
+Figure 6: Plug-in and bootstrap-normal p(α) functions for the three empirical applica-tions. In these p-value plots, any value of α whose p-value is larger than 10% is compatible with the mild stationarity assumption. For instance, for the Arizona data, we cannot reject any 
+
+α between 0.73 and 1 using the bootstrap method, or any α between 0.8 and 1 using the plug-in method. When a non-rejection region reaches the upper grid boundary, this should be read as weak separation between candidate values of α0 < 1 close to one and the exact unit-root boundary, not as evidence in favor of the exact unit-root model. Note that it is not automatically the case that when the same procedure is applied to any data, values near 1 will have a p-value that is larger than 10 percent. In Appendix B, we also propose a benchmark comparison using the break-and-enter dwelling crime count data used by Peng et al. (2024). For two of the three cities considered there, the upper boundary 
+
+α = 1 is rejected under both the plug-in and bootstrap-normal calibrations, and it is only 45 borderline for the remaining city. This comparison shows that the non-rejection of values close to one in our main applications reflects the persistence and uncertainty structure of those samples, rather than a mechanical consequence of the p(α) construction. 
+
+# 8 Conclusion 
+
+This paper has established the near-unit-root theory for a class of Markov affine processes with exploding conditional variance, encompassing count, positive, or nonnegative pro-cesses. We have considered both the local-to-unity and the mildly integrated frameworks. The mildly stationary framework with autoregressive coefficient αn = 1 − 1 
+
+> kn
+
+is of partic-ular interest, as it (i) solves the nuisance parameter problem; (ii ) leads to more plausible stochastic properties of the process than the mildly integrated AR(1) model with inter-cept; (iii ) admits feasible inference, with a consistent and jointly asymptotically normal OLS estimator, a plug-in procedure that does not require knowledge of kn, and an asymp-totically valid randomly weighted bootstrap; and (iv ) can generate bubble-like episodes without locally explosive least-squares estimates. Several directions remain open. First, the WLS estimator studied in Proposition 9 requires the condition 2 μ > σ 2; its properties when this condition fails are unknown, even in the exact unit-root case (Wei and Winnicki, 1990). Second, simulations have revealed that the finite-sample bias in ˆ αn can materially affect inference through either the plug-in or the bootstrap methods. This suggests that bias correction for ˆ αn may be a useful direction for future work. Third, our inference is carried out within the mildly stationary family; developing a formal test that discriminates between the mildly stationary and local-to-unity regimes is a much harder problem, especially given the nuisance parameter problem of the local-to-unity case. This is left for future research. 
+
+# References 
+
+Agosto, A., Cavaliere, G., Kristensen, D., and Rahbek, A. (2016). Modeling corporate defaults: Poisson autoregressions with exogenous covariates (PARX). Journal of Em-
+
+46 pirical Finance , 38:640–663. Barndorff-Nielsen, O. E. (1997). Normal inverse Gaussian distributions and stochastic volatility modelling. Scandinavian Journal of Statistics , 24(1):1–13. Barreto-Souza, W. and Chan, N. H. (2024). Nearly unstable integer-valued ARCH process and unit root testing. Scandinavian Journal of Statistics , 51(1):402–424. Barrot, J.-N. and Sauvagnat, J. (2016). Input specificity and the propagation of idiosyn-cratic shocks in production networks. Quarterly Journal of Economics , 131(3):1543– 1592. Bourdeau-Brien, M. and Kryzanowski, L. (2020). Natural disasters and risk aversion. 
+
+Journal of Economic Behavior & Organization , 177:818–835. Bykhovskaya, A. and Duffy, J. A. (2024). The local-to-unity dynamic Tobit model. Jour-nal of Econometrics , 241(2):105764. Cavaliere, G. (2004). The asymptotic distribution of the Dickey–Fuller statistic under nonnegativity constraint—solution. Econometric Theory , 20(4):808–810. Chen, L., Liu, X., Peng, L., and Zhu, F. (2024). Unified inference for an integer-valued AR(1) model. Communications in Statistics – Theory and Methods , 54(12):3732–3742. Cox, J. C., Ingersoll, J. E. J., and Ross, S. A. (1985). A theory of the term structure of interest rates. Econometrica , 53(2):385–407. Creal, D. D. (2017). A class of non-Gaussian state space models with exact likelihood inference. Journal of Business & Economic Statistics , 35(4):585–597. Cui, Y. and Wu, R. (2016). On conditional maximum likelihood estimation for ingarch (p, q) models. Statistics & Probability Letters , 118:1–7. Darolles, S., Gouriéroux, C., and Jasiak, J. (2006). Structural Laplace Transform and Compound Autoregressive Models. Journal of Time Series Analysis , 27(4):477–503. Duffie, D., Pan, J., and Singleton, K. (2000). Transform Analysis and Asset Pricing for Affine Jump-Diffusions. Econometrica , 68(6):1343–1376. Ethier, S. N. and Kurtz, T. G. (1986). Markov Processes: Characterization and Conver-gence . Wiley. Fei, Y. (2018). Limit theory for mildly integrated process with intercept. Economics Letters , 163:98–101. 47 Giraitis, L. and Phillips, P. C. (2006). Uniform limit theory for stationary autoregression. 
+
+Journal of Time Series Analysis , 27(1):51–60. Göing-Jaeschke, A. and Yor, M. (2003). A survey and some generalizations of Bessel processes. Bernoulli , 9(2):313–349. Gouriéroux, C. and Jasiak, J. (2006). Autoregressive Gamma Processes. Journal of Fore-casting , 25(2):129–152. Gouriéroux, C. and Jasiak, J. (2022). Long run predictions. Annals of Economics and Statistics , 145:75–90. Gouriéroux, C. and Jasiak, J. (2025). Long-run risk in stationary vector autoregressive models. Journal of Econometrics , 248:105905. Gouriéroux, C. and Lu, Y. (2019). Negative Binomial Autoregressive Process with Stochastic Intensity. Journal of Time Series Analysis , 40(2):225–247. Gouriéroux, C. and Lu, Y. (2023). Noncausal affine processes with applications to deriva-tive pricing. Mathematical Finance , 33(3):766–796. Gouriéroux, C., Lu, Y., and Monfort, A. (2026). Ultra long run term structure models. Working paper. Gouriéroux, C., Monfort, A., and Polimenis, V. (2006). Affine Models for Credit Risk Analysis. Journal of Financial Econometrics , 4(3):494–530. Guo, G., Sun, Y., and Wang, S. (2019). Testing for moderate explosiveness. Econometrics Journal , 22(1):73–94. Hamilton, J. D. (1994). Time Series Analysis . Princeton University Press. Ispány, M., Pap, G., and van Zuijlen, M. C. (2003). Asymptotic inference for nearly unstable INAR(1) models. Journal of Applied Probability , 40(3):750–765. Kejriwal, M., Nguyen, L., and Perron, P. (2025). An improved procedure for retrospec-tively dating the emergence and collapse of bubbles. Journal of Time Series Analysis ,46(5):867–883. Le, A., Singleton, K. J., and Dai, Q. (2010). Discrete-time affine Q term structure models with generalized market prices of risk. Review of Financial Studies , 23(5):2184–2227. Lieberman, O. and Phillips, P. C. (2020). Hybrid stochastic local unit roots. Journal of Econometrics , 215(1):257–285. 48 Liu, Q., Xia, C., and Liu, X. (2025). Limit theory for an AR(1) model with intercept and a possible infinite variance. Indian Journal of Pure and Applied Mathematics , 56:615– 630. Liu, X. and Peng, L. (2019). Asymptotic theory and unified confidence region for an autoregressive model. Journal of Time Series Analysis , 40(1):43–65. Liu, Y. and Phillips, P. C. (2023). Robust inference with stochastic local unit root regres-sors in predictive regressions. Journal of Econometrics , 235(2):563–591. Lu, Y. (2021). The Predictive Distributions of Thinning-Based Count Processes. Scandi-navian Journal of Statistics , 48(1):42–67. Lu, Y. (2026). Estimation of the intercept parameter in integrated Galton–Watson pro-cesses. forthcoming Journal of Time Series Analysis .Marriott, F. and Pope, J. (1954). Bias in the estimation of autocorrelations. Biometrika ,41(3/4):390–402. Mendes, F. G., Barreto-Souza, W., and Ndreca, S. (2025). Gamma-driven Markov pro-cesses and extensions with application to realized volatility. Journal of Business & Economic Statistics , 43(1):14–26. Monfort, A., Pegoraro, F., Renne, J.-P., and Roussellet, G. (2017). Staying at Zero With Affine Processes: An Application to Term-Structure Modelling. Journal of Economet-rics , 201(2):348–366. Overbeck, L. and Ryden, T. (1997). Estimation in the Cox–Ingersoll–Ross model. Econo-metric Theory , 13(3):430–461. Pei, J. and Lu, Y. (2025). Forecasting natural disaster frequencies using nonstationary count time series models. Statistical Papers , 66(3):72. Peng, L., Xie, S., Liu, X., and Zhu, F. (2024). A note on the asymptotic behavior of a mildly unstable integer-valued AR (1) model. Statistics , 58(5):1248–1266. Phillips, P. C. (1987). Towards a unified asymptotic theory for autoregression. Biometrika ,74(3):535–547. Phillips, P. C. (2023). Estimation and inference with near unit roots. Econometric Theory ,39(2):221–263. Phillips, P. C. and Magdalinos, T. (2007). Limit theory for moderate deviations from a 49 unit root. Journal of Econometrics , 136(1):115–130. Phillips, P. C., Magdalinos, T., and Giraitis, L. (2010). Smoothing local-to-moderate unit root theory. Journal of Econometrics , 158(2):274–279. Phillips, P. C., Moon, H. R., and Xiao, Z. (2001). How to estimate autoregressive roots near unity. Econometric Theory , 17(1):29–69. Phillips, P. C., Shi, S., and Yu, J. (2015a). Testing for multiple bubbles: Historical episodes of exuberance and collapse in the S&P 500. International Economic Review ,56(4):1043–1078. Phillips, P. C., Shi, S., and Yu, J. (2015b). Testing for multiple bubbles: Limit theory of real-time detectors. International Economic Review , 56(4):1079–1134. Phillips, P. C. and Yu, J. (2011). Dating the timeline of financial bubbles during the sub-prime crisis. Quantitative Economics , 2(3):455–491. Pitt, M. K. and Walker, S. G. (2005). Constructing stationary time series models using auxiliary variables with applications. Journal of the American Statistical Association ,100(470):554–564. Stoykov, M. Z. (2019). Least squares bias in time series with moderate deviations from a unit root. Journal of Time Series Analysis , 40(1):23–42. Wei, C. and Winnicki, J. (1990). Estimation of the means in the branching process with immigration. Annals of Statistics , 18(4):1757–1773. Wei, C.-Z. (1991). Convergence rates for the critical branching process with immigration. 
+
+Statistica Sinica , 1:175–184. Yu, X. and Kejriwal, M. (2025). Inference in mildly explosive autoregressions under unconditional heteroskedasticity. Econometric Theory , 41(6):1322–1357. Zhu, K. (2016). Bootstrapping the portmanteau tests in weak auto-regressive moving aver-age models. Journal of the Royal Statistical Society Series B: Statistical Methodology ,78(2):463–485. 50 A Appendix 
+
+## A.1 Proof of Theorem 1 
+
+Let 
+
+Yn(s) = X⌊ns ⌋
+
+n .
+
+We verify the local characteristics of the Markov chain Yn. Conditional on Xt−1 = x, put 
+
+∆n,t := Xt − Xt−1
+
+n .
+
+Then 
+
+nE[∆n,t | Xt−1 = x] = ( αn − 1)x + μn = γn
+
+xn + μn,
+
+which converges locally uniformly, for x/n in compact sets, to 
+
+γy + μ, y = x/n.
+
+Moreover, 
+
+nE[∆2 
+
+> n,t
+
+| Xt−1 = x] = 1
+
+nE[( Xt − Xt−1)2 | Xt−1 = x]= βnx + δn
+
+n + {(αn − 1)x + μn}2
+
+n ,
+
+which converges locally uniformly to σ 2y.It remains to verify the local Lindeberg condition. Let p > 2 be the exponent in Assump-tion 5. By the affine representation and Rosenthal’s inequality, 
+
+E[|Wt |p | Xt−1 = x] ≤ C(1 + xp/2)
+
+uniformly in n, where 
+
+Wt = Xt − E[Xt | Xt−1].
+
+Since 
+
+Xt − Xt−1 = Wt + ( αn − 1)x + μn,
+
+51 and since (αn − 1)x + μn is uniformly bounded on {x/n ≤ K}, it follows that 
+
+E[|Xt − Xt−1|p | Xt−1 = x] ≤ CK np/2.
+
+Therefore, for every ε > 0, 
+
+nE
+
+h
+
+∆2 
+
+> n,t
+
+1{| ∆n,t |>ε} | Xt−1 = x
+
+i
+
+≤ nε−(p−2)E[|∆n,t |p | Xt−1 = x]
+
+≤ CK ε−(p−2)n1−p/2 −→ 0,
+
+locally uniformly for x/n ≤ K.The limiting local characteristics are therefore 
+
+b(y) = μ + γy, a(y) = σ 2y.
+
+The martingale problem associated with 
+
+A f (y) = ( μ + γy) f ′(y) + 12σ 2y f ′′ (y)
+
+is well posed, and its solution is the CIR diffusion 
+
+dϒs = ( μ + γϒs) ds + σ pϒs dB s, ϒ0 = 0.
+
+By the standard diffusion approximation theorem for Markov chains (Ethier and Kurtz, 1986, Theorem 7.4.1), X⌊ns ⌋
+
+n
+
+
+
+> s≥0
+
+⇒ (ϒs)s≥0.
+
+This proves Theorem 1. 
+
+## A.2 Proof of Theorem 2 
+
+If x is integer-valued, the desired weak convergence becomes CLT. It therefore suffices to establish the result for non-integer values of x, which arise only when the state space of 52 (Xt ) is continuous. In this case, the LT e−a is infinitely divisible. Write x = ⌊x⌋ + ( x − ⌊ x⌋). By the affine property, conditional on Xt−1 = x, the random variable Xt admits the decomposition 
+
+Xt d
+
+=
+
+> ⌊x⌋
+
+# ∑
+
+> i=1
+
+Yi + ε +V,
+
+where (Yi), i = 1, . . . are i.i.d. random variables with LT e−a, ε has LT e−b(u) and V has LT e−(x−⌊ x⌋)a, with Yi, ε, V mutually independent. Then it suffices to remark that for fixed values of x − ⌊ x⌋, as ⌊x⌋ increases to infinity, both ε and V are negligible, while the first term ∑⌊x⌋ 
+
+> i=1
+
+Yi is approximately Gaussian, by the CLT, after appropriate centering and normalization. Theorem 2 follows. 
+
+## A.3 Proof of Theorem 3 
+
+Let us introduce the rescaled terms: ˜Fn :=
+
+"
+
+n−3/2 00 n−1/2
+
+#
+
+Fn
+
+"
+
+n−3/2 00 n−1/2
+
+#
+
+=
+
+"
+
+n−3 ∑nt=1 X2 
+
+> t−1
+
+n−2 ∑nt=1 Xt−1
+
+n−2 ∑nt=1 Xt−1 1
+
+#
+
+,
+
+˜dn :=
+
+"
+
+n−2 00 n−1
+
+#
+
+dn =
+
+"
+
+n−2 ∑nt=1 Xt−1Wt
+
+n−1 ∑nt=1 Wt
+
+#
+
+.
+
+Then we use the following Lemma: 
+
+Lemma 1. We have the joint weak convergence: 
+
+• a) of the two processes: the martingale process (Ms) defined by M s = ∑[ns ] 
+
+> t=1
+
+Wt /n and 
+
+(Ys): " (X⌊ns ⌋/n)(∑[ns ] 
+
+> t=1
+
+Wt /n)
+
+#
+
+> w
+
+−→ 
+
+"
+
+(ϒs)(σ R s
+
+> 0
+
+√ϒrdB r)
+
+#
+
+53 • b) of the following random variables: 
+
+
+
+n−3 ∑nt=1 X2
+
+> t−1
+
+n−2 ∑nt=1 Xt−1
+
+n−2 ∑nt=1 Xt−1Wt
+
+n−1 ∑nt=1 Wt
+
+
+
+> w
+
+→
+
+
+
+R 10 ϒ2 
+
+> s
+
+ds
+
+R 10 ϒsds
+
+R 10 σ ϒ3/2 
+
+> s
+
+dBs
+
+R 10 σ ϒ1/2 
+
+> s
+
+dBs
+
+ . (26) 
+
+Proof of Lemma 1. Convergence a) is simply due to the fact that: 1
+
+n
+
+> ⌊ns ⌋
+
+# ∑
+
+> t=1
+
+Wt = 1
+
+n
+
+> ⌊ns ⌋
+
+# ∑
+
+> t=1
+
+(Xt − μn − αnXt−1) = X⌊ns ⌋
+
+n − γ
+
+n2
+
+> ⌊ns ⌋
+
+# ∑
+
+> t=1
+
+Xt−1 − ⌊ns ⌋
+
+n μn, (27) which, by the continuous mapping theorem (CMT), converges to ϒs − γ R s 
+
+> 0
+
+ϒrdr − sμ =
+
+σ R s
+
+> 0
+
+√ϒrdB r.The first, second, and fourth convergences in b) are simple consequences of the CMT. The third convergence says that when the two processes in Lemma 1 a) converge jointly, their stochastic integral also converges to the corresponding limiting stochastic integral. This kind of result requires some tightness argument. We refer to the proof of Theorem 1 in Lu (2026) for a similar proof. Let us now prove Theorem 3. By CMT, the joint distribution of ( ˜Fn, ˜dn) converges to 
+
+F∞, d∞) :=
+
+ "R 10 ϒ2 
+
+> s
+
+ds R 10 ϒsds
+
+R 10 ϒsds 1
+
+#
+
+,
+
+"R 10 σ ϒ3/2 
+
+> s
+
+dBs
+
+R 10 σ ϒ1/2 
+
+> s
+
+dBs
+
+#! 
+
+Then we have: 
+
+F−1 
+
+> n
+
+dn =
+
+"
+
+n−3/2 00 n−1/2
+
+#
+
+˜F−1
+
+> n
+
+"
+
+n−3/2 00 n−1/2
+
+# " 
+
+n2 00 n
+
+#
+
+˜dn =
+
+"
+
+n−1 00 1
+
+#
+
+˜F−1 
+
+> n
+
+˜dn
+
+54 Hence, the distribution of 
+
+"
+
+n 00 1
+
+#
+
+F−1 
+
+> n
+
+dn =
+
+"
+
+n 00 1
+
+# " ˆα − αn
+
+ˆμn − μn
+
+#
+
+=
+
+"
+
+n( ˆα − αn)
+
+ˆμn − μn
+
+#
+
+converges to the distribution of F−1 
+
+> ∞
+
+d∞. Theorem 3 follows. 
+
+## A.4 Proof of Part a) of Theorem 4 
+
+By the normal equations, we have: 
+
+( ˆαn, ˆμn)′ :=
+
+"
+
+∑nt=1 X2 
+
+> t−1
+
+∑nt=1 Xt−1
+
+∑nt=1 Xt−1 n
+
+#| {z }
+
+> :=Fn
+> −1
+
+"
+
+∑nt=1 Xt−1Xt
+
+∑nt=1 Xt
+
+#
+
+. (28) Thus, after centering around their true values, we obtain the following: 
+
+" ˆαn
+
+ˆμn
+
+#
+
+−
+
+"
+
+αn
+
+μn
+
+#
+
+= F−1
+
+> n
+
+ "
+
+∑nt=1 Xt−1Xt
+
+∑nt=1 Xt
+
+#
+
+− Fn
+
+"
+
+αn
+
+μn
+
+# 
+
+= F−1
+
+> n
+
+"
+
+∑nt=1 Xt−1Wt
+
+∑nt=1 Wt
+
+#| {z }
+
+> :=dn
+
+, (29) where 
+
+Wt = Xt − αnXt−1 − μn
+
+forms a martingale difference sequence (MDS). Let us first prove the following two Lemmas, which are analogues of Lemma 1. 
+
+Lemma 2 (Mildly stationary LLN) . Assume Assumptions 1, 2, 4, and 6, and suppose 
+
+γ < 0. After the normalization γ = −1, let Y n,t = Xt /kn. Then 
+
+1
+
+n
+
+> n
+
+# ∑
+
+> t=1
+
+Y jn,t−1
+
+> p
+
+−→ E[ϒ j
+
+> ∞
+
+], j = 1, 2, 3.
+
+55 Moreover, for every η > 0,
+
+lim  
+
+> R→∞
+
+lim sup 
+
+> n→∞
+
+P 1
+
+n
+
+> n
+
+# ∑
+
+> t=1
+
+Y 3
+
+> n,t−1
+
+1{Yn,t−1>R} > η
+
+!
+
+= 0.
+
+This lemma says that in the long-run, the mildly stationary process, once scaled by kn, is “almost ergodic". Let us, for instance, take j = 1. Then: 
+
+(nk n)−1 n
+
+# ∑
+
+> t=1
+
+Xt = ( nk n)−1
+
+Z n
+
+> 1
+
+X⌊t⌋dt
+
+= kn
+
+n
+
+Z n/kn
+
+> 1/kn
+
+X⌊knr⌋
+
+kn
+
+dr w
+
+→ 1
+
+n/kn
+
+Z n/kn
+
+> 0
+
+ϒrdr for fixed n/kn, and n → ∞
+
+→ E[ϒ∞] as n/kn → ∞ (30) where in the last step, we have used the ergodic theorem for the stationary process (ϒs).Here, in the last step, the argument of letting n and n/kn go to infinity separately is heuristic and has also been used in the unit root literature by Phillips et al. (2010) [see their equations (6)-(7)]. Since this type of double asymptotic technique will be used throughout the paper, Lemma 2 formalizes this argument. 
+
+Proof of Lemma 2. Let πn be the invariant distribution of Yn,t . Since αn = 1 − 1/kn < 1, this invariant distribution is unique. By Assumption 6, Rosenthal’s inequality and the affine moment recursion imply that, for the exponent p > 3 in Assumption 6, sup 
+
+> n
+
+Z
+
+yp πn(dy ) < ∞. (A.1) Indeed, for Xt in stationarity, one has 
+
+E[X pt | Xt−1 = x] ≤ α pn xp +C(1 + xp−1),
+
+uniformly in n. Dividing by kpn , integrating with respect to πn, and using 1 − α pn ≍ k−1
+
+> n
+
+gives (A.1). 56 By tightness, take a subsequence such that πn ⇒ π. Applying Proposition 2 with initial law πn shows that the CIR diffusion with initial law π is stationary. Hence π is the unique invariant law of the limiting CIR diffusion, namely (ϒ∞). Therefore 
+
+πn ⇒ (ϒ∞). (A.2) Together, (A.1) and (A.2) imply convergence of moments up to order three: 
+
+> Z
+
+y j πn(dy ) → E[ϒ j
+
+> ∞
+
+], j = 1, 2, 3. (A.3) For any bounded Lipschitz function h, the subcritical affine chain mixes at rate αℓ
+
+> n
+
+. Thus 
+
+Cov πn
+
+ h(Yn,0), h(Yn,ℓ ) ≤ Chαℓ
+
+> n
+
+.
+
+Consequently, under stationarity, Var 1
+
+n
+
+> n
+
+# ∑
+
+> t=1
+
+h(Yn,t−1)
+
+!
+
+≤ Ch
+
+n2
+
+> n−1
+
+# ∑
+
+> ℓ=0
+
+(n − ℓ)αℓ 
+
+> n
+
+≤ Ch
+
+kn
+
+n → 0.
+
+The initial condition contributes only a transient term of order kn/n = o(1). Hence 1
+
+n
+
+> n
+
+# ∑
+
+> t=1
+
+h(Yn,t−1) −
+
+> Z
+
+h(y)πn(dy ) p
+
+−→ 0. (A.4) Apply (A.4) to the bounded Lipschitz truncations h j,R(y) = y j ∧ R, j = 1, 2, 3, and then let 
+
+R → ∞. The truncation error is negligible by (A.1). This proves 1
+
+n
+
+> n
+
+# ∑
+
+> t=1
+
+Y jn,t−1
+
+> p
+
+−→ E[ϒ j
+
+> ∞
+
+], j = 1, 2, 3.
+
+57 Finally, by Markov’s inequality and (A.1), 
+
+P 1
+
+n
+
+> n
+
+# ∑
+
+> t=1
+
+Y 3
+
+> n,t−1
+
+1{Yn,t−1>R} > η
+
+!
+
+≤ C
+
+η R3−p,
+
+which tends to zero as R → ∞ because p > 3. 
+
+Lemma 3. We have the following joint convergence of: 
+
+• a) The processes: " (X⌊kns⌋/kn)(∑[kns] 
+
+> k=1
+
+Wk/kn)
+
+#
+
+> w
+
+→
+
+"
+
+(ϒs)(σ R s
+
+> 0
+
+√ϒrdB r)
+
+#
+
+• b) the random vector 
+
+"
+
+n−1/2k−3/2 
+
+> n
+
+∑nt=1 Xt−1Wt
+
+(nk n)−1/2 ∑nt=1 Wt
+
+#
+
+> w
+
+−→ N (0, Σ).
+
+Proof of Lemma 3. For convergence a), we have: 1
+
+kn
+
+> [kns]
+
+# ∑
+
+> t=1
+
+Wt = 1
+
+kn
+
+> ⌊kns⌋
+
+# ∑
+
+> t=1
+
+(Xt − μn − αnXt−1) = X⌊kns⌋
+
+kn
+
+− γ
+
+k2
+
+> n
+> ⌊kns⌋
+
+# ∑
+
+> t=1
+
+Xt−1 − μn
+
+⌊kns⌋
+
+kn
+
+, (31) which, by CMT, converges weakly to: 
+
+ϒs − γ
+
+Z s
+
+> 0
+
+ϒrdr − μs = σ
+
+Z s
+
+> 0
+
+pϒrdBr.
+
+For part b), define 
+
+ξn,t :=
+
+"
+
+n−1/2k−3/2 
+
+> n
+
+Xt−1Wt
+
+(nk n)−1/2Wt
+
+#
+
+.
+
+Then (ξn,t , Ft ) is a martingale-difference array. Let us check the conditions to apply the martingale central limit theorem (MCLT). Its conditional covariance matrix equals 
+
+" 1 
+
+> nk 3
+> n
+
+∑ X2
+
+> t−1
+
+(βnXt−1 + δn) 1 
+
+> nk 2
+> n
+
+∑ Xt−1(βnXt−1 + δn) 
+
+> 1
+> nk 2
+> n
+
+∑ Xt−1(βnXt−1 + δn) 1 
+
+> nk n
+
+∑(βnXt−1 + δn)
+
+#
+
+.
+
+58 By Lemma 2, and since βn → σ 2, and δn = O(1), this converges in probability to Σ.It remains only to verify the conditional Lindeberg condition. Let p > 3 be the exponent in Assumption 6, and set δ = p − 2 > 1. Assumption 6 implies 
+
+E[|Wt |p | Ft−1] ≤ C(1 + X p/2 
+
+> t−1
+
+).
+
+Fix R > 0 and write An,t (R) = {Yn,t−1 ≤ R}. On An,t (R), Xt−1 ≤ Rk n, and hence 
+
+∥ξn,t ∥ ≤ CR
+
+|Wt |√nk n
+
+.
+
+Therefore, n
+
+# ∑
+
+> t=1
+
+E
+
+h
+
+∥ξn,t ∥p1An,t (R) | Ft−1
+
+i
+
+≤ CRn1−p/2 = o(1).
+
+By Markov’s inequality, 
+
+> n
+
+# ∑
+
+> t=1
+
+E
+
+h
+
+∥ξn,t ∥21{∥ ξn,t ∥>ε}1An,t (R) | Ft−1
+
+i
+
+≤ ε−δ n
+
+# ∑
+
+> t=1
+
+E
+
+h
+
+∥ξn,t ∥2+δ 1An,t (R) | Ft−1
+
+i
+
+= o(1).
+
+On An,t (R)c, the Lindeberg term is bounded by the corresponding conditional variance term. For R ≥ 1, 
+
+> n
+
+# ∑
+
+> t=1
+
+E
+
+h
+
+∥ξn,t ∥21An,t (R)c | Ft−1
+
+i
+
+≤ C 1
+
+n
+
+> n
+
+# ∑
+
+> t=1
+
+Y 3
+
+> n,t−1
+
+1{Yn,t−1>R} + op(1),
+
+which is negligible as R → ∞ by Lemma 2. Thus the conditional Lindeberg condition holds. By the martingale central limit theorem, part b) follows. Let us now prove Part a) of Theorem 4. We follow the proof of Theorem 3, and define ˜ Fn
+
+and ˜ dn by: ˜Fn :=
+
+"
+
+n−1/2k−1 
+
+> n
+
+00 n−1/2
+
+#
+
+Fn
+
+"
+
+n−1/2k−1 
+
+> n
+
+00 n−1/2
+
+#
+
+=
+
+"
+
+(nk 2
+
+> n
+
+)−1 ∑nt=1 X2 
+
+> t−1
+
+(nk n)−1 ∑nt=1 Xt−1
+
+(nk n)−1 ∑nt=1 Xt−1 1
+
+#
+
+,
+
+59 and ˜dn :=
+
+"
+
+n−1/2k−3/2 
+
+> n
+
+00 n−1/2k−1/2
+
+> n
+
+#
+
+dn =
+
+"
+
+n−1/2k−3/2 
+
+> n
+
+∑nt=1 Xt−1Wt
+
+(nk n)−1/2 ∑nt=1 Wt
+
+#
+
+.
+
+Then by the previous two Lemmas, we get the joint convergence of: ˜Fn w
+
+→ Ω, ˜dn w
+
+→ N (0, Σ),
+
+Thus: 
+
+F−1 
+
+> n
+
+dn =
+
+"
+
+n−1/2k−1 
+
+> n
+
+00 n−1/2
+
+#
+
+˜F−1
+
+> n
+
+"
+
+n−1/2k−1 
+
+> n
+
+00 n−1/2
+
+# " 
+
+n1/2k3/2 
+
+> n
+
+00 n1/2k1/2
+
+> n
+
+#
+
+˜dn
+
+=
+
+"
+
+(nk n)−1/2 00 (kn/n)1/2
+
+#
+
+˜F−1 
+
+> n
+
+˜dn.
+
+Hence, the distribution of 
+
+"
+
+(nk n)1/2 00 (n/kn)1/2
+
+#
+
+˜F−1 
+
+> n
+
+˜dn =
+
+"
+
+(nk n)1/2( ˆαn − αn)(n/kn)1/2( ˆμn − μn)
+
+#
+
+converges weakly to N (0, Ω−1ΣΩ −1) by CMT. Part a) of Theorem 4 follows. 
+
+## A.5 Proof of Part b) of Theorem 4 
+
+We first prove the following lemma: 
+
+Lemma 4. We have the joint weak convergence of the following terms: i) k−1 
+
+> n
+
+α−nn Xn w
+
+→ Zii ) k−2 
+
+> n
+
+α−nn ∑nt=1 Xt−1 w
+
+→ Z, iii ) 2k−3 
+
+> n
+
+α−2nn ∑nt=1 X2
+
+> t−1
+> w
+
+→ Z2,iv ) 3k−4 
+
+> n
+
+α−3nn ∑nt=1 X3
+
+> t−1
+> w
+
+→ Z3,v)
+
+
+
+> 1
+
+√knX3
+
+> n
+
+∑nt=1 Xt−1Wt 
+
+> 1√knXn
+
+∑nt=1 Wt
+
+ w
+
+−→ N 0, σ 2
+
+"
+
+1/3 1212 1
+
+#! 
+
+, where random variable Z is de-fined in Proposition 3 and the Gaussian vector in v ) is independent of Z. 
+
+60 Proof of Lemma 4. We first prove (i) directly under the normalization αnn . Fix λ ≥ 0 and set 
+
+un,0 = λ
+
+knαnn
+
+, un,m+1 = an(un,m), m ≥ 0.
+
+Iterating the affine Laplace transform gives 
+
+E
+
+
+
+exp 
+
+
+
+−λ Xn
+
+knαnn
+
+ 
+
+= exp 
+
+(
+
+−X0un,n −
+
+> n−1
+
+# ∑
+
+> m=0
+
+bn(un,m)
+
+)
+
+.
+
+Using 
+
+an(u) = αnu − βn
+
+2 u2 + o(u2), bn(u) = μnu + o(u),
+
+uniformly for the arguments above, the usual discrete Riccati calculation gives 
+
+X0un,n → 0,
+
+> n−1
+
+# ∑
+
+> m=0
+
+bn(un,m) → 2μσ 2 log 
+
+
+
+1 + σ 2λ
+
+2
+
+
+
+.
+
+Hence 
+
+E
+
+
+
+exp 
+
+
+
+−λ Xn
+
+knαnn
+
+ 
+
+→
+
+
+
+1 + σ 2λ
+
+2
+
+−2μ/σ 2
+
+,
+
+which is the Laplace transform of the random variable Z in Proposition 3. This proves (i).We next prove (ii )–(iv ). Let 
+
+Rn,t := Xt
+
+knαtn
+
+.
+
+For every fixed M > 0, Doob’s inequality, the martingale decomposition 
+
+Rn,t − Rn,t−1 = μn +Wt
+
+knαtn
+
+,
+
+and the affine moment recursion implies sup 
+
+> 0≤r≤Mk n
+
+|Rn,n−r − Rn,n| p
+
+−→ 0.
+
+61 Thus, for j = 1, 2, 3, 
+
+j k −( j+1) 
+
+> n
+
+α− jn nn
+
+# ∑
+
+> t=1
+
+X jt−1 = jknn
+
+# ∑
+
+> r=1
+
+α− jr n R jn,n−r.
+
+Splitting the last sum at ⌊Mk n⌋, the terminal-window part satisfies 
+
+jkn
+
+> ⌊Mk n⌋
+
+# ∑
+
+> r=1
+
+α− jr n R jn,n−r = R jn,n
+
+jkn
+
+> ⌊Mk n⌋
+
+# ∑
+
+> r=1
+
+α− jr n + op(1) ⇒ Z j(1 − e− jM ).
+
+The remaining part is negligible as M → ∞; indeed, by the same moment recursion, lim  
+
+> M→∞
+
+lim sup 
+
+> n→∞
+
+P jkn ∑
+
+> r>⌊Mk n⌋
+
+α− jr n R jn,n−r > η
+
+!
+
+= 0, η > 0.
+
+Letting M → ∞ gives 
+
+j k −( j+1) 
+
+> n
+
+α− jn nn
+
+# ∑
+
+> t=1
+
+X jt−1
+
+> w
+
+→ Z j, j = 1, 2, 3.
+
+The cases j = 1, 2, 3 give (ii ), (iii ), and (iv ), respectively. It remains to prove (v). This is the same martingale-CLT argument as in the proof of part a) of Theorem 4, except that the mildly stationary LLN is replaced by the explosive terminal-window limits. Let us define the deterministically normalized martingale array 
+
+ζn,t :=
+
+"
+
+k−2 
+
+> n
+
+α−3n/2 
+
+> n
+
+Xt−1Wt
+
+k−1 
+
+> n
+
+α−n/2 
+
+> n
+
+Wt
+
+#
+
+.
+
+Its conditional covariance matrix is 
+
+> n
+
+# ∑
+
+> t=1
+
+E[ζn,t ζ ′ 
+
+> n,t
+
+| Ft−1] = 
+
+" 1 
+
+> k4
+> nα3nn
+
+∑ X2
+
+> t−1
+
+(βnXt−1 + δn) 1 
+
+> k3
+> nα2nn
+
+∑ Xt−1(βnXt−1 + δn) 
+
+> 1
+> k3
+> nα2nn
+
+∑ Xt−1(βnXt−1 + δn) 1 
+
+> k2
+> nαnn
+
+∑(βnXt−1 + δn)
+
+#
+
+.
+
+62 Using (ii ), (iii ), (iv ), and βn → σ 2, this converges in distribution to 
+
+σ 2
+
+"
+
+Z3/3 Z2/2
+
+Z2/2 Z
+
+#
+
+.
+
+The conditional Lindeberg condition follows exactly as in the proof of part a) of Theo-rem 4, using Assumption 6. Hence the martingale central limit theorem gives the stable convergence n
+
+# ∑
+
+> t=1
+
+ζn,t ⇒ σ
+
+"
+
+Z3/2G1
+
+Z1/2G2
+
+#
+
+,
+
+where (G1, G2) follows N 0,
+
+"13 1212 1
+
+#! 
+
+, and is independent of Z.Finally, by (i), Xn
+
+knαnn
+
+⇒ Z.
+
+Therefore, by Slutsky’s theorem, 
+
+"
+
+(knX3 
+
+> n
+
+)−1/2 ∑nt=1 Xt−1Wt
+
+(knXn)−1/2 ∑nt=1 Wt
+
+#
+
+=
+
+ Xn
+
+> knαnn
+
+−3/2
+
+00
+
+ Xn
+
+> knαnn
+
+−1/2
+
+
+
+> n
+
+# ∑
+
+> t=1
+
+ζn,t ⇒ σ
+
+"
+
+G1
+
+G2
+
+#
+
+.
+
+This proves (v), and the limit is independent of Z.Let us now prove part b) of Theorem 4. (v) of Lemma 4 says that ∑nt=1 Xt−1Wt ≈ σ G1k2
+
+> n
+
+α3n/2 
+
+> n
+
+Z 32
+
+and ∑nt=1 Wt ≈ σ G2knαn/2 
+
+> n
+
+Z 12 . Straightforward algebra gives: 63 " ˆαn − αn
+
+ˆμn − μn
+
+#
+
+=
+
+"
+
+∑nt=1 X2 
+
+> t−1
+
+∑nt=1 Xt−1
+
+∑nt=1 Xt−1 n
+
+#−1 "
+
+∑nt=1 Xt−1Wt
+
+∑nt=1 Wt
+
+#
+
+≈
+
+"12 k3
+
+> n
+
+α2nn Z2 k2
+
+> n
+
+αnn Zk2
+
+> n
+
+αnn Z n
+
+#−1 "
+
+σ G1k2
+
+> n
+
+α3n/2 
+
+> n
+
+Z 32
+
+σ G2knαn/2 
+
+> n
+
+Z 12
+
+#
+
+= σ
+
+(n 
+
+> 2
+
+− kn)k3
+
+> n
+
+α2nn Z2
+
+"
+
+(nG 1 − knG2)k2
+
+> n
+
+α3n/2 
+
+> n
+
+Z 32
+
+−α5n/2 
+
+> n
+
+Z5/2k4
+
+> n
+
+(G1 − G2/2)
+
+#
+
+≈ σ 
+
+> n
+> 2
+
+k3
+
+> n
+
+α2nn Z2
+
+"
+
+nG 1k2
+
+> n
+
+α3n/2 
+
+> n
+
+Z 32
+
+−α5n/2 
+
+> n
+
+Z5/2k4
+
+> n
+
+(G1 − G2/2)
+
+#
+
+.
+
+Thus ˆ αn − αn converges at the rate knαn/2 
+
+> n
+
+, whereas since kn 
+
+> n
+
+αn/2 
+
+> n
+
+increases to infinity, ˆμn − μn does not converge. 
+
+## A.6 Proof of Theorem 5 
+
+Using the technique of (Giraitis and Phillips, 2006, Theorem 1), we obtain ˆαn − αn = Op(( 1 − αn)1/2n−1/2) = Op(n−1/2k−1/2 
+
+> n
+
+)
+
+As a consequence, 
+
+n
+
+1 − ˆαn
+
+= n
+
+1 − αn
+
+| {z } 
+
+> Op(nk n)
+
++ n( ˆαn − αn)(1 − ˆαn)( 1 − αn)
+
+| {z }  
+
+> Op (n1/2k−1/2
+> n)
+> Op (k−2
+> n)
+
+= n
+
+1 − αn
+
++ s.o., 
+
+n(1 − ˆαn) = n(1 − αn)
+
+| {z } 
+
+> Op(nk −1
+> n)
+
++ n(αn − ˆαn)
+
+| {z } 
+
+> Op(n1/2k−1/2
+> n)
+
+= n(1 − αn) + s.o., 
+
+where s.o. denotes a term of smaller order in probability. This means that we can substitute 
+
+kn by ˆ kn = 11− ˆαn in Theorem 4. Theorem 5 follows. 64 A.7 Proof of Theorem 6 
+
+First, by Jensen’s inequality, there is no loss of generality to assume that η is small enough, that is, it satisfies 3 + 3η/2 < p. In the following, we assume this is satisfied. Let ¯δ bt = δ bt − 1, ˆWt = Xt − ˆαnXt−1 − ˆμn.
+
+Assume the bootstrap weights are independent of the data and satisfy 
+
+E[δ bt ] = 1, Var (δ bt ) = 1, E|δ bt − 1|2+η < ∞
+
+for some η > 0 such that 3 + 3η/2 < p.By the OLS normal equations, 
+
+# ∑Xt−1 ˆWt = 0, ∑ ˆWt = 0.
+
+Hence 
+
+Fbn ( ˆθ bn − ˆθn) = dbn ,
+
+where 
+
+Fbn =
+
+"
+
+∑ δ bt X2 
+
+> t−1
+
+∑ δ bt Xt−1
+
+∑ δ bt Xt−1 ∑ δ bt
+
+#
+
+, dbn =
+
+"
+
+∑ ¯δ bt Xt−1 ˆWt
+
+∑ ¯δ bt ˆWt
+
+#
+
+.
+
+First consider the normalized bootstrap design matrix. Its random-weight part is controlled by truncation. For example, 1
+
+n ∑ ¯δ bt Y 2 
+
+> n,t−1
+
+= 1
+
+n ∑ ¯δ bt Y 2
+
+> n,t−1
+
+1{Yn,t−1≤R} + 1
+
+n ∑ ¯δ bt Y 2
+
+> n,t−1
+
+1{Yn,t−1>R}.
+
+Conditionally on the data, the variance of the first term is bounded by CR 4/n. The second term is bounded in conditional L1 by 
+
+C 1
+
+n ∑Y 2
+
+> n,t−1
+
+1{Yn,t−1>R} ≤ CR
+
+1
+
+n ∑Y 3
+
+> n,t−1
+
+1{Yn,t−1>R},
+
+65 which is negligible by Lemma 2. The other entries are easier. Therefore ˜Fbnp∗
+
+−→ Ω
+
+in probability. Now define the normalized bootstrap score ˜dbn =
+
+"
+
+n−1/2k−3/2 
+
+> n
+
+∑ ¯δ bt Xt−1 ˆWt
+
+(nk n)−1/2 ∑ ¯δ bt ˆWt
+
+#
+
+.
+
+Conditionally on the data, this is a sum of independent centered random vectors. Its con-ditional covariance is 
+
+V ∗ 
+
+> n
+
+=
+
+" 1 
+
+> nk 3
+> n
+
+∑ X2 
+
+> t−1
+
+ˆW 2  
+
+> t1
+> nk 2
+> n
+
+∑ Xt−1 ˆW 2 
+
+> t
+> 1
+> nk 2
+> n
+
+∑ Xt−1 ˆW 2  
+
+> t1
+> nk n
+
+∑ ˆW 2
+
+> t
+
+#
+
+.
+
+We show that V ∗ 
+
+> n
+
+→p Σ. For r = 0, 1, 2, 1
+
+nk r+1 
+
+> n
+
+# ∑Xrt−1{W 2 
+
+> t
+
+− E[W 2 
+
+> t
+
+| Ft−1]} p
+
+−→ 0.
+
+Indeed, choose q > 1 such that q ≤ 2, 2 q ≤ p, and (r + 1)q ≤ p. The affine moment recursion gives uniformly bounded q-moments for the scaled martingale differences, and the von Bahr–Esseen inequality yields 
+
+E 1
+
+n ∑k−(r+1) 
+
+> n
+
+Xrt−1{W 2 
+
+> t
+
+− E[W 2 
+
+> t
+
+| Ft−1]}
+
+> q
+
+= O(n1−q) → 0.
+
+Since 
+
+E[W 2 
+
+> t
+
+| Ft−1] = βnXt−1 + δn,
+
+Lemma 2 gives 1
+
+nk r+1 
+
+> n
+
+# ∑Xrt−1W 2
+
+> tp
+
+−→ σ 2E[ϒr+1 
+
+> ∞
+
+], r = 0, 1, 2.
+
+66 It remains to replace Wt by ˆ Wt . Put 
+
+Rt = ˆWt −Wt = −( ˆαn − αn)Xt−1 − ( ˆμn − μn).
+
+By Theorem 4 (a),ˆαn − αn = Op(( nk n)−1/2), ˆμn − μn = Op(( kn/n)1/2).
+
+The only apparently fourth-order term is 
+
+( ˆαn − αn)2 1
+
+nk 3 
+
+> n
+
+# ∑X4 
+
+> t−1
+
+= Op(1) 1
+
+n2 ∑Y 4
+
+> n,t−1
+
+.
+
+But 1
+
+n2 ∑Y 4 
+
+> n,t−1
+
+≤
+
+max t≤n Yn,t−1
+
+n
+
+ 1
+
+n ∑Y 3 
+
+> n,t−1
+
+= op(1),
+
+because by Markov’s inequality max t≤n Yn,t−1/n = op(1), and Lemma 2 gives n−1 ∑Y 3 
+
+> n,t−1
+
+=
+
+Op(1). Thus, for r = 0, 1, 2, 1
+
+nk r+1 
+
+> n
+
+# ∑Xrt−1R2 
+
+> t
+
+= op(1).
+
+By Cauchy-Schwarz, 1
+
+nk r+1 
+
+> n
+
+# ∑Xrt−1( ˆW 2 
+
+> t
+
+−W 2 
+
+> t
+
+) = op(1).
+
+Hence V ∗ 
+
+> n
+
+→p Σ.Finally, the conditional Lindeberg condition follows from E| ¯δ bt |2+η < ∞ and 3 + 3η/2 <
+
+p:
+
+# ∑
+
+> t
+
+E∗h
+
+∥ ¯δ bt zn,t ∥21{∥ ¯δ bt zn,t ∥>ε}
+
+i
+
+≤ Cε−η ∑
+
+> t
+
+∥zn,t ∥2+η = op(1),
+
+where 
+
+zn,t =
+
+"
+
+n−1/2k−3/2 
+
+> n
+
+Xt−1 ˆWt
+
+(nk n)−1/2 ˆWt
+
+#
+
+.
+
+67 Therefore, conditionally on the data, ˜dbnw∗
+
+−→ N (0, Σ)
+
+in probability. Combining this with ˜ Fbn → Ω gives 
+
+" √nk n( ˆαbn − ˆαn)
+
+pn/kn( ˆμbn − ˆμn)
+
+#
+
+> w∗
+
+−→ N (0, Ω−1ΣΩ −1).
+
+## A.8 Proof of Proposition 8 
+
+Using the same technique as in the proof of Theorem 4, we have: 
+
+(nk n)−1 n
+
+# ∑
+
+> t=1
+
+W 2
+
+> tw
+
+→ σ 2E[ϒ∞]
+
+On the other hand, by the proof of Lemma 2, we have: 
+
+(nk n)−1 n
+
+# ∑
+
+> t=1
+
+Xt−1 w
+
+→ E[ϒ∞]
+
+Then we remark that: ˆWt = Wt + ( αn − ˆαn)Xt−1 + ( μn − ˆμn)
+
+Thus 
+
+> n
+
+# ∑
+
+> t=1
+
+ˆW 2 
+
+> t
+
+=
+
+> n
+
+# ∑
+
+> t=1
+
+W 2 
+
+> t
+
++
+
+> n
+
+# ∑
+
+> t=1
+
+[( αn − ˆαn)Xt−1 + ( μn − ˆμn)] 2 + 2
+
+> n
+
+# ∑
+
+> t=1
+
+Wt [( αn − ˆαn)Xt−1 + ( μn − ˆμn)] .
+
+It is easily checked that the second term is negligible with respect to the denominator 
+
+∑nt=1 Xt−1, and by Cauchy-Schwarz, the third, cross term, is also negligible. Finally, taking the ratio of these two equations leads to ˆ σ 2 = ∑nt=1 ˆW 2 
+
+> t
+> ∑nt=1Xt−1
+> w
+
+→ σ 2.
+
+68 A.9 Proof of Proposition 9 
+
+This proposition is based on the following lemma, which is the analog of Lemma 2. 
+
+Lemma 5. Under the assumption μ > σ 2 
+
+> 2
+
+, we have the joint weak convergence of the random variables: 
+
+• i). kn 
+
+> n
+
+∑nt=1 1
+
+> Xt−1+1
+> w
+
+→ E[1/ϒ∞]
+
+• ii ). 1 
+
+> nk n
+
+∑nt=1
+
+> X2
+> t−1
+> Xt−1+1
+> w
+
+→ E[ϒ∞]
+
+• iii ). 1 
+
+> n
+
+∑nt=1
+
+> Xt−1
+> Xt−1+1
+> w
+
+→ 1• iv ).
+
+"n−1/2k−1/2 
+
+> n
+
+∑nt=1
+
+> Xt−1Wt
+> Xt−1+1
+
+(n/kn)−1/2 ∑nt=1 Wt
+
+> Xt−1+1
+
+#
+
+> w
+
+→ N (0, σ 2Ω1), where Ω1 =
+
+"
+
+E[ϒ∞] 11 E[1/ϒ∞]
+
+#
+
+.Proof of Lemma 5. To investigate the term Sn := ∑nt=1 1 
+
+> Xt−1+1
+
+in convergence i), we write: 
+
+> n
+
+# ∑
+
+> t=1
+
+1
+
+Xt−1 + 1 =
+
+> n
+
+# ∑
+
+> t=1
+
+1
+
+kn
+
+1 
+
+> 1
+> kn
+
++ Xt−1
+
+> kn
+
+≈
+
+> n
+
+# ∑
+
+> t=1
+
+1
+
+kn
+
+1
+
+> Xt−1
+> kn
+
+.
+
+Since X⌊kns⌋/kn converges weakly, we have 
+
+> n
+
+# ∑
+
+> t=1
+
+1
+
+n
+
+1
+
+> Xt−1
+> kn
+
+≈ kn
+
+n
+
+Z n/kn
+
+> 0
+
+1
+
+ϒs
+
+ds → E[1/ϒ∞],
+
+provided that the latter limit is finite. Since the diffusion (ϒs) has a gamma invariant distribution with shape parameter 2 μ/σ 2, the invariant distribution of 1 
+
+> ϒs
+
+is inverse gamma with the same shape parameter, which has an infinite mean if 2 μ/σ 2 < 1. Thus we get convergence i). Convergences ii ) and iii ) are simple consequences of i). Convergence iv )
+
+can be proved in a similar way as convergence b) in Lemma 3. 69 Let us now prove Proposition 9. We introduce the rescaled square matrix ˜Hn : =
+
+"
+
+(nk n)−1/2 00 (n/kn)−1/2
+
+#
+
+Hn
+
+"
+
+(nk n)−1/2 00 (n/kn)−1/2
+
+#
+
+=
+
+(nk n)−1 ∑nt=1 
+
+> X2
+> t−1
+> Xt−1+1
+
+n−1 ∑nt=1
+
+> Xt−1
+> Xt−1+1
+
+n−1 ∑nt=1 
+
+> Xt−1
+> Xt−1+1
+> kn
+> n
+
+∑nt=1 1
+
+> Xt−1+1
+
+ p
+
+→ Ω1,
+
+and ˜vn :=
+
+"
+
+(nk n)−1/2 00 (n/kn)−1/2
+
+#
+
+vn =
+
+"n−1/2k−1/2 
+
+> n
+
+∑nt=1
+
+> Xt−1Wt
+> Xt−1+1
+
+(n/kn)−1/2 ∑nt=1 Wt
+
+> Xt−1+1
+
+#
+
+> w
+
+→ N (0, σ 2Ω1).
+
+Thus: 
+
+H−1 
+
+> n
+
+vn =
+
+"
+
+(nk n)−1/2 00 (n/kn)−1/2
+
+#
+
+˜H−1
+
+> n
+
+"
+
+(nk n)−1/2 00 (n/kn)−1/2
+
+# " 
+
+(nk n)1/2 00 (n/kn)1/2
+
+#
+
+˜vn
+
+=
+
+"
+
+(nk n)−1/2 00 (n/kn)−1/2
+
+#
+
+˜H−1 
+
+> n
+
+˜vn.
+
+Hence the distribution of 
+
+"
+
+(nk n)1/2 00 (n/kn)1/2
+
+#
+
+˜H−1 
+
+> n
+
+˜vn =
+
+"
+
+(nk n)1/2( ˆˆαn − αn)(n/kn)1/2( ˆˆμn − μn)
+
+#
+
+converges weakly to N (0, σ 2Ω−11 Ω1Ω−11 ) = N (0, σ 2Ω−11 ) by CMT. Proposition 9 follows. 
+
+# B Benchmark comparison with Peng et al. (2024) 
+
+As a benchmark comparison, we apply the p(α) calculation to break-and-enter dwelling crime count data used by Peng et al. (2024). The data are monthly counts for three mu-nicipalities (Inner West, Blacktown, and Sydney) from January 1995 to September 2023. Peng et al. (2024) consider the mildly stationary INAR(1) specification for these data, cor-responding to the limiting case of our framework with σ 2 = 0. Using our estimator ˆ σ 2, we estimate the value of σ 2 to be 6.5, 4.3 and 7.15 for these three cities, respectively. Since the INAR model implies conditional under-dispersion, whereas our framework allows for 70 both under- and over-dispersion, an estimate of ˆ σ 2 that is substantially larger than 1 sug-gests potential over-dispersion of the data, thus favoring our affine framework. The OLS estimates are ˆ αn = 0.962 , 0.931 , 0.924, respectively, which are close to those reported by Peng et al. (2024). The resulting ˆ kn is 26, 14 and 13, respectively, which is much smaller than n = 344 for each series, making the mildly stationary framework potentially appro-priate. Figure 7 plots the plug-in and bootstrap-normal p(α) functions. 0.85 0.90 0.95 1.00 0.0  0.2  0.4  0.6  0.8  1.0          
+
+> Inner West
+> candidate α0p( α0 )
+> plug−in bootstrap−normal
+> hat alpha = 0.962
+> 0.85 0.90 0.95 1.00 0.0  0.2  0.4  0.6  0.8  1.0
+> Blacktown
+> candidate α0p( α0 )
+> hat alpha = 0.931
+> 0.85 0.90 0.95 1.00 0.0  0.2  0.4  0.6  0.8  1.0
+> Sydney
+> candidate α0p( α0 )
+> hat alpha = 0.924 Peng et al. (2024) crime counts: p−value functions under our calibration
+
+Figure 7: Plug-in and bootstrap-normal p(α) functions for the break-and-enter dwelling counts used by Peng et al. (2024). The horizontal dotted line is the 10% significance level, and the vertical dashed line marks ˆ α.The resulting non-rejection regions are broadly comparable to those obtained for the count applications in Section 7. Unlike our main applications, however, the upper boundary 
+
+α = 1 is rejected for Blacktown and Sydney under both plug-in and bootstrap-normal inference, and is borderline for Inner West. This illustrates that non-rejection near the upper grid boundary is not a mechanical feature of the p(α) construction, but reflects the uncertainty and persistence structure of the particular sample. 71

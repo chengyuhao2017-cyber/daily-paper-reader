@@ -1,0 +1,348 @@
+Title: Linear Ordering Problem: Time for a Change
+
+URL Source: https://arxiv.org/pdf/2605.31051v1
+
+Published Time: Mon, 01 Jun 2026 00:55:34 GMT
+
+Number of Pages: 17
+
+Markdown Content:
+# Linear Ordering Problem: Time for a Change 
+
+Fabrizio Fagiolo 1[0009 −0003 −0390 −7855] , Marco Baioletti 2[0000 −0001 −5630 −7173] ,and Valentino Santucci 1[0000 −0003 −1483 −7998]  
+
+> 1
+
+University for Foreigners of Perugia, Perugia 06123, Italy 
+
+f.fagiolo@phd.unistrapg.it, valentino.santucci@unistrapg.it  
+
+> 2
+
+University of Perugia, Perugia 06123, Italy 
+
+marco.baioletti@unipg.it 
+
+Abstract. The Linear Ordering Problem (LOP) is a fundamental com-binatorial optimization problem with important applications in areas such as economics, social choice, and machine learning. Its most promi-nent use is the triangulation of economic input-output tables, which helps identify critical industries in an economy. Most existing algorithms have been evaluated on benchmarks derived from outdated macroeconomic data, which no longer reflect the structure of contemporary economies. Furthermore, LOP instances often exhibit many distinct global optima that can differ substantially from one another, creating challenges for applications that rely on a single solution. To address these limitations, we introduce a novel benchmark suite derived from up-to-date real-world economic data and an algorithmic scheme that leverages state-of-the-art LOP metaheuristics to generate diverse sets of high-quality solutions, to-gether with metrics for assessing both quality and diversity. Experiments were conducted to report results on the proposed benchmark suite un-der both the traditional single-solution setting and the newly introduced multi-solution scenario. 
+
+Keywords: Linear Ordering Problem · Multimodal Combinatorial Op-timization · Benchmarking · Permutation Diversity. 
+
+## 1 Introduction 
+
+The Linear Ordering Problem (LOP) is a fundamental combinatorial optimiza-tion problem that has been extensively studied due to its central role in a variety of economically and computationally relevant applications [31]. Its most promi-nent application is the triangulation of economic input-output tables [13,26,31], a core task in input-output analysis [28], the field for which Leontief received the Nobel Prize in 1973. Beyond economics, the LOP has also found applications in diverse areas, including social choice [4], sports analytics [9], anthropology [21], natural language processing and translation [25,50], machine learning [33], and prompt engineering for generative AI [47]. Moreover, the LOP has recently at-tracted attention in studies examining the difficulty and structural characteris-tics of combinatorial problem instances [17,24,30,41]  
+
+> arXiv:2605.31051v1 [cs.NE] 29 May 2026 2F. Fagiolo et al.
+
+The LOP involves finding a permutation that reorders the rows and columns of a given matrix so as to maximize the sum of its upper-triangular part. When interpreted as the weight matrix of a digraph, the LOP is equivalent to finding a maximum-weight tournament subgraph [31]. In economic applications, the graph nodes represent industries, while the arcs correspond to inter-industry flows. The resulting triangulation provides a structured representation of these relationships and helps to identify critical industries within an economy. The vast majority of algorithms proposed in the literature have been eval-uated using the same benchmark suite, whose most recent version dates back to 2010 [32]. This suite includes a mix of artificial and real-world instances, al-though the latter are based on macroeconomic data that are now between 47 and 67 years old. In the meantime, financial crises, pandemics, globalization and rapid digitalization of markets have fundamentally reshaped economies, making many of these historical instances less representative of contemporary economies. Moreover, from an algorithmic perspective, although the No Free Lunch theo-rem does not apply to the LOP—since its objective function is not closed under permutation 3 [16]—, algorithms’ performance can still vary significantly across different instances. Consequently, updated benchmarks are essential both to ac-curately assess algorithms’ performance in contemporary settings and to ensure that algorithmic design reflects the structural characteristics of modern economic data. To address this gap, in this work we introduce a novel benchmark suite for the LOP based on up-to-date real-world economic data. Thanks to advances in macroeconomic data collection, the proposed suite, called EXIOBASE , includes larger realistic instances than previous benchmarks, offering a more representa-tive and challenging testbed for modern algorithm evaluation. Furthermore, recent studies have shown that LOP instances often admit many distinct global optima rather than a single one [3,7,9]. These optimal solutions can differ substantially from one another, posing significant challenges for analyses that rely on a single solution and motivating the need for methods capable of identifying representative and diverse sets of global optima. Recent approaches mostly rely on exact algorithms, which are only feasible for relatively small instances due to the NP-hardness of the LOP. To address this limitation, this work introduces an algorithmic scheme de-signed to leverage state-of-the-art LOP metaheuristics to generate a diverse set of high-quality solutions. We also propose appropriate metrics for evaluating the quality and diversity of the obtained solutions, providing a rigorous framework for experimental assessment. The rest of the paper is organized as follows. Sect. 2 formally defines the LOP, reviews state-of-the-art algorithms, summarizes commonly adopted benchmarks, and discusses recent approaches for collecting multiple solutions. Sect. 3 intro-duces the newly proposed real-world economic benchmark suite, while Sect. 4   
+
+> 3This follows immediately from the skew-symmetry property of the LOP: given an instance, the optimal solution is the reverse of the worst solution, the second-best solution is the reverse of the second-worst solution, and so on. Linear Ordering Problem: Time for a Change 3
+
+formally defines the Multi-Solution LOP (MS-LOP). The algorithmic scheme for generating multiple high-quality solutions is presented in Sect. 5, and exper-imental results are reported and analyzed in Sect. 6. Finally, Sect. 7 concludes the paper by also outlining directions for future research. 
+
+## 2 Linear Ordering Problem 
+
+An LOP instance is represented by a square matrix B = [ bij ]n×n. Denoting the set of all permutations of [n] = {1, 2, . . . , n } as Sn, the goal is to find an optimal permutation σ∗ ∈ Sn that maximizes the objective function 
+
+f (σ) = 
+
+> n−1
+
+X
+
+> i=1
+> n
+
+X
+
+> j=i+1
+
+bσ(i),σ (j). (1) 
+
+Algorithms for the LOP. The LOP was proven NP-hard in the seminal work of Garey and Johnson [20], and was later shown to be APX-complete [34]. Consequently, many metaheuristics have been proposed over the past decades (e.g., [2,5,6,10,12,19,27,31,39,40]). To the best of our knowledge, the current state-of-the-art methods for the LOP are CD-RVNS [42] and MA-EDM [29]. CD-RVNS, introduced in [42], alternates between a variable neighborhood search phase and a destruction-construction phase. The variable neighborhood search identifies a local optimum under both insertion and interchange neigh-borhoods, using the restricted neighborhood technique for the LOP proposed in [11]. The destruction and construction operators partially disrupt the local optimum and then reconstruct a new solution by exploiting a novel represen-tation specifically designed for the LOP. These latter procedures employ both intensification and diversification mechanisms, which appear to be the reason for the superior performance of CD-RVNS with respect to previous methods. MA-EDM was introduced in [29] and its core idea is to maintain a population of local optima, under the insertion neighborhood, that is both diverse and of high quality. To this end, it employs a population selection procedure based on the permutation deviation distance, previously introduced in [45], which can be computed in linear time and is particularly well-suited for the LOP. Unlike CD-RVNS, the local search incorporated in MA-EDM does not use the restricted neighborhood, but relies on a classical acceleration technique that allows the evaluation of all the neighbors in Θ(n2) time [44]. 
+
+Benchmark suites for the LOP. LOLIB is the most extensively studied bench-mark suite for the LOP. It was compiled in 2010 and presented in [32]. The suite originally comprised 485 instances grouped into eight distinct sets and was later extended in [11] with the addition of the xLOLIB2 instance set 4. The resulting     
+
+> 4LOLIB and xLOLIB2 are available at https://www.uv.es/rmarti/paper/lop.html and https://github.com/sgpceurj/EJOR2015, respectively.
+
+4 F. Fagiolo et al. 
+
+Table 1: Main characteristics of the benchmark instance sets for the LOP.                                                                 
+
+> Instance Set #Instances Size Normal Form #Optima Type
+> IO [23] 50 44-79 Yes 50 Economic IO tables (1959–1979)
+> SGB [27] 25 75 Yes 25 Random uniform from large range
+> RandA1 [10] 100 100-500 Yes 0Random uniform from small range
+> RandA2 [10] 75 100-200 Yes 0From random permutations
+> RandB [32] 90 40-50 Yes 71 Random asymmetric
+> MB [35] 30 100-250 Yes 30 Random asymmetric + zeroed entries
+> xLOLIB [43] 78 150-250 Yes 0Oversampled IO instances
+> Spec [14,22,32] 37 11-452 Yes 30 Artificial, subsampled IO , tennis results
+> xLOLIB2 [11] 200 300-1000 No 0Oversampled IO instances
+
+suite, now consisting of nine sets and 685 instances, has become the de facto standard in LOP research. All the state-of-the-art algorithms discussed previ-ously [42,29] have been evaluated on these nine instance sets, which are listed along with their main characteristics in Tab. 1. Most of the instances are artifi-cial, while only a few are derived from real-world data. The only proper real-world instances are the national input-output tables in the IO set, first used in the context of the LOP in [23] and based on data from Eurostat and other statistical agencies. These IO tables span the years 1959–1979 and include 50 instances: 31 with n = 44 , 4 with n = 50 , 11 with 
+
+n = 56 , 3 with n = 60 , and one ( usa79 ) with n = 79 . Schiavinotto and Stüt-zle [43] then generated the xLOLIB instances by oversampling 39 IO instances: for each, they created two larger instances with n = 150 and n = 250 by uni-formly sampling entries from the corresponding IO table. They describe these 
+
+xLOLIB instances as “real-life like” problems. The same procedure was later used by Ceberio et al. [11] to generate the xLOLIB2 instances, 50 for each size 
+
+n ∈ { 300 , 500 , 750 , 1000 }. Finally, the Spec set—comprising both artificial and real-world instances—contains 15 economic-like matrices generated in [14] by subsampling the usa79 instance from the IO set, as well as 8 preference counting matrices derived from the results of ATP tennis tournaments held in 1993—1994. All remaining instances are artificially generated. The entries of SGB and 
+
+RandA1 instances are sampled uniformly at random from [0 , 250 000] and [0 , 100] ,respectively. RandA2 instances are preference counting matrices constructed from a set of randomly generated permutations. RandB and MB instances are generated with upper and lower triangular parts drawn from uniform distributions over intervals of different length, with MB instances further processed by zeroing-out a certain percentage of entries. Finally, the 14 fully artificial instances in Spec 
+
+include 6 random binary matrices and 8 Paley graph adjacency matrices. The number of known optima reported in Tab. 1 (proven via integer pro-gramming) is taken from [29]. In general, the unsolved instances are the larger ones, with a few exceptions: MB instances are easier due to the zeroing-out pro-cess, and RandA1 instances appear more difficult than SGB instances because of their different variability. Indeed, both sparsity (the percentage of zeros) and entry variability are known to influence instance difficulty [43]. All benchmark instances have non-negative integer entries. Moreover, all in-stances except those in xLOLIB2 are in normal form, i.e., min {bij , b ji } = 0 for Linear Ordering Problem: Time for a Change 5
+
+all i, j ∈ [n]. As noted in [32], every LOP instance can be normalized without altering the ranking over the solutions induced by the objective function. 
+
+Multiple high-quality solutions for the LOP. Recently, there has been a growing interest in the observation that LOP instances often have multiple dis-tinct global optima rather than a single one. Benito-Marimom et al. [7] showed, using integer programming, that: all IO instances have more than one global optimum, only 7 out of 50 instances had fewer than 500 optima, while 21 exhib-ited more than 500 000 distinct optima. Although these solutions share the same optimal objective value, they can differ substantially in their genotypic repre-sentations. In particular, [3] showed that some items may vary considerably in both their positions and relative ordering across the different optimal solutions. Therefore, novel algorithms aimed at identifying representative sets of multi-ple global optima for the LOP have begun to emerge. Cameron et al. [9] proposed an integer programming model to identify two global optima that are maximally distant according to the Kendall’s-τ distance [44]. Building on this idea, Ander-son et al. [3] introduced a family of integer programming models to: compute a summary—referred to as the “centroid”—of item positions across all global optima, identify pairs of optima closest to and farthest from this centroid, as well as the most similar and most dissimilar pairs of optima. In all cases, the Kendall’s-τ distance is used to measure (dis)similarity, as it is particularly well suited to the LOP. More recently, [7] extended the model of [9] to generate sets of more than two global optima that are maximally distant from one another. To this end, they considered two distinct objectives: maximizing the sum of all pairwise distances and maximizing the minimum distance between any two solutions. The latter helps to prevent multiple copies of the same optimum and ensures better coverage of the entire set of global optima. The same authors also noted that the integer programming approaches are limited to small/medium-sized instances and there-fore proposed a two-phase heuristic method based on a Variable Neighborhood Search (VNS) scheme using insertion neighborhoods with an increasing number of moves. In the first phase, VNS finds the best possible objective value (with no theoretical guarantee), while in the second phase, a separate VNS collects 
+
+m solutions attaining this value into a representative set that tries to maximize the sum of pairwise Kendall’s-τ distances. The authors explicitly note that this second-phase VNS ignores any solutions with an objective value higher than that found in the first phase. Beyond the LOP, two related areas of research can be identified in the evolu-tionary computation field: multimodal optimization and evolutionary diversity optimization. Multimodal optimization [36,37] deals with the task of approximat-ing the set of local optima whose quality is higher than a specified threshold. In this context, the diversity of solutions is primarily considered to enhance the search exploration, rather than being an explicit optimization goal in its own [15]. In contrast, evolutionary diversity optimization, introduced in [51], aims to com-pute a set of solutions whose quality is higher than a given threshold and that are 6 F. Fagiolo et al. 
+
+maximally diverse from one another. While multimodal optimization is mainly applied to continuous search spaces (see the recent GECCO competition [1]), evolutionary diversity optimization has mostly been studied from a theoretical perspective (e.g., [8,15]). Neither has been applied to the LOP. Moreover, most of the works in these research lines assume that the optima or their objective values are known in advance. 
+
+## 3 The EXIOBASE Benchmark Suite 
+
+To address the limitations of existing benchmark suites for the LOP, we in-troduce a novel suite, EXIOBASE , derived from real-world data in the homony-mous input-output (IO) database introduced by Stadler et al. [48] for economical and sustainability analyses. The proposed benchmarks are publicly available at https://doi.org/10.5281/zenodo.19238064. The rest of this section outlines the structure of the original IO tables, de-scribes the construction of our benchmark suite, and presents comparative statis-tics with classical benchmarks. 
+
+The original IO database. EXIOBASE [48] is a widely used global multi-regional input-output database that links economic transactions between coun-tries and industries with environmental and social indicators; it is standardly applied in footprint and sustainability assessments. At the time of writing, the most recent release is version 3.9.6, available at [49], which provides annual data from 1995 to 2022. While environmental extensions are available, the present study focuses exclusively on the economic component containing the IO tables. For each year, four primary economic data structures are provided: the multi-regional transaction matrix Z, the final demand matrix Y, the total output vector x, and the structural matrix A.Data are available in both industry-by-industry and product-by-product for-mats. Here, we focus on the product-by-product format. In this configuration, the rows and columns of Z = [ zij ]s×s correspond to specific region-product pairs. Each entry zij represents the monetary value of the output from region-product i
+
+used as intermediate input by region-product j, expressed in millions of euros. The order of Z is s = sR · sP, with sR = 49 regions (44 countries and 5 rest-of-the-world regions) and sP = 200 products. The matrix Y ∈ Rs×f represents final demand, with rows corresponding to the s region-product pairs and f = sR · sF
+
+columns representing the sF = 7 standard final demand categories repeated for each of the sR regions. The output vector x ∈ Rs contains the total pro-duction of each sector and is computed as x = Z1 s + Y1 f , where 1s and 1f
+
+are all-ones vectors of length s and f , respectively. Finally, the structural ma-trix A = [ aij ]s×s is a normalized version of Z, computed as A = Z diag( x)−1,where each entry aij ≥ 0 is a technical coefficient representing the amount of output from region-product i required to produce one unit of region-product j.These coefficients are dimensionless ratios of monetary values, and A, like Z, is Linear Ordering Problem: Time for a Change 7
+
+a 9800 × 9800 matrix with the following block structure: 
+
+A =
+
+
+
+A1,1 A1,2 · · · A1,s R
+
+A2,1 A2,2 · · · A2,s R
+
+... ... . . . ...
+
+AsR,1 AsR,2 · · · AsR,s R
+
+ , (2) where each block Akl is a sP × sP matrix, with diagonal blocks Akk representing inter-industry flows within region k, and the off-diagonal blocks Akl (k̸ = l)describing inter-regional trade. 
+
+Construction of the benchmark suite. Building on the data described above, we introduce the EXIOBASE benchmark suite for the LOP, consisting of four distinct instance sets: pxp , rxr , isic , and os300 . These sets are designed to reflect different levels of aggregation and capture a range of contemporary global economic interdependencies. The set pxp (product-by-product) consists of 49 instances derived from the domestic structural matrices for the year 2022. Each instance is obtained from the corresponding diagonal block Akk in Eq. (2), representing the inter-industry transactions for region k ∈ { 1, 2, . . . , 49 }. Formally, given a 200 × 200 domestic matrix A, a corresponding LOP instance B is constructed in two steps. First, an intermediate matrix B′ is computed as B′ = ⌊cA − min( cA, c AT )⌉, where 
+
+c = 10 5 is a scaling factor, both min and ⌊·⌉ are applied element-wise, and ⌊·⌉ 
+
+denotes the rounding to the nearest integer. This transformation ensures that instances have integer entries within [0 , 10 5] and are in normal form, as defined in [32]. Second, the final LOP instance B is obtained from B′ by removing all products i for which both the i-th row and i-th column are entirely zero. This filtering step is essential, since such “null products” can be placed arbitrarily within a permutation without affecting its LOP objective value; consequently, k
+
+null products would artificially increase the number of global optima by a factor of  nk
+
+ = Θ(nk). As a result, the instances in pxp have varying sizes, ranging from 89 to 176, with a median size of 149. The set rxr (region-by-region) consists of 28 instances, one for each year from 1995 to 2022, obtained by first aggregating the technical coefficients into 49 × 49 
+
+matrices representing inter-regional trade and then applying the same scaling, rounding, and normalization steps described above. In this case, all instances have size n = 49 .The set isic comprises 49 matrices generated by aggregating the 2022 data according to the International Standard Industrial Classification (ISIC). This aggregation groups the 200 original products into the first ten ISIC categories (e.g., agriculture, manufacturing, and services). Scaling, rounding and normal-ization steps are applied here as well. All instances therefore have size n = 10 
+
+and can be exhaustively evaluated, making them particularly useful in scenarios where exact global optima are required (e.g., [30]). 8 F. Fagiolo et al. 
+
+Table 2: Structural statistics for the EXIOBASE and LOLIB benchmark suites.                                                                                                                                          
+
+> Sparsity Variation Coeff. Skewness Suite Set Median [Min,Max] Median [Min,Max] Median [Min,Max]
+> EXIOBASE isic 0.00 [0 .00 ,0.04] 1.23 [0 .89 ,2.86] 2.14 [0 .74 ,5.88]
+> rxr 0.00 [0 .00 ,0.01] 1.85 [1 .77 ,2.30] 4.67 [4 .07 ,10 .02]
+> pxp 0.17 [0 .03 ,0.45] 5.19 [3 .03 ,8.26] 16 .01 [7 .88 ,27 .17]
+> os300 0.01 [0 .00 ,0.02] 3.62 [2 .20 ,6.20] 10 .14 [5 .83 ,16 .69]
+> Overall 0.01 [0 .00 ,0.45] 2.92 [0 .89 ,8.26] 8.70 [0 .74 ,27 .17]
+> LOLIB IO 0.18 [0 .05 ,0.71] 3.74 [2 .59 ,9.22] 10 .54 [4 .95 ,23 .67]
+> SGB 0.10 [0 .08 ,0.12] 6.48 [6 .42 ,6.78] 17 .02 [16 .64 ,17 .65]
+> RandA1 0.01 [0 .01 ,0.01] 0.71 [0 .69 ,0.73] 0.56 [0 .53 ,0.62]
+> RandA2 0.08 [0 .00 ,0.12] 0.75 [0 .73 ,0.79] 0.94 [0 .77 ,1.09]
+> RandB 0.01 [0 .00 ,0.02] 0.57 [0 .52 ,0.61] 0.07 [−0.05 ,0.47]
+> MB 0.02 [0 .01 ,0.06] 0.72 [0 .70 ,0.77] 0.49 [0 .43 ,0.63]
+> xLOLIB 0.12 [0 .05 ,0.65] 3.87 [3 .19 ,11 .60] 9.81 [7 .17 ,30 .89]
+> xLOLIB2 0.34 [0 .26 ,0.73] 4.18 [3 .56 ,12 .35] 9.88 [7 .53 ,27 .81]
+> Overall 0.10 [0 .00 ,0.73] 3.42 [0 .52 ,12 .35] 7.87 [−0.05 ,30 .89]
+
+Finally, the set os300 consists of 49 real-life-like instances of size n = 300 .Each is created by oversampling the corresponding pxp instance using the tech-nique used in [43] and [11], followed by normalization of the resulting matrix. 
+
+Statistical analysis of the instances. Tab. 2 compares the main structural statistics of the EXIOBASE and LOLIB benchmark suites. In particular, we report the same measures used in [43]: sparsity (percentage of zeros), the coefficient of variation (ratio of standard deviation to mean), and the skewness index. Since the instances are in normal form, these statistics were computed only on the maximum of each pair (bij , b ji ) for all 1 ≤ i < j ≤ n.Although these statistics are not strong predictors of instance difficulty, it is apparent that EXIOBASE instances exhibit lower sparsity and variation than 
+
+LOLIB instances, while the overall skewness is roughly similar. 
+
+## 4 Multi-Solution Linear Ordering Problem 
+
+We introduce the Multi-Solution LOP (MS-LOP) as a multimodal and diversity-aware extension of the LOP that unifies three related research directions: the Multiple LOP of Benito-Marimom et al. [7], and the tasks of multimodal opti-mization (e.g., [37]) and evolutionary diversity optimization (e.g., [15]). Let f : Sn → R be the LOP objective function defined as in Eq. (1) and 
+
+N : Sn → 2Sn be a neighborhood relation on Sn (e.g., the insertion neighbor-hood), then L = {σ ∈ Sn : f (σ) ≥ f (π), ∀ π ∈ N (σ)} is the set of local optima of f with respect to N . Given an integer m > 0, Lm = {S ⊆ L : |S| = m} is the family of sets containing exactly m distinct local optima. For any S ∈ L m, we define its quality Φ(S) and its diversity ∆(S). The quality Φ(S) is the average of the individual objective values in S, while the diversity ∆(S) can be instantiated by any suitable metric that quantifies the dispersion within S based on the pairwise Kendall’s-τ distances of its members. The Kendall’s-τ distance counts the number of pairwise disagreements between Linear Ordering Problem: Time for a Change 9
+
+two permutations and is widely regarded as the most appropriate distance mea-sure for the LOP [43,44]. Two reasonable choices for ∆ are: the sum of nearest-neighbor distances ∆NN [7,31], and the Solow-Polasky diversity ∆SP [38,46]. The metrics Φ, ∆NN and ∆SP are formally defined as: 
+
+Φ(S) = 1
+
+m
+
+X
+
+> σ∈S
+
+f (σ), (3) 
+
+∆NN (S) = X
+
+> σ∈S
+
+min  
+
+> π∈S\{ σ}
+
+d(σ, π ), (4) 
+
+∆SP (S) = 1TmC−11m, (5) where: d(·, ·) is the Kendall’s-τ distance between permutations, C = [ cij ]m×m is the similarity matrix with entries cij = e−θd (σi,σ j ) for each pair σi, σ j ∈ S, θ > 0
+
+is a Solow-Polasky parameter [46], and 1m is a (column) vector of m ones. We compare sets in Lm using a lexicographic order ⪰ that prioritizes qual-ity over diversity. For any S, P ∈ L m, we define S ⪰ P if and only if ei-ther Φ(S) > Φ (P ), or Φ(S) = Φ(P ) and ∆(S) ≥ ∆(P ). Therefore, the goal of MS-LOP is to identify a set S∗ of m distinct local optima that is maximal with respect to ⪰. More formally, 
+
+S∗ ∈ { S ∈ L m : S ⪰ P ∀ P ∈ L m} (6) Interestingly, MS-LOP subsumes several established tasks: the Multiple LOP of [7], since global optima are also local optima; the objective of multimodal op-timization [37], as quality is prioritized over diversity; and evolutionary diversity optimization [15], as diversity is explicitly optimized. Importantly, unlike these approaches, MS-LOP does not require the optimal objective value, which is un-available in practice due to the NP-hardness of the LOP. Finally, we suggest addressing the MS-LOP with small set cardinalities, such as m ∈ { 5, 10 , 15 }, since in practical settings the (approximation of the) solution set S∗ is ultimately analyzed by a human decision maker. 
+
+## 5 Algorithms for the Multi-Solution LOP 
+
+As a first approach to the MS-LOP, we propose an algorithmic scheme that can be readily integrated into any single-solution LOP algorithm A based on local search. As discussed in Sect. 2, such methods constitute the predominant paradigm in the current state-of-the-art. The proposed scheme maintains an archive of solutions S, initialized as the empty set. A is modified in such a way that, during its execution, it triggers the procedure UpdateArchive (σ) whenever a locally optimal solution σ ∈ Sn
+
+is generated. Upon termination, the archive S contains m distinct local optima that approximate the goal defined in Eq. (6). The pseudo-code of UpdateArchive (σ) is shown in Alg. 1. It first checks whether σ ∈ S. If it is, no action is taken, since all solutions in S must be distinct. 10 F. Fagiolo et al. 
+
+Algorithm 1 The algorithm for updating the archive S.                                                     
+
+> 1: procedure UpdateArchive (σ∈Sn)2: if σ / ∈Sthen
+> 3: if |S|< m then
+> 4: S←S∪ { σ}
+> 5: else
+> 6: S′←S∪ { σ}
+> 7: for all π∈S′do
+> 8: u(π)0←f(π)
+> 9: Calculate the mKendall’s-τdistances d(π, ρ )for each ρ∈S′\ { π}
+> 10: ⟨u(π)1, . . . , u (π)
+> m⟩ ← sort the distances 11: π←lexicographic argmin of the uvectors 12: S←S′\ { π}
+
+Otherwise, if |S| < m , σ is simply added to the archive. In the more interesting case where σ / ∈ S and |S| = m, a temporary set S′ = S ∪ { σ} of m + 1 solutions is formed. To determine which solution to exclude, a (m + 1) -dimensional utility vector u(π) = ( u0, u 1, . . . , u m) is constructed for each π ∈ S′, where: u0 = f (π)
+
+and u1 ≤ u2 ≤ . . . ≤ um are the Kendall’s-τ distances between π and the remaining members of S′, sorted in ascending order. Finally, the solution π ∈ S′
+
+with the lexicographically smallest utility vector u(π) is removed from S′ to yield the updated archive S.This procedure, inspired by the selection mechanism of the well-known SPEA2 algorithm [52] widely used in multi-objective optimization, enables the construc-tion of an anytime algorithm, i.e., if interrupted at any iteration, it always returns a solution set of m elements. The underlying rationale is that u0, i.e., the ob-jective value, serves as the primary selection criterion. In the case of ties, u1,i.e., the distance to the nearest neighbor, is used as a secondary criterion, and any remaining ties are resolved by recursively reapplying the nearest-neighbor principle. Consequently, an algorithm A equipped with UpdateArchive explic-itly maximizes the average objective value while ensuring good diversity in the returned solution set. Since m ≪ n, the complexity of UpdateArchive is dominated by the com-putation of the Kendall’s-τ distances, each of which requires Θ(n log n) steps. To improve efficiency, we maintain simple bookkeeping: at each call, only the m
+
+distances between the new solution σ and those in S are computed. Hence, the worst-case asymptotic complexity of UpdateArchive is Θ(mn log n).
+
+## 6 Experiments 
+
+Experiments were conducted on the proposed EXIOBASE benchmark suite under both single-solution and multiple-solution settings using the two state-of-the-art algorithms CD-RVNS and MA-EDM. In the single-solution setting, each algorithm was executed 30 times per instance. For the multiple-solution set-ting (MS-LOP), the algorithms were extended with the scheme introduced in Linear Ordering Problem: Time for a Change 11 
+
+Sect. 5, resulting in the variants MS-CD-RVNS and MS-MA-EDM. Three archive sizes, m ∈ { 5, 10 , 15 }, were considered, with 30 independent runs per instance and size. To ensure comparability, we adopt a unified stopping criterion, termi-nating each run after 100 n local optima (not necessarily distinct) are generated. The algorithms were evaluated on the rxr , pxp , and os300 instance sets, with the smaller isic instances used in a preliminary experiment to study how the number of global optima varies with instance sparsity. C ++ implementations were used, and all experiments were conducted on a machine running Ubuntu 22.04, equipped with an Intel Core i9-11900F CPU (2.50 GHz) and 32 GB of RAM. 
+
+Number of global optima vs. sparsity. A first experiment was conducted to investigate how the number of global optima varies with instance sparsity (percentage of zeros in the LOP matrix). The isic instances were used, as their size ( n = 10 ) allows exhaustive evaluation of the search space. For each instance, sparsity was gradually increased by zeroing out one additional matrix entry at each iteration, generating a chain of instances ranging from no sparsity to full sparsity. Then, for every generated instance, all n! solutions were evaluated and the number of global optima was recorded. The experiment was repeated for all 
+
+isic instances, and the results were aggregated in Fig. 1a, which reports the mean number of global optima and the corresponding 95% confidence interval as a function of instance sparsity. The results clearly indicate that the number of global optima increases exponentially as sparsity grows. 
+
+Single-solution experiments. To evaluate the effectiveness of CD-RVNS and MA-EDM in the classical LOP setting, we use the standard Relative Percentage Deviation (RPD) metric. Let v denote the final objective value obtained from a single execution, and let best be the best objective value observed across all executions of all algorithms on the same instance. Then, v is converted to a RPD value as rpd = 100 · best −v 
+
+> best
+
+. Lower RPDs indicate better effectiveness, and this normalization allows results to be fairly aggregated across instances. 0.0 0.2 0.4 0.6 0.8 1.0 
+
+> Instance Sparsity
+> 10 0
+> 10 1
+> 10 2
+> 10 3
+> 10 4
+> 10 5
+> 10 6
+> # Global Optima
+
+(a) rxr pxp os300  
+
+> Instance Set
+> 0
+> 10 −2
+> 10 −1
+> 10 0
+> RPD
+> CD-RVNS
+> MA-EDM
+
+(b) 50 100 150 200 250  
+
+> ΔNN
+> 27100000
+> 27120000
+> 27140000
+> 27160000
+> 27180000
+> 27200000
+> 27220000
+> 27240000
+> Φ
+> Algorithms
+> MS-MA-EDM
+> MS-CD-RVNS
+
+(c) 
+
+Fig. 1: (a) Number of global optima (log scale) as a function of sparsity for isic 
+
+instances. (b) Relative percentage deviations (log scale) in the single-solution setting for the rxr , pxp , and os300 instances. (c) Φ vs. ∆NN for all the execu-tions in the os300_it_2022_n300 instance with archive size m = 15 .12 F. Fagiolo et al. 
+
+Fig. 1b shows the RPDs obtained from the experiments, aggregated by in-stance set. On the smallest rxr instances, both algorithms consistently achieve near-zero RPDs, indicating that all runs converged to essentially the same value. For medium-sized pxp instances, CD-RVNS is more robust and effective than MA-EDM, while the latter performs better on the larger os300 instances. These observations are supported by per-instance Mann–Whitney U tests at a 0.05 significance level and p-values adjusted via the Benjamini–Hochberg procedure: no significant differences were found on rxr , CD-RVNS significantly outperforms MA-EDM on 29 out of 49 pxp instances while being significantly outperformed on only 4, and MA-EDM is significantly better on 46 out of 49 os300 instances. This behavior is possibly explained by the stronger emphasis of MA-EDM on diversity management, which we believe provides an advantage on larger instances and longer runs, while the trajectory-based strategy of CD-RVNS ap-pears better suited for medium-sized instances. For detailed results and best known objective values in the classical LOP setting, we refer the interested reader to the supplementary material [18] 
+
+MS-LOP experiments. To evaluate the multi-solution variant of the LOP, we assess each run in terms of both solution quality and diversity. Quality is measured using the Φ metric as defined in Eq. (3), while diversity is quanti-fied using ∆NN and ∆SP as defined in Eqs. (4) and (5). For aggregation and visualization, all measures are normalized using the same RPD technique de-scribed earlier (using the best Φ value for each instance, and the maximum ∆NN 
+
+and ∆SP values 5 for each instance-archive size pair). The resulting normalized values—which have to be minimized for better quality and diversity, due to the RPD transformation—are presented in log scale as boxplots in Fig. 2. Regarding the Φ metric, for all m values, similarly to the classical setting, MS-CD-RVNS performs better on pxp instances, while MS-MA-EDM outper-forms on the larger os300 instances. Interestingly, the tie observed in the classi-cal LOP for the smaller rxr instances does not occur in the MS-LOP case, where MS-MA-EDM is slightly more effective. To further investigate this behavior, we analyzed the archive filling patterns and found that while the archive is always filled to its maximum size m for pxp and os300 instances, in the rxr case it is often underfilled—likely due to fewer local optima in the instance landscape—, and MS-CD-RVNS surprisingly returns a slightly larger archive on average than MS-MA-EDM (e.g., 10.94 vs. 10.28 for m = 15 ), suggesting that its additional solutions may have worse objective values. Regarding diversity, rxr appears to be the only instance set where diver-sity depends on the archive size, showing greater diversity for smaller m values. For pxp instances, the Solow-Polasky diversity remains stable and nearly iden-tical across all runs (approximately 0 deviation) for both algorithms, while the nearest-neighbor diversity of MS-MA-EDM is higher than that of MS-CD-RVNS.      
+
+> 5∆SP was computed using normalized Kendall’s-τdistances, with θcalibrated such that the median of the observed distances corresponds to a similarity of 0.5.
+
+Linear Ordering Problem: Time for a Change 13 
+
+In contrast, for os300 instances, there is no clear difference in diversity between the two algorithms. Finally, in Fig. 1c, for illustrative purposes, we provide a scatter plot showing the relationship between the Φ quality and the ∆NN diversity achieved by each run on the os300_it_2022_n300 instance with an archive size of m = 15 . The figure confirms the previously observation, showing that, on this illustrative in-stance, MS-MA-EDM achieves higher objective values ( Φ) than MS-CD-RVNS, while the distribution of the average Kendall’s-τ distance to the nearest neighbor within the returned solution set ( ∆NN ) is similar for both algorithms. Further-more, since each point in the scatter plot of Fig. 1c corresponds to the solution 0          
+
+> 0.01
+> 0.1
+> 1
+> Φ (RPD)
+> m= 5
+> Algorithms
+> MS-CD-RVNS
+> MS-MA-EDM
+> m= 10 m= 15
+> 0
+> 0.01
+> 0.1
+> 1
+> 10
+> 100
+> ΔNN  (RPD)
+> rxr pxp os300
+> Instance Set
+> 0
+> 0.01
+> 0.1
+> 1
+> 10
+> 100
+> ΔSP  (RPD)
+> rxr pxp os300
+> Instance Set
+> rxr pxp os300
+> Instance Set
+
+Fig. 2: Each row of boxplots shows the relative percentage deviations of the Φ,
+
+∆NN , and ∆SP metrics, respectively. Columns correspond to different archive sizes ( m values), and within each plot, the metrics are shown in log scale and aggregated by instance set. 14 F. Fagiolo et al. 
+
+set obtained by a single execution of the algorithms, it becomes evident that nei-ther method consistently returns the same solution set. This variability suggests that there is still room for improvement, particularly in terms of robustness. For detailed results and statistical analyses in the MS-LOP setting, we refer the interested reader to the supplementary material [18], which also includes a reproducibility package. 
+
+## 7 Conclusion and Future Work 
+
+This work has addressed a critical gap in the study of the Linear Ordering Problem (LOP) by modernizing its benchmarking infrastructure and expanding its algorithmic objectives. By introducing the EXIOBASE benchmark suite, derived from a widely used global multi-regional input-output database, this work provides a contempo-rary testbed that captures the structural complexity of modern economies from 1995 to 2022. The newly introduced instances offer a more representative eval-uation environment for modern algorithms than traditional benchmarks, which are based on macroeconomic data that are now more than half a century old. Initial experimental results on the new instances are provided using two recent state-of-the-art LOP algorithms. Furthermore, this work formalizes the Multi-Solution LOP (MS-LOP), shift-ing the focus from the search for a single optimum to the identification of di-verse sets of high-quality solutions. The MS-LOP framework unifies three ex-isting approaches to multi-solution optimization: one tailored to the LOP but less suitable for non-exact methods such as metaheuristics, and the two tasks of multimodal optimization and evolutionary diversity optimization that have not previously been applied to the LOP. The introduction of rigorous metrics for both quality and diversity, alongside the lexicographic prioritization of these ob-jectives, provides a comprehensive framework for future research in multimodal and diversity-aware combinatorial optimization. To address the MS-LOP, we proposed an algorithmic scheme that can be readily integrated into existing (single-solution) metaheuristics to identify di-verse sets of high quality solutions. Specifically, our approach has been incor-porated into CD-RVNS and MA-EDM, two recent state-of-the-art LOP algo-rithms—one trajectory-based and the other population-based. Initial experimen-tal results for the MS-LOP are then presented using the proposed methodology and considering the EXIOBASE benchmark suite. Finally, a promising avenue for future research is the development of algo-rithms specifically designed for the MS-LOP, rather than adaptations of existing (single-solution) LOP methods. 
+
+## References 
+
+> 1. Ahrari, A., Fieldsend, J., Preuss, M., Li, X., Epitropakis, M.: Experimental setup for gecco 2024 competition on benchmarking niching methods for multimodal op-
+
+Linear Ordering Problem: Time for a Change 15 timization. In: Proceedings of the Genetic and Evolutionary Computation Confer-ence Companion. pp. 5–6 (2024) 2. Ali, A.B.: Comprehensive learning TLBO with recursive precedence-based solution construction and multilevel local search for the linear ordering problem. Expert Systems with Applications 238 , 122315 (2024) 3. Anderson, P.E., Chartier, T.P., Langville, A.N., Pedings-Behling, K.E.: Fairness and the set of optimal rankings for the linear ordering problem. Optimization and Engineering 23 (3), 1289–1317 (2022) 4. Ando, K., Sukegawa, N., Takagi, S.: Strong condorcet criterion for the linear or-dering problem. Journal of the Operations Research Society of Japan 65 (2), 67–75 (2022) 5. Baioletti, M., Milani, A., Santucci, V.: Linear ordering optimization with a combi-natorial differential evolution. In: 2015 IEEE International Conference on Systems, Man, and Cybernetics. pp. 2135–2140. IEEE (2015) 6. Baioletti, M., Milani, A., Santucci, V.: A new precedence-based ant colony op-timization for permutation problems. In: Asia-Pacific Conference on Simulated Evolution and Learning. pp. 960–971. Springer (2017) 7. Benito-Marimon, M., Martí, R., Martínez-Gavara, A.: Multiple linear ordering problem. European Journal of Operational Research (2025) 8. Bossek, J., Neumann, F.: Evolutionary diversity optimization and the minimum spanning tree problem. In: Proceedings of the Genetic and Evolutionary Compu-tation Conference. pp. 198–206 (2021) 9. Cameron, T.R., Charmot, S., Pulaj, J.: On the linear ordering problem and the rankability of data. Foundations of Data Science 3(2), 133–149 (2021) 10. Campos, V., Glover, F., Laguna, M., Martí, R.: An experimental evaluation of a scatter search for the linear ordering problem. Journal of Global Optimization 
+
+21 (4), 397–414 (2001) 11. Ceberio, J., Mendiburu, A., Lozano, J.A.: The linear ordering problem revisited. European Journal of Operational Research 241 (3), 686–696 (2015) 12. Ceberio, J., Santucci, V.: Model-based gradient search for permutation problems. ACM Transactions on Evolutionary Learning and Optimization 3(4), 1–35 (2023) 13. Chiarini, B., Chaovalitwongse, W., Pardalos, P.M.: A new algorithm for the tri-angulation of input–output tables in economics. In: Supply chain and finance, pp. 253–272. World Scientific (2004) 14. Christof, T., Reinelt, G.: Combinatorial optimization and small polytopes. Top 
+
+4(1), 1–53 (1996) 15. Do, A., Guo, M., Neumann, A., Neumann, F.: Analysis of evolutionary diversity optimization for permutation problems. ACM Transactions on Evolutionary Learn-ing 2(3), 1–27 (2022) 16. Droste, S., Jansen, T., Wegener, I.: Optimization with randomized search heuris-tics—the (a) nfl theorem, realistic scenarios, and difficult functions. Theoretical Computer Science 287 (1), 131–144 (2002) 17. Elorza, A., Hernando, L., Lozano, J.A.: Characterizing permutation-based combi-natorial optimization problems in fourier space. Evolutionary Computation 31 (3), 163–199 (2023) 18. F.Fagiolo, M.Baioletti, V.: Supplementary material for "Linear Ordering Problem: Time for a Change" (2026), https://doi.org/10.5281/zenodo.20441719 19. Garcia, C.G., Pérez-Brito, D., Campos, V., Martí, R.: Variable neighborhood search for the linear ordering problem. Computers & operations research 33 (12), 3549–3565 (2006) 16 F. Fagiolo et al. 20. Garey, M.R., Johnson, D.S.: Computers and Intractability: A Guide to the The-ory of NP-Completeness (Series of Books in the Mathematical Sciences). W. H. Freeman, first edition edn. (1979) 21. Glover, F., Klastorin, T., Kongman, D.: Optimal weighted ancestry relationships. Management Science 20 (8), 1190–1193 (1974) 22. Goemans, M.X., Hall, L.A.: The strongest facets of the acyclic subgraph polytope are unknown. In: International Conference on Integer Programming and Combi-natorial Optimization. pp. 415–429. Springer (1996) 23. Grötschel, M., Jünger, M., Reinelt, G.: A cutting plane algorithm for the linear ordering problem. Operations research 32 (6), 1195–1220 (1984) 24. Hernando, L., Mendiburu, A., Lozano, J.A.: Journey to the center of the linear ordering problem. In: Proceedings of the 2020 Genetic and Evolutionary Compu-tation Conference. pp. 201–209 (2020) 25. Kim, A., Skiena, S.: Chapter ordering in novels. In: Proceedings of the 2022 Confer-ence on Empirical Methods in Natural Language Processing. pp. 3838–3848 (2022) 26. Kondo, Y.: Triangulation of input–output tables based on mixed integer programs for inter-temporal and inter-regional comparison of production structures. Journal of Economic Structures 3(1), 2 (2014) 27. Laguna, M., Marti, R., Campos, V.: Intensification and diversification with elite tabu search solutions for the linear ordering problem. Computers & Operations Research 26 (12), 1217–1230 (1999) 28. Leontief, W.: Input-output economics. Oxford University Press (1986) 29. Lugo, L., Segura, C., Miranda, G.: A diversity-aware memetic algorithm for the linear ordering problem. Memetic Computing 14 (4), 395–409 (2022) 30. Ma, Y., Santucci, V., Witt, C.: Theoretical and empirical analysis of lehmer codes to search permutation spaces with evolutionary algorithms. Proceedings of the AAAI Conference on Artificial Intelligence 40 (43), 37099–37107 (Mar 2026). https://doi.org/10.1609/aaai.v40i43.41039, https://ojs.aaai.org/index.php/ AAAI/article/view/41039 31. Marti, R., Reinelt, G.: Exact and Heuristic Methods in Combinatorial Optimiza-tion, vol. 175. Springer (2022) 32. Martí, R., Reinelt, G., Duarte, A.: A benchmark library and a comparison of heuristic methods for the linear ordering problem. Computational optimization and applications 51 (3), 1297–1317 (2012) 33. Mishra, N.K., Singh, P.K.: Linear ordering problem based classifier chain using ge-netic algorithm for multi-label classification. Applied Soft Computing 117 , 108395 (2022) 34. Mishra, S., Sikdar, K.: On approximability of linear ordering and related np-optimization problems on graphs. Discrete Applied Mathematics 136 (2-3), 249–269 (2004) 35. Mitchell, J.E., Borchers, B.: Solving linear ordering problems with a combined interior point/simplex cutting plane algorithm. In: High performance optimization, pp. 349–366. Springer (2000) 36. Preuss, M.: Multimodal optimization by means of evolutionary algorithms. Springer (2015) 37. Preuss, M., Epitropakis, M., Li, X., Fieldsend, J.E.: Multimodal optimization: Formulation, heuristics, and a decade of advances. In: Metaheuristics for finding multiple solutions, pp. 1–26. Springer (2021) 38. Preuss, M., Wessing, S.: Measuring multimodal optimization solution sets with a view to multiobjective techniques. EVOLVE–A Bridge between Probability, Set Linear Ordering Problem: Time for a Change 17 Oriented Numerics, and Evolutionary Computation IV, M. Emmerich et al., Eds. Springer 227 , 123–137 (2013) 39. Qian, Y., Lin, J., Li, D., Hu, H.: Block-insertion-based algorithms for the linear ordering problem. Computers & Operations Research 115 , 104861 (2020) 40. Sakuraba, C.S., Yagiura, M.: Efficient local search algorithms for the linear order-ing problem. International Transactions in Operational Research 17 (6), 711–737 (2010) 41. Santucci, V., Baioletti, M., Tomassini, M.: Optimization through iterative smooth morphological transformations. In: Proceedings of the Genetic and Evolutionary Computation Conference. pp. 241–248 (2024) 42. Santucci, V., Ceberio, J.: Using pairwise precedences for solving the linear ordering problem. Applied Soft Computing 87 , 105998 (2020) 43. Schiavinotto, T., Stützle, T.: The linear ordering problem: Instances, search space analysis and algorithms. Journal of Mathematical Modelling and Algorithms 3(4), 367–402 (2004) 44. Schiavinotto, T., Stützle, T.: A review of metrics on permutations for search land-scape analysis. Computers & operations research 34 (10), 3143–3153 (2007) 45. Sevaux, M., Sörensen, K., et al.: Permutation distance measures for memetic algo-rithms with population management. In: Proceedings of 6th Metaheuristics Inter-national Conference (MIC’05). pp. 832–838 (2005) 46. Solow, A.R., Polasky, S.: Measuring biological diversity. Environmental and Eco-logical Statistics 1(2), 95–103 (1994) 47. Song, W., Ahn, C.W.: Order matters: Permutation-based prompt optimization for personalized image generation. IEEE Access 13 , 206155–206164 (2025). https: //doi.org/10.1109/ACCESS.2025.3638839 48. Stadler, K., Wood, R., Bulavskaya, T., Södersten, C.J., Simas, M., Schmidt, S., Usubiaga, A., Acosta-Fernández, J., Kuenen, J., Bruckner, M., et al.: Exiobase 3: Developing a time series of detailed environmentally extended multi-regional input-output tables. Journal of Industrial Ecology 22 (3), 502–515 (2018) 49. Stadler, K., Wood, R., Bulavskaya, T., Södersten, C.J., Simas, M., Schmidt, S., Usubiaga, A., Acosta-Fernández, J., Kuenen, J., Bruckner, M., Giljum, S., Lutter, S., Merciai, S., Schmidt, J.H., Theurl, M.C., Plutzar, C., Kastner, T., Eisenmenger, N., Erb, K.H., Koning, A., Deck, C.E.C.A.E., Rasul, K., Hertwich, E., Tukker, A.: Exiobase 3 (Jun 2025). https://doi.org/10.5281/zenodo.15689391, https://doi.org/ 10.5281/zenodo.15689391 50. Tromble, R., Eisner, J.: Learning linear ordering problems for better translation. In: Proceedings of the 2009 conference on empirical methods in natural language processing. pp. 1007–1016 (2009) 51. Ulrich, T., Thiele, L.: Maximizing population diversity in single-objective optimiza-tion. In: Proceedings of the 13th annual conference on Genetic and evolutionary computation. pp. 641–648 (2011) 52. Zitzler, E., Laumanns, M., Thiele, L.: Spea2: Improving the strength pareto evo-lutionary algorithm. TIK report 103 (2001)

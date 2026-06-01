@@ -1,0 +1,1105 @@
+Title: A Statistical Physics View of the S   P 500: Pairwise Interactions and Time-Varying Dynamics
+
+URL Source: https://arxiv.org/pdf/2605.25261v1
+
+Published Time: Tue, 26 May 2026 01:57:13 GMT
+
+Number of Pages: 24
+
+Markdown Content:
+# A Statistical Physics View of the S&P 500: Pairwise Interactions and Time-Varying Dynamics 
+
+Sebin Oh a, Marta C. González a,b,c, ∗, Ziqi Wang a, ∗
+
+> aDepartment of Civil and Environmental Engineering, University of California, Berkeley, United States
+> bDepartment of City and Regional Planning, University of California, Berkeley, United States
+> cLawrence Berkeley National Laboratory, Berkeley, United States
+
+Abstract 
+
+We analyze a fixed panel of S&P 500 stocks from 1996 to 2026 using complementary static and kinetic Ising models applied to daily binary open-to-close movements. The static pairwise model provides a long-run maximum-entropy summary of low-order dependence and reveals a sectorally organized interaction network with modest small-world structure and within-sector couplings about 2.8 times stronger than between-sector couplings, with especially coherent real estate and energy sectors. The kinetic model incorporates smooth time-varying external fields, self-memory, and directed lagged couplings to describe next-day dynamics. It reveals slow field-regime shifts around three major market-wide perturbations—the dot-com bust, the global financial crisis, and the COVID-19 episode. Self-memory is generally weak, and the directed coupling struc-ture is much less sector-concentrated and more asymmetric than the static network, while still reproducing the broad evolution of aggregate market movement. Taken together, the two complementary models char-acterize both persistent market organization and short-horizon cross-stock dynamics, providing a compact statistical physics view of interaction structure and time-varying behavior in the S&P 500. 
+
+Keywords: Financial networks, S&P 500, Maximum entropy modeling, Ising models 
+
+1. Introduction 
+
+Financial markets are high-dimensional systems in which many assets interact through common information, sectoral linkages, and institutional connections [4, 14, 20, 25, 26]. These interdependencies make the system inherently complex and can produce collective behavior such as synchronization and phase transitions [11, 28]. This complexity has motivated a wide range of efforts to characterize market-wide structure and collective behavior. A major strand of research has analyzed financial markets through complex-network methods. Correla-tion matrices, minimum spanning trees, planar maximally filtered graphs, and related dependency networks have been used to uncover clustering, hierarchy, centrality, and topological changes during crises [10, 14, 20, 21, 25, 26]. These approaches provide useful structural descriptions, but the inferred networks depend on choices such as the dependence measure, filtering procedure, and temporal aggregation. They also do not, by themselves, specify a probabilistic model for joint market states. Recent work has further emphasized that financial networks should be studied as dynamical systems rather than purely static objects [12], and that changes in stock-network organization can be informative about market instability and volatility [8]. Maximum entropy modeling offers a complementary probabilistic framework by inferring the least-structured distribution consistent with selected empirical constraints [9, 17]. For binary variables, con-straining first- and second-order moments yields the pairwise Ising model. This framework has been ap-plied widely in diverse fields, including machine learning, ecology, neuroscience, and natural hazard re-silience [3, 17–19, 23]. Within finance, maximum-entropy studies have focused mainly on static pairwise     
+
+> ∗Corresponding authors
+> Email addresses: martag@berkeley.edu (Marta C. González), ziqiwang@berkeley.edu (Ziqi Wang)
+> arXiv:2605.25261v1 [stat.AP] 24 May 2026
+
+dependence and collective market states [5, 6, 28]; comparatively less attention has been given to combining long-run interaction structure and time-varying directed dynamics within a unified Ising-based framework. This study analyzes a fixed 30-year panel of stock data from firms in the S&P 500, a standard benchmark for large-cap U.S. equities, using complementary static and kinetic Ising models. The static pairwise Ising model provides a least-biased long-run summary of low-order dependence and the associated interaction network over the full sample. The kinetic Ising model complements it by exploiting the temporal ordering of the data through time-varying external fields, self-memory, and directed cross-stock interactions. This combined perspective is useful because a full-sample static fit captures the persistent low-order structure, while a dynamic model offers a statistical description of the transient, next-day market dynamics. Estimating both models on the same set of firms over the same sample period permits a direct comparison between long-run interaction structure and evolving short-run directional dynamics. We therefore examine both how the market is organized as an interacting system over the long run and how influence propagates across that system from one trading day to the next. By integrating these two perspectives within a unified maximum-entropy framework, our approach extends prior work that often isolates static network topology from dynamic propagation, yielding a more comprehensive and probabilistically grounded characterization of market complexity. This paper is organized as follows. Section 2 describes the data construction and preprocessing steps. Section 3 introduces the static and kinetic Ising models and the associated estimation procedures. Section 4 presents the long-run interaction network inferred from the static model. Section 5 studies the time-varying market dynamics captured by the kinetic model. Section 6 concludes. 
+
+2. Data and preprocessing 
+
+We construct a daily binary panel for a fixed set of S&P 500 firms spanning January 1, 1996 to January 1, 2026. Company symbols, sector labels, and S&P 500 inclusion dates are collected from the publicly available S&P 500 constituent table. Sector labels follow the Global Industry Classification Standard (GICS) [24], which categorizes companies into the 11 primary sectors summarized in Table 1. Daily open and close prices are downloaded from Yahoo Finance using the Python package yfinance [2].               
+
+> Table 1: The 11 Global Industry Classification Standard (GICS) sectors and their abbreviations used in this study. These standard sector definitions are used to categorize the 306 S&P 500 firms retained in the fixed panel.
+> Sector Abbreviation
+> Communication Services Comm Consumer Discretionary ConsDisc Consumer Staples Staples Energy Energy Financials Fin Health Care Health Industrials Ind Information Technology IT Materials Mat Real Estate RE Utilities Util
+
+For each stock i on each trading day t, we binarize the daily open-to-close movement into a spin variable 
+
+si(t) ∈ {− 1, +1 }, assigning si(t) = +1 when the closing price exceeds the opening price and si(t) = −1
+
+otherwise. Observations with missing open or close prices are discarded. We retain only firms with complete observations over the entire 30-year period. This yields a fixed panel of 306 companies observed over 7,550 trading days, corresponding to a data matrix of size (7550 , 306) . The same panel is used for both the static and kinetic Ising models so that the two results are comparable. Figure 1 shows the corresponding raw closing-price panel before binarization together with the empirical 2distribution of daily market breadth after binarization, where daily market breadth is defined as the cross-sectional mean of the binarized stock states. The raw series display large cross-sectional differences in prices, persistent long-run drift, and common declines during major market-wide perturbations. These features motivate the binary encoding adopted here, which removes non-comparable level effects across firms and centers the analysis on directional movement rather than on raw price magnitudes.          
+
+> Figure 1: Raw closing-price panel and empirical distribution of daily market breadth. Left: gray lines show the daily closing prices of the 306 firms, and the black line shows the unweighted cross-sectional mean closing price. Shaded gray bands mark the dot-com collapse (June 1, 2000–June 1, 2002), the global financial crisis (October 1, 2007–October 1, 2008), and the COVID-19 period (January 1, 2020–January 1, 2021). A shorter drawdown is also visible around April 2025, coinciding with tariff-related market volatility. Right: histogram of daily market breadth across the full sample, computed as the cross-sectional mean of the binarized stock states, 1
+> N
+> PNi=1 si(t)where N= 306 denotes the number of stocks in the panel.
+
+3. Maximum entropy models for stock movements 
+
+As a maximum entropy model for binary variables under low-order moment constraint, the Ising model yields a static model that matches first- and second-order moments and a kinetic model that matches one-step transition statistics. This section introduces both formulations and their estimation; Appendix A provides the corresponding derivations using the principle of maximum entropy. 
+
+3.1. Static Ising model 
+
+For binary stock movements, let si ∈ {− 1, +1 } denote the movement of stock i, with +1 and −1 repre-senting upward and downward moves, respectively. The static Ising model assigns to a configuration s the Hamiltonian 
+
+H(s) = −
+
+> N
+
+X
+
+> i=1
+
+hisi − X
+
+> i<j
+
+Jij sisj , (1) where N is the number of stocks, hi represents a local field acting on spin i, and Jij represents the pairwise coupling between spins i and j. In the financial context, hi reflects the intrinsic tendency of stock i to move upward or downward, while Jij captures pairwise dependence between stocks arising from shared exposure to economic factors or correlated investor behavior. A positive Jij favors alignment, whereas a negative 
+
+Jij favors opposite movement. In the static Ising model, the coupling matrix J = [ Jij ] is symmetric by construction and can be interpreted as an undirected effective interaction network. The probability of observing s is then given by the Boltzmann distribution p(s) ∝ exp( −βH(s)) , where 
+
+β represents the inverse temperature. In data-analytic applications [17], β is usually absorbed into the parameters, giving 
+
+p(s) = 1
+
+Z exp 
+
+ NX
+
+> i=1
+
+hisi + X
+
+> i<j
+
+Jij sisj
+
+
+
+, (2) where Z is the normalization constant (partition function). 33.2. Kinetic Ising model 
+
+The kinetic Ising model [7, 16, 22] specifies the conditional probability of the next market state given the current state. We adopt a synchronous update rule, meaning that all stock movements are updated simultaneously at each time step. This choice is natural for stock market data because all stocks share the same daily opening and closing times. Under this formulation, the conditional probability of the next state 
+
+s(t + 1) given the current state s(t) is 
+
+p (s(t + 1) | s(t)) = 
+
+> N
+
+Y
+
+> i=1
+
+exp( si(t + 1) θi(t)) 2 cosh( θi(t)) , (3) where the effective local field is 
+
+θi(t) = hi(t) + aisi(t) + X 
+
+> j̸=i
+
+Jij sj (t). (4) Here Jij measures how the state of stock j at time t affects the tendency of stock i at time t + 1 , hi(t)
+
+represents time-varying external influences, and ai is a self-memory coefficient that allows the next-day movement of stock i to depend on its past state at time t. Unlike the static model, the kinetic coupling matrix J is not necessarily symmetric. A positive ai indicates short-term persistence, whereas a negative ai
+
+indicates short-term reversal. Equation (3) implies 
+
+E [si(t + 1) | s(t)] = tanh( θi(t)) . (5) From a parameter-estimation perspective, allowing hi(t) to vary independently at each time step would substantially increase the number of parameters to be estimated, thereby hindering both reliable estimation and interpretability. We therefore represent hi(t) using a basis expansion, 
+
+hi(t) = 
+
+> M
+
+X
+
+> m=1
+
+ϕm(t)γim , (6) where ϕm(t) is the mth temporal basis function. Specifically, we adopt a piecewise-linear hat basis, 
+
+ϕm(t) = max 
+
+
+
+1 − |τ (t) − cm|
+
+∆ , 0
+
+
+
+, ∆ = 1
+
+M − 1 , (7) where τ (t) = t−1  
+
+> T−2
+
+for t = 1 , . . . , T − 1 is the normalized time index, and cm = m−1  
+
+> M−1
+
+for m = 1 , . . . , M 
+
+denotes the equally spaced center of the mth basis function. Thus, each basis function has local support and overlaps linearly only with its neighboring basis functions. This yields 
+
+θi(t) = 
+
+> M
+
+X
+
+> m=1
+
+ϕm(t)γim + aisi(t) + X 
+
+> j̸=i
+
+Jij sj (t), (8) where γim is the coefficient of the mth basis function for stock i. We use M = 30 basis functions over the 30-year observation period, so this representation is sufficiently flexible to capture year-scale variation in external effects. Under this specification, the effective local field consists of three components: the cross-stock interaction term P  
+
+> j̸=i
+
+Jij sj (t), the self-memory term aisi(t), and the time-varying external field hi(t).This formulation of the kinetic Ising model, which may also be viewed as a discrete-time Markov chain on the finite state space {− 1, +1 }N , is often used as a nonequilibrium model of binary dynamics [1, 13]. Under special choices of parameters and update rules the chain may satisfy detailed balance and admit the static Ising distribution as a stationary distribution. 43.3. Parameter estimation 
+
+For the full 30-year sample, we estimate the static Ising parameters h and J by maximum likelihood [3, 17]. Let D = {s(1) , s(2) , . . . , s(nobs )} denote the set of nobs daily stock movement configurations, where each 
+
+s(m) ∈ {− 1, +1 }N . The average log-likelihood is 
+
+Lstatic (h, J | D ) = 
+
+> N
+
+X
+
+> i=1
+
+hiMD 
+
+> 1,i
+
++ X
+
+> i<j
+
+Jij MD 
+
+> 2,ij
+
+− log Z(h, J), (9) where MD 
+
+> 1,i
+
+= 1
+
+> nobs
+
+Pnobs  
+
+> m=1
+
+s(m) 
+
+> i
+
+and MD 
+
+> 2,ij
+
+= 1
+
+> nobs
+
+Pnobs  
+
+> m=1
+
+s(m) 
+
+> i
+
+s(m) 
+
+> j
+
+are the empirical first- and second-order moments. The corresponding gradient components are 
+
+∂Lstatic 
+
+∂h i
+
+= MD 
+
+> 1,i
+
+− M 1,i , ∂Lstatic 
+
+∂J ij 
+
+= MD 
+
+> 2,ij
+
+− M 2,ij , (10) so maximum likelihood amounts to matching the empirical moments to the model counterparts calculated using Eq. (2). Because exact evaluation of Z and of the model moments M1,i and M2,ij is infeasible for a system of this size, we use Monte Carlo maximum likelihood, with Gibbs sampling to approximate the model moments during gradient-based optimization [15]. For the kinetic Ising model, the parameters are estimated from the same time-ordered data D =
+
+{s(1) , s(2) , . . . , s(T )}, where T = nobs , by penalized conditional maximum likelihood, with average con-ditional log-likelihood 
+
+Lkinetic = 1
+
+T − 1 
+
+> T−1
+
+X
+
+> t=1
+> N
+
+X
+
+> i=1
+
+[si(t + 1) θi(t) − log(2 cosh( θi(t)))] . (11) Because the synchronous conditional probability factorizes over nodes (Eq. (3)), the conditional log-likelihood decomposes into a sum of stock-specific terms, and the parameters associated with each stock can be esti-mated separately. For each stock i, the corresponding gradient components are 
+
+∂Lkinetic 
+
+∂γ im 
+
+= 1
+
+T − 1 
+
+> T−1
+
+X
+
+> t=1
+
+ϕm(t) [ si(t + 1) − tanh( θi(t))] , (12) 
+
+∂Lkinetic 
+
+∂a i
+
+= 1
+
+T − 1 
+
+> T−1
+
+X
+
+> t=1
+
+si(t) [ si(t + 1) − tanh( θi(t))] , (13) and 
+
+∂Lkinetic 
+
+∂J ij 
+
+= 1
+
+T − 1 
+
+> T−1
+
+X
+
+> t=1
+
+sj (t) [ si(t + 1) − tanh( θi(t))] , j̸ = i. (14) These gradient expressions show that, for the unpenalized conditional likelihood, estimation amounts to comparing the observed next-step movement si(t + 1) with its conditional expectation tanh( θi(t)) . To stabilize the fit, we add ℓ2 penalties to γim , ai, and Jij , together with a second-difference penalty on the basis coefficients γim across m to encourage smooth variation in the external field. Unlike in the static case, this conditional likelihood is tractable and does not require evaluation of a global partition function. 
+
+4. Interaction structure in the static Ising model 
+
+The fitted static Ising model yields a signed, weighted interaction network over the S&P 500 stocks. As shown in Appendix Fig. A.1, the model closely reproduces the empirical first- and second-order moments, indicating that the inferred external fields hi and couplings Jij capture the dominant low-order dependence structure of the pooled 30-year panel. For the filtered interaction network, the small-world coefficient 5is σ = C/C rand  
+
+> L/L rand
+
+= 1 .424 , where C and L denote the observed average clustering coefficient and average shortest-path length, respectively, and Crand and Lrand denote the corresponding edge-matched random-graph benchmarks. Thus, σ > 1 suggests that the network shows a modest small-world tendency: the network has higher clustering than comparable random graphs while maintaining a similarly short path length. Detailed diagnostics are reported in Table A.1 in the Appendix, with benchmark comparison provided in Appendix Fig. A.3. The network also exhibits positive sector assortativity of 0.259 , reflecting a tendency for stocks to connect more densely with other stocks in the same sector and indicating that sector membership remains an important organizing principle. The discussion below focuses on the structural patterns revealed by the inferred fields and couplings. Figure 2 summarizes the coupling structure in matrix form. Diagonal entries dominate both the signed and absolute sector-level matrices, and the mean within-sector interaction magnitude is about 2.8 times the between-sector average. Real estate and energy stand out as the most coherent sectors, whereas most between-sector signed averages remain small and weakly positive. Figure 3 provides a complementary sector-level view in which node size is proportional to the sector mean |hi|, node color reflects the mean within-sector 
+
+|Jij |, and edge width represents the mean absolute inter-sector coupling. Information technology has the largest field magnitude, with health care also prominent on this dimension, while real estate and energy remain most prominent in terms of within-sector coupling. The retained cross-sector links have broadly similar widths, consistent with the relatively homogeneous off-diagonal values in the absolute sector matrix, so no single sector pair dominates the cross-sector interaction pattern. Health care and communication services appear more selectively connected. Taken together, the sector-level summaries depict a market organized around strong within-sector cohesion while remaining tied together through broadly distributed cross-sector interactions.         
+
+> Figure 2: Sector-level summaries of the static Ising couplings. Left: mean signed coupling Jij for each sector pair. Right: mean absolute coupling |Jij |for each sector pair. Diagonal entries denote within-sector averages, whereas off-diagonal entries denote between-sector averages. Strong diagonal dominance indicates systematically stronger within-sector interactions, with especially large within-sector magnitudes in real estate and energy. The signed averages are weakly positive for most sector pairs.
+
+6Figure 3: Sector interaction network. Node size is proportional to the sector mean |hi|, node color indicates the mean within-sector |Jij |, and edge width is proportional to the mean absolute inter-sector coupling. To avoid an overly dense display, only inter-sector links above the 30th percentile of cross-sector mean absolute couplings are shown, corresponding approximately to the strongest 70% of cross-sector links. The retained cross-sector edges have broadly comparable widths, indicating that no single sector pair dominates the inter-sector interaction pattern. Health care and communication services appear relatively selective, with fewer retained links than most other sectors. 
+
+The stock-level backbone in Fig. 4 adds finer resolution to the sector-level picture. Since the full inter-action matrix is dense and dominated by near-zero entries (Appendix Fig. A.2), we first construct a filtered network by retaining the top decile of pairwise coupling magnitudes |Jij |, equivalently thresholding with 
+
+|Jij | = 0 .03534 (Table A.1). The left panel compresses this filtered network into a sparse backbone that pre-serves connectivity and the strongest pairwise relations, revealing compact clusters that largely follow sector boundaries together with a smaller set of cross-sector connections. The right panel places all stocks in the 
+
+(hi, P 
+
+> j
+
+|Jij |) plane, where distance from the central cloud reflects the combined magnitude of the external field and aggregate coupling strength. A large value of P 
+
+> j
+
+|Jij | indicates that a stock is strongly tied to the rest of the network, so stocks with both large |hi| and large aggregate coupling occupy especially prominent positions in the inferred market structure. Most stocks remain near the center, whereas WEC Energy Group (WEC), Procter & Gamble (PG), Citigroup (C), Advanced Micro Devices (AMD), Old Dominion Freight Line (ODFL), Ford Motor Company (F), and CRH plc (CRH) lie outside the selection boundary. WEC and PG stand out mainly through unusually large aggregate coupling strength despite negative fields; C, AMD, and ODFL combine strong coupling with large positive fields; CRH is elevated on both dimensions more moderately; and F is distinguished primarily by an extreme positive field. These firms therefore emerge as the most prominent stocks in the inferred 30-year interaction network. Notably, the highlighted firms are distributed across different parts of the backbone rather than concentrated in a single cluster, indicating that prominence in the inferred interaction structure is not confined to one sector. 7Figure 4: Company-level backbone structure and stocks with large field and interaction strength in the full 30-year network. Left: stock-level backbone of the inferred interaction network. The full-edge interaction network is first filtered by retaining the edges with the top 10% |Jij | values, corresponding to the cutoff τJ = 0 .03534 , yielding 4,667 retained edges in the filtered network. For visualization, the backbone is then constructed from this filtered network using a maximum-spanning-tree scaffold based on |Jij |, with the strongest remaining non-tree edges added to yield 467 edges in total, approximately 10% of the filtered-network edges. Nodes are colored by sector and sized by |hi|, while edge width is proportional to |Jij |.Right: scatter plot of external field hi versus aggregate absolute coupling P        
+
+> j|Jij |, where each point represents a stock. Gray points show all stocks, whereas colored labeled points denote the highlighted stocks with large field and interaction strength also shown in the backbone: WEC (WEC Energy Group), PG (Procter & Gamble), C (Citigroup), AMD (Advanced Micro Devices), ODFL (Old Dominion Freight Line), F (Ford Motor Company), and CRH (CRH plc). After rescaling |hi|and P
+> j|Jij |by their respective 90th-percentile values, these stocks are identified as the top 2% with the largest normalized radial distances. The dashed curve in the right panel shows the corresponding selection boundary.
+
+Overall, the static Ising network portrays the S&P 500 as sectorally organized yet not sectorally frag-mented, with modest small-world properties. The strongest dependencies concentrate within sectors, yet cross-sector couplings keep those sectors embedded in a single market-wide structure. A limited set of firms also stands out through the combination of large field magnitude and strong aggregate coupling. The static fit serves as a long-run low-order interaction surrogate for the market’s backbone structure. By construction, however, it compresses the full 30-year sample to a single equilibrium description up to low-order moments and therefore cannot capture temporal nonstationarity or regime mixing, as reflected in the mismatch between the empirical and model-implied distributions of daily market breadth (Appendix Fig. A.4). This limitation motivates the kinetic Ising analysis, which uses the temporal ordering of the data to incorporate slowly varying background conditions, self-memory, and directed lagged interactions. 
+
+5. Market dynamics in the kinetic Ising model 
+
+The kinetic Ising model uses the time ordering of the data to describe next-day market movement through a slowly varying external field hi(t), a self-memory term ai, and directed interactions Jij that transmit influence across stocks. The field, represented through a low-dimensional basis expansion, captures market-wide low-frequency perturbations rather than day-to-day shocks. The inferred dynamics therefore separate naturally into two layers: a low-frequency regime component carried by the external field and a high-frequency day-to-day component carried mainly by the directed interaction network. Appendix Fig. A.5 shows that the fitted model is well calibrated and closely reproduces the stock-level means and lagged cross-stock correlations. More detailed fit diagnostics are reported in Appendix Table A.2. The discussion below therefore focuses on the broader dynamical picture. Figure 5 shows that the market-average field ¯h(t) = 1
+
+> N
+
+PNi=1 hi(t) does not simply mirror empirical market returns. Instead, it evolves at a distinctly low frequency: it is predominantly negative early in the sample, becomes less negative around the dot-com and global financial crisis windows, remains mostly 8positive through much of the post-2009 period, and softens again during the COVID-19 episode. The sector-level heatmap conveys the same regime structure in cross section. These market-wide perturbation periods are accompanied by more diffuse sectoral field patterns, whereas quieter intervals exhibit more coherent sector-level configurations. In this sense, the external field behaves less like a compressed return series than like a latent background state after accounting for interaction and memory effects. The initially negative regime is consistent with the negative early-sample binary market breadth, visible in the left panel of Fig. 6 and summarized in Appendix Table A.2. Because hi(t) is inferred from binarized open-to-close movements rather than raw prices, the sign of ¯h(t) should be interpreted as a low-frequency tendency in the binary movement process, not as the sign of raw closing-price changes.           
+
+> Figure 5: External-field dynamics in the kinetic Ising model. Left: market-average external field ¯h(t)over the full sample; shaded vertical bands mark major market-wide perturbations—the dot-com bust (June 1, 2000–June 1, 2002), the global financial crisis (October 1, 2007–October 1, 2008), and the COVID-19 episode (January 1, 2020–January 1, 2021)—and the gray envelope indicates cross-sectional dispersion across stocks. Right: sector-average external fields through time. Major market perturbations coincide with more diffuse sectoral patterns, whereas quieter periods show more coherent sector-level fields that remain predominantly negative or positive. The initially negative values of ¯h(t)align with the negative empirical market breadth in the early sample, as shown in the left panel of Fig. 6 and summarized in Appendix Table A.2. Because ¯h(t)
+> is inferred from binarized open-to-close directional movements and regularized to vary smoothly over time, its sign should be interpreted as a low-frequency baseline tendency in the binary movement process after accounting for interaction and memory effects, rather than as the sign of raw closing-price changes. This distinction also helps explain why short-lived magnitude-driven raw-price drawdowns, such as the April 2025 decline visible in Fig. 1, may be attenuated rather than appearing as distinct external-field regimes.
+
+This interpretation is consistent with the market-level fit in Fig. 6. The model reproduces the broad evolution of the empirical market mean, with a Spearman rank correlation of ρs = 0 .56 between the two series, indicating a moderate rank-based monotonic association, although it does not capture most of the day-to-day noise. The decomposition of the market-average local field in the right panel helps explain this result. The external field captures the slow drift of market conditions, whereas the interaction term contributes most of the shorter-horizon variation. By contrast, the self-memory component remains small throughout the sample, and the estimated ai are tightly centered near zero. In this sense, the field sets the background regime, while the interaction term drives most of the short-run adjustment. Next-day market movement in the kinetic model therefore appears to be shaped primarily by changing market conditions and cross-stock interactions rather than by simple own-state persistence. 9Figure 6: Market-level diagnostics for the kinetic model. Left: model-predicted and empirical market breadths. The model captures the broad evolution of aggregate market movement reasonably well (Spearman ρs = 0 .56 ), although it misses much of the day-to-day variation. Right: decomposition of the market-average local field into external, self-memory, interaction, and total components. The external field mainly tracks the slowly varying market environment, whereas the interaction term contributes most of the higher-frequency variation; the self-memory term remains comparatively small. 
+
+Figure 7 shows that this interaction layer is organized differently from the long-run static network. In the static model, interaction strength is strongly concentrated within sectors. In the kinetic model, that concentration nearly disappears: the within-sector/between-sector ratio for |Jij | is only 1.016, compared with about 2.8 in the static network, and both the signed and absolute sector interaction is highly asymmetric. Short-horizon propagation is therefore not a directed replica of the static sector blocks. Instead, next-day effects move through a more cross-sector and direction-dependent interaction layer in which source and target are not interchangeable.          
+
+> Figure 7: Sector-level coupling structure in the kinetic model. Left: sector-level mean signed directed couplings
+> Jij .The matrix is visibly asymmetric, indicating that sector-to-sector influence depends on direction. Right: sector-level mean absolute directed couplings |Jij |. Unlike the full-sample static network, the diagonal entries are not strongly dominant, indicating limited additional within-sector concentration in next-day effects.
+
+The comparison with the static network sharpens the central point. Although the parameters of the two models should not be compared one-to-one, stocks that are more strongly embedded in the long-run static network also tend to have larger directed strength in the kinetic model, especially in outgoing influence, as shown in Fig. 8. The two models are thus aligned in which firms matter most, even though they organize the market in different ways. Overall, the kinetic Ising model portrays the S&P 500 as a system in which slow regime shifts operate through the external field, while next-day adjustment is governed by a directional and relatively cross-sector transmission network. 10 Figure 8: Connection between the kinetic and static models. Static node strength versus kinetic total directed strength. Stocks that are more strongly connected in the full-sample static network also tend to have larger influence in the kinetic model, with a Spearman rank correlation of ρs = 0 .42 .
+
+6. Conclusions 
+
+Using a fixed panel of 306 S&P 500 stocks from 1996 to 2026, this study combined static and kinetic Ising models to characterize the market as both a long-run interaction network and a time-ordered dynamical system. The static model recovered the dominant low-order dependence structure of the panel and revealed a sectorally organized interaction network with modest small-world organization (σ = 1 .424) , with within-sector couplings substantially stronger than between-sector couplings. Real estate and energy were especially coherent sectors, and a limited set of firms stood out for simultaneously large field magnitudes and strong aggregate coupling. Although the static fit closely reproduced the empirical first- and second-order moments, the static Ising model is not designed to capture the market’s nonstationary evolution. It is therefore best interpreted as a long-run surrogate for low-order backbone interaction structure rather than as a complete description of the historical sequence. The kinetic model complemented this picture by incorporating temporal ordering, time-varying external conditions, self-memory, and directed lagged interactions. Its external field captured slow regime shifts, its self-memory terms were generally weak, and its directed couplings formed a much less sector-concentrated transmission layer than the static network. The fitted model was also well calibrated and closely reproduced the one-step statistics it directly constrains. Taken together, the results show that the two models serve distinct but complementary purposes: the static Ising model summarizes persistent interaction structure, whereas the kinetic Ising model captures slowly varying background conditions and next-day cross-stock propagation. More broadly, the combined framework offers a compact way to separate persistent market organization from short-horizon dynamical transmission. Future work could extend this approach through stronger structural regularization for shorter estimation windows, rolling or regime-switching specifications, and higher-order interactions to better represent the full distribution of collective market states. 
+
+References 
+
+[1] Miguel Aguilera, S. Amin Moosavi, and Hideaki Shimazaki. A unifying framework for mean-field theories of asymmetric kinetic Ising systems. Nature Communications , 12(1):1197, February 2021. ISSN 2041-1723. doi: 10.1038/s41467-021-20890-5. URL https://www.nature.com/articles/s41467-021-208 90-5 .11 [2] Ran Aroussi. yfinance: Download market data from yahoo! finance api. GitHub repository: https: //github.com/ranaroussi/yfinance , 2026. Version 1.2.0. [3] Erik Aurell and Magnus Ekeberg. Inverse ising inference using all the data. Physical Review Letters ,108(9), March 2012. ISSN 00319007. doi: 10.1103/PhysRevLett.108.090201. arXiv: 1107.3536. [4] Marco Bardoscia, Paolo Barucca, Stefano Battiston, Fabio Caccioli, Giulio Cimini, Diego Garlaschelli, Fabio Saracco, Tiziano Squartini, and Guido Caldarelli. The physics of financial networks. Nature Reviews Physics , 3(7):490–507, July 2021. ISSN 25225820. doi: 10.1038/s42254-021-00322-5. arXiv: 2103.05623. [5] Thomas Bury. Market structure explained by pairwise interactions. Physica A: Statistical Mechanics and its Applications , 392(6):1375–1385, March 2013. ISSN 03784371. doi: 10.1016/j.physa.2012.10.046. arXiv: 1210.8380. [6] Thomas Bury. Statistical pairwise interaction model of stock market. European Physical Journal B , 86 (3), March 2013. ISSN 14346028. doi: 10.1140/epjb/e2013-30598-1. arXiv: 1206.4420. [7] Carlo Campajola, Domenico Di Gangi, Fabrizio Lillo, and Daniele Tantari. Modelling time-varying interactions in complex systems: the Score Driven Kinetic Ising Model. Scientific Reports , 12(1):19339, November 2022. ISSN 2045-2322. doi: 10.1038/s41598-022-23770-0. URL https://www.nature.com /articles/s41598-022-23770-0 .[8] Dragos Gorduza, Stefan Zohren, and Xiaowen Dong. Understanding stock market instability via graph auto-encoders. EPJ Data Science , 14(1):13, February 2025. ISSN 2193-1127. doi: 10.1140/epjds/s136 88-025-00523-3. URL https://epjdatascience.springeropen.com/articles/10.1140/epjds/s13 688-025-00523-3 .[9] E. T. Jaynes. Information Theory and Statistical Mechanics. Physical Review , 106(4):620–630, May 1957. ISSN 0031-899X. doi: 10.1103/PhysRev.106.620. URL https://link.aps.org/doi/10.1103/P hysRev.106.620 .[10] Dror Y. Kenett, Michele Tumminello, Asaf Madi, Gitit Gur-Gershgoren, Rosario N. Mantegna, and Eshel Ben-Jacob. Dominating Clasp of the Financial Sector Revealed by Partial Correlation Analysis of the Stock Market. PLoS ONE , 5(12):e15032, December 2010. ISSN 1932-6203. doi: 10.1371/journa l.pone.0015032. URL https://dx.plos.org/10.1371/journal.pone.0015032 .[11] Yup Kim, Hong Joo Kim, and Soon Hyung Yook. Agent-based spin model for financial markets on complex networks: Emergence of two-phase phenomena. Physical Review E - Statistical, Nonlinear, and Soft Matter Physics , 78(3), September 2008. ISSN 15393755. doi: 10.1103/PhysRevE.78.036115. [12] Teruyoshi Kobayashi and Taro Takaguchi. Social dynamics of financial networks. EPJ Data Science ,7(1):15, December 2018. ISSN 2193-1127. doi: 10.1140/epjds/s13688-018-0143-y. URL https: //epjdatascience.springeropen.com/articles/10.1140/epjds/s13688-018-0143-y .[13] David A Levin and Yuval Peres. Markov chains and mixing times , volume 107. American Mathematical Soc., 2017. [14] R.N. Mantegna. Hierarchical structure in financial markets. The European Physical Journal B , 11(1): 193–197, September 1999. ISSN 1434-6028. doi: 10.1007/s100510050929. URL http://link.springe r.com/10.1007/s100510050929 .[15] Ori Maoz and Elad Schneidman. maxent_toolbox: Maximum entropy toolbox for matlab, version 1.0.2, 2017. URL https://orimaoz.github.io/maxent_toolbox .12 [16] M Mézard and J Sakellariou. Exact mean-field inference in asymmetric kinetic Ising systems. Journal of Statistical Mechanics: Theory and Experiment , 2011(07):L07001, July 2011. ISSN 1742-5468. doi: 10.1088/1742-5468/2011/07/L07001. URL https://iopscience.iop.org/article/10.1088/1742-5 468/2011/07/L07001 .[17] H. Chau Nguyen, Riccardo Zecchina, and Johannes Berg. Inverse statistical problems: from the inverse Ising problem to data science. Advances in Physics , 66(3):197–261, July 2017. ISSN 14606976. doi: 10.1080/00018732.2017.1341604. arXiv: 1702.01522. [18] Sebin Oh, Sangri Yi, and Ziqi Wang. Long-range Ising model for regional-scale seismic risk analysis. 
+
+Earthquake Engineering & Structural Dynamics , 53(12):3904–3923, 2024. [19] Sebin Oh, Jinyan Zhao, Raul Rincon, Jamie E. Padgett, and Ziqi Wang. Phase Transitions in Collective Damage of Civil Structures under Natural Hazards, February 2026. URL http://arxiv.org/abs/26 02.16195 . arXiv:2602.16195 [stat]. [20] J.-P. Onnela, A. Chakraborti, K. Kaski, J. Kertész, and A. Kanto. Dynamics of market correlations: Taxonomy and portfolio analysis. Physical Review E , 68(5):056110, November 2003. ISSN 1063-651X, 1095-3787. doi: 10.1103/PhysRevE.68.056110. URL https://link.aps.org/doi/10.1103/PhysRev E.68.056110 .[21] Mahmudul Islam Rakib, Ashadun Nobi, and Jae Woo Lee. Structure and dynamics of financial networks by feature ranking method. Scientific Reports , 11(1):17618, September 2021. ISSN 2045-2322. doi: 10.1038/s41598-021-97100-1. URL https://www.nature.com/articles/s41598-021-97100-1 .[22] Yasser Roudi and John Hertz. Dynamical TAP equations for non-equilibrium Ising spin glasses. Journal of Statistical Mechanics: Theory and Experiment , 2011(03):P03031, March 2011. ISSN 1742-5468. doi: 10.1088/1742-5468/2011/03/P03031. URL https://iopscience.iop.org/article/10.1088/1742-5 468/2011/03/P03031 .[23] Elad Schneidman, Michael J. Berry, Ronen Segev, and William Bialek. Weak pairwise correlations imply strongly correlated network states in a neural population. Nature , 440(7087):1007–1012, April 2006. ISSN 14764687. doi: 10.1038/nature04701. arXiv: q-bio/0512013. [24] S&P Dow Jones Indices and MSCI. Global industry classification standard (gics ®) methodology, October 2025. URL https://www.spglobal.com/spdji/en/documents/methodologies/methodolog y-gics.pdf . Accessed: 2026-03-17. [25] Yong Tang, Jason Jie Xiong, Zi Yang Jia, and Yi Cheng Zhang. Complexities in financial network topological dynamics: Modeling of emerging and developed stock markets. Complexity , 2018, 2018. ISSN 10990526. doi: 10.1155/2018/4680140. [26] Michele Tumminello, Fabrizio Lillo, and Rosario N. Mantegna. Correlation, hierarchies, and networks in financial markets. Journal of Economic Behavior & Organization , 75(1):40–58, July 2010. ISSN 01672681. doi: 10.1016/j.jebo.2010.01.004. URL https://linkinghub.elsevier.com/retrieve/pii /S0167268110000077 .[27] Duncan J Watts and Steven H Strogatz. Collective dynamics of ‘small-world’networks. nature , 393 (6684):440–442, 1998. [28] Ditian Zhang, Yangyang Zhuang, Pan Tang, Hongjuan Peng, and Qingying Han. Financial price dynamics and phase transitions in the stock markets. The European Physical Journal B , 96(3):35, 2023. 13 Funding Declaration 
+
+The authors declare no relevant funding. 
+
+Data availability 
+
+The raw daily open and close price data analyzed in this study were obtained from Yahoo Finance and are publicly available subject to its terms of use. The processed data supporting the findings of this study are available from the corresponding authors upon reasonable request. 
+
+Code availability 
+
+The code used to generate the results is available at [URL that will be available once the paper is accepted]. 
+
+Competing interests 
+
+The authors declare no competing interests. 
+
+Author contributions 
+
+S.O. conceived the study, collected and processed the data, developed the models, performed the analyses, prepared the figures, and wrote the original manuscript. Z.W. and M.C.G. provided supervision and guid-ance, contributed to the interpretation of the results, and reviewed and edited the manuscript. All authors reviewed and approved the final manuscript. 
+
+Appendix A. Maximum entropy derivation of the static and kinetic Ising models 
+
+This appendix outlines the maximum entropy derivations of the static and kinetic Ising models used in the main text. In each case, the model is obtained by maximizing entropy subject to normalization and the relevant moment constraints, with the resulting coefficients given by the associated Lagrange multipliers. 
+
+Appendix A.1. Static pairwise Ising model 
+
+Let Ω = {− 1, +1 }N denote the set of spin configurations, indexed by s(k), k = 1 , . . . , 2N , and write 
+
+Pk = P  {s(k)}. We maximize 
+
+S = −
+
+> 2N
+
+X
+
+> k=1
+
+Pk log Pk (A.1) subject to 
+
+> 2N
+
+X
+
+> k=1
+
+Pk = 1 , (A.2) 
+
+> 2N
+
+X
+
+> k=1
+
+Pks(k) 
+
+> i
+
+= mi,
+
+> 2N
+
+X
+
+> k=1
+
+Pks(k) 
+
+> i
+
+s(k) 
+
+> j
+
+= Cij , i < j. (A.3) Introducing multipliers α, hi, and Jij for these constraints gives 
+
+L = −
+
+> 2N
+
+X
+
+> k=1
+
+Pk log Pk − α
+
+1 −
+
+> 2N
+
+X
+
+> k=1
+
+Pk
+
+
+
+−
+
+> N
+
+X
+
+> i=1
+
+hi
+
+mi −
+
+> 2N
+
+X
+
+> k=1
+
+Pks(k)
+
+> i
+
+ − X
+
+> i<j
+
+Jij 
+
+Cij −
+
+> 2N
+
+X
+
+> k=1
+
+Pks(k) 
+
+> i
+
+s(k)
+
+> j
+
+ .
+
+(A.4) 14 Setting ∂L/∂P k = 0 yields 
+
+− log Pk − 1 + α +
+
+> N
+
+X
+
+> i=1
+
+his(k) 
+
+> i
+
++ X
+
+> i<j
+
+Jij s(k) 
+
+> i
+
+s(k) 
+
+> j
+
+= 0 , (A.5) so 
+
+Pk = 1
+
+Z exp 
+
+
+
+> N
+
+X
+
+> i=1
+
+his(k) 
+
+> i
+
++ X
+
+> i<j
+
+Jij s(k) 
+
+> i
+
+s(k)
+
+> j
+
+ , (A.6) with partition function 
+
+Z =
+
+> 2N
+
+X
+
+> k=1
+
+exp 
+
+
+
+> N
+
+X
+
+> i=1
+
+his(k) 
+
+> i
+
++ X
+
+> i<j
+
+Jij s(k) 
+
+> i
+
+s(k)
+
+> j
+
+ . (A.7) Equivalently, for a generic configuration s,
+
+p(s) = 1
+
+Z exp 
+
+
+
+> N
+
+X
+
+> i=1
+
+hisi + X
+
+> i<j
+
+Jij sisj
+
+ , (A.8) which is the static pairwise Ising model. 
+
+Appendix A.2. Kinetic Ising model 
+
+The kinetic model follows from an analogous conditional maximum entropy construction. For each current state s(t), let pt(s′ | s(t)) denote the one-step transition law to a generic next state s′. We maximize the conditional entropy 
+
+Sc = − 
+
+> T−1
+
+X
+
+> t=1
+
+X
+
+> s′∈{− 1,+1 }N
+
+pt(s′ | s(t)) log pt(s′ | s(t)) (A.9) subject to normalization at each time point, 
+
+X
+
+> s′∈{− 1,+1 }N
+
+pt(s′ | s(t)) = 1 , t = 1 , . . . , T − 1, (A.10) and constraints on the basis-weighted next-step means, self-lag products, and cross-lag products:  
+
+> T−1
+
+X
+
+> t=1
+
+X
+
+> s′
+
+pt(s′ | s(t)) ϕm(t) s′ 
+
+> i
+
+= Bim , (A.11)  
+
+> T−1
+
+X
+
+> t=1
+
+X
+
+> s′
+
+pt(s′ | s(t)) s′
+
+> i
+
+si(t) = Di, (A.12)  
+
+> T−1
+
+X
+
+> t=1
+
+X
+
+> s′
+
+pt(s′ | s(t)) s′
+
+> i
+
+sj (t) = Kij , j̸ = i, (A.13) where Bim , Di, and Kij are the corresponding empirical quantities. 15 Introducing multipliers λt, γim , ai, and Jij gives 
+
+Lc = − 
+
+> T−1
+
+X
+
+> t=1
+
+X
+
+> s′
+
+pt(s′ | s(t)) log pt(s′ | s(t)) 
+
+− 
+
+> T−1
+
+X
+
+> t=1
+
+λt 1 − X
+
+> s′
+
+pt(s′ | s(t)) 
+
+!
+
+−
+
+> N
+
+X
+
+> i=1
+> M
+
+X
+
+> m=1
+
+γim Bim − 
+
+> T−1
+
+X
+
+> t=1
+
+X
+
+> s′
+
+pt(s′ | s(t)) ϕm(t) s′
+
+> i
+
+!
+
+−
+
+> N
+
+X
+
+> i=1
+
+ai Di − 
+
+> T−1
+
+X
+
+> t=1
+
+X
+
+> s′
+
+pt(s′ | s(t)) s′
+
+> i
+
+si(t)
+
+!
+
+−
+
+> N
+
+X
+
+> i=1
+
+X 
+
+> j̸=i
+
+Jij Kij − 
+
+> T−1
+
+X
+
+> t=1
+
+X
+
+> s′
+
+pt(s′ | s(t)) s′
+
+> i
+
+sj (t)
+
+!
+
+.
+
+(A.14) Setting the derivative with respect to pt(s′ | s(t)) to zero gives 
+
+− log pt(s′ | s(t)) − 1 + λt +
+
+> N
+
+X
+
+> i=1
+> M
+
+X
+
+> m=1
+
+γim ϕm(t)s′
+
+> i
+
++
+
+> N
+
+X
+
+> i=1
+
+ais′
+
+> i
+
+si(t) + 
+
+> N
+
+X
+
+> i=1
+
+X 
+
+> j̸=i
+
+Jij s′
+
+> i
+
+sj (t) = 0 .
+
+(A.15) Hence 
+
+pt(s′ | s(t)) = 1
+
+Zt(s(t)) exp 
+
+
+
+> N
+
+X
+
+> i=1
+
+s′
+
+> i
+
+
+
+> M
+
+X
+
+> m=1
+
+ϕm(t)γim + aisi(t) + X 
+
+> j̸=i
+
+Jij sj (t)
+
+ . (A.16) Defining the effective local field as 
+
+θi(t) = 
+
+> M
+
+X
+
+> m=1
+
+ϕm(t)γim + aisi(t) + X 
+
+> j̸=i
+
+Jij sj (t), (A.17) we obtain 
+
+pt(s′ | s(t)) = 1
+
+Zt(s(t)) exp 
+
+> N
+
+X
+
+> i=1
+
+s′
+
+> i
+
+θi(t)
+
+!
+
+. (A.18) Because the exponent separates over i, the normalizing constant factorizes as 
+
+Zt(s(t)) = 
+
+> N
+
+Y
+
+> i=1
+
+2 cosh( θi(t)) , (A.19) and therefore 
+
+pt(s′ | s(t)) = 
+
+> N
+
+Y
+
+> i=1
+
+exp( s′
+
+> i
+
+θi(t)) 2 cosh( θi(t)) . (A.20) 16 Replacing s′ with the empirical next state s(t + 1) gives 
+
+p(s(t + 1) | s(t)) = 
+
+> N
+
+Y
+
+> i=1
+
+exp( si(t + 1) θi(t)) 2 cosh( θi(t)) , (A.21) which is the synchronous kinetic Ising model. 17 Figure A.1: Validation of the fitted static Ising model against the empirical constraints. Left: empirical mean MD
+
+> 1,i
+
+versus model mean M1,i across stocks. Right: empirical versus model pairwise correlation coefficient, excluding the trivial diagonal entries equal to 1. The dashed line is the identity line. The near-perfect alignment confirms that the fitted model closely reproduces the first- and second-order moments used in estimation. 
+
+18 Figure A.2: Distributions of the inferred external fields and couplings in the static Ising model. Left: histogram of the estimated external fields hi. Right: histogram of the estimated pairwise couplings Jij . The hi values are centered near zero with moderate spread, whereas the Jij values are sharply concentrated near zero, indicating that most inferred pairwise interactions are weak. The inset highlights the positive tail of the coupling distribution. 
+
+19 Table A.1: Detailed diagnostics of the static Ising interaction network for the full 30-year S&P 500 sample. 
+
+Description Value 
+
+Filtering and graph size 
+
+Number of stocks / unique pairwise couplings 306 / 46,665 Filtering rule Top decile of |Jij |
+
+Top-decile cutoff on |Jij | 0.03534 Retained edges / edge fraction 4,667 / 0.1000 Connected components 1
+
+Filtered-network diagnostics 
+
+Nodes / edges 306 / 4,667 Average degree 30.50 Average clustering coefficient 0.1450 Average shortest-path length (largest connected component) 1.9670 Number of positive / negative edges 3,317 / 1,350 Sector assortativity 0.259 Small-world coefficient σ 1.424 
+
+Sector-level structure 
+
+Within-sector mean |Jij | / between-sector mean |Jij | 0.04367 / 0.01566 Within/between ratio 2.7879 Largest within-sector mean |Jij |
+
+Real Estate (0.0737) Energy (0.0710) Utilities (0.0526) Communication Services (0.0525) Materials (0.0412) Largest sector mean |hi|
+
+Information Technology (0.0259) Financials (0.0210) Consumer Discretionary (0.0209) Consumer Staples (0.0198) Materials (0.0198) 
+
+Stock-level diagnostics 
+
+Largest |hi|
+
+Ford (0.1083) AMD (0.0933) ODFL (0.0923) CRH (0.0712) PG (0.0699) Largest P 
+
+> j
+
+|Jij |
+
+WEC (3.047) BAC (2.991) XOM (2.938) AVB (2.906) AMAT (2.885)                   
+
+> *Abbreviations: AMD = Advanced Micro Devices; ODFL = Old Dominion Freight Line; CRH = CRH plc; PG = Procter & Gamble; WEC = WEC Energy Group; BAC = Bank of America; XOM = ExxonMobil; AVB = AvalonBay Communities; AMAT = Applied Materials.
+> †The cutoff on |Jij |is obtained by sorting the 306 ×305 /2 = 46 ,665 unique pairwise coupling magnitudes |Jij |in decreasing order. The top-decile threshold is then used as the cutoff, so retaining edges with |Jij |above this value yields 4,667 edges in the filtered network.
+
+20 Figure A.3: Benchmark comparison for the filtered stock interaction network. Left: average clustering coefficient. Right: average shortest-path length. Boxplots show the distributions of these statistics across 300 realizations each of edge-matched random graphs and Watts–Strogatz graphs [27] with comparable mean degree, with the latter generated using a rewiring probability of β = 0 .53 . In each panel, the dashed vertical line marks the observed value for the filtered S&P 500 network. The observed network exhibits substantially higher clustering than the random benchmark while maintaining a similarly short path length, placing it closer to the small-world benchmark in clustering and to the random benchmark in path length, consistent with small-world organization. 
+
+21 Figure A.4: Distribution of daily market breadth in the empirical data and in equilibrium samples from the fitted static Ising model. Here the daily market breadth is defined as m = 1
+
+> N
+
+PNi=1 si. The empirical distribution is unimodal, whereas the model distribution is more clearly bimodal, showing that the static fit reproduces low-order moments well but does not capture the full distribution of collective market states. 
+
+22 Figure A.5: Validation of the fitted kinetic Ising model. Left: comparison between the empirical frequency of an upward next-day move and the corresponding model-implied probability, P (si(t + 1) = +1 |s(t)) , grouped into 100 bins (equivalently, 0.01 probability increment) to assess calibration. This quantity measures how well the fitted kinetic Ising model reproduces the observed frequencies of s(t + 1) = +1 . Each point represents one non-empty bin of stock-day observations, and marker size is proportional to the number of observations in the bin. Right: comparison between empirical and model-implied off-diagonal lag-1 cross-stock correlations, corr( si(t + 1) , s j (t)) where i̸ = j, which measure how the state of stock j at day t is associated with the next-day state of stock i. Each point in the right panel represents one ordered stock pair (i, j ) with i̸ = j. The dashed line in each panel is the identity line; closer agreement indicates more accurate reproduction of the corresponding one-step statistic by the fitted kinetic Ising model. 
+
+23 Table A.2: Detailed diagnostics of the kinetic Ising model for the full 30-year S&P 500 sample. 
+
+Description Value 
+
+Sample and model size 
+
+Number of stocks / one-step transitions / basis count 306 / 7,549 / 30 
+
+Market-level fit and regime diagnostics 
+
+Spearman ρs between model-predicted and empirical market means 0.56 Full-sample mean ¯h(t) / standard deviation ¯h(t) 0.00157 / 0.03812 Spearman ρs
+
+ ¯h(t), empirical market mean  0.09095 Spearman ρs
+
+ ¯θ(t), empirical market mean  0.21719 
+
+Windowed field diagnostics 
+
+Values in parentheses are mean ¯h(t), mean ¯θ(t), empirical market mean, respectively. 
+
+Full sample 0.00157 , −0.00132 , −0.00115 
+
+Early sample −0.04353 , −0.04217 , −0.04473 
+
+Dot-com bust −0.02604 , −0.02302 , −0.02085 
+
+GFC −0.00185 , −0.01180 , −0.04717 
+
+COVID 0.01298 , 0.01152 , 0.00098 
+
+Self-memory terms 
+
+Mean ai / median ai 0.00119 / 0.00033 Fraction positive / negative ai 0.50654 / 0.49346 Largest positive ai
+
+AIG (0.0626) CRH (0.0549) TPL (0.0473) APA (0.0410) EME (0.0395) Most negative ai
+
+NEM ( −0.0568 )QCOM ( −0.0498 )EMR ( −0.0443 )ECL ( −0.0391 )MTB ( −0.0371 )
+
+Directed-coupling diagnostics 
+
+Mean Jij / standard deviation Jij −0.00010 / 0.01474 Mean |Jij | / 90th percentile |Jij | 0.01174 / 0.02425 Within-sector mean |Jij | / between-sector mean |Jij | 0.01185 / 0.01167 Within/between ratio 1.0161 Frobenius asymmetry index 1.415 Symmetry Spearman ρs(Jij , J ji ) / Pearson r(Jij , J ji ) −0.0013 / −0.0017 
+
+Comparison with the static network 
+
+Static within-sector mean |Jij | / between-sector mean |Jij | 0.04367 / 0.01566 Static within/between ratio 2.7879 Spearman ρs (static strength, kinetic total / incoming / outgoing strength) 0.41558 / −0.01553 / 0.46854  
+
+> *
+
+Here ¯h(t) = 1
+
+> N
+
+PNi=1 hi(t) and ¯θ(t) = 1
+
+> N
+
+PNi=1 θi(t) denote the market-average external field and market-average total local field, respectively; the empirical market mean is 1
+
+> N
+
+PNi=1 si(t). All reported ρs values are Spearman rank correlations. Window definitions: Early sample = 1996-01-01 to 2004-12-31; Dot-com bust = 2000-06-01 to 2002-06-01; GFC = 2007-10-01 to 2008-10-01; COVID = 2020-01-01 to 2021-01-01.  
+
+> †
+
+Abbreviations: AIG = American International Group; CRH = CRH plc; TPL = Texas Pacific Land Corporation; APA = APA Corporation; EME = Emcor; NEM = Newmont; QCOM = Qualcomm; EMR = Emerson Electric; ECL = Ecolab; MTB = M&T Bank; GFC = global financial crisis. 
+
+24
