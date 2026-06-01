@@ -403,7 +403,13 @@ window.SubscriptionsSmartQuery = (function () {
   };
 
   const getAvailablePaperSources = () => {
-    const cfg = window.SubscriptionsManager.getDraftConfig ? window.SubscriptionsManager.getDraftConfig() : {};
+    let cfg = window.SubscriptionsManager.getDraftConfig ? window.SubscriptionsManager.getDraftConfig() : {};
+    // Fallback: if draftConfig is empty, try to get config directly
+    if (!cfg || !cfg.source_backends || !Object.keys(cfg.source_backends || {}).length) {
+      if (window.SubscriptionsManager._lastLoadedConfig) {
+        cfg = window.SubscriptionsManager._lastLoadedConfig;
+      }
+    }
     const rawBackends = cfg && cfg.source_backends && typeof cfg.source_backends === 'object'
       ? cfg.source_backends
       : {};
