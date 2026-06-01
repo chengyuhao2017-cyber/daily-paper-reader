@@ -93,8 +93,17 @@ window.SubscriptionsSmartQuery = (function () {
     'acl',
     'emnlp',
     'aaai',
+    'serper_scholar',
+    'cnki',
+    'google_scholar',
+    'jstor',
+    'repec',
+    'sciencedirect',
+    'scopus',
+    'wiley',
+    'wos',
   ];
-  const VISIBLE_PAPER_SOURCES = ['arxiv', 'biorxiv'];
+  const VISIBLE_PAPER_SOURCES = ['arxiv', 'biorxiv', 'medrxiv', 'chemrxiv', 'neurips', 'iclr', 'icml', 'acl', 'emnlp', 'aaai', 'serper_scholar', 'cnki', 'google_scholar', 'jstor', 'repec', 'sciencedirect', 'scopus', 'wiley', 'wos'];
   const PAPER_SOURCE_LABELS = {
     arxiv: 'arXiv',
     biorxiv: 'bioRxiv',
@@ -106,6 +115,15 @@ window.SubscriptionsSmartQuery = (function () {
     acl: 'ACL',
     emnlp: 'EMNLP',
     aaai: 'AAAI',
+    serper_scholar: 'Serper Scholar',
+    cnki: 'CNKI (知网)',
+    google_scholar: 'Google Scholar',
+    jstor: 'JSTOR',
+    repec: 'RePEc',
+    sciencedirect: 'ScienceDirect',
+    scopus: 'Scopus',
+    wiley: 'Wiley',
+    wos: 'Web of Science',
   };
   const getSelectionLimit = (kind) => (
     normalizeCandidateKind(kind) === 'intent'
