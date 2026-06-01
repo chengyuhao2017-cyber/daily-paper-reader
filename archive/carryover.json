@@ -1,6 +1,32 @@
 {
-  "generated_at": "2026-06-01T14:44:11.632802+00:00",
+  "generated_at": "2026-06-01T15:29:52.812537+00:00",
   "updated_date": "20260523-20260601",
   "carryover_days": 9,
-  "tag_states": {}
+  "tag_states": {
+    "MP": {
+      "updated_date": "20260523-20260601",
+      "carryover_days": 9,
+      "items": []
+    },
+    "ETR": {
+      "updated_date": "20260523-20260601",
+      "carryover_days": 9,
+      "items": []
+    },
+    "PN": {
+      "updated_date": "20260523-20260601",
+      "carryover_days": 9,
+      "items": []
+    },
+    "PE": {
+      "updated_date": "20260523-20260601",
+      "carryover_days": 9,
+      "items": []
+    },
+    "ER": {
+      "updated_date": "20260523-20260601",
+      "carryover_days": 9,
+      "items": []
+    }
+  }
 }
