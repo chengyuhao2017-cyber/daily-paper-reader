@@ -295,3 +295,4 @@ jobs:
           git fetch origin "$branch"
           git rebase -X theirs "origin/$branch"
           git push origin HEAD:"$branch"
+
