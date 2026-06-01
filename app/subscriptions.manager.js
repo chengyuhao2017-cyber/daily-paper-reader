@@ -205,8 +205,17 @@ window.SubscriptionsManager = (function () {
     'acl',
     'emnlp',
     'aaai',
+    'serper_scholar',
+    'cnki',
+    'google_scholar',
+    'jstor',
+    'repec',
+    'sciencedirect',
+    'scopus',
+    'wiley',
+    'wos',
   ];
-  const VISIBLE_PAPER_SOURCES = ['arxiv', 'biorxiv'];
+  const VISIBLE_PAPER_SOURCES = ['arxiv', 'biorxiv', 'medrxiv', 'chemrxiv', 'neurips', 'iclr', 'icml', 'acl', 'emnlp', 'aaai', 'serper_scholar', 'cnki', 'google_scholar', 'jstor', 'repec', 'sciencedirect', 'scopus', 'wiley', 'wos'];
   const SOURCE_BACKEND_DEFAULTS = {
     arxiv: {
       papers_table: 'arxiv_papers',
