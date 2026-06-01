@@ -375,7 +375,12 @@ window.SubscriptionsSmartQuery = (function () {
 
   const filterVisiblePaperSources = (values) => {
     const visible = new Set(VISIBLE_PAPER_SOURCES);
-    return (Array.isArray(values) ? values : []).filter((value) => visible.has(normalizeText(value).toLowerCase()));
+    const result = (Array.isArray(values) ? values : []).filter((value) => visible.has(normalizeText(value).toLowerCase()));
+    // Fallback: if we only got arxiv (config not loaded), return all visible sources
+    if (result.length <= 1 && result[0] === 'arxiv' && VISIBLE_PAPER_SOURCES.length > 2) {
+      return [...VISIBLE_PAPER_SOURCES];
+    }
+    return result;
   };
 
   const normalizePaperSources = (values, options = {}) => {
@@ -403,14 +408,8 @@ window.SubscriptionsSmartQuery = (function () {
   };
 
   const getAvailablePaperSources = () => {
-    let cfg = window.SubscriptionsManager.getDraftConfig ? window.SubscriptionsManager.getDraftConfig() : {};
-    // Fallback: if draftConfig is empty, try to get config directly
-    if (!cfg || !cfg.source_backends || !Object.keys(cfg.source_backends || {}).length) {
-      if (window.SubscriptionsManager._lastLoadedConfig) {
-        cfg = window.SubscriptionsManager._lastLoadedConfig;
-      }
-    }
-    const rawBackends = cfg && cfg.source_backends && typeof cfg.source_backends === 'object'
+    let cfg = window.SubscriptionsManager && window.SubscriptionsManager.getDraftConfig ? window.SubscriptionsManager.getDraftConfig() : {};
+    const rawBackends = cfg && cfg.source_backends && typeof cfg.source_backends === 'object' && Object.keys(cfg.source_backends).length > 0
       ? cfg.source_backends
       : {};
     const seen = new Set();
