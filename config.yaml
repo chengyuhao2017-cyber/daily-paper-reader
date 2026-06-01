@@ -25,3 +25,156 @@ subscriptions:
     stage: A
     diff_threshold_pct: 15
   keyword_recall_mode: or
+  intent_profiles:
+    - tag: Monetary-Policy
+      description: 货币政策研究
+      enabled: true
+      paper_sources:
+        - sciencedirect
+        - cnki
+        - wos
+        - jstor
+        - scopus
+        - google_scholar
+        - repec
+        - wiley
+      keywords:
+        - keyword: monetary policy
+          keyword_cn: 货币政策
+          query: monetary policy transmission mechanisms and central bank decisions
+        - keyword: interest rate
+          keyword_cn: 利率
+          query: interest rate setting and its macroeconomic effects
+        - keyword: central bank
+          keyword_cn: 中央银行
+          query: central bank communication and policy tools
+        - keyword: quantitative easing
+          keyword_cn: 量化宽松
+          query: unconventional monetary policy and quantitative easing programs
+        - keyword: inflation targeting
+          keyword_cn: 通胀目标制
+          query: inflation targeting frameworks and monetary policy rules
+      intent_queries:
+        - query: effects of monetary policy on economic growth and inflation
+          enabled: true
+          source: manual
+        - query: central bank independence and monetary policy credibility
+          enabled: true
+          source: manual
+        - query: monetary policy spillover effects in open economies
+          enabled: true
+          source: manual
+    - tag: Economic-Tail-Risk
+      description: 经济尾部风险
+      enabled: true
+      paper_sources:
+        - sciencedirect
+        - cnki
+        - wos
+        - jstor
+        - scopus
+        - google_scholar
+        - repec
+        - wiley
+      keywords:
+        - keyword: tail risk
+          keyword_cn: 尾部风险
+          query: tail risk measurement and management in economics and finance
+        - keyword: extreme events
+          keyword_cn: 极端事件
+          query: extreme events and rare disasters in macroeconomics
+        - keyword: financial crisis
+          keyword_cn: 金融危机
+          query: financial crisis prediction and systemic risk assessment
+        - keyword: risk management
+          keyword_cn: 风险管理
+          query: risk management strategies for extreme economic downturns
+        - keyword: Value at Risk
+          keyword_cn: 风险价值
+          query: Value at Risk and Expected Shortfall in economic tail risk analysis
+      intent_queries:
+        - query: measuring and forecasting economic tail risks
+          enabled: true
+          source: manual
+        - query: impact of tail risk on asset pricing and portfolio allocation
+          enabled: true
+          source: manual
+        - query: macroeconomic uncertainty and downside risk
+          enabled: true
+          source: manual
+    - tag: Production-Networks
+      description: 生产网络
+      enabled: true
+      paper_sources:
+        - sciencedirect
+        - cnki
+        - wos
+        - jstor
+        - scopus
+        - google_scholar
+        - repec
+        - wiley
+      keywords:
+        - keyword: production networks
+          keyword_cn: 生产网络
+          query: production networks and input-output linkages in the economy
+        - keyword: supply chain
+          keyword_cn: 供应链
+          query: supply chain structure and macroeconomic fluctuations
+        - keyword: input-output analysis
+          keyword_cn: 投入产出分析
+          query: input-output analysis and inter-industry linkages
+        - keyword: network effects
+          keyword_cn: 网络效应
+          query: network propagation of shocks in production economies
+        - keyword: global value chains
+          keyword_cn: 全球价值链
+          query: global value chains and international production networks
+      intent_queries:
+        - query: shock propagation through production networks
+          enabled: true
+          source: manual
+        - query: role of production networks in business cycle fluctuations
+          enabled: true
+          source: manual
+        - query: granular origins of aggregate fluctuations via firm networks
+          enabled: true
+          source: manual
+    - tag: Policy-Effect
+      description: 政策效果评估
+      enabled: true
+      paper_sources:
+        - sciencedirect
+        - cnki
+        - wos
+        - jstor
+        - scopus
+        - google_scholar
+        - repec
+        - wiley
+      keywords:
+        - keyword: policy evaluation
+          keyword_cn: 政策评估
+          query: causal evaluation of economic policy interventions
+        - keyword: causal inference
+          keyword_cn: 因果推断
+          query: causal inference methods for policy effect estimation
+        - keyword: difference in differences
+          keyword_cn: 双重差分法
+          query: difference-in-differences and policy impact evaluation
+        - keyword: regression discontinuity
+          keyword_cn: 断点回归
+          query: regression discontinuity design for policy analysis
+        - keyword: fiscal policy
+          keyword_cn: 财政政策
+          query: fiscal policy effects on output and employment
+      intent_queries:
+        - query: methods for estimating causal effects of economic policies
+          enabled: true
+          source: manual
+        - query: fiscal and monetary policy interaction effects
+          enabled: true
+          source: manual
+        - query: policy evaluation using natural experiments and quasi-experimental designs
+          enabled: true
+          source: manual
