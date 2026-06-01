@@ -22,7 +22,17 @@ except Exception:  # pragma: no cover
 
 
 ARXIV_SOURCE_KEY = "arxiv"
-DEFAULT_SUPPORTED_SOURCES = (ARXIV_SOURCE_KEY, "biorxiv", "medrxiv", "chemrxiv", "neurips", "iclr", "icml", "acl", "emnlp", "aaai")
+DEFAULT_SUPPORTED_SOURCES = (
+    ARXIV_SOURCE_KEY,
+    "sciencedirect",
+    "cnki",
+    "wos",
+    "jstor",
+    "scopus",
+    "google_scholar",
+    "repec",
+    "wiley",
+)
 
 
 def _norm(value: Any) -> str:
@@ -105,167 +115,36 @@ def build_env_source_backend_overrides() -> Dict[str, Dict[str, Any]]:
     if arxiv_backend:
         out[ARXIV_SOURCE_KEY] = arxiv_backend
 
-    if _env_bool("DPR_ENABLE_BIORXIV_BACKEND", False):
-        backend: Dict[str, Any] = {
-            "enabled": _env_bool("DPR_BIORXIV_ENABLED", True),
-            "papers_table": _norm(os.getenv("DPR_BIORXIV_PAPERS_TABLE") or "biorxiv_papers"),
-            "use_vector_rpc": _env_bool("DPR_BIORXIV_USE_VECTOR_RPC", True),
-            "vector_rpc": _norm(os.getenv("DPR_BIORXIV_VECTOR_RPC") or "match_biorxiv_papers_exact"),
-            "vector_rpc_exact": _norm(os.getenv("DPR_BIORXIV_VECTOR_RPC_EXACT") or "match_biorxiv_papers_exact"),
-            "use_bm25_rpc": _env_bool("DPR_BIORXIV_USE_BM25_RPC", True),
-            "bm25_rpc": _norm(os.getenv("DPR_BIORXIV_BM25_RPC") or "match_biorxiv_papers_bm25"),
-        }
-        if _norm(os.getenv("DPR_BIORXIV_URL")):
-            backend["url"] = _norm(os.getenv("DPR_BIORXIV_URL"))
-        if _norm(os.getenv("DPR_BIORXIV_ANON_KEY")):
-            backend["anon_key"] = _norm(os.getenv("DPR_BIORXIV_ANON_KEY"))
-        if _norm(os.getenv("DPR_BIORXIV_SCHEMA")):
-            backend["schema"] = _norm(os.getenv("DPR_BIORXIV_SCHEMA"))
-        out["biorxiv"] = backend
+    # --- 经济学论文源后端 ---
+    _EXTRA_SOURCES = (
+        ("SCIENCEDIRECT", "sciencedirect", "sciencedirect_papers"),
+        ("CNKI", "cnki", "cnki_papers"),
+        ("WOS", "wos", "wos_papers"),
+        ("JSTOR", "jstor", "jstor_papers"),
+        ("SCOPUS", "scopus", "scopus_papers"),
+        ("GOOGLE_SCHOLAR", "google_scholar", "google_scholar_papers"),
+        ("REPEC", "repec", "repec_papers"),
+        ("WILEY", "wiley", "wiley_papers"),
+    )
 
-    if _env_bool("DPR_ENABLE_MEDRXIV_BACKEND", False):
-        backend = {
-            "enabled": _env_bool("DPR_MEDRXIV_ENABLED", True),
-            "papers_table": _norm(os.getenv("DPR_MEDRXIV_PAPERS_TABLE") or "medrxiv_papers"),
-            "use_vector_rpc": _env_bool("DPR_MEDRXIV_USE_VECTOR_RPC", True),
-            "vector_rpc": _norm(os.getenv("DPR_MEDRXIV_VECTOR_RPC") or "match_medrxiv_papers_exact"),
-            "vector_rpc_exact": _norm(os.getenv("DPR_MEDRXIV_VECTOR_RPC_EXACT") or "match_medrxiv_papers_exact"),
-            "use_bm25_rpc": _env_bool("DPR_MEDRXIV_USE_BM25_RPC", True),
-            "bm25_rpc": _norm(os.getenv("DPR_MEDRXIV_BM25_RPC") or "match_medrxiv_papers_bm25"),
-        }
-        if _norm(os.getenv("DPR_MEDRXIV_URL")):
-            backend["url"] = _norm(os.getenv("DPR_MEDRXIV_URL"))
-        if _norm(os.getenv("DPR_MEDRXIV_ANON_KEY")):
-            backend["anon_key"] = _norm(os.getenv("DPR_MEDRXIV_ANON_KEY"))
-        if _norm(os.getenv("DPR_MEDRXIV_SCHEMA")):
-            backend["schema"] = _norm(os.getenv("DPR_MEDRXIV_SCHEMA"))
-        out["medrxiv"] = backend
-
-    if _env_bool("DPR_ENABLE_CHEMRXIV_BACKEND", False):
-        backend = {
-            "enabled": _env_bool("DPR_CHEMRXIV_ENABLED", True),
-            "papers_table": _norm(os.getenv("DPR_CHEMRXIV_PAPERS_TABLE") or "chemrxiv_papers"),
-            "use_vector_rpc": _env_bool("DPR_CHEMRXIV_USE_VECTOR_RPC", True),
-            "vector_rpc": _norm(os.getenv("DPR_CHEMRXIV_VECTOR_RPC") or "match_chemrxiv_papers_exact"),
-            "vector_rpc_exact": _norm(os.getenv("DPR_CHEMRXIV_VECTOR_RPC_EXACT") or "match_chemrxiv_papers_exact"),
-            "use_bm25_rpc": _env_bool("DPR_CHEMRXIV_USE_BM25_RPC", True),
-            "bm25_rpc": _norm(os.getenv("DPR_CHEMRXIV_BM25_RPC") or "match_chemrxiv_papers_bm25"),
-        }
-        if _norm(os.getenv("DPR_CHEMRXIV_URL")):
-            backend["url"] = _norm(os.getenv("DPR_CHEMRXIV_URL"))
-        if _norm(os.getenv("DPR_CHEMRXIV_ANON_KEY")):
-            backend["anon_key"] = _norm(os.getenv("DPR_CHEMRXIV_ANON_KEY"))
-        if _norm(os.getenv("DPR_CHEMRXIV_SCHEMA")):
-            backend["schema"] = _norm(os.getenv("DPR_CHEMRXIV_SCHEMA"))
-        out["chemrxiv"] = backend
-
-    if _env_bool("DPR_ENABLE_NEURIPS_BACKEND", False):
-        backend = {
-            "enabled": _env_bool("DPR_NEURIPS_ENABLED", True),
-            "papers_table": _norm(os.getenv("DPR_NEURIPS_PAPERS_TABLE") or "neurips_openreview_papers"),
-            "use_vector_rpc": _env_bool("DPR_NEURIPS_USE_VECTOR_RPC", True),
-            "vector_rpc": _norm(os.getenv("DPR_NEURIPS_VECTOR_RPC") or "match_neurips_openreview_papers_exact"),
-            "vector_rpc_exact": _norm(os.getenv("DPR_NEURIPS_VECTOR_RPC_EXACT") or "match_neurips_openreview_papers_exact"),
-            "use_bm25_rpc": _env_bool("DPR_NEURIPS_USE_BM25_RPC", True),
-            "bm25_rpc": _norm(os.getenv("DPR_NEURIPS_BM25_RPC") or "match_neurips_openreview_papers_bm25"),
-        }
-        if _norm(os.getenv("DPR_NEURIPS_URL")):
-            backend["url"] = _norm(os.getenv("DPR_NEURIPS_URL"))
-        if _norm(os.getenv("DPR_NEURIPS_ANON_KEY")):
-            backend["anon_key"] = _norm(os.getenv("DPR_NEURIPS_ANON_KEY"))
-        if _norm(os.getenv("DPR_NEURIPS_SCHEMA")):
-            backend["schema"] = _norm(os.getenv("DPR_NEURIPS_SCHEMA"))
-        out["neurips"] = backend
-
-    if _env_bool("DPR_ENABLE_ICLR_BACKEND", False):
-        backend = {
-            "enabled": _env_bool("DPR_ICLR_ENABLED", True),
-            "papers_table": _norm(os.getenv("DPR_ICLR_PAPERS_TABLE") or "iclr_openreview_papers"),
-            "use_vector_rpc": _env_bool("DPR_ICLR_USE_VECTOR_RPC", True),
-            "vector_rpc": _norm(os.getenv("DPR_ICLR_VECTOR_RPC") or "match_iclr_openreview_papers_exact"),
-            "vector_rpc_exact": _norm(os.getenv("DPR_ICLR_VECTOR_RPC_EXACT") or "match_iclr_openreview_papers_exact"),
-            "use_bm25_rpc": _env_bool("DPR_ICLR_USE_BM25_RPC", True),
-            "bm25_rpc": _norm(os.getenv("DPR_ICLR_BM25_RPC") or "match_iclr_openreview_papers_bm25"),
-        }
-        if _norm(os.getenv("DPR_ICLR_URL")):
-            backend["url"] = _norm(os.getenv("DPR_ICLR_URL"))
-        if _norm(os.getenv("DPR_ICLR_ANON_KEY")):
-            backend["anon_key"] = _norm(os.getenv("DPR_ICLR_ANON_KEY"))
-        if _norm(os.getenv("DPR_ICLR_SCHEMA")):
-            backend["schema"] = _norm(os.getenv("DPR_ICLR_SCHEMA"))
-        out["iclr"] = backend
-
-    if _env_bool("DPR_ENABLE_ICML_BACKEND", False):
-        backend = {
-            "enabled": _env_bool("DPR_ICML_ENABLED", True),
-            "papers_table": _norm(os.getenv("DPR_ICML_PAPERS_TABLE") or "icml_openreview_papers"),
-            "use_vector_rpc": _env_bool("DPR_ICML_USE_VECTOR_RPC", True),
-            "vector_rpc": _norm(os.getenv("DPR_ICML_VECTOR_RPC") or "match_icml_openreview_papers_exact"),
-            "vector_rpc_exact": _norm(os.getenv("DPR_ICML_VECTOR_RPC_EXACT") or "match_icml_openreview_papers_exact"),
-            "use_bm25_rpc": _env_bool("DPR_ICML_USE_BM25_RPC", True),
-            "bm25_rpc": _norm(os.getenv("DPR_ICML_BM25_RPC") or "match_icml_openreview_papers_bm25"),
-        }
-        if _norm(os.getenv("DPR_ICML_URL")):
-            backend["url"] = _norm(os.getenv("DPR_ICML_URL"))
-        if _norm(os.getenv("DPR_ICML_ANON_KEY")):
-            backend["anon_key"] = _norm(os.getenv("DPR_ICML_ANON_KEY"))
-        if _norm(os.getenv("DPR_ICML_SCHEMA")):
-            backend["schema"] = _norm(os.getenv("DPR_ICML_SCHEMA"))
-        out["icml"] = backend
-
-    if _env_bool("DPR_ENABLE_ACL_BACKEND", False):
-        backend = {
-            "enabled": _env_bool("DPR_ACL_ENABLED", True),
-            "papers_table": _norm(os.getenv("DPR_ACL_PAPERS_TABLE") or "acl_papers"),
-            "use_vector_rpc": _env_bool("DPR_ACL_USE_VECTOR_RPC", True),
-            "vector_rpc": _norm(os.getenv("DPR_ACL_VECTOR_RPC") or "match_acl_papers_exact"),
-            "vector_rpc_exact": _norm(os.getenv("DPR_ACL_VECTOR_RPC_EXACT") or "match_acl_papers_exact"),
-            "use_bm25_rpc": _env_bool("DPR_ACL_USE_BM25_RPC", True),
-            "bm25_rpc": _norm(os.getenv("DPR_ACL_BM25_RPC") or "match_acl_papers_bm25"),
-        }
-        if _norm(os.getenv("DPR_ACL_URL")):
-            backend["url"] = _norm(os.getenv("DPR_ACL_URL"))
-        if _norm(os.getenv("DPR_ACL_ANON_KEY")):
-            backend["anon_key"] = _norm(os.getenv("DPR_ACL_ANON_KEY"))
-        if _norm(os.getenv("DPR_ACL_SCHEMA")):
-            backend["schema"] = _norm(os.getenv("DPR_ACL_SCHEMA"))
-        out["acl"] = backend
-
-    if _env_bool("DPR_ENABLE_EMNLP_BACKEND", False):
-        backend = {
-            "enabled": _env_bool("DPR_EMNLP_ENABLED", True),
-            "papers_table": _norm(os.getenv("DPR_EMNLP_PAPERS_TABLE") or "emnlp_papers"),
-            "use_vector_rpc": _env_bool("DPR_EMNLP_USE_VECTOR_RPC", True),
-            "vector_rpc": _norm(os.getenv("DPR_EMNLP_VECTOR_RPC") or "match_emnlp_papers_exact"),
-            "vector_rpc_exact": _norm(os.getenv("DPR_EMNLP_VECTOR_RPC_EXACT") or "match_emnlp_papers_exact"),
-            "use_bm25_rpc": _env_bool("DPR_EMNLP_USE_BM25_RPC", True),
-            "bm25_rpc": _norm(os.getenv("DPR_EMNLP_BM25_RPC") or "match_emnlp_papers_bm25"),
-        }
-        if _norm(os.getenv("DPR_EMNLP_URL")):
-            backend["url"] = _norm(os.getenv("DPR_EMNLP_URL"))
-        if _norm(os.getenv("DPR_EMNLP_ANON_KEY")):
-            backend["anon_key"] = _norm(os.getenv("DPR_EMNLP_ANON_KEY"))
-        if _norm(os.getenv("DPR_EMNLP_SCHEMA")):
-            backend["schema"] = _norm(os.getenv("DPR_EMNLP_SCHEMA"))
-        out["emnlp"] = backend
-
-    if _env_bool("DPR_ENABLE_AAAI_BACKEND", False):
-        backend = {
-            "enabled": _env_bool("DPR_AAAI_ENABLED", True),
-            "papers_table": _norm(os.getenv("DPR_AAAI_PAPERS_TABLE") or "aaai_papers"),
-            "use_vector_rpc": _env_bool("DPR_AAAI_USE_VECTOR_RPC", True),
-            "vector_rpc": _norm(os.getenv("DPR_AAAI_VECTOR_RPC") or "match_aaai_papers_exact"),
-            "vector_rpc_exact": _norm(os.getenv("DPR_AAAI_VECTOR_RPC_EXACT") or "match_aaai_papers_exact"),
-            "use_bm25_rpc": _env_bool("DPR_AAAI_USE_BM25_RPC", True),
-            "bm25_rpc": _norm(os.getenv("DPR_AAAI_BM25_RPC") or "match_aaai_papers_bm25"),
-        }
-        if _norm(os.getenv("DPR_AAAI_URL")):
-            backend["url"] = _norm(os.getenv("DPR_AAAI_URL"))
-        if _norm(os.getenv("DPR_AAAI_ANON_KEY")):
-            backend["anon_key"] = _norm(os.getenv("DPR_AAAI_ANON_KEY"))
-        if _norm(os.getenv("DPR_AAAI_SCHEMA")):
-            backend["schema"] = _norm(os.getenv("DPR_AAAI_SCHEMA"))
-        out["aaai"] = backend
+    for env_tag, source_key, default_table in _EXTRA_SOURCES:
+        if _env_bool(f"DPR_ENABLE_{env_tag}_BACKEND", False):
+            backend: Dict[str, Any] = {
+                "enabled": _env_bool(f"DPR_{env_tag}_ENABLED", True),
+                "papers_table": _norm(os.getenv(f"DPR_{env_tag}_PAPERS_TABLE") or default_table),
+                "use_vector_rpc": _env_bool(f"DPR_{env_tag}_USE_VECTOR_RPC", True),
+                "vector_rpc": _norm(os.getenv(f"DPR_{env_tag}_VECTOR_RPC") or f"match_{default_table}_exact"),
+                "vector_rpc_exact": _norm(os.getenv(f"DPR_{env_tag}_VECTOR_RPC_EXACT") or f"match_{default_table}_exact"),
+                "use_bm25_rpc": _env_bool(f"DPR_{env_tag}_USE_BM25_RPC", True),
+                "bm25_rpc": _norm(os.getenv(f"DPR_{env_tag}_BM25_RPC") or f"match_{default_table}_bm25"),
+            }
+            if _norm(os.getenv(f"DPR_{env_tag}_URL")):
+                backend["url"] = _norm(os.getenv(f"DPR_{env_tag}_URL"))
+            if _norm(os.getenv(f"DPR_{env_tag}_ANON_KEY")):
+                backend["anon_key"] = _norm(os.getenv(f"DPR_{env_tag}_ANON_KEY"))
+            if _norm(os.getenv(f"DPR_{env_tag}_SCHEMA")):
+                backend["schema"] = _norm(os.getenv(f"DPR_{env_tag}_SCHEMA"))
+            out[source_key] = backend
 
     return out
 

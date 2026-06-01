@@ -91,23 +91,23 @@ class SourceConfigMigrationTest(unittest.TestCase):
                 "schema": "public",
             },
             "source_backends": {
-                "biorxiv": {
+                "scopus": {
                     "enabled": False,
-                    "papers_table": "biorxiv_papers",
-                    "vector_rpc_exact": "match_biorxiv_papers_exact",
-                    "bm25_rpc": "match_biorxiv_papers_bm25",
+                    "papers_table": "scopus_papers",
+                    "vector_rpc_exact": "match_scopus_papers_exact",
+                    "bm25_rpc": "match_scopus_papers_bm25",
                 }
             },
         }
         shared = get_supabase_shared_config(cfg)
         self.assertEqual(shared["url"], "https://shared.supabase.co")
-        backend = get_source_backend(cfg, "biorxiv")
+        backend = get_source_backend(cfg, "scopus")
         self.assertEqual(backend["url"], "https://shared.supabase.co")
         self.assertEqual(backend["anon_key"], "shared-key")
-        self.assertEqual(backend["papers_table"], "biorxiv_papers")
+        self.assertEqual(backend["papers_table"], "scopus_papers")
         self.assertFalse(backend["enabled"])
 
-    def test_resolve_source_backends_supports_env_biorxiv_backend(self):
+    def test_resolve_source_backends_supports_env_sciencedirect_backend(self):
         cfg = {
             "supabase_shared": {
                 "url": "https://shared.supabase.co",
@@ -118,20 +118,20 @@ class SourceConfigMigrationTest(unittest.TestCase):
         with patch.dict(
             "os.environ",
             {
-                "DPR_ENABLE_BIORXIV_BACKEND": "1",
-                "DPR_BIORXIV_ENABLED": "1",
-                "DPR_BIORXIV_PAPERS_TABLE": "biorxiv_papers",
-                "DPR_BIORXIV_VECTOR_RPC_EXACT": "match_biorxiv_papers_exact",
-                "DPR_BIORXIV_BM25_RPC": "match_biorxiv_papers_bm25",
+                "DPR_ENABLE_SCIENCEDIRECT_BACKEND": "1",
+                "DPR_SCIENCEDIRECT_ENABLED": "1",
+                "DPR_SCIENCEDIRECT_PAPERS_TABLE": "sciencedirect_papers",
+                "DPR_SCIENCEDIRECT_VECTOR_RPC_EXACT": "match_sciencedirect_papers_exact",
+                "DPR_SCIENCEDIRECT_BM25_RPC": "match_sciencedirect_papers_bm25",
             },
             clear=False,
         ):
-            backend = get_source_backend(cfg, "biorxiv")
+            backend = get_source_backend(cfg, "sciencedirect")
         self.assertEqual(backend["url"], "https://shared.supabase.co")
-        self.assertEqual(backend["papers_table"], "biorxiv_papers")
-        self.assertEqual(backend["vector_rpc_exact"], "match_biorxiv_papers_exact")
+        self.assertEqual(backend["papers_table"], "sciencedirect_papers")
+        self.assertEqual(backend["vector_rpc_exact"], "match_sciencedirect_papers_exact")
 
-    def test_resolve_source_backends_supports_env_medrxiv_backend(self):
+    def test_resolve_source_backends_supports_env_cnki_backend(self):
         cfg = {
             "supabase_shared": {
                 "url": "https://shared.supabase.co",
@@ -142,20 +142,20 @@ class SourceConfigMigrationTest(unittest.TestCase):
         with patch.dict(
             "os.environ",
             {
-                "DPR_ENABLE_MEDRXIV_BACKEND": "1",
-                "DPR_MEDRXIV_ENABLED": "1",
-                "DPR_MEDRXIV_PAPERS_TABLE": "medrxiv_papers",
-                "DPR_MEDRXIV_VECTOR_RPC_EXACT": "match_medrxiv_papers_exact",
-                "DPR_MEDRXIV_BM25_RPC": "match_medrxiv_papers_bm25",
+                "DPR_ENABLE_CNKI_BACKEND": "1",
+                "DPR_CNKI_ENABLED": "1",
+                "DPR_CNKI_PAPERS_TABLE": "cnki_papers",
+                "DPR_CNKI_VECTOR_RPC_EXACT": "match_cnki_papers_exact",
+                "DPR_CNKI_BM25_RPC": "match_cnki_papers_bm25",
             },
             clear=False,
         ):
-            backend = get_source_backend(cfg, "medrxiv")
+            backend = get_source_backend(cfg, "cnki")
         self.assertEqual(backend["url"], "https://shared.supabase.co")
-        self.assertEqual(backend["papers_table"], "medrxiv_papers")
-        self.assertEqual(backend["vector_rpc_exact"], "match_medrxiv_papers_exact")
+        self.assertEqual(backend["papers_table"], "cnki_papers")
+        self.assertEqual(backend["vector_rpc_exact"], "match_cnki_papers_exact")
 
-    def test_resolve_source_backends_supports_env_chemrxiv_backend(self):
+    def test_resolve_source_backends_supports_env_wos_backend(self):
         cfg = {
             "supabase_shared": {
                 "url": "https://shared.supabase.co",
@@ -166,20 +166,20 @@ class SourceConfigMigrationTest(unittest.TestCase):
         with patch.dict(
             "os.environ",
             {
-                "DPR_ENABLE_CHEMRXIV_BACKEND": "1",
-                "DPR_CHEMRXIV_ENABLED": "1",
-                "DPR_CHEMRXIV_PAPERS_TABLE": "chemrxiv_papers",
-                "DPR_CHEMRXIV_VECTOR_RPC_EXACT": "match_chemrxiv_papers_exact",
-                "DPR_CHEMRXIV_BM25_RPC": "match_chemrxiv_papers_bm25",
+                "DPR_ENABLE_WOS_BACKEND": "1",
+                "DPR_WOS_ENABLED": "1",
+                "DPR_WOS_PAPERS_TABLE": "wos_papers",
+                "DPR_WOS_VECTOR_RPC_EXACT": "match_wos_papers_exact",
+                "DPR_WOS_BM25_RPC": "match_wos_papers_bm25",
             },
             clear=False,
         ):
-            backend = get_source_backend(cfg, "chemrxiv")
+            backend = get_source_backend(cfg, "wos")
         self.assertEqual(backend["url"], "https://shared.supabase.co")
-        self.assertEqual(backend["papers_table"], "chemrxiv_papers")
-        self.assertEqual(backend["vector_rpc_exact"], "match_chemrxiv_papers_exact")
+        self.assertEqual(backend["papers_table"], "wos_papers")
+        self.assertEqual(backend["vector_rpc_exact"], "match_wos_papers_exact")
 
-    def test_resolve_source_backends_supports_env_neurips_backend(self):
+    def test_resolve_source_backends_supports_env_jstor_backend(self):
         cfg = {
             "supabase_shared": {
                 "url": "https://shared.supabase.co",
@@ -190,20 +190,20 @@ class SourceConfigMigrationTest(unittest.TestCase):
         with patch.dict(
             "os.environ",
             {
-                "DPR_ENABLE_NEURIPS_BACKEND": "1",
-                "DPR_NEURIPS_ENABLED": "1",
-                "DPR_NEURIPS_PAPERS_TABLE": "neurips_openreview_papers",
-                "DPR_NEURIPS_VECTOR_RPC_EXACT": "match_neurips_openreview_papers_exact",
-                "DPR_NEURIPS_BM25_RPC": "match_neurips_openreview_papers_bm25",
+                "DPR_ENABLE_JSTOR_BACKEND": "1",
+                "DPR_JSTOR_ENABLED": "1",
+                "DPR_JSTOR_PAPERS_TABLE": "jstor_papers",
+                "DPR_JSTOR_VECTOR_RPC_EXACT": "match_jstor_papers_exact",
+                "DPR_JSTOR_BM25_RPC": "match_jstor_papers_bm25",
             },
             clear=False,
         ):
-            backend = get_source_backend(cfg, "neurips")
+            backend = get_source_backend(cfg, "jstor")
         self.assertEqual(backend["url"], "https://shared.supabase.co")
-        self.assertEqual(backend["papers_table"], "neurips_openreview_papers")
-        self.assertEqual(backend["vector_rpc_exact"], "match_neurips_openreview_papers_exact")
+        self.assertEqual(backend["papers_table"], "jstor_papers")
+        self.assertEqual(backend["vector_rpc_exact"], "match_jstor_papers_exact")
 
-    def test_resolve_source_backends_supports_env_iclr_backend(self):
+    def test_resolve_source_backends_supports_env_scopus_backend(self):
         cfg = {
             "supabase_shared": {
                 "url": "https://shared.supabase.co",
@@ -214,20 +214,20 @@ class SourceConfigMigrationTest(unittest.TestCase):
         with patch.dict(
             "os.environ",
             {
-                "DPR_ENABLE_ICLR_BACKEND": "1",
-                "DPR_ICLR_ENABLED": "1",
-                "DPR_ICLR_PAPERS_TABLE": "iclr_openreview_papers",
-                "DPR_ICLR_VECTOR_RPC_EXACT": "match_iclr_openreview_papers_exact",
-                "DPR_ICLR_BM25_RPC": "match_iclr_openreview_papers_bm25",
+                "DPR_ENABLE_SCOPUS_BACKEND": "1",
+                "DPR_SCOPUS_ENABLED": "1",
+                "DPR_SCOPUS_PAPERS_TABLE": "scopus_papers",
+                "DPR_SCOPUS_VECTOR_RPC_EXACT": "match_scopus_papers_exact",
+                "DPR_SCOPUS_BM25_RPC": "match_scopus_papers_bm25",
             },
             clear=False,
         ):
-            backend = get_source_backend(cfg, "iclr")
+            backend = get_source_backend(cfg, "scopus")
         self.assertEqual(backend["url"], "https://shared.supabase.co")
-        self.assertEqual(backend["papers_table"], "iclr_openreview_papers")
-        self.assertEqual(backend["vector_rpc_exact"], "match_iclr_openreview_papers_exact")
+        self.assertEqual(backend["papers_table"], "scopus_papers")
+        self.assertEqual(backend["vector_rpc_exact"], "match_scopus_papers_exact")
 
-    def test_resolve_source_backends_supports_env_icml_backend(self):
+    def test_resolve_source_backends_supports_env_google_scholar_backend(self):
         cfg = {
             "supabase_shared": {
                 "url": "https://shared.supabase.co",
@@ -238,20 +238,20 @@ class SourceConfigMigrationTest(unittest.TestCase):
         with patch.dict(
             "os.environ",
             {
-                "DPR_ENABLE_ICML_BACKEND": "1",
-                "DPR_ICML_ENABLED": "1",
-                "DPR_ICML_PAPERS_TABLE": "icml_openreview_papers",
-                "DPR_ICML_VECTOR_RPC_EXACT": "match_icml_openreview_papers_exact",
-                "DPR_ICML_BM25_RPC": "match_icml_openreview_papers_bm25",
+                "DPR_ENABLE_GOOGLE_SCHOLAR_BACKEND": "1",
+                "DPR_GOOGLE_SCHOLAR_ENABLED": "1",
+                "DPR_GOOGLE_SCHOLAR_PAPERS_TABLE": "google_scholar_papers",
+                "DPR_GOOGLE_SCHOLAR_VECTOR_RPC_EXACT": "match_google_scholar_papers_exact",
+                "DPR_GOOGLE_SCHOLAR_BM25_RPC": "match_google_scholar_papers_bm25",
             },
             clear=False,
         ):
-            backend = get_source_backend(cfg, "icml")
+            backend = get_source_backend(cfg, "google_scholar")
         self.assertEqual(backend["url"], "https://shared.supabase.co")
-        self.assertEqual(backend["papers_table"], "icml_openreview_papers")
-        self.assertEqual(backend["vector_rpc_exact"], "match_icml_openreview_papers_exact")
+        self.assertEqual(backend["papers_table"], "google_scholar_papers")
+        self.assertEqual(backend["vector_rpc_exact"], "match_google_scholar_papers_exact")
 
-    def test_resolve_source_backends_supports_env_acl_backend(self):
+    def test_resolve_source_backends_supports_env_repec_backend(self):
         cfg = {
             "supabase_shared": {
                 "url": "https://shared.supabase.co",
@@ -262,20 +262,20 @@ class SourceConfigMigrationTest(unittest.TestCase):
         with patch.dict(
             "os.environ",
             {
-                "DPR_ENABLE_ACL_BACKEND": "1",
-                "DPR_ACL_ENABLED": "1",
-                "DPR_ACL_PAPERS_TABLE": "acl_papers",
-                "DPR_ACL_VECTOR_RPC_EXACT": "match_acl_papers_exact",
-                "DPR_ACL_BM25_RPC": "match_acl_papers_bm25",
+                "DPR_ENABLE_REPEC_BACKEND": "1",
+                "DPR_REPEC_ENABLED": "1",
+                "DPR_REPEC_PAPERS_TABLE": "repec_papers",
+                "DPR_REPEC_VECTOR_RPC_EXACT": "match_repec_papers_exact",
+                "DPR_REPEC_BM25_RPC": "match_repec_papers_bm25",
             },
             clear=False,
         ):
-            backend = get_source_backend(cfg, "acl")
+            backend = get_source_backend(cfg, "repec")
         self.assertEqual(backend["url"], "https://shared.supabase.co")
-        self.assertEqual(backend["papers_table"], "acl_papers")
-        self.assertEqual(backend["vector_rpc_exact"], "match_acl_papers_exact")
+        self.assertEqual(backend["papers_table"], "repec_papers")
+        self.assertEqual(backend["vector_rpc_exact"], "match_repec_papers_exact")
 
-    def test_resolve_source_backends_supports_env_emnlp_backend(self):
+    def test_resolve_source_backends_supports_env_wiley_backend(self):
         cfg = {
             "supabase_shared": {
                 "url": "https://shared.supabase.co",
@@ -286,42 +286,18 @@ class SourceConfigMigrationTest(unittest.TestCase):
         with patch.dict(
             "os.environ",
             {
-                "DPR_ENABLE_EMNLP_BACKEND": "1",
-                "DPR_EMNLP_ENABLED": "1",
-                "DPR_EMNLP_PAPERS_TABLE": "emnlp_papers",
-                "DPR_EMNLP_VECTOR_RPC_EXACT": "match_emnlp_papers_exact",
-                "DPR_EMNLP_BM25_RPC": "match_emnlp_papers_bm25",
+                "DPR_ENABLE_WILEY_BACKEND": "1",
+                "DPR_WILEY_ENABLED": "1",
+                "DPR_WILEY_PAPERS_TABLE": "wiley_papers",
+                "DPR_WILEY_VECTOR_RPC_EXACT": "match_wiley_papers_exact",
+                "DPR_WILEY_BM25_RPC": "match_wiley_papers_bm25",
             },
             clear=False,
         ):
-            backend = get_source_backend(cfg, "emnlp")
+            backend = get_source_backend(cfg, "wiley")
         self.assertEqual(backend["url"], "https://shared.supabase.co")
-        self.assertEqual(backend["papers_table"], "emnlp_papers")
-        self.assertEqual(backend["vector_rpc_exact"], "match_emnlp_papers_exact")
-
-    def test_resolve_source_backends_supports_env_aaai_backend(self):
-        cfg = {
-            "supabase_shared": {
-                "url": "https://shared.supabase.co",
-                "anon_key": "shared-key",
-                "schema": "public",
-            }
-        }
-        with patch.dict(
-            "os.environ",
-            {
-                "DPR_ENABLE_AAAI_BACKEND": "1",
-                "DPR_AAAI_ENABLED": "1",
-                "DPR_AAAI_PAPERS_TABLE": "aaai_papers",
-                "DPR_AAAI_VECTOR_RPC_EXACT": "match_aaai_papers_exact",
-                "DPR_AAAI_BM25_RPC": "match_aaai_papers_bm25",
-            },
-            clear=False,
-        ):
-            backend = get_source_backend(cfg, "aaai")
-        self.assertEqual(backend["url"], "https://shared.supabase.co")
-        self.assertEqual(backend["papers_table"], "aaai_papers")
-        self.assertEqual(backend["vector_rpc_exact"], "match_aaai_papers_exact")
+        self.assertEqual(backend["papers_table"], "wiley_papers")
+        self.assertEqual(backend["vector_rpc_exact"], "match_wiley_papers_exact")
 
 
 if __name__ == "__main__":

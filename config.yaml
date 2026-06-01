@@ -25,3 +25,224 @@ subscriptions:
     stage: A
     diff_threshold_pct: 15
   keyword_recall_mode: or
+  intent_profiles:
+    - tag: MP
+      description: 货币政策
+      enabled: true
+      paper_sources:
+        - arxiv
+        - scopus
+        - wos
+        - repec
+        - google_scholar
+      keywords:
+        - keyword: monetary policy
+          keyword_cn: 货币政策
+          query: monetary policy transmission mechanisms and central bank decisions
+        - keyword: interest rate
+          keyword_cn: 利率
+          query: interest rate dynamics and monetary policy instruments
+        - keyword: quantitative easing
+          keyword_cn: 量化宽松
+          query: unconventional monetary policy and quantitative easing effects
+        - keyword: central bank communication
+          keyword_cn: 央行沟通
+          query: central bank forward guidance and communication strategies
+        - keyword: inflation targeting
+          keyword_cn: 通胀目标制
+          query: inflation targeting frameworks and price stability
+        - keyword: money supply
+          keyword_cn: 货币供应量
+          query: money supply growth and macroeconomic effects
+      intent_queries:
+        - query: how does monetary policy affect economic growth and inflation
+          query_cn: 货币政策如何影响经济增长和通胀
+          enabled: true
+          source: manual
+          note: ''
+        - query: effectiveness of unconventional monetary policy tools
+          query_cn: 非常规货币政策工具的有效性
+          enabled: true
+          source: manual
+          note: ''
+        - query: monetary policy spillover effects across countries
+          query_cn: 货币政策的跨国溢出效应
+          enabled: true
+          source: manual
+          note: ''
+    - tag: ETR
+      description: 经济尾部风险
+      enabled: true
+      paper_sources:
+        - arxiv
+        - scopus
+        - wos
+        - repec
+        - google_scholar
+      keywords:
+        - keyword: tail risk
+          keyword_cn: 尾部风险
+          query: economic tail risk measurement and modeling
+        - keyword: extreme events
+          keyword_cn: 极端事件
+          query: extreme economic events and financial crises
+        - keyword: growth-at-risk
+          keyword_cn: 增长在险值
+          query: growth-at-risk framework and downside risk to GDP
+        - keyword: financial stability
+          keyword_cn: 金融稳定
+          query: systemic risk and financial stability assessment
+        - keyword: value at risk
+          keyword_cn: 在险价值
+          query: value at risk and expected shortfall in macroeconomics
+        - keyword: downside risk
+          keyword_cn: 下行风险
+          query: downside risk to economic growth and recession probability
+      intent_queries:
+        - query: methods for measuring and predicting economic tail risks
+          query_cn: 经济尾部风险的测量与预测方法
+          enabled: true
+          source: manual
+          note: ''
+        - query: relationship between financial conditions and tail risk
+          query_cn: 金融条件与尾部风险的关系
+          enabled: true
+          source: manual
+          note: ''
+        - query: how monetary policy affects economic tail risk distribution
+          query_cn: 货币政策如何影响经济尾部风险分布
+          enabled: true
+          source: manual
+          note: ''
+    - tag: PN
+      description: 生产网络
+      enabled: true
+      paper_sources:
+        - arxiv
+        - scopus
+        - wos
+        - repec
+        - google_scholar
+      keywords:
+        - keyword: production network
+          keyword_cn: 生产网络
+          query: inter-industry production networks and input-output linkages
+        - keyword: supply chain
+          keyword_cn: 供应链
+          query: supply chain networks and shock propagation
+        - keyword: input-output analysis
+          keyword_cn: 投入产出分析
+          query: input-output models and sectoral interdependencies
+        - keyword: network effects
+          keyword_cn: 网络效应
+          query: network effects and amplification of economic shocks
+        - keyword: granular origins
+          keyword_cn: 微观起源
+          query: granular origins of aggregate fluctuations through production networks
+        - keyword: vertical integration
+          keyword_cn: 纵向一体化
+          query: vertical integration and firm boundaries in production networks
+      intent_queries:
+        - query: how production network structure amplifies economic shocks
+          query_cn: 生产网络结构如何放大经济冲击
+          enabled: true
+          source: manual
+          note: ''
+        - query: role of key sectors and firms in production networks
+          query_cn: 关键部门和企业在生产网络中的作用
+          enabled: true
+          source: manual
+          note: ''
+        - query: production network models and general equilibrium
+          query_cn: 生产网络模型与一般均衡
+          enabled: true
+          source: manual
+          note: ''
+    - tag: PE
+      description: 政策效应
+      enabled: true
+      paper_sources:
+        - arxiv
+        - scopus
+        - wos
+        - repec
+        - google_scholar
+      keywords:
+        - keyword: policy evaluation
+          keyword_cn: 政策评估
+          query: causal inference and policy evaluation methods
+        - keyword: fiscal policy
+          keyword_cn: 财政政策
+          query: fiscal policy multipliers and government spending effects
+        - keyword: policy transmission
+          keyword_cn: 政策传导
+          query: policy transmission channels and mechanism design
+        - keyword: difference-in-differences
+          keyword_cn: 双重差分
+          query: difference-in-differences and causal identification strategies
+        - keyword: regression discontinuity
+          keyword_cn: 断点回归
+          query: regression discontinuity design for policy impact assessment
+        - keyword: structural VAR
+          keyword_cn: 结构向量自回归
+          query: structural VAR models for macroeconomic policy analysis
+      intent_queries:
+        - query: causal methods for evaluating macroeconomic policy effects
+          query_cn: 评估宏观经济政策效果的因果方法
+          enabled: true
+          source: manual
+          note: ''
+        - query: fiscal and monetary policy interaction effects
+          query_cn: 财政与货币政策的交互效应
+          enabled: true
+          source: manual
+          note: ''
+        - query: heterogeneous effects of economic policies across agents
+          query_cn: 经济政策在不同主体间的异质性效应
+          enabled: true
+          source: manual
+          note: ''
+    - tag: ER
+      description: 经济韧性
+      enabled: true
+      paper_sources:
+        - arxiv
+        - scopus
+        - wos
+        - repec
+        - google_scholar
+      keywords:
+        - keyword: economic resilience
+          keyword_cn: 经济韧性
+          query: economic resilience to shocks and recovery dynamics
+        - keyword: economic recovery
+          keyword_cn: 经济复苏
+          query: post-crisis economic recovery patterns and determinants
+        - keyword: shock absorption
+          keyword_cn: 冲击吸收
+          query: shock absorption capacity of economies and institutions
+        - keyword: adaptive capacity
+          keyword_cn: 适应能力
+          query: adaptive capacity and structural transformation of economies
+        - keyword: economic vulnerability
+          keyword_cn: 经济脆弱性
+          query: economic vulnerability assessment and risk exposure
+        - keyword: business cycle
+          keyword_cn: 经济周期
+          query: business cycle fluctuations and resilience mechanisms
+      intent_queries:
+        - query: determinants of economic resilience across regions and countries
+          query_cn: 不同地区和国家经济韧性的决定因素
+          enabled: true
+          source: manual
+          note: ''
+        - query: role of institutions and policies in building economic resilience
+          query_cn: 制度和政策在建设经济韧性中的作用
+          enabled: true
+          source: manual
+          note: ''
+        - query: measuring economic resilience and vulnerability indicators
+          query_cn: 经济韧性与脆弱性指标的测量
+          enabled: true
+          source: manual
+          note: ''
