@@ -10,6 +10,86 @@ supabase:
   enabled: true
   url: https://lyucdwgefyfbmaiopjbk.supabase.co
   anon_key: sb_publishable_lX-oi64Uxyd7SIVv3_w2Uw_MTOojeKq
+  biorxiv:
+    kind: supabase
+    enabled: false
+    papers_table: biorxiv_papers
+    url: https://lyucdwgefyfbmaiopjbk.supabase.co
+    anon_key: sb_publishable_lX-oi64Uxyd7SIVv3_w2Uw_MTOojeKq
+    use_vector_rpc: true
+    vector_rpc: match_biorxiv_papers_exact
+    use_bm25_rpc: true
+    bm25_rpc: match_biorxiv_papers_bm25
+    schema: public
+  medrxiv:
+    kind: supabase
+    enabled: false
+    papers_table: medrxiv_papers
+    url: https://lyucdwgefyfbmaiopjbk.supabase.co
+    anon_key: sb_publishable_lX-oi64Uxyd7SIVv3_w2Uw_MTOojeKq
+    use_vector_rpc: true
+    vector_rpc: match_medrxiv_papers_exact
+    use_bm25_rpc: true
+    bm25_rpc: match_medrxiv_papers_bm25
+    schema: public
+  chemrxiv:
+    kind: supabase
+    enabled: false
+    papers_table: chemrxiv_papers
+    url: https://lyucdwgefyfbmaiopjbk.supabase.co
+    anon_key: sb_publishable_lX-oi64Uxyd7SIVv3_w2Uw_MTOojeKq
+    use_vector_rpc: true
+    vector_rpc: match_chemrxiv_papers_exact
+    use_bm25_rpc: true
+    bm25_rpc: match_chemrxiv_papers_bm25
+    schema: public
+  neurips:
+    kind: conference
+    enabled: true
+  iclr:
+    kind: conference
+    enabled: true
+  icml:
+    kind: conference
+    enabled: true
+  acl:
+    kind: conference
+    enabled: true
+  emnlp:
+    kind: conference
+    enabled: true
+  aaai:
+    kind: conference
+    enabled: true
+  serper_scholar:
+    kind: api
+    enabled: true
+    api_key_env: SERP_API_KEY
+  cnki:
+    kind: api
+    enabled: false
+  google_scholar:
+    kind: api
+    enabled: true
+    api_key_env: SERP_API_KEY
+  jstor:
+    kind: api
+    enabled: false
+  repec:
+    kind: api
+    enabled: false
+  sciencedirect:
+    kind: api
+    enabled: false
+  scopus:
+    kind: api
+    enabled: false
+  wiley:
+    kind: api
+    enabled: false
+  wos:
+    kind: api
+    enabled: false
   papers_table: arxiv_papers
   use_vector_rpc: true
   vector_rpc: match_arxiv_papers
@@ -246,3 +326,83 @@ source_backends:
     enabled: true
     url: https://lyucdwgefyfbmaiopjbk.supabase.co
     anon_key: sb_publishable_lX-oi64Uxyd7SIVv3_w2Uw_MTOojeKq
+  biorxiv:
+    kind: supabase
+    enabled: false
+    papers_table: biorxiv_papers
+    url: https://lyucdwgefyfbmaiopjbk.supabase.co
+    anon_key: sb_publishable_lX-oi64Uxyd7SIVv3_w2Uw_MTOojeKq
+    use_vector_rpc: true
+    vector_rpc: match_biorxiv_papers_exact
+    use_bm25_rpc: true
+    bm25_rpc: match_biorxiv_papers_bm25
+    schema: public
+  medrxiv:
+    kind: supabase
+    enabled: false
+    papers_table: medrxiv_papers
+    url: https://lyucdwgefyfbmaiopjbk.supabase.co
+    anon_key: sb_publishable_lX-oi64Uxyd7SIVv3_w2Uw_MTOojeKq
+    use_vector_rpc: true
+    vector_rpc: match_medrxiv_papers_exact
+    use_bm25_rpc: true
+    bm25_rpc: match_medrxiv_papers_bm25
+    schema: public
+  chemrxiv:
+    kind: supabase
+    enabled: false
+    papers_table: chemrxiv_papers
+    url: https://lyucdwgefyfbmaiopjbk.supabase.co
+    anon_key: sb_publishable_lX-oi64Uxyd7SIVv3_w2Uw_MTOojeKq
+    use_vector_rpc: true
+    vector_rpc: match_chemrxiv_papers_exact
+    use_bm25_rpc: true
+    bm25_rpc: match_chemrxiv_papers_bm25
+    schema: public
+  neurips:
+    kind: conference
+    enabled: true
+  iclr:
+    kind: conference
+    enabled: true
+  icml:
+    kind: conference
+    enabled: true
+  acl:
+    kind: conference
+    enabled: true
+  emnlp:
+    kind: conference
+    enabled: true
+  aaai:
+    kind: conference
+    enabled: true
+  serper_scholar:
+    kind: api
+    enabled: true
+    api_key_env: SERP_API_KEY
+  cnki:
+    kind: api
+    enabled: false
+  google_scholar:
+    kind: api
+    enabled: true
+    api_key_env: SERP_API_KEY
+  jstor:
+    kind: api
+    enabled: false
+  repec:
+    kind: api
+    enabled: false
+  sciencedirect:
+    kind: api
+    enabled: false
+  scopus:
+    kind: api
+    enabled: false
+  wiley:
+    kind: api
+    enabled: false
+  wos:
+    kind: api
+    enabled: false
