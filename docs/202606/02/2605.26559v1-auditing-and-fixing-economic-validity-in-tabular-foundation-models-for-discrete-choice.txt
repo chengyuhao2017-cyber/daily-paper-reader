@@ -1,0 +1,146 @@
+Title: Auditing and Fixing Economic Validity in Tabular Foundation Models for Discrete Choice
+
+URL Source: https://arxiv.org/pdf/2605.26559v1
+
+Published Time: Wed, 27 May 2026 00:35:47 GMT
+
+Number of Pages: 5
+
+Markdown Content:
+# Auditing and Fixing Economic Validity in Tabular Foundation Models for Discrete Choice 
+
+Yingshuo Wang 1 Xian Sun 2 Yanhang Li 3 Zhichao Fan 4 Zexin Zhuang 5
+
+# Abstract 
+
+Tabular foundation models achieve strong accu-racy on choice prediction tasks, but their pre-dictions often violate the economic logic those tasks require: raising a price sometimes increases predicted demand, and implied willingness-to-pay estimates are frequently negative or implau-sible. We propose a two-stage adapter that em-beds foundation model predictions within a utility-maximization framework. In the first stage, we estimate a standard choice model whose param-eters are constrained to obey economic theory. In the second stage, we freeze those parameters and train a correction term that incorporates the foundation model’s predictions as additional in-formation. The result is a model that inherits the foundation model’s accuracy gains while guar-anteeing monotonic price–demand relationships under policy perturbation and producing analyt-ically computable trade-off measures. On two transportation datasets, the adapter recovers up to 13 percentage points of accuracy over a standard logit model while maintaining perfect economic consistency, something neither the raw foundation models nor conventional distillation achieve. 
+
+# 1. Introduction 
+
+Many consequential decisions involve choosing among dis-crete alternatives: which health plan to enroll in, which tran-sit mode to take, which car to buy. Predicting these choices matters because the predictions feed directly into policy: governments set transit fares, agencies evaluate infrastruc-ture investments, and firms set prices based on forecasted demand. 
+
+> 1
+
+University of California, Berkeley, CA, USA 2Duke University, Durham, NC, USA 3Northeastern University, Boston, MA, USA 
+
+> 4
+
+University of Illinois Urbana-Champaign, IL, USA 5Southern Methodist University, Dallas, TX, USA. Correspondence to: Ying-shuo Wang <yingshuow@berkeley.edu >.Accepted at the FMSD Workshop, ICML 2026, Seoul, South Korea. 
+
+The standard approach is the multinomial logit model (MNL) and its extensions (Ben-Akiva & Lerman, 1985; Train, 2009), which derive predictions from utility maxi-mization. This premise imposes useful structure: raising a price should lower demand, and the rate at which people trade off time against money (the value of time, or VOT) should be positive and finite. These are consequences of the assumption that choices reflect purposeful behavior. Machine learning models consistently outperform MNL on prediction accuracy (Hillel et al., 2021), but whether they respect economic structure is less studied. Zhao et al. (2020) find that neural networks frequently violate monotonicity and produce implausible willingness-to-pay estimates. Han et al. (2022) propose architecturally constrained networks that enforce monotonicity but require redesigning the model for each application. van Cranenburgh et al. (2022) sur-vey the field and identify economic consistency as an open challenge. Tabular foundation models (TFMs), pretrained on large collections of tabular datasets and applied to new tasks with minimal configuration, have intensified this tension. TabPFN (Hollmann et al., 2023; 2025) performs in-context learning by treating the training set as context at inference time; Mitra (Zhang et al., 2025) scales this approach to larger datasets via AutoGluon. These models have been benchmarked on classification accuracy but not on behav-ioral validity. A model that correctly predicts which mode a commuter chose, but implies that higher fares increase 
+
+ridership, would produce structurally misleading policy rec-ommendations. We find that this concern is not hypothetical. When we audit two TFMs on standard choice datasets, we observe monotonicity violations in up to half of test observations, negative VOT estimates in 40–65% of cases depending on mode, and nonzero probability assigned to alternatives that are physically unavailable. The natural reaction is knowledge distillation (Hinton et al., 2015): train an MNL on the TFM’s soft labels. In our experiments, the distilled MNL achieves only 57.3% on Swissmetro (below the standard MNL’s 63.7% ) and 70.0% on LPMC (matching the MNL’s 69.8% ). The MNL’s lin-ear utility functions cannot represent the nonlinear patterns 1
+
+> arXiv:2605.26559v1 [cs.LG] 26 May 2026 Auditing and Fixing Economic Validity in Tabular Foundation Models for Discrete Choice
+
+that give TFMs their accuracy advantage; the student is the bottleneck. We propose a different approach. Instead of replacing the TFM with a constrained model, we embed the TFM’s pre-dictions within a constrained model. The utility for each alternative becomes a sum of two parts: a structural com-ponent with constrained parameters that enforce economic theory, and a correction term that incorporates the TFM’s predicted probabilities as additional explanatory variables. We train this model in two stages (utility parameters first, then the correction term with utility frozen) so the TFM never distorts the economic parameters. The result is a model that (i) guarantees monotonic price– demand relationships by construction, (ii) produces analyti-cally computable VOT from the structural parameters, (iii) assigns zero probability to unavailable alternatives, and (iv) recovers much of the TFM’s accuracy advantage. On Swiss-metro, the adapter gains 13 percentage points over MNL while maintaining perfect behavioral validity. On LPMC, it gains 2 percentage points, more modest but with the same structural guarantees. 
+
+# 2. Method 
+
+2.1. Behavioral Audit 
+
+We test three conditions that any economically valid choice model should satisfy. Each test perturbs one input variable and checks whether the model’s predictions respond in the expected direction. This requires only the ability to query the model; no access to internals is needed. 
+
+Monotonicity. We increase the cost (or time) of one alter-native by 1% of its observed range, re-run the model on the modified input, and check whether the predicted prob-ability of choosing that alternative decreases. We report the fraction of test observations where this holds. A model grounded in utility theory scores 100%. For the adapter, the TFM predictions are pre-computed and fixed, so only the structural utility responds to the perturbation. 
+
+Value of time (VOT). VOT measures willingness to pay for travel time savings. In a choice model with explicit coefficients, VOT = βtime /β cost ; when both are negative the ratio is positive. For TFMs without coefficients, we approximate VOT via finite differences. Published bench-marks place VOT at 5–20 GBP/hr for London commuters and 50–100 CHF/hr for Swiss intercity travelers. 
+
+Availability compliance. A valid model assigns zero proba-bility to unavailable alternatives. We report the mean pre-dicted probability for unavailable options; any nonzero value is a structural error. 
+
+2.2. Two-Stage Behavioral Adapter 
+
+Anyone using a choice model for policy evaluation needs two things: accurate predictions (to forecast demand) and sensible economics (to evaluate interventions). A planner asking “what happens if we raise fares 10%?” needs the model to get both the level and the direction right. The MNL gives sensible economics but mediocre accuracy; the TFM gives strong accuracy but broken economics. Existing reme-dies do not resolve this: fine-tuning with a monotonicity penalty is impractical for in-context learners like TabPFN, and even where feasible, penalized loss does not yield inter-pretable coefficients. Distillation preserves economic struc-ture but loses accuracy, as shown above. Both approaches treat the TFM and the choice model as alternatives. Instead, we put them together. Concretely, the utility of alternative k for observation i is: 
+
+Vk(xi) = V struct  
+
+> k
+
+(xi)
+
+| {z }
+
+> economic structure
+
++ α log qk(xi) + gk(q(xi)) 
+
+| {z }
+
+> FM correction
+
+(1) where V struct  
+
+> k
+
+is the utility from a standard specification (alternative-specific constants, constrained time and cost coefficients, sociodemographic interactions), qk(xi) is the TFM’s predicted probability for alternative k, α is a learned scalar weight, and gk is a small neural network that maps the full TFM probability vector q to a residual correction for each alternative. Choice probabilities follow the standard logit formula: Pk = exp( Vk)/ P 
+
+> j
+
+exp( Vj ).The time and cost coefficients in V struct  
+
+> k
+
+are parameterized as β = − exp( θ) for unconstrained θ, guaranteeing β < 0
+
+regardless of what the optimizer does. This makes mono-tonicity a mathematical certainty, not an empirical outcome: higher cost always enters the utility as a larger negative number, always reducing the predicted probability. VOT is analytically computable as βtime /β cost , with no numerical differentiation needed. Availability compliance is enforced by setting Vk = −∞ for unavailable alternatives. 
+
+Why two stages? If we train all parameters jointly, the op-timizer will route information through whichever pathway minimizes loss fastest. In practice, this means the correction term α log qk + gk(q) absorbs most of the signal, the struc-tural coefficients shrink toward zero, and VOT becomes meaningless: a ratio of two near-zero numbers. To prevent this, we train in two stages. In Stage 1 , we freeze the correction term at zero ( α = 0 , gk = 0 ) and train only the structural parameters. This is equivalent to fitting a standard MNL. The resulting coefficients reflect economic fundamentals (time sensitivity, cost sensitivity, mode preferences) estimated without any TFM influence. In Stage 2 , we freeze the structural parameters and train only α and gk. The correction term now learns to explain whatever variance the MNL left on the table, using the 2Auditing and Fixing Economic Validity in Tabular Foundation Models for Discrete Choice 
+
+TFM’s predictions as its information source. Because the structural parameters are frozen, the economic interpretation is locked in before the TFM touches anything. 
+
+What each component contributes. The TFM is good at who chooses what : it discriminates among alternatives at the observation level. The structural model is good at 
+
+how choices respond to policy : its constrained coefficients encode the direction and magnitude of demand response. Because the TFM’s predictions are pre-computed and fixed, the correction term acts as a per-observation intercept shift that does not alter how the model responds to cost or time changes. The structural coefficients alone determine price sensitivity, which is why monotonicity and VOT are pre-served. This mirrors standard practice: a planner perturbs features while holding everything else fixed. In the adapter, “ev-erything else” includes the TFM’s per-observation assess-ments; retraining on new data would re-run the full two-stage pipeline. 
+
+# 3. Experiments 
+
+3.1. Setup 
+
+We use two standard mode choice datasets. Swissmetro 
+
+(Bierlaire et al., 2001) contains 10,719 stated-preference observations with three alternatives (train, Swissmetro, car) and features including travel times, costs, headway, and a binary indicator for annual travel pass (GA) ownership. We follow the standard specification: generic time and cost coefficients, with cost zeroed out for GA holders (who face no marginal cost). LPMC (Hillel et al., 2018) contains 81,086 revealed-preference trip records from London with four alternatives (walking, cycling, public transit, driving) and features including mode-specific travel times, costs, and sociodemographics. We use a random 10,000-observation subsample. Both datasets use 70/15/15 train/validation/test splits. We evaluate two TFMs: Mitra (Zhang et al., 2025), ac-cessed via AutoGluon, and TabPFN v2 (Hollmann et al., 2025), which performs in-context learning at inference time. The TFMs’ predicted probabilities on each split are pre-computed and stored; the adapter treats them as fixed inputs. We compare against a standalone MNL (identical to the adapter’s Stage 1) and the raw TFM predictions. 
+
+3.2. The Problem: TFMs Fail Behavioral Validity 
+
+Table 1 reports accuracy and behavioral validity for all mod-els on both datasets. The raw TFMs achieve the highest accuracy: Mitra reaches 77.7% on Swissmetro (vs. MNL’s 63.7%) and 74.2% on LPMC (vs. 69.8%). But this accuracy comes with serious behavioral failures. On LPMC, Mitra satisfies monotonicity for only 50.8% of observations, meaning that for nearly half the test set, raising a mode’s cost does not lower its predicted choice probability. This happens because the TFM learns corre-lations, not causal relationships: if higher-cost trips in the training data tend to be chosen by wealthier travelers who also have strong mode preferences, the model may associate higher cost with higher choice probability, confusing “who chooses” with “why they choose.” Its finite-difference VOT estimates are negative for 40% of public transit observa-tions and 65% of driving observations. A negative VOT implies the traveler prefers longer, more expensive trips, an economically absurd implication. On Swissmetro, Mitra’s monotonicity is higher (90.3%) but its median VOT is 0.30 CHF/hr, two orders of magnitude below published benchmarks of 50–100 CHF/hr, implying near-zero sensitivity to travel time. This would lead a plan-ner to conclude that time savings have almost no value, a conclusion contradicted by decades of empirical evidence. The MNL, by contrast, achieves 100% monotonicity on both datasets and produces VOT of 79.7 CHF/hr on Swissmetro (within 12% of the published benchmark of 71.1 CHF/hr from Bierlaire et al. (2001)) and 1.76 GBP/hr for London public transit and 18.3 GBP/hr for driving, consistent with the literature for short urban trips. The cost is accuracy: 14 percentage points below Mitra on Swissmetro, 4.4 points below on LPMC. 
+
+3.3. The Adapter Recovers Both 
+
+The two-stage adapter closes most of the accuracy gap while maintaining perfect behavioral validity (Table 1). On Swissmetro, both Adapter+Mitra and Adapter+TabPFN reach 76.6% accuracy, recovering 13 of the 14 percentage points that separate MNL from the raw TFMs. Monotonicity is 100%, availability leak is effectively zero ( < 10 −12 ), and VOT remains 79.7 CHF/hr. The structural coefficients are identical regardless of which TFM provides the correction (since Stage 1 trains without TFM input), confirming that the TFM does not contaminate the economic parameters. On LPMC, Adapter+Mitra reaches 71.8% and Adapter+TabPFN 72.1%, gains of 2.0 and 2.3 per-centage points over MNL, with 100% monotonicity and VOT of 1.76 GBP/hr (public transit) and 18.3 GBP/hr (driv-ing). Across 10 different 10,000-observation subsamples, the accuracy gain is +2 .2 ± 0.5 percentage points (95% CI: [+1 .2, +3 .3] ), with all runs showing positive gains and 100% monotonicity. The learned correction weight 
+
+α is lower on LPMC (0.41–0.44) than on Swissmetro (1.16–1.27), indicating that the MNL already captures more of the choice structure in the LPMC data. The adapter never exceeds the raw TFM’s accuracy; it recovers accuracy 3Auditing and Fixing Economic Validity in Tabular Foundation Models for Discrete Choice                                                                    
+
+> Table 1. Accuracy and behavioral validity on held-out test sets. Acc: fraction of correctly predicted choices (%). Mono: fraction of observations where raising cost lowers predicted probability (%; 100 is ideal). VOT: implied value of time in local currency per hour, computed analytically for MNL and adapter models, via finite differences for TFMs. Leak: mean predicted probability assigned to unavailable alternatives on Swissmetro (%; 0 is ideal). Adapter models inherit the MNL’s Stage 1 coefficients, so VOT is identical to MNL by construction. †LPMC uses a 10K random subsample.
+> SWISSMETRO (3 MODES ,n= 1 ,608 TEST )MODEL ACC MONO VOT LEAK
+> MNL 63.7 100 79.7 <.001 MITRA 77.7 90.3 0.30 .208 TAB PFN 78.0 ———ADAPT +M ITRA 76.6 100 79.7 <.001 ADAPT +T AB PFN 76.6 100 79.7 <.001
+> LPMC †(4 MODES ,n= 1 ,501 TEST )MODEL ACC MONO VOT PT VOT DR
+> MNL 69.8 100 1.76 18.3 MITRA 74.2 50.8 7.47 −5.7 TAB PFN 74.4 ———ADAPT +M ITRA 71.8 100 1.76 18.3 ADAPT +T AB PFN 72.1 100 1.76 18.3 Swissmetro VOT in CHF/hr (generic coefficient, scaled ×60 ). LPMC VOT in GBP/hr: VOT pt = public transit, VOT dr = driv-ing. Mitra LPMC VOT pt = 7.47 median but 40% of estimates are negative; VOT dr =−5.7 median with 65% negative. TabPFN be-havioral audit omitted: its in-context learning architecture requires re-fitting on the full context for each perturbed input, making perturbation-based metrics prohibitively expensive.
+
+gains, not creates them. 
+
+# 4. Discussion 
+
+The FM correction does real work. On Swissmetro, α
+
+exceeds 1.0, meaning the FM predictions are a major driver of accuracy, not a small refinement. The structural compo-nent’s role is in guarantees , not prediction: it determines how the model responds to price and time changes, which is what enters policy analysis. 
+
+The adapter mechanism is general. We demonstrated the adapter on MNL utility specifications, but the struc-tural component can be any choice model that enforces the desired economic constraints: mixed logit for taste hetero-geneity, nested logit for correlated alternatives, or neural-embedded utility models (Han et al., 2022) for flexible non-linear specifications. The two-stage training procedure ap-plies unchanged: fit the economic model first, then add the TFM correction. The mechanism producing behavioral con-straints is the decision theory, not the dataset or the specific model form. 
+
+Limitations. We evaluate two TFMs on two transportation datasets. Transportation mode choice has well-established economic constraints; extending to domains with less settled theory (healthcare treatment choice, energy tariff selection) requires domain-specific audit design. The correction term’s contribution varies by dataset ( +13 pp on Swissmetro, +2 pp on LPMC), and its value depends on TFM quality; with a poor TFM, the adapter degrades gracefully to the standalone MNL. We report results from a single TFM training run per dataset; future work should examine sensitivity to TFM hyperparameters and training seeds. 
+
+# Impact Statement 
+
+This paper addresses the gap between predictive accuracy and economic validity in foundation models applied to decision-relevant tasks. Deploying models with inverted price–demand relationships could lead to misguided infras-tructure investment and fare-setting decisions. Our adapter provides a practical path to using foundation models in pol-icy contexts where economic consistency is non-negotiable. 
+
+# References 
+
+Ben-Akiva, M. E. and Lerman, S. R. Discrete Choice Anal-ysis: Theory and Application to Travel Demand . MIT Press, 1985. Bierlaire, M., Axhausen, K. W., and Abay, G. The accep-tance of modal innovation: The case of Swissmetro. Pro-ceedings of the 1st Swiss Transport Research Conference ,2001. Han, Y., Calara Oereuran, F., Ben-Akiva, M., and Zegras, C. A neural-embedded discrete choice model: Learn-ing taste representation with strengthened interpretability. 
+
+Transportation Research Part B , 163:166–186, 2022. Hillel, T., Elshafie, M. Z. E. B., and Jin, Y. Recreating pas-senger mode choice-sets generated by CAPI interviews. 
+
+Proceedings of the Institution of Civil Engineers – Smart Infrastructure and Construction , 171(1):29–42, 2018. Hillel, T., Bierlaire, M., Elshafie, M. Z. E. B., and Jin, Y. A systematic review of machine learning classifica-tion methodologies for modelling passenger mode choice. 
+
+Journal of Choice Modelling , 38:100221, 2021. Hinton, G., Vinyals, O., and Dean, J. Distilling the knowledge in a neural network. arXiv preprint arXiv:1503.02531 , 2015. Hollmann, N., M ¨uller, S., Eggensperger, K., and Hutter, F. TabPFN: A transformer that solves small tabular classifi-4Auditing and Fixing Economic Validity in Tabular Foundation Models for Discrete Choice 
+
+cation problems in a second. In International Conference on Learning Representations , 2023. Hollmann, N., M ¨uller, S., Purucker, L., et al. Accurate predictions on small data with a tabular foundation model. 
+
+Nature , 2025. doi: 10.1038/s41586-024-08328-6. Train, K. E. Discrete Choice Methods with Simulation .Cambridge University Press, 2 edition, 2009. van Cranenburgh, S., Wang, S., Vij, A., Pereira, F., and Walker, J. Choice modelling in the age of machine learning—discussion paper. Journal of Choice Modelling ,42:100340, 2022. Zhang, X., Maddix, D. C., et al. Mitra: Mixed synthetic priors for enhancing tabular foundation models. arXiv preprint arXiv:2510.21204 , 2025. Zhao, X., Yan, X., Yu, A., and Van Hentenryck, P. Predic-tion and behavioral analysis of travel mode choice: A comparison of machine learning and logit models. Travel Behaviour and Society , 20:22–35, 2020. 5

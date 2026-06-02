@@ -1,0 +1,4286 @@
+Title: Identification and Inference for Structural Accelerated Failure Time Models via Instrument Interactions
+
+URL Source: https://arxiv.org/pdf/2605.28341v2
+
+Published Time: Fri, 29 May 2026 00:36:23 GMT
+
+Number of Pages: 60
+
+Markdown Content:
+# Identification and Inference for Structural Accelerated Failure Time Models via Instrument Interactions 
+
+## Qiushi Bu 1,2 , Wen Su 1, Xinyu Zhang 2, Xingqiu Zhao 3, and Zhonghua Liu ∗41Department of Biostatistics, City University of Hong Kong, Hong Kong 
+
+> 2
+
+Academy of Mathematics and Systems Science, Chinese Academy of Sciences, Beijing, China 
+
+> 3
+
+Department of Applied Mathematics, The Hong Kong Polytechnic University, Hong Kong 
+
+> 4
+
+Department of Biostatistics, Columbia University, New York, NY, USA 
+
+## May 29, 2026 
+
+Abstract 
+
+We study causal inference for time-to-event outcomes under right censoring in the presence of unmeasured confounding. Focusing on structural accelerated failure time models, we develop an identification and inference framework that exploits interactions among instrumental variables. The proposed approach does not rely on classical instrumental variable validity and yields valid causal inference under both valid and invalid instruments, provided that the interaction-based identification condition holds. To accommodate right censoring, we construct a censoring-adjusted observed data moment function using an augmented inverse probability censoring weighting approach. The resulting moment function is Neyman orthogonal with respect to nuisance functions and enjoys a double robustness property, enabling valid inference under flexible nuisance estimation. Estimation and inference are conducted using generalized empirical likelihood, which is well suited to settings with many potentially weak interaction-based moment conditions. We establish consistency, and asymptotic normality under many weak moment asymptotics, and develop diagnostic tools to assess interaction-based identification strength and overidentifying restrictions. Simulation studies demonstrate favorable finite sample performance across a range of censoring rates and instrument configurations. An application to UK Biobank data illustrates the practical relevance of the proposed method for causal survival analysis in large-scale observational studies. 
+
+1          
+
+> arXiv:2605.28341v2 [stat.ME] 28 May 2026 Keywords: Causal inference; Censored data; Mendelian randomization; Instrumental variables; Structural accelerated failure time model; Weak identification
+
+# 1 Introduction 
+
+Estimating causal effects on the time to disease onset is important in epidemiology. Many modern cohorts record outcomes as time-to-event data with long follow-up. The UK Biobank is a representative resource that links genome-wide genetic data with longitudinal outcomes from health records and registries (Sudlow et al., 2015). This type of data supports large-scale survival analyses, and recent work has analyzed hundreds of time-to-event outcomes constructed from linked electronic health records (EHR) in the UK Biobank (Dey et al., 2022). These data sets are increasing, and they motivate methods for causal inference with censored survival outcomes. A main difficulty in observational studies is unmeasured confounding, for example, when unobserved lifestyle factor affects both the exposure and the time to disease onset. Ignoring such unmeasured confounding generally leads to biased estimation and invalid statistical inference. Instrumental variables (IV) address this problem by using variables that affect the exposure but do not otherwise affect the outcome. Mendelian randomization applies this idea using genetic variants as instruments (Katan, 1986; Smith and Ebrahim, 2003). In biobank studies, many variants are available for a given exposure, which makes it natural to use many candidate instruments in one analysis. Instrumental variable validity is often summarized by three requirements Angrist and Krueger (2001): (i) Relevance, which means that the instrument is associated with the exposure. (ii) Independence, which means that the instrument is independent of unmeasured confounders. (iii) Exclusion restriction, which means that the instrument affects the outcome only through the exposure. However, in genetic studies, these requirements may not be fully satisfied. Many variants have only weak associations with the exposure, which can yield weak identification and substantial weak IV bias (Burgess and Thompson, 2011; Stock et al., 2002). Moreover, horizontal pleiotropy, defined as a genetic variant influencing the outcome through pathways other than the exposure of interest, will also lead to spurious findings (Verbanck et al., 2018; Solovieff et al., 2013; Ye et al., 2024). Motivated by the prevalence of weak and invalid instruments in Mendelian randomization, a substantial body of work has been devoted to developing identification and inference methods that address these challenges, primarily in settings with uncensored outcomes. One line of work establishes identification by imposing restrictions on the set of instruments, assuming that a majority of candidate instruments are valid 2(Han, 2008; Kang et al., 2016; Bowden et al., 2016). A second line studies random coefficient formulations, showing that valid causal inference may still be possible even when all candidate instruments are invalid, provided that the effects of the instruments on the exposure are Neyman orthogonal to their direct effects on the outcome (Kolesár et al., 2015; Bowden et al., 2015; Zhao et al., 2020; Ye et al., 2021). A third line exploits heteroskedasticity in the exposure models to identify the causal effect in the presence of invalid instruments (Lewbel, 2012; Spiller et al., 2019; Tchetgen Tchetgen et al., 2021; Sun et al., 2022; Liu et al., 2023; Ye et al., 2024). More recently, additional identification methods have been obtained by constructing moment conditions from gene-by-gene interactions, which can deliver identification even when main effect instruments violate exclusion restrictions (Zhang et al., 2025). These results show that identification can be possible with many weak and potentially invalid instruments, but most theory is developed for fully observed outcomes. However, work for right-censored survival outcomes is much more limited. Existing instrumental variable methods for censored time-to-event data usually focus on handling censoring under valid instruments (Nie et al., 2011; Huling et al., 2019). There is also work that considers censoring together with weak instruments, for example, in applications where the outcome is a censored duration (Ertefaie et al., 2018). These papers do not cover the setting of many weak and potentially invalid genetic instruments that are common in Mendelian randomization. Tchetgen Tchetgen et al. (2021) develop estimation methods for censored outcomes in the presence of potentially weak and invalid instruments. However, their identification strategies rely on heteroskedasticity-based conditions. This paper develops a causal inference framework for right-censored outcomes with many weak and potentially invalid instruments through gene-gene interaction identification. We propose an observed data estimation strategy that combines interaction-based identification with a censoring-adjusted moment construction. Identification is achieved through interaction terms that remain informative under weak instrument strength and allow violations of standard instrumental variable assumptions. Estimation and inference are conducted using generalized empirical likelihood (GEL), which combines many moment functions and is suitable for weak identification settings (Smith, 1997; Newey and Smith, 2004; Owen, 2001; Newey and Windmeijer, 2009; Hansen, 1982). In summary, our contributions are mainly threefold: 1. We develop iGSAFT , (Interaction-IV based Generalized Structural Accelerated Failure Time), a causal inference framework for right-censored survival outcomes with many weak and potentially invalid instrumental variables. The proposed model is identified through interaction-based conditions, under which the causal effect 3is identifiable regardless of whether the instruments are valid, provided that the interaction-based assumptions hold. 2. We develop an estimation and inference procedure based on a censoring-adjusted augmented inverse probability weighted moment function under the GSAFT model. The moment function is Neyman orthogonal and doubly robust, yielding consistent estimation if either the censoring model or the outcome-related augmentation component is correctly specified. These properties support valid inference with flexible nuisance estimation and allow overidentification through many moment conditions under right censoring. 3. We develop two model diagnosis tools, focusing on weak identification and overidentification, respectively. The weak identification test assesses whether the gene-by-gene interaction-based identification conditions are sufficiently informative in the observed data, while the overidentification test evaluates the compatibility of the imposed moment functions with the observed data. Together, these procedures offer data-driven checks of the key identification assumptions and improve the reliability and scalability of the proposed methodology in large observational and biobank studies. The remainder of the paper is organized as follows. Section 2 introduces the problem setup and the structural accelerated failure time model. Section 3 presents the identification strategy and the censoring-adjusted moment function. Section 4 describes the estimation procedure. Section 5 establishes the asymptotic properties of the proposed estimator. Section 6 develops model diagnostic tools, including a weak identification test and an overidentification test. Section 7 reports simulation results. Section 8 applies the proposed method to UK Biobank data to study the causal effect of body mass index on disease onset. Section 9 concludes with a discussion. Technical proofs are provided in the Supplementary Material. 
+
+# 2 Structural AFT model with possibly invalid instruments 
+
+The classical structural accelerated failure time (SAFT) model quantifies treatment effects on survival outcomes, which characterizes the causal effect through an acceleration factor acting on the counterfactual failure time (Robins and Tsiatis, 1991; Robins, 1992; Vandebosch et al., 2005; Hernán et al., 2005). Let T ∗(d) denote the counterfactual failure time that would be observed if the exposure were set to level d ∈ R. The baseline counterfactual failure time T ∗(0) is not always observed and represents the survival 4outcome that would have been realized in the absence of exposure. The causal effect of the exposure is defined through the time ratio T ∗(d)/T ∗(0) .Under this model setup, the classical SAFT model (Robins and Tsiatis, 1991; Robins, 1993; Hernán et al., 2005) can be written as 
+
+T ∗(0) = T ∗(d)exp( −β0d),
+
+where β0 belongs to a compact set B. In randomized experiments, the exposure d is independent of the baseline counterfactual failure time T ∗(0) , so that d is exogenous and 
+
+β0 is identifiable. In observational settings, however, d may be correlated with T ∗(0) ,rendering d endogenous and the causal effect no longer identifiable without additional assumptions. In this case, instrumental variables can be used to achieve identification in SAFT model (Robins and Tsiatis, 1991; Robins, 1993). However, if the instrumental variables are invalid, for example, due to violations of the exclusion restriction or the independence condition, identification again fails. While identification under invalid instrumental variables have been studied in other causal frameworks (Kang et al., 2016; Zhang et al., 2025), these approaches do not directly generalize to SAFT models, where methodological developments remain limited. To accommodate possibly invalid instrumental variables, we generalize the SAFT model with valid instrumental variables in Robins (1993), and refer to the resulting model as the generalized structural accelerated failure time (GSAFT) model. Let T ∗(d, z) denote the counterfactual failure time that would be observed if the exposure were set to level 
+
+d ∈ R and the candidate instrumental variables were set to z = ( z1, . . . , z p)⊤ ∈ Rp. The baseline counterfactual failure time T ∗(0 , 0) represents the survival outcome that would have been realized when both exposure and candidate instruments are set to zero. Then the GSAFT model is given by 
+
+T ∗(0 , 0) = T ∗(d, z)exp 
+
+> {
+
+−β0d −
+
+> p∑
+> k=1
+
+γkzk
+
+> }
+
+, (1) 
+
+E{log T ∗(0 , 0)|z} =
+
+> p∑
+> k=1
+
+αkzk. (2) Here, the coefficients γk capture direct effects of the candidate instruments on the failure time; instruments with γk̸ = 0 violate the exclusion restriction and are therefore invalid. The coefficients αk characterize the dependence between the candidate instruments and the baseline counterfactual failure time T ∗(0 , 0). When αk̸ = 0 , the instruments are associated with unobserved confounders, implying that the IV independence assumption is violated. These two sources of invalidity are jointly summarized by ϕk = γk + αk.5In what follows, ϕk serves as an index of instrument invalidity. A nonzero value of ϕk
+
+indicates that the candidate instrument violates at least one of the core IV assumptions considered here, while ϕk = 0 corresponds to the absence of these two violations, and the model will reduce to classical SAFT model. A special case occurs when γk = −αk̸ = 0 .In this situation, ϕk = 0 by construction, but the instrument is still invalid, as both the exclusion restriction and the independence condition are violated despite the algebraic cancellation. Figure 1 illustrates the relationship among the instrumental variables, exposure, outcome, and confounders. 
+
+Z D T
+
+U
+
+α
+
+β0
+
+γ
+
+Figure 1: Invalid instrumental variable Z due to violation of IV validity requirements (ii) independence ( α̸ = 0 ) and (iii) exclusion restriction ( γ̸ = 0 ). Under model (1), exp( β0) represents the causal effect associated with a one-unit increase in the exposure while holding the instruments fixed. A positive value of β0
+
+corresponds to prolonged survival, whereas a negative value corresponds to shortened survival. To link the counterfactual outcome model (1) to the realized failure time, we impose the consistency assumption (Rubin, 1974): if an individual actually receives treatment level (D, Z) = ( d, z), then the realized failure time equals the corresponding counterfactual outcome. Substituting the realized treatment levels into the structural relation among counterfactual outcomes yields a log-linear representation for the counterfactual failure time. Consequently, (1) can be written as 
+
+log( T ∗) = β0D +
+
+> p∑
+> k=1
+
+ϕkZk + ε. (3) The error term ε is defined as ε = log T ∗(0 , 0)−E{log T ∗(0 , 0) | Z}, and thus satisfies E(ε |
+
+Z) = 0 . If the IV independence assumption holds, that is, α = 0 , then E{log T ∗(0 , 0)|z} =
+
+E{log T ∗(0 , 0)} and thus ε does not depend on Z. Despite its regression-like form, the structural model in (3) generally involves an endogenous exposure D in observational studies. Before specifying the structural equation for D, we first introduce notation for the interaction terms. The kth order interaction terms Ik(Z) and centered kth order interaction terms Ik(Z; ζ), which are both C(p, k ) = (pk
+
+> )
+
+dimensional vectors, capture 6higher order interactions among the instruments, defined as 
+
+I⊤ 
+
+> k
+
+(Z) = 
+
+> ∏
+> j∈Ξ
+
+Zj : Ξ ∈ Sk 
+
+> 
+
+, and I⊤ 
+
+> k
+
+(Z; ζ) = 
+
+> ∏
+> j∈Ξ
+
+(Zj − ζj ) : Ξ ∈ Sk 
+
+> 
+
+,
+
+where Sk denotes the collection of all distinct size k subsets of {1, . . . , p }, and 
+
+ζ = ( ζ1, . . . , ζ p)⊤ with ζk = E(Zk) is the mean of the jth instrument. For example, if there are three instruments, then I2(Z) = ( Z1Z2, Z 1Z3, Z 2Z3)⊤, and I3(Z) = ( Z1Z2Z3).The centering (Zj − ζj ) yields interaction terms Ik(Z; ζ) whose components have mean zero and play an important role in establishing Neyman orthogonality properties exploited in subsequent identification and estimation. For a range of interaction orders q1 ≤ q2, we further define Iq1:q2 (Z) = {I ⊤ 
+
+> q1
+
+(Z), . . . , I⊤ 
+
+> q2
+
+(Z)}⊤, and 
+
+Iq1:q2 (Z; ζ) = {I ⊤ 
+
+> q1
+
+(Z; ζ), . . . , I⊤ 
+
+> q2
+
+(Z; ζ)}⊤, which collects all interaction terms from order 
+
+q1 to order q2. Then we can write the structural equation for D as 
+
+D =
+
+> p∑
+> k=1
+
+θkZk +
+
+> p∑
+> k=2
+
+φ⊤ 
+
+> k
+
+Ik(Z) + ν, (4) where ν is the stochastic error term satisfying E(ν | Z) = 0 , and φk is a coefficient vector with the same dimension as Ik(Z).Finally, we account for right censoring, which commonly arises in survival studies due to administrative end of follow-up, loss to follow-up, or study termination before the occurrence of the event of interest. For notational simplicity, denote T = log( T ∗)
+
+as the log-transformed failure time in the following. Let C denote the log-transformed censoring time, representing the time at which observation of the event process ceases. The log-transformed observed outcome is then defined as 
+
+Y = min( T, C ), δ = I(T ≤ C),
+
+so that only partial information about the failure time T is available when censoring occurs. 
+
+# 3 Identification and moment function construction 
+
+## 3.1 Identification under uncensored data 
+
+We first outline the identification argument in the setting without censoring. The presence of unobserved confounders prevents identification of the causal effect in the SAFT model through direct regression, since the exposure is no longer conditionally exogenous given the observed instruments. To illustrate, the standard instrumental variable method 7identifies the causal parameter through the following equation: 
+
+E[( Z − ζ)( T − Dβ 0)] = E[( Z − ζ)( 
+
+> p∑
+> k=1
+
+ϕkZk + ε)] = 0 
+
+supposing that ϕk = 0 , i.e., the candidate IVs are valid. The remaining term involving ε
+
+vanishes since E(ε | Z) = 0 by definition. However, with invalid IVs ϕk̸ = 0 , the equation no longer holds since E[ϕk(Zk − ζk)( Zk)] ̸ = 0 , and thus β cannot be identified. To overcome this difficulty, we achieve causal identification by exploiting interaction terms constructed from the candidate instrumental variables. The new moment condition is given by 
+
+E[( Z1 − ζ1)( Z2 − ζ2)( T − Dβ 0)] = E[( Z1 − ζ1)( Z2 − ζ2)( 
+
+> p∑
+> k=1
+
+ϕkZk + ε)] = 0 . (5) Even when ϕk̸ = 0 , if the instruments are mutually independent, the interaction terms cancel out the effect induced by ϕk, so that the resulting moment condition has mean zero. Then a closed-form solution to β0 can be obtained by 
+
+β0 = E[( Z1 − ζ1)( Z2 − ζ2)T ]
+
+E[( Z1 − ζ1)( Z2 − ζ2)D]
+
+if the denominator is non-zero: E[( Z1 − ζ1)( Z2 − ζ2)D]̸ = 0 . Equation (5) presents only one particular interaction term. In fact, any linear combination of such interaction terms can be used to construct a valid moment function. Collecting moment functions of order 2 to q yields an r(p, q )-dimensional moment function, E[I2: q(Z; ζ)( T − β0D)] , where q ≤ p
+
+and r(p, q ) = ∑qk=2 C(p, k ) is the number of interaction terms. The identifiability conditions discussed above can be summarized in the following assumption. 
+
+Assumption 1. (i).(IV independence) All p candidate IVs are independent. (ii).(Interaction relevance) E [I2: q(Z; ζ0)D]̸ = 0, that is, at least one constructed interaction term is correlated with the exposure. 
+
+Assumption 1 (i) requires that all p candidate IVs are mutually independent. This condition can be satisfied in genetic studies, as one can perform linkage disequilibrium clumping to obtain an independent set of variants before the MR analysis (Purcell et al., 2007; Bowden et al., 2016; Zhao et al., 2020). Assumption 1 (ii) requires that at least one constructed interaction term is correlated with the exposure. Let m denote the total number of interaction terms. Then assumption 1 (ii) implies that our framework achieves r(p, q )-robust identification, i.e., identification is guaranteed as long as at least one component of the r(p, q )-dimensional vector I2: q(Z; ζ0)D is nonzero. 8Figure 2 illustrates the motivation for using interaction-based instruments. Identification can be achieved by constructing interaction-based instruments that avoid the violation of dependence and exclusion restriction. 
+
+Ik(Z) D T
+
+U
+
+β0
+
+## ×
+
+## ×
+
+Figure 2: Identification can be achieved by constructing interaction-based instruments from the candidate instruments. The moment I2: q(Z; ζ)( T − Dβ ) can be used as a moment function and identify the causal effect. However, the moment is not Neyman orthogonal with respect to the nuisance ζ. A formal definition of Neyman orthogonality is provided in Section 3.3. Following Zhang et al. (2025), we construct a new moment function that satisfies the Neyman orthogonality property. Define Vk = {1, I⊤
+
+> 1: k−1
+
+(Z)} as the collection of all interaction terms of Z up to order k − 1, including an intercept. To partial out the components of Y and D explained by Vk, we regress Y and D on Vk and denote the resulting coefficient vectors by ϑk and ωk, respectively, and let Λk = {ζ, ϑ k, ω k}. Under this setup, a moment function of order k is constructed to achieve identification in the presence of potential weak and invalid instrumental variables by leveraging interaction terms of the instrumental variables, given by 
+
+gk(β, Λk; OT ) = Ik(Z; ζ){
+
+(T − Vkϑk) − β(D − Vkωk)}
+
+.
+
+Then aggregate interaction terms of orders up to q and stack the resulting moments into a 
+
+r(p, q )-dimensional moment function: g(β, Λ; OT ) = ( g2(β, Λ2; OT )⊤, . . . , g q(β, Λq; OT )⊤)⊤,where Λ = {ζ, ϑ 2, ω 2, . . . , ϑ q, ω q}. Throughout the paper, we use a subscript 0 to indicate the true value of a nuisance function. For example, let Λ0 denote the true value of Λ. With the independent IV assumption, β can be uniquely determined. 
+
+Lemma 1. Under the structural models (3) , (4) and Assumption 1, β0 is the unique solution to the moment function 
+
+Eg(β, Λ0; OT ) = 0 .
+
+93.2 AIPCW moment function under right censoring 
+
+In the presence of right censoring, the moment function gk(β, Λ; OT ) cannot be evaluated since the true failure time T is not always observed. To accommodate censoring, we construct an augmented inverse probability censoring weighting (AIPCW) moment function. AIPCW methods originate from the general semiparametric theory for censored data developed by Robins and Rotnitzky (1992). In contrast, the AFT literature has primarily relied on the Buckley-James estimator (Buckley and James, 1979), rank-based estimating equations (Jin et al., 2003), and inverse probability of censoring weighted estimating equations without augmentation (Fan and Datta, 2011). To the best of our knowledge, there appears to be limited work on explicit AIPCW moment function tailored to the AFT model. We generalize the estimator of Robins et al. (1994) and propose an AIPCW estimator under the GSAFT model: 
+
+ψk(β, ηk; O) = δG(Y |Z, D )gk(β, Λ; O)
+
+− δG(Y |Z, D )ξk(β; Y, Z, D ) + ξk(β; −∞ , Z, D ) +  
+
+> ∫Y
+> −∞
+
+d ξ k(β; u, Z, D )
+
+G(u|Z, D ) , (6) where 
+
+G(u|Z, D ) = P (C > u |Z, D ), ξk(β; u, Z, D ) = E[
+
+gk(β, Λ; OT )|T ≥ u, Z, D ]
+
+,
+
+and ηk = {G, ξ k, Λk} collects the nuisance functions. The lower limit of integration is 
+
+−∞ , as we apply a logarithmic transformation to the time variable from Y = log( Y ∗),resulting in support on (−∞ , ∞).The AIPCW-type moment function contains two parts. The first term is an inverse probability censoring weighting term: 
+
+δG(Y |Z, D )gk(β, Λ; O).
+
+It reweighs the uncensored data moment gk(β, Λ; O) by the inverse probability of being uncensored, thereby amplifying the contribution from uncensored observations (δ = 1) .The second part is the augmentation term 
+
+− δG(Y |Z, D )ξk(β; Y, Z, D ) + ξk(β; −∞ , Z, D ) +  
+
+> ∫Y
+> −∞
+
+d ξ k(β; u, Z, D )
+
+G(u|Z, D ) .
+
+The resulting moment function is constructed to satisfy Neyman orthogonality and to enjoy a doubly robust property. The inverse probability term uses only uncensored observations and reweighs them by the inverse censoring survival probability G. As a result, its performance depends directly on the estimation accuracy of G, and the 10 resulting moment function can be sensitive to perturbations in the nuisance parameters. The augmentation term is introduced to offset this sensitivity. In particular, ξk uses the observed data and the censoring mechanism to impute the unobserved contribution of a censored individual to the moment function. This allows censored observations to contribute to the moment function rather than being discarded altogether. As a result, the augmentation component plays a crucial role in ensuring that the resulting moment function is Neyman orthogonal with respect to the nuisance parameters and enjoys a doubly robust property. These properties will be formally established and discussed in the next subsection. Similar to the case without censoring, we stack the interaction of orders up to q and obtain the final r(p, q )-dimensional AIPCW moment function as 
+
+ψ(β, η; O) = (ψ2(β, η2; O)⊤, . . . , ψ q(β, ηq; O)⊤)⊤, with η = (G, η2, ξ 2, . . . , ηq, ξ q, Λ)
+
+collecting all nuisance parameters. Also, let η0 denote the collection of all components of η evaluated at their true values. We now show that the proposed AIPCW moment function (6) is uniquely satisfied at the true parameter β0 with the following assumptions. Let τ < ∞ be the maximum follow-up horizon after logarithmic transformation. 
+
+Assumption 2 (Conditional non-informative censoring) . T ⊥ C|Z, D .
+
+Assumption 3 (Positivity of censoring distribution) . There exists a constant c > 0 such that 
+
+P (C > τ | Z, D ) ≥ c. 
+
+Assumption 2 states that, conditional on Z and D, the censoring mechanism is independent of the failure time, which is commonly used in the analysis of censored data (Cai et al., 2009; Tang et al., 2020). Assumption 3 rules out vanishing censoring probabilities and prevents the denominator in the inverse-probability weights from approaching zero (Cui et al., 2023). 
+
+Theorem 1. Under the structural models (3) , (4) and Assumption 1-3, β0 is the unique solution to the moment function 
+
+Eψ(β, η0; O) = 0 .
+
+Theorem 1 shows that the causal effect β0 is identified by the proposed AIPCW moment function under additional assumptions on censoring. Similar to Lemma 1, the identification condition remains unchanged. In particular, β0 is identified if and only if at least one constructed interaction term is correlated with the exposure. One additional remark is that when censoring rate is zero, the censoring probability satisfies G0(Y |
+
+Z, D ) ≡ 1, and the additional censoring adjustments vanish and the moment function 
+
+ψ reduces to its uncensored form g, confirming coherence between the censored and uncensored settings. 11 3.3 Neyman orthogonality and double robustness of the proposed AIPCW moment function 
+
+The AIPCW moment function ψ(β, η; O) defined in (6) depends on several unknown components, including the censoring-related functions G0 and ξ0 and ζ, ϑ, ω collected in Λ0. These components are not of primary interest for the target parameter β0 and are treated as nuisance functions. Since these nuisance functions are typically estimated using nonparametric methods, their estimation errors may converge at rates slower than 
+
+n−1/2, such as the estimation of G and ξ (He et al., 2013; Tang et al., 2020). To ensure valid inference for β0 in such settings, it is essential that the moment function possesses robustness properties that mitigate the impact of nuisance estimation. A central property of the proposed AIPCW moment is Neyman orthogonality (Neyman, 1959, 1979; Chernozhukov et al., 2018). Let η0 denote the true nuisance functions. The moment function ψ(β, η; O) is said to be Neyman orthogonal at (β0, η0)
+
+if its expectation is locally insensitive to perturbations of the nuisance functions. Formally, Neyman orthogonality requires that 
+
+∂∂t E[
+
+ψ(
+
+β0, η0 + t(η − η0); O)] ∣∣∣∣∣t=0 
+
+= 0 
+
+for all admissible directions η − η0. This condition eliminates the first-order contribution of nuisance estimation error in the asymptotic expansion of the estimator for β0 (Bickel et al., 1993; Chernozhukov et al., 2018), thereby preserving root-n consistency and asymptotic normality even when nuisance functions are estimated at slower rates. For the proposed construction, the augmentation term in (6) is chosen to enforce Neyman orthogonality, in the sense that the directional derivative of E{ψ(β0, η; O)}
+
+with respect to η equals zero at η = η0. This design feature distinguishes our moment construction from AIPCW approaches that primarily target censoring adjustment (Tang et al., 2020). In addition to Neyman orthogonality, the proposed moment function is doubly robust (Bang and Robins, 2005). Specifically, we consider the following two specifications for the nuisance functions: 
+
+M1 : {ξ, Λ are correctly specified }, M2 : {G, Λ are correctly specified },
+
+The proposed moment function ψ(β0, η; O) has zero expectation under the union model 
+
+M1∪M 2, that is the expectation of ψ equals zero if either the exposure-related component 
+
+ξ0 or the conditional censoring distribution G0 is correctly specified, but not necessarily both. As a result, identification and consistency of β0 do not require simultaneous correctness of all nuisance functions. This double robustness property provides additional 12 protection against model misspecification, which is particularly valuable in nuisance estimation. The following theorem formalizes the Neyman orthogonality and double robustness properties of the proposed AIPCW moment function. 
+
+Theorem 2. Under Assumptions 2–3, (i) The moment function ψ(β0, η; O) is Neyman orthogonal with respect to η at (β0, η0).(ii) E{ψ(β0, η; O)} = 0 under M1 ∪ M 2.
+
+Together, Neyman orthogonality and double robustness ensure that the proposed moment function is well suited for estimation and inference in right-censored models. Neyman orthogonality shields the asymptotic distribution from first-order nuisance estimation error, while double robustness guarantees consistency even when part of the model is misspecified (Bickel et al., 1993; Chernozhukov et al., 2018). 
+
+# 4 Estimation procedure 
+
+This section presents an implementation of the proposed estimator based on the AIPCW moment functions developed in Section 3. We begin by estimating the nuisance functions required for constructing the AIPCW moment functions. To ensure asymptotic independence between nuisance function estimation and moment evaluation, we employ a cross-fitting scheme (Chernozhukov et al., 2018). Specifically, the sample is randomly partitioned into two folds; nuisance functions are estimated on one fold and the corresponding moment functions are evaluated on the other. The roles of the two folds are then interchanged, and the resulting moment functions are averaged. Let ̂ ζk = n−1 ∑ni=1 Zk,i denote the sample mean of the kth instrument, and let ̂ ζ =(̂ ζ1, . . . , ̂ ζp). For each interaction order k, we regress Y on Vk and D on Vk separately, and denote the resulting coefficient estimators by ̂ ϑk and ̂ ωk. Using these estimators, the uncensored-data interaction-based moment function of order k is defined as 
+
+gk(β, ̂ Λk; O) = Ik(Z;̂ ζ)
+
+> {
+
+(Y − V ⊤ 
+
+> k̂
+
+ϑk) − β(D − V ⊤ 
+
+> k̂
+
+ωk)
+
+> }
+
+,
+
+where ̂ Λk = {̂ ζ,̂ ϑk,̂ ωk} collects the nuisance functions in uncensored-data moment function g of kth order interaction. To account for right censoring, we apply an AIPCW transformation to gk. The conditional censoring survival function G(y | Z, D ) = Pr( C ≥ y | Z, D ) is estimated 13 using a local Kaplan-Meier estimator (Dabrowska, 1989; Tang et al., 2020), ̂
+
+G(y | Z, D ) = 
+
+> n∏
+> i=1
+> [
+
+1 − Bni (Z, D ) 
+
+> ∑nj=1
+
+I(Yj ≥ Yi)Bnj (Z, D )
+
+> ]I(Yi≤y,δ i=0)
+
+,
+
+where 
+
+Bnj (Z, D ) = K( (Z,D )−(Zj ,D j ) 
+
+> h
+> )∑ni=1
+
+K( (Z,D )−(Zi,D i) 
+
+> h
+> )
+
+.
+
+Here K(·) is a kernel function and h is a bandwidth. Next, we estimate ξk(β; u, Z, D ) = E{gk(β, Λk; OT ) | Y ≥ u, Z, D } by ̂
+
+ξk(β; u, z, d ) =  
+
+> ∑nj=1
+
+I(Yj ≥ u) Bnj (z, d ) δĵ  
+
+> G(Yj|z,d )
+
+gk(β, ̂ Λk; Oj ) 
+
+> ∑nj=1
+
+I(Yj ≥ u) Bnj (z, d ) δĵ 
+
+> G(Yj|z,d )
+
+.
+
+Finally, ∫ Y 
+
+> −∞
+
+d ξ k(β; u, Z, D )/G (u|Z, D ) is approximated by a sum over the observed failure times. Let u1 < · · · < u K denote the distinct failure times. For subject i, we approximate ∫ Yi 
+
+> −∞
+
+d̂ ξk(β; u, Zi, D i)/̂G(u | Zi, D i) by  
+
+> ∑
+> uk≤Yi
+
+∆̂ξk (uk; Zi, D i)̂
+
+G(uk | Zi, D i) ,
+
+where ∆̂ξk (uk; Zi, D i) = ̂ ξk(β; uk, Zi, D i) −̂ ξk(β; uk−1, Zi, D i) and u0 = −∞ .The resulting AIPCW-transformed observed data moment function of order k is 
+
+ψk(β, ̂ ηk; O) = δ̂
+
+G(Y | Z, D )
+
+> {
+
+gk(β, ̂ Λk; O) −̂ ξk(β; Y, Z, D )
+
+> }
+
++̂ξk(β; −∞ , Z, D ) +  
+
+> ∫Y
+> −∞
+
+d̂ ξk(β; u, Z, D )̂
+
+G(u | Z, D ) ,
+
+where ̂ ηk collects all nuisance function estimators involved in the kth-order moment function. After constructing the AIPCW moment functions, the remaining task is to aggregate a potentially large collection of interaction-based moment functions into a single estimator of β. In practice, particularly in genetic applications, it is common that the instruments and their interaction terms are only weakly correlated with the treatment variable D (Davies et al., 2015). This weak association implies that the corresponding coefficient φk in the structural equation (4) is small, reflecting limited variation in D
+
+explained by the interaction-based instruments. In the presence of many and weakly informative moment functions, conventional quadratic GMM estimators (Hansen, 1982) may suffer from substantial weak-instrument bias (Newey and Windmeijer, 2009). We therefore aggregate the moment functions using a generalized empirical likelihood (GEL) 14 criterion (Owen, 1988; Qin and Lawless, 1994; Kitamura and Stutzer, 1997). Relative to quadratic GMM, GEL avoids committing to a fixed quadratic approximation and instead determines data-adaptive implied probabilities through a tilting parameter, which can stabilize estimation when the moment functions are nearly redundant, when sample moments and their derivatives are highly correlated, or when identification is weak (Newey and Smith, 2004). We aggregate the moment functions and estimate β by minimizing the GEL objective ̂
+
+β = argmin β∈B ̂ Q(β, ̂ η),̂ Q(β, ̂ η) = sup  
+
+> λ∈L(β, ̂η)
+
+1
+
+n
+
+> n∑
+> i=1
+
+ρ(
+
+λ⊤ψ(β, ̂ η; Oi))
+
+,
+
+where ρ(·) is a concave tilting function and L(β, ̂ η) = {λ : λ⊤ψ(β, ̂ η; Oi) ∈ V , i =1, . . . , n }. Different choices of ρ correspond to familiar members of the GEL family, including empirical likelihood with ρ(v) = log(1 − v) (Owen, 1988), exponential tilting with ρ(v) = −exp( v) + 1 (Qin and Lawless, 1994), and the continuous updating estimator with ρ(v) = −v − v2/2 (Hansen, 1982; Imbens, 2002). These criteria behave similarly in a neighborhood of zero, but they differ substantially in their second-order derivatives, leading to distinct curvature properties. Empirical likelihood and exponential tilting exhibit state-dependent curvature, whereas the continuous updating estimator has constant curvature and is known to suffer from larger higher-order bias and less favorable finite sample performance (Kitamura et al., 2004). For these reasons, we primarily use empirical likelihood or exponential tilting in implementation. Although GEL provides a principled way to aggregate many moment functions, the construction of interaction-based moments can still pose practical challenges in applications. In particular, the number of interaction terms Ik(Z) grows combinatorially with the dimension of the instrument vector Z. For a p-dimensional Z, interaction terms of order 2 to q involves r(p, q ) = ∑qk=2 C(p, k ) terms, so even moderate values of 
+
+p can lead to an extremely large set of candidate interaction terms. To mitigate this dimensionality burden while retaining interaction terms that contribute meaningfully to identification, we introduce a preliminary screening step based on penalized regression. A variety of penalization methods can be used for this screening step, including lasso (Tibshirani, 1996), ridge regression (Hoerl and Kennard, 1970), SCAD (Fan and Li, 2001), and MCP (Zhang, 2010). For simplicity, we employ the adaptive lasso (Zou, 2006) in our implementation. We also conducted a brief comparison with alternative selection procedures and found that the resulting estimates are qualitatively similar across methods. Since identification in our setting requires only that at least one interaction moment be nonzero, the procedure does not rely on selection consistency, and exact recovery of the true nonzero interaction terms is unnecessary. The penalized selection step functions primarily as a dimension-reduction device that removes clearly uninformative components 15 rather than perfectly separating zero from nonzero interactions. Identification is preserved as long as the selected set contains at least one interaction term associated with a nonzero moment condition. As a result, moderate selection errors do not undermine identification, making the method comparatively robust to imperfect model selection. Suppose we retain an m-dimensional moment function via penalized regression, then the above steps together define the proposed estimation procedure, which is summarized in Algorithm 1. Note that the nuisances in the moment function of order k
+
+depend explicitly on k. Therefore, the associated nuisance functions must be estimated individually for each k, rather than pooled across orders. 
+
+Algorithm 1 Estimation Procedure  
+
+> 1:
+
+Split the sample into two folds.  
+
+> 2:
+
+for k = 2 , . . . , q do  
+
+> 3:
+
+for each fold do  
+
+> 4:
+
+Estimate nuisance functions ̂ ηk = ( ̂ ζ,̂ ϑk,̂ ωk,̂ G, ̂ ξk) on the auxiliary fold.  
+
+> 5:
+
+Construct AIPCW moment functions ψk on the evaluation fold.  
+
+> 6:
+
+end for  
+
+> 7:
+
+Concatenate the two-fold moment functions to obtain ψk(β, ̂ ηk; O). 
+
+> 8:
+
+end for  
+
+> 9:
+
+Stack moment functions across orders ψ(β, ̂ η;O) = ( ψ2(β, ̂ η2;O)⊤, . . . , ψ q(β, ̂ ηq;O)⊤)⊤. 
+
+> 10:
+
+Select m interaction terms from all r(q, p ) terms via penalized regression.  
+
+> 11:
+
+Form the final m-dimensional moment vector ψ†(β, ̂ η; O) using the selected components.  
+
+> 12:
+
+Estimate ̂ β by minimizing the GEL criterion ̂ Q(β, ̂ η) based on the selected moments. 
+
+# 5 Asymptotic properties 
+
+This section establishes the consistency and asymptotic normality of the proposed estimator. We first introduce the required notation. Let ψ′(η; O) = ∂ψ (β, η; O)/∂β ,
+
+ψ∗ = Eψ′(η0; O). Moreover, let Ω( β, η; O) = Eψ(β, η; O)ψ(β, η; O)⊤, and 
+
+Ω0 = Ω( β0, η0; O). λmax (Ω) and λmin (Ω) represent the maximal and minimal eigenvalues of matrix Ω. ∥ · ∥ denotes the Euclidean norm for vectors and the Frobenius norm for matrices. For a measurable function f , ∥f ∥ denotes its L2 norm with respect to the underlying probability measure. We next give some regularity conditions required to establish the asymptotic properties. 
+
+Condition 1 (Many weak moment asymptotics) . (i). The total number of moments m
+
+satisfies m3/n → 0.(ii). There exist scalars μn, c, c ′ > 0, such that 
+
+μ2
+
+> n
+
+c ≤ nψ ∗⊤ Ω−10 ψ∗ ≤ μ2
+
+> n
+
+c′,
+
+16 μn satisfies μn → ∞ as n → ∞ and m/μ 2 
+
+> n
+
+is bounded. 
+
+Condition 1 (i) imposes the conditions that m3/n → 0, which restricts how quickly the number of moment functions may diverge. Here m denotes the number of constructed interaction-based moments rather than the dimension of the original instrument vector 
+
+Z, so it can be larger than p. The condition ensures that the expanding moment set remains well behaved for the asymptotic analysis. Condition 1 (ii) places restrictions on the concentration parameter nψ ∗⊤ Ω−10 ψ∗ (Staiger and Stock, 1997), which summarizes the overall strength of the moment functions. When μn scales as √n, it falls into the classical strong moment regime. In contrast, our framework permits μn to increase more slowly than √n, allowing the concentration parameter to diverge at a slower rate and therefore accommodating many weak interactions. The quantity μn governs the convergence rate of the estimator ̂ β, and all asymptotic results remain valid without imposing the conventional √n scaling. 
+
+Condition 2 (Convergence rate of nuisance) . The estimator of G and ξ satisfy ∥̂G −
+
+G0∥ = op(n−1/4m−1/4), and ∥̂ξ − ξ0∥ = op(n−1/4m−1/4).
+
+Condition 2 imposes a generic requirement on the convergence rates of the estimators ̂
+
+G and ̂ ξ. The condition does not rely on any specific estimation procedure, and other approaches, such as Cox model (Cox, 1972), may also be used provided that the required convergence rates are achieved. It only requires that the estimators achieve rates of order op(n−1/4m−1/4), which is commonly required in double robustness literature, such as in Chernozhukov et al. (2018). In our method, G0 is estimated using a local Kaplan-Meier estimator, which attains the rate of O((log( n)/(nh p)) 1/2) (Tang et al., 2020), where 
+
+h is the bandwidth. Further regulartity conditions are included in the supplementary material. 
+
+Theorem 3. Under Conditions 1-2 and Conditions 3-5 in the supplementary material, ̂
+
+β is asymptotically normal as n → ∞ , i.e., 
+
+μn(̂ β − β0)
+
+> √
+
+H−1(H + V )H−1 → N (0 , 1) ,
+
+where H = nψ ∗⊤ Ω−10 ψ∗, V = μ−2 
+
+> n
+
+E[U ⊤ 
+
+> i
+
+Ω−10 Ui], and 
+
+Ui = ψ′(η0; Oi) − ψ∗ − { Ω−10 E(ψ(β0, η0; O)ψ′
+
+(η0; O)⊤)}⊤ψ(β0, η0; Oi) is the population residual of the least squares regression of ψ′
+
+(η0; Oi) − ψ∗ on ψ(β0, η0; Oi).
+
+Theorem 3 establishes that ̂ β attains a convergence rate of μn, which is typically slower than the usual √n rate. This loss in convergence rate is the price paid for weak instruments, under which the moment conditions provide substantially less information than that in the strong moment setting. The variance of ̂ β contains two distinct 17 components. The first variance term H−1 matches the standard GMM variance in settings with strong instruments (Hansen, 1982). The second variance component H−2V
+
+originates from the U -statistic term associated with weak interactions This additional component does not vanish when the number of interactions diverges and plays a central role in delivering valid inference. When all moments are strong and the number of interaction terms stays fixed, the U -statistic variance converges to zero, recovering the classical GMM variance H−1, which coincides with the variance lower bound under the strong moment regime (Tang et al., 2020). In contrast, in the presence of weak moments, the additional variance term reflects the intrinsic loss of information induced by weak identification. The variance lower bound in such weak moment settings remains an open question and deserves further investigation. Figure 3 illustrates the influence of the strength of the moment conditions μn. Panel (a) shows that, under weaker moments, the norm ∥ψ∥ exhibits smaller curvature as 
+
+β deviates from the true value β0, leading to a flatter curve and a more challenging estimation problem for β. Panel (b) further demonstrates the impact of weak moments on inference. In particular, the asymptotic variance of the estimator involves the term 
+
+V = μ−2 
+
+> n
+
+E[U ⊤ 
+
+> i
+
+Ω−10 Ui], which increases as μn decreases. This variance inflation is reflected in the progressively more dispersed density of the GEL estimator in Panel (b), and when 
+
+μn = 1 so that the moment strength does not diverge with n, the resulting limiting distribution departs substantially from normal distribution.    
+
+> (a) Norm of ψ(b) Density of ̂β
+
+Figure 3: Behavior of the moment function and the GEL estimator under different moment strengths indexed by μn. The true value is β0 = 1 . Panel (a) plots the ∥ψ∥
+
+curves under varying moment strengths, where smaller μn yields a flatter norm curve. When μn = 1 ( μn does not diverge with n), the curve becomes flat, indicating lack of identification. Panel (b) displays the density of the GEL estimator of β under the same moment regimes. As μn decreases, the density becomes more dispersed with larger variance; when μn = 1 , the limiting distribution tends to be flat. A distinctive feature of our result is that the moment function is Neyman orthogonal to the nuisance functions. Neyman orthogonality eliminates the first-order impact of estimating η0, ensuring that the asymptotic distribution depends only on the limiting 18 behavior of the moment functions themselves, as long as the nuisance estimators achieve a minimal convergence rate required by the Neyman orthogonality condition. As a result, the influence of nuisance estimation is asymptotically negligible, and the asymptotic variance takes a clean two-component form driven solely by the structure of the weak interactions. In practice, the variance term H and V can be consistently estimated by ̂
+
+H = ∂2̂ Q(̂β, ̂ η)
+
+∂β 2 ,̂ V1 =̂ H−1̂ D⊤ ¯Ω( ̂β, ̂ η)−1̂ D̂ H−1,
+
+respectively, where ̂
+
+D =
+
+> n∑
+> i=1
+
+ρ′
+
+(̂λ(̂β, ̂ η)⊤ψ(̂ β, ̂ η; Oi)) ψ′
+
+(̂β, ̂ η; Oi) 
+
+> ∑nj=1
+
+ρ′ (̂λ(̂β, ̂ η)⊤ψ(̂β, ̂ η; Oj )) ,
+
+and ¯Ω( ̂β, ̂ η) = 1 /n ∑ 
+
+> i=1 n
+
+ψ(̂β, ̂ η; Oi)ψ(̂β, ̂ η; Oi)⊤.
+
+# 6 Model diagnoses 
+
+When more moment conditions are imposed than are needed to identify the parameter of interest, it becomes important to assess whether these restrictions are compatible with the data. This assessment can be formalized as a hypothesis test on the joint validity of the m-dimensional moment functions: 
+
+H0 : E{ψ(β0, η0; O)} = 0.
+
+Under correct specification, the moment conditions are satisfied at the true parameter values. This motivates a specification test analogous to the classical J-test in the GMM literature (Sargan, 1958; Hansen, 1982), which assesses the joint validity of overidentifying restrictions by examining whether the sample moments are sufficiently close to zero. Specifically, we employ the statistic 2n̂Q(̂β, ̂ η) (Newey and Windmeijer, 2009; Ye et al., 2024) to quantify the aggregate deviation of the sample moments from their population counterparts. Under appropriate regularity conditions, this statistic admits a well-defined asymptotic distribution under the null hypothesis and can therefore be used to conduct a formal overidentification test, as stated in the following theorem. 
+
+Theorem 4 (Overidentification test) . Under Conditions 1-2 and Conditions 3-5 in the supplementary material, and m, n → ∞ , if 
+
+E{ψ(β0, η0; O)} = 0,
+
+19 then 
+
+P (
+
+2n̂ Q(̂ β, ̂ η) ≥ χ21−α(m − 1) )
+
+→ α, 
+
+as n → ∞ .
+
+Theorem 4 implies a simple decision rule for assessing the validity of the imposed moment conditions. At significance level α, the null hypothesis is rejected whenever the value of 2n̂Q(̂β, ̂ η) exceeds the corresponding chi-squared critical value. Rejection of the null hypothesis suggests that the moment conditions may fail. 
+
+# 7 Simulation studies 
+
+We assess the finite sample performance of the estimator under several right censoring scenarios. The candidate instruments Z1, . . . , Z p are generated independently from the standard normal distributions. The structural equations for the outcome and exposure are 
+
+T = β0D +
+
+> p∑
+> k=1
+
+ϕkZk + ε, D =
+
+> p∑
+> k=1
+
+θkZk + ∑
+
+> 1≤j<k ≤p
+
+φD,jk Zj Zk + ν, 
+
+where ε and ν are noise terms, generated from a joint normal distribution with mean zero, variance 0.4, and covariance 0.2. The true causal effect is β0 = 1 . The censoring time C is generated from a uniform distribution [τ1, τ 2]. Across different simulation settings, τ1 and 
+
+τ2 are varied to produce empirical censoring rates of approximately 20% , 40% , and 60% ,respectively. The observed failure times are Y = min( T, C ), and indicator δ = I{T ≤ C}.
+
+The interaction coefficients decay with sample size: φD,jk = cn −1/4 with c = 4 ,representing a weak instrumental variables setting. We test two different IV dimensions: 10 and 20. When p = 10 , all interaction terms are set to be nonzero. When p = 20 , we randomly select 40% of the possible interactions and set the corresponding coefficients to be nonzero, with the remaining interactions set to be zero. In the estimation procedure, we use only second-order interaction terms in line with the data-generating process. Moreover, we examine four configurations for (θk, ϕ k), controlling instrument strength and the proportion of invalid instruments: • Case 1: θk = 1 for all k, and 30% of SNPs are invalid with ϕk = 0 .2.• Case 2: θk = 1 for all k, and 60% of SNPs are invalid with ϕk taking values 0.2,
+
+0.4, and 0.6 in equal proportions. • Case 3: θk ∼ N (1 , 1) and ϕk ∼ N (0 .2, 0.2) independently. 20 • Case 4: θk ∼ N (1 , 1) and 70% of SNPs are invalid with ϕk = 0 .5θk.We consider sample sizes n = 10000 and 20000 and repeat each configuration 
+
+500 times. For each simulated data set we implement the estimator in three steps. First, we apply adaptive LASSO to select relevant interaction terms from the set of interaction terms. Second, we estimate the nuisance functions ̂ η and use the selected set of interactions to construct the Neyman orthogonal moment ψ(β, ̂ η; O) with sample-splitting method. Finally, we obtain the estimator of ̂ β by GEL. We also consider the AFT model as a benchmark method, where the relationship between Y and 
+
+D is modeled directly while ignoring the unmeasured confounder U .Table 1 reports the simulation results for sample sizes n = 10000 with censoring rate 0.2. Additional simulation results across different sample sizes and censoring levels are provided in Supplementary Materials. The simulation results are evaluated using four summary measures: the percentage finite sample bias (Bias), the empirical standard deviation over replications (SD), the average estimated standard error (SE), and the empirical coverage probability (CP) of the 95% confidence interval. These metrics jointly assess accuracy, sampling variability, and inferential validity across the considered settings. Table 1: Performance of the proposed estimators for n = 10 ,000 across Cases 1-4, and instrument dimensions p = 10 and p = 20 . BIAS denotes percentage finite sample bias, SD the empirical standard deviation, SE the average estimated standard error, and CP the empirical coverage probability of the 95% confidence interval. 
+
+p = 10 p = 20 
+
+GEL Bias SD SE CP Bias SD SE CP Case 1 CUE 0.238% 0.093 0.087 0.932 -0.511% 0.066 0.071 0.968 EL 0.236% 0.091 0.085 0.926 -0.291% 0.064 0.066 0.952 ET 0.263% 0.091 0.086 0.934 -0.448% 0.064 0.067 0.956 AFT -24.163% 0.462 0.008 0.000 -78.848% 0.418 0.014 0.000 Case 2 CUE 0.618% 0.082 0.088 0.976 -0.429% 0.072 0.072 0.960 EL 0.544% 0.081 0.085 0.966 -0.366% 0.068 0.066 0.936 ET 0.549% 0.082 0.086 0.970 -0.328% 0.070 0.067 0.944 AFT -32.038% 0.554 0.011 0.000 -96.333% 0.201 0.017 0.000 Case 3 CUE -0.047% 0.086 0.088 0.962 -0.292% 0.066 0.072 0.958 EL -0.040% 0.085 0.086 0.970 -0.198% 0.063 0.066 0.950 ET -0.035% 0.085 0.086 0.968 -0.228% 0.064 0.067 0.956 AFT -66.156% 0.498 0.014 0.008 -99.328% 0.083 0.014 0.002 Case 4 CUE 0.995% 0.091 0.088 0.948 0.063% 0.070 0.072 0.960 EL 0.943% 0.089 0.086 0.940 0.065% 0.068 0.066 0.938 ET 1.006% 0.089 0.086 0.942 0.031% 0.069 0.067 0.946 AFT -80.035% 0.444 0.017 0.000 -100.005% 0.001 0.014 0.000 For both n = 10000 and n = 20000 , the three GEL estimators, CUE, EL, and ET, exhibit stable performance across all four cases. The estimated biases remain small, 21 while the SD closely matches the SE, indicating accurate variance estimation. The empirical coverage probabilities stay near the nominal level of 0.95 across censoring levels and instrument dimensions, demonstrating that the proposed AIPCW estimator delivers reliable inference in settings with many weak and invalid instruments. Among the three GEL variants, CUE exhibits modestly larger bias in some settings, particularly under large censoring rate, whereas EL and ET remain comparatively stable. In contrast, the AFT estimator performs poorly across all configurations. The estimated biases are substantial and do not diminish as the sample size increases, reflecting the sensitivity of the AFT specification to unmeasured confounding. Moreover, the estimated standard errors severely understate the sampling variability, leading to empirical coverage probabilities far below the nominal level. These results suggest that the AFT model does not yield reliable causal inference in the presence of many weak interaction instruments. To check whether at least one constructed interaction term is correlated with the exposure in the observed sample, we conduct a heteroskedasticity-robust F test (White, 1980; MacKinnon and White, 1985). Across all simulation designs, the heteroskedasticity-robust F test yields p-values smaller than 0.001 , indicating strong evidence that the interaction component in the first stage is nontrivial and the interaction relevance. To validate Theorem 4, we conduct an overidentification test and report the empirical type I error based on 500 simulation replications. The results are presented in the supplementary materials. Overall, the simulation results provide clear evidence that the proposed GEL estimators maintain accuracy and inferential validity across a wide range of challenging cases, while the standard AFT approach is unable to accommodate the complexities introduced by the unobserved confounding. 
+
+# 8 Application to UK Biobank data 
+
+UK Biobank is a large population-based cohort comprising roughly half a million participants recruited across the United Kingdom between 2006 and 2010. Baseline assessments include anthropometric measurements, blood and urine biomarkers, and detailed lifestyle and medical questionnaires (Sudlow et al., 2015). Longitudinal follow-up is enabled through linkage to national hospital, primary care, and mortality registries, which provide information on diagnoses, procedures, and prescription records. These data allow the construction of prospective time-to-event outcomes from routinely collected electronic health records. In this application, we restrict attention to individuals who were at least 60 years old at baseline, for whom age related cardiovascular and gastrointestinal conditions become 22 increasingly common. We further limit the sample to unrelated participants of white British ancestry and apply standard quality control procedures. These procedures exclude individuals with mismatched genetic and reported sex, excessive genotype missingness, or withdrawn consent. Variants with low imputation quality are also removed (Liu et al., 2023; Ye et al., 2024). We consider two right-censored outcomes derived from phenotype code (phecode) based on ICD-coded hospital and primary care records (Dey et al., 2022). The first outcome is ischemic heart disease (phecode 411), and the second outcome is gastritis and duodenitis (phecode 535). Their sample sizes were 78995 and 80567, with 7155 and 6320 observed events, respectively. The corresponding censoring rates were 0.909 and 0.922. For each phecode, the failure time for uncensored individuals was defined as the logarithm of the age at disease onset minus the age at enrollment into the UK Biobank. For censored individuals, the failure time was defined as the logarithm of the last observed age from hospital admissions, general practice records, or death registries minus the age at enrollment. The exposure of interest is body mass index (BMI). For instrument selection, we identify genetic variants associated with BMI using previously established genome-wide association results (Locke et al., 2015). Among single nucleotide polymorphisms that reach genome-wide significance at the threshold p < 5 × 10 −8, we apply linkage disequilibrium clumping to obtain an approximately independent set, using an r2 threshold 0.001 and distance based pruning consistent with prior Mendelian randomization studies. From the resulting pool, we retain the top 15 single nucleotide polymorphisms with the strongest marginal associations with BMI as candidate instruments. As benchmark methods, we fit two AFT models for disease onset with BMI as the covariate of interest, denoted as AFT (without covariates) and AFT (with covariates), respectively, where the latter further includes age and sex as covariates. Table 2 reports the estimated causal effects of BMI on the two time-to-event outcomes. For interpretability, the estimates are presented on the exponentiated scale, and the corresponding standard errors are obtained via the delta method. For gastritis and duodenitis, all three GEL-based estimators (CUE, EL, ET) yield highly consistent results, with estimated effects ranging from exp( ̂ β) = 0.836 to 0.842. These estimates imply that a one-unit increase in the exposure multiplies the time to onset by approximately 0.84, corresponding to an average 16% shorter time to onset on the multiplicative scale. In contrast, the AFT estimator produces an effect estimate extremely close to one, suggesting almost no detectable association, which is likely attributable to residual confounding not adequately addressed by the standard AFT specification. We also conduct two diagnostic methods to test whether the identification assumption and the moment conditions are satisfied in UK Biobank data. Both test results support the validity of the model. In Table 2, pF denotes the p-value of the 23 Table 2: Estimated causal effect of BMI on two survival outcomes, with exponentiated coefficients and standard errors. pF and pover-id represent the p value for heteroskedasticity-robust F test and overidentification test, respectively. Gastritis and Duodenitis exp (̂β) SE pF pover-id 
+
+CUE 0.8418 0.0163 <0.001 0.605 EL 0.8414 0.0117 0.652 ET 0.8365 0.0156 0.796 AFT (without covariates) 0.9960 0.0013 - -AFT (with covariates) 0.9957 0.0014 - -Ischemic Heart Disease exp (̂β) SE pF pover-id 
+
+CUE 0.8370 0.1490 <0.001 0.303 EL 0.8431 0.0169 0.893 ET 0.8041 0.0351 0.690 AFT (without covariates) 0.9771 0.0014 - -AFT (with covariates) 0.9763 0.0014 - -heteroskedasticity-robust F test (White, 1980; MacKinnon and White, 1985), which is used to assess the interaction relevance assumption. The test results strongly rejects the null hypothesis of no interaction effects, indicating that at least one constructed interaction term is correlated with the exposure. In addition, the overidentification test does not show systematic rejection, providing no evidence against the imposed moment conditions. For ischemic heart disease, the pattern is similar. The GEL estimators produce multiplicative effects between exp( ̂ β) = 0.804 and 0.834, indicating that each one-unit increase in the exposure corresponding to an approximately 17% shorter time to onset. Again, the AFT model yields an estimate near one, substantially attenuated relative to the GEL-based results. This attenuation suggests that the traditional AFT model fails to fully account for unmeasured confounding, leading to underestimation of the true causal effect. The close agreement among CUE, EL, and ET further demonstrates the robustness of our proposed AIPCW-GEL framework in capturing meaningful causal signals across both outcomes. 
+
+# 9 Discussion 
+
+This paper studies causal inference for time-to-event outcomes under right censoring when many candidate instruments may be weak and invalid. We propose a generalized structural accelerated failure time model that generalizes the classical SAFT framework to accommodate potential weak and invalid IVs. Within this framework, we develop a censoring-adjusted moment construction that allows for right censoring. Identification is 24 achieved by exploiting interaction-based moment restrictions, which remain informative even under weak instrument strength and invalidity. Estimation and inference are conducted using generalized empirical likelihood, enabling the combination of many moments and delivering stable performance in the many weak instrument settings. We establish the large-sample properties of the proposed estimator, and demonstrate its finite sample and empirical performance through simulation studies and an application to the UK Biobank. Several directions merit further investigation. First, under weak moment conditions, the existence and characterization of a variance lower bound is still unclear and warrants further investigation. Second, an important direction is to extend the proposed framework to other survival models, such as structural Cox model (Wang et al., 2023) and semiparametric AFT model (Huling et al., 2019). More broadly, it would be of interest to develop data-adaptive procedures for selecting or weighting interaction terms in very large genetic data, with finite sample guarantees in regimes where the number of candidate interactions grows rapidly with sample size. 
+
+# References 
+
+Angrist, J. D. and Krueger, A. B. (2001). Instrumental variables and the search for identification: From supply and demand to natural experiments. Journal of Economic Perspectives , 15(4):69–85. Bang, H. and Robins, J. M. (2005). Doubly robust estimation in missing data and causal inference models. Biometrics , 61(4):962–973. Bickel, P. J., Klaassen, C. A., Bickel, P. J., Ritov, Y., Klaassen, J., Wellner, J. A., and Ritov, Y. (1993). Efficient and adaptive estimation for semiparametric models ,volume 4. Springer. Bowden, J., Davey Smith, G., Haycock, P. C., and Burgess, S. (2016). Consistent estimation in mendelian randomization with some invalid instruments using a weighted median estimator. Genetic Epidemiology , 40(4):304–314. Bowden, J., Smith, G. D., and Burgess, S. (2015). Mendelian randomization with invalid instruments: effect estimation and bias detection through Egger regression. 
+
+International Journal of Epidemiology , 44(2):512–525. Buckley, J. and James, I. (1979). Linear regression with censored data. Biometrika ,66(3):429–436. 25 Burgess, S. and Thompson, S. G. (2011). Bias in causal estimates from mendelian randomization studies with weak instruments. Statistics in Medicine , 30(11):1312– 1323. Cai, T., Huang, J., and Tian, L. (2009). Regularized estimation for the accelerated failure time model. Biometrics , 65(2):394–404. Chernozhukov, V., Chetverikov, D., Demirer, M., Duflo, E., Hansen, C., Newey, W., and Robins, J. (2018). Double/debiased machine learning for treatment and structural parameters. The Econometrics Journal , 21(1):C1–C68. Cox, D. R. (1972). Regression models and life-tables. Journal of the Royal Statistical Society Series B: Statistical Methodology , 34(2):187–202. Cui, Y., Kosorok, M. R., Sverdrup, E., Wager, S., and Zhu, R. (2023). Estimating heterogeneous treatment effects with right-censored data via causal survival forests. 
+
+Journal of the Royal Statistical Society Series B , 85(2):179–211. Dabrowska, D. M. (1989). Uniform consistency of the kernel conditional Kaplan-Meier estimate. The Annals of Statistics , 17(3):1157–1167. Davies, N. M., von Hinke Kessler Scholder, S., Farbmacher, H., Burgess, S., Windmeijer, F., and Smith, G. D. (2015). The many weak instruments problem and mendelian randomization. Statistics in Medicine , 34(3):454–468. Dey, R., Zhou, W., Kiiskinen, T., Havulinna, A., Elliott, A., Karjalainen, J., Kurki, M., Qin, A., FinnGen, Lee, S., et al. (2022). Efficient and accurate frailty model approach for genome-wide survival association analysis in large-scale biobanks. Nature Communications , 13(1):5437. Ertefaie, A., Nguyen, A. P., Harding, D. J., Morenoff, J. D., and Yang, W. (2018). Instrumental variable analysis with censored data in the presence of many weak instruments: application to the effect of being sentenced to prison on time to employment. The Annals of Applied Statistics , 12(4):2647–2673. Fan, J. and Datta, S. (2011). Fitting marginal accelerated failure time models to clustered survival data with potentially informative cluster size. Computational Statistics & Data Analysis , 55(12):3295–3303. Fan, J. and Li, R. (2001). Variable selection via nonconcave penalized likelihood and its oracle properties. Journal of the American Statistical Association , 96(456):1348–1360. Han, C. (2008). Detecting invalid instruments using LASSO and other shrinkage estimators. Econometric Theory , 24(4):1114–1147. 26 Hansen, L. P. (1982). Large sample properties of generalized method of moments estimators. Econometrica , 50(4):1029–1054. He, X., Wang, L., and Hong, H. G. (2013). Quantile-adaptive model-free variable screening for high-dimensional heterogeneous data. The Annals of Statistics , 41(1):342– 369. Hernán, M. A., Cole, S. R., Margolick, J., Cohen, M., and Robins, J. M. (2005). Structural accelerated failure time models for survival analysis in studies with time-varying treatments. Pharmacoepidemiology and Drug Safety , 14(7):477–491. Hoerl, A. E. and Kennard, R. W. (1970). Ridge regression: biased estimation for nonorthogonal problems. Technometrics , 12(1):55–67. Huling, J. D., Yu, M., and O’Malley, A. J. (2019). Instrumental variable based estimation under the semiparametric accelerated failure time model. Biometrics , 75(2):516–527. Imbens, G. W. (2002). Generalized method of moments and empirical likelihood. Journal of Business & Economic Statistics , 20(4):493–506. Jin, Z., Lin, D., Wei, L., and Ying, Z. (2003). Rank-based inference for the accelerated failure time model. Biometrika , 90(2):341–353. Kang, H., Zhang, A., Cai, T., and Small, D. S. (2016). Instrumental variables estimation with some invalid instruments and its application to mendelian randomization. Journal of the American Statistical Association , 111(513):132–144. Katan, M. B. (1986). Apolipoprotein E isoforms, serum cholesterol, and cancer. The Lancet , 327(8479):507–508. Kitamura, Y. and Stutzer, M. (1997). An information-theoretic alternative to generalized method of moments estimation. Econometrica , 65(4):861–874. Kitamura, Y., Tripathi, G., and Ahn, H. (2004). Empirical likelihood-based inference in conditional moment restriction models. Econometrica , 72(6):1667–1714. Kolesár, M., Chetty, R., Friedman, J., Glaeser, E., and Imbens, G. W. (2015). Identification and inference with many invalid instruments. Journal of Business & Economic Statistics , 33(4):474–484. Lewbel, A. (2012). Using heteroscedasticity to identify and estimate mismeasured and endogenous regressor models. Journal of Business & Economic Statistics , 30(1):67–80. 27 Liu, Z., Ye, T., Sun, B., Schooling, M., and Tchetgen Tchetgen, E. (2023). Mendelian randomization mixed-scale treatment effect robust identification and estimation for causal inference. Biometrics , 79(3):2208–2219. Locke, A. E., Kahali, B., Berndt, S. I., Justice, A. E., Pers, T. H., Day, F. R., Powell, C., Vedantam, S., Buchkovich, M. L., Yang, J., et al. (2015). Genetic studies of body mass index yield new insights for obesity biology. Nature , 518(7538):197–206. MacKinnon, J. G. and White, H. (1985). Some heteroskedasticity-consistent covariance matrix estimators with improved finite sample properties. Journal of Econometrics ,29(3):305–325. Newey, W. K. and Smith, R. J. (2004). Higher Order Properties of GMM and Generalized Empirical Likelihood Estimators. Econometrica , 72(1):219–255. Newey, W. K. and Windmeijer, F. (2009). Generalized method of moments with many weak moment conditions. Econometrica , 77(3):687–719. Neyman, J. (1959). Optimal asymptotic tests of composite statistical hypotheses. 
+
+Probability and Statistics , 57:213. Neyman, J. (1979). c(α) tests and their use. Sankhyā , pages 1–21. Nie, H., Cheng, J., and Small, D. S. (2011). Inference for the effect of treatment on survival probability in randomized trials with noncompliance and administrative censoring. Biometrics , 67(4):1397–1405. Owen, A. B. (1988). Empirical likelihood ratio confidence intervals for a single functional. 
+
+Biometrika , 75(2):237–249. Owen, A. B. (2001). Empirical Likelihood . Chapman and Hall/CRC. Purcell, S., Neale, B., Todd-Brown, K., Thomas, L., Ferreira, M. A., Bender, D., Maller, J., Sklar, P., De Bakker, P. I., Daly, M. J., et al. (2007). PLINK: a tool set for whole-genome association and population-based linkage analyses. The American Journal of Human Genetics , 81(3):559–575. Qin, J. and Lawless, J. (1994). Empirical likelihood and general estimating equations. 
+
+The Annals of Statistics , 22(1):300–325. Robins, J. (1992). Estimation of the time-dependent accelerated failure time model in the presence of confounding factors. Biometrika , 79(2):321–334. Robins, J. M. (1993). Analytic methods for estimating hiv-treatment and cofactor effects. In Methodological Issues in AIDS Behavioral Research , page 213. 28 Robins, J. M. and Rotnitzky, A. (1992). Recovery of information and adjustment for dependent censoring using surrogate markers. In AIDS Epidemiology: Methodological Issues , pages 297–331. Springer. Robins, J. M., Rotnitzky, A., and Zhao, L. P. (1994). Estimation of regression coefficients when some regressors are not always observed. Journal of the American Statistical Association , 89(427):846–866. Robins, J. M. and Tsiatis, A. A. (1991). Correcting for non-compliance in randomized trials using rank preserving structural failure time models. Communications in Statistics-Theory and Methods , 20(8):2609–2631. Rubin, D. B. (1974). Estimating causal effects of treatments in randomized and nonrandomized studies. Journal of Educational Psychology , 66(5):688. Sargan, J. D. (1958). The estimation of economic relationships using instrumental variables. Econometrica , 26(3):393–415. Smith, G. D. and Ebrahim, S. (2003). Mendelian randomization: can genetic epidemiology contribute to understanding environmental determinants of disease? 
+
+International Journal of Epidemiology , 32(1):1–22. Smith, R. J. (1997). Alternative semi-parametric likelihood approaches to generalised method of moments estimation. The Economic Journal , 107(441):503–519. Solovieff, N., Cotsapas, C., Lee, P. H., Purcell, S. M., and Smoller, J. W. (2013). Pleiotropy in complex traits: challenges and strategies. Nature Reviews Genetics ,14(7):483–495. Spiller, W., Slichter, D., Bowden, J., and Davey Smith, G. (2019). Detecting and correcting for bias in mendelian randomization analyses using gene-by-environment interactions. International Journal of Epidemiology , 48(3):702–712. Staiger, D. and Stock, J. H. (1997). Instrumental variables regression with weak instruments. Econometrica , 65(3):557–586. Stock, J. H., Wright, J. H., and Yogo, M. (2002). A survey of weak instruments and weak identification in generalized method of moments. Journal of Business & Economic Statistics , 20(4):518–529. Sudlow, C., Gallacher, J., Allen, N., Beral, V., Burton, P., Danesh, J., Downey, P., Elliott, P., Green, J., Landray, M., Liu, B., Matthews, P., Pell, J., Silman, A., Young, A., Ong, G., Sprosen, T., Peakman, T., and Collins, R. (2015). UK Biobank: An open access 29 resource for identifying the causes of a wide range of complex diseases of middle and old age. PLoS Medicine , 12(3):e1001779. Sun, B., Cui, Y., and Tchetgen, E. T. (2022). Selective machine learning of the average treatment effect with an invalid instrumental variable. Journal of Machine Learning Research , 23(204):1–40. Tang, N., Yan, X., and Zhao, X. (2020). Penalized generalized empirical likelihood with a diverging number of general estimating equations for censored data. The Annals of Statistics , 48(1):607–627. Tchetgen Tchetgen, E., Sun, B., and Walter, S. (2021). The GENIUS approach to robust mendelian randomization inference. Statistical Science , 36(3):443–464. Tibshirani, R. (1996). Regression shrinkage and selection via the lasso. Journal of the Royal Statistical Society: Series B , 58(1):267–288. Tropp, J. A. (2016). The expected norm of a sum of independent random matrices: An elementary approach. In High Dimensional Probability VII: The Cargese Volume , pages 173–202. Vandebosch, A., Goetghebeur, E., and Van Damme, L. (2005). Structural accelerated failure time models for the effects of observed exposures on repeated events in a clinical trial. Statistics in Medicine , 24(7):1029–1046. Verbanck, M., Chen, C.-Y., Neale, B., and Do, R. (2018). Detection of widespread horizontal pleiotropy in causal relationships inferred from mendelian randomization between complex traits and diseases. Nature Genetics , 50(5):693–698. Wang, L., Tchetgen Tchetgen, E., Martinussen, T., and Vansteelandt, S. (2023). Instrumental variable estimation of the causal hazard ratio. Biometrics , 79(2):539– 550. White, H. (1980). A heteroskedasticity-consistent covariance matrix estimator and a direct test for heteroskedasticity. Econometrica , 48(4):817–838. Ye, T., Liu, Z., Sun, B., and Tchetgen Tchetgen, E. (2024). GENIUS-MAWII: for robust Mendelian randomization with many weak invalid instruments. Journal of the Royal Statistical Society Series B: Statistical Methodology , 86(4):1045–1067. Ye, T., Shao, J., and Kang, H. (2021). Debiased inverse-variance weighted estimator in two-sample summary-data mendelian randomization. The Annals of Statistics ,49(4):2079–2100. 30 Zhang, C.-H. (2010). Nearly unbiased variable selection under minimax concave penalty. 
+
+The Annals of Statistics , 38(2):894–942. Zhang, D., Yao, M., Liu, Z., and Sun, B. (2025). Mr-magic: Robust causal inference using many weak genetic interactions. arXiv preprint arXiv:2504.13565 .Zhao, Q., Wang, J., Hemani, G., Bowden, J., and Small, D. S. (2020). Statistical inference in two-sample summary-data Mendelian randomization using robust adjusted profile score. The Annals of Statistics , 48(3):1742–1769. Zou, H. (2006). The adaptive lasso and its oracle properties. Journal of the American Statistical Association , 101(476):1418–1429. 31 Supplementary material for ‘Identification and Inference for Structural Accelerated Failure Time Models via Instrument Interactions’ S1 Proof of Theorem 1 
+
+Proof. For the first term δG0(Y |Z,D ) {g(β, Λ0; O) − ξ0(β; Y, Z, D )}, since Y = T when δ = 1 
+
+and the whole term is 0 when δ = 0 , we have 
+
+E
+
+[ δG0(Y |Z, D ){g(β, Λ0; O) − ξ0(β; Y, Z, D )}
+
+∣∣∣∣T, Z, D 
+
+]
+
+=E
+
+[ δG0(T |Z, D ){g(β, Λ0; OT ) − ξ0(β; T, Z, D )}
+
+∣∣∣∣T, Z, D 
+
+]
+
+=E
+
+[ I(C ≥ T )
+
+G0(T |Z, D )
+
+∣∣∣∣T, Z, D 
+
+]
+
+{g(β, Λ0; OT ) − ξ0(β; T, Z, D )}
+
+=g(β, Λ0; OT ) − ξ0(β; T, Z, D ).
+
+For the third term ∫ Y 
+
+> −∞
+> dξ 0(β;u, Z,D )
+> G0(u|Z,D )
+
+, we have 
+
+E
+
+[∫ Y
+
+> −∞
+
+dξ 0(β; u, Z, D )
+
+G0(u|Z, D )
+
+∣∣∣∣T, Z, D 
+
+]
+
+=E
+
+[∫ ∞−∞ 
+
+I(T ≥ u)I(C ≥ u)dξ 0(β; u, Z, D )
+
+G0(u|Z, D )
+
+∣∣∣∣T, Z, D 
+
+]
+
+=
+
+∫ ∞−∞ 
+
+I(T ≥ u)E
+
+[ I(C ≥ u)
+
+G0(u|Z, D )
+
+∣∣∣∣T, Z, D 
+
+]
+
+dξ 0(β; u, Z, D )=
+
+∫ ∞−∞ 
+
+I(T ≥ u)dξ 0(β; u, Z, D )=
+
+∫ T
+
+> −∞
+
+dξ 0(β; u, Z, D )=ξ0(β; T, Z, D ) − ξ0(β; −∞ , Z, D ). (S1) Thus 
+
+Eψ(β0, η0; O)=E
+
+(
+
+E
+
+[
+
+ψ(β0, η0; O)
+
+∣∣∣∣T, Z, D 
+
+]) 
+
+=E [g(β0, Λ0; OT ) − ξ0(β0; T, Z, D ) + ξ0(β0; −∞ , Z, D ) + ξ0(β0; T, Z, D ) − ξ0(β0; −∞ , Z, D )] =E [g(β0, Λ0; OT )] =0 .
+
+32 Then we prove the uniqueness of β. If there exists β1 and β2 both satisfy 
+
+Eψ(β, η0; O) = 0 , then we have 
+
+Eψk(β1, η0; O) − Eψk(β2, η0; O)=Egk(β1, Λ0; OT ) − Egk(β2, Λ0; OT )=E [Ik(Z; ζ0)( Y − Vkϑk, 0 − β1(D − Vkωk, 0))] − E [Ik(Z; ζ0)( Y − Vkϑk, 0 − β2(D − Vkωk, 0))] =( β1 − β2)E [Ik(Z; ζ0)( D − Vkωk, 0)] =0 .
+
+Since Vk includes only interaction terms up to order k − 1, while Ik(Z; ζ0) involves kth-order interactions, there exists at least one centered component (Zj − ζj0) that appears in Ik(Z; ζ0) but not in any element of Vk. Under Assumption 1, this unmatched centered factor is independent of Vk and has mean zero, which implies E [Ik(Z; ζ0)Vk] = 0 . Putting interaction terms of order 2 to q together, given that E [I2: q(Z; ζ0)D] has at least one non-zero entry, we have E [I2: q(Z; ζ0)( D − Vkωk, 0)] = E [I2: q(Z; ζ0)D] also has at least one non-zero entry, which means β1 = β2.
+
+# S2 Proof of Theorem 2 
+
+Proof. (i). First, we prove ψ is Neyman orthogonal to ξ. For an admissible perturbation direction hξ
+
+∂ψ (β0, ξ 0 + th ξ; O)
+
+∂t 
+
+> ∣∣∣∣t=0
+
+= ∂∂t  
+
+> [
+
+δG0(Y |Z, D ){g(β0, Λ0; O) − ξ0(β0; Y, Z, D ) − th ξ(β0; Y, Z, D )}
+
+> ] ∣∣∣∣t=0
+
++ ∂∂t [ξ0(β0; −∞ , Z, D ) + th ξ(β0; −∞ , Z, D )] 
+
+> ∣∣∣∣t=0
+
++ ∂∂t  
+
+> [∫Y
+> −∞
+
+dξ 0(β0; u, Z, D ) + th ξ(β0; u, Z, D )
+
+G0(u|Z, D )
+
+> ] ∣∣∣∣t=0
+
+= − δG0(Y |Z, D )hξ(β0; Y, Z, D ) + hξ(β0; −∞ , Z, D ) +  
+
+> ∫Y
+> −∞
+
+dh ξ(β0; u, Z, D )
+
+G0(u|Z, D ) .
+
+Taking expectation, we have 
+
+E∂ψ (β0, ξ 0 + th ξ; O)
+
+∂t 
+
+> ∣∣∣∣t=0
+
+=E
+
+> (
+
+E
+
+> [
+
+− δG0(Y |Z, D )hξ(β0; Y, Z, D ) + hξ(β0; −∞ , Z, D ) +  
+
+> ∫Y
+> −∞
+
+dh ξ(β0; u, Z, D )
+
+G0(u|Z, D )
+
+> ∣∣∣∣
+
+T, Z, D 
+
+> ])
+
+=E (−hξ(β0; T, Z, D ) + hξ(β0; −∞ , Z, D ) + hξ(β0; T, Z, D ) − hξ(β0; −∞ , Z, D )) =0 ,
+
+33 where the integration term is similar to (S1). Thus ψ is Neyman orthogonal to ξ.Next, we prove ψ is Neyman orthogonal to G.
+
+∂ψ (β0, G 0 + th G; O)
+
+∂t 
+
+> ∣∣∣∣t=0
+
+= ∂∂t  
+
+> [
+
+δG0(Y |Z, D ) + th G(Y |Z, D ){g(β0, Λ0; O) − ξ0(β0; Y, Z, D )}
+
+> ] ∣∣∣∣t=0
+
++ ∂∂t 
+
+> [
+
+ξ0(β0; −∞ , Z, D ) +  
+
+> ∫Y
+> −∞
+
+dξ 0(β0; u, Z, D )
+
+G0(u|Z, D ) + th G(u|Z, D )
+
+> ] ∣∣∣∣t=0
+
+= − δh G(Y |Z, D )
+
+G0(Y |Z, D )2 {g(β0, Λ0; O) − ξ0(β0; Y, Z, D )} −  
+
+> ∫Y
+> −∞
+
+hG(u|Z, D )dξ 0(β0; u, Z, D )
+
+G0(u|Z, D )2 .
+
+Taking expectation, we have 
+
+− E∂ψ (β0, G 0 + th G; O)
+
+∂t 
+
+> ∣∣∣∣t=0
+
+=E
+
+> (
+
+E 
+
+> [
+
+δh G(Y |Z, D )
+
+G0(Y |Z, D )2 {g(β0, Λ0; O) − ξ0(β0; Y, Z, D )}
+
+> ∣∣∣∣
+
+T, Z, D 
+
+> ])
+
++ E
+
+> (
+
+E 
+
+> [∫Y
+> −∞
+
+hG(u|Z, D )dξ 0(β0; u, Z, D )
+
+G0(u|Z, D )2
+
+> ∣∣∣∣
+
+T, Z, D 
+
+> ])
+
+=E 
+
+> (
+
+hG(T |Z, D )
+
+G0(T |Z, D ){g(β0, Λ0; OT ) − ξ0(β0; T, Z, D )}
+
+> )
+
++ E 
+
+> (∫T
+> −∞
+
+hG(u|Z, D )
+
+G0(u|Z, D )dξ 0(β0; u, Z, D )
+
+> )
+
+=E 
+
+> (
+
+hG(T |Z, D )
+
+G0(T |Z, D ){g(β0, Λ0; OT ) − ξ0(β0; T, Z, D )}
+
+> )
+
++ E 
+
+> (
+
+hG(T |Z, D )
+
+G0(T |Z, D )ξ0(β0; u, Z, D )
+
+> ∣∣∣∣
+> T
+> 0
+
+− 
+
+> ∫T
+> −∞
+
+ξ0(β0; u, Z, D )d hG(u|Z, D )
+
+G0(u|Z, D )
+
+> )
+
+=E 
+
+> (
+
+hG(T |Z, D )
+
+G0(T |Z, D )g(β0, Λ0; OT ) − hG(T |Z, D )
+
+G0(T |Z, D )ξ0(β0; T, Z, D )
+
+> )
+
++ E 
+
+> (
+
+hG(T |Z, D )
+
+G0(T |Z, D )ξ0(β0; T, Z, D ) − hG(−∞| Z, D )
+
+G0(−∞| Z, D )ξ0(β0; −∞ , Z, D )
+
+− 
+
+> ∫T
+> −∞
+
+ξ0(β0; u, Z, D )d hG(u|Z, D )
+
+G0(u|Z, D )
+
+> )
+
+=E 
+
+> (
+
+hG(T |Z, D )
+
+G0(T |Z, D )g(β0, Λ0; OT ) − hG(−∞| Z, D )
+
+G0(−∞| Z, D )ξ0(β0; −∞ , Z, D )
+
+− 
+
+> ∫T
+> −∞
+
+ξ0(β0; u, Z, D )d hG(u|Z, D )
+
+G0(u|Z, D )
+
+> )
+
+. (S2) Let F (t|Z, D ) = P (T ≤ t|Z, D ) and S(t|Z, D ) = 1 − F (t|Z, D ) = P (T ≥ t|Z, D ). The 34 definition of ξ implies that 
+
+ξ0(β; u, Z, D ) = E[g(β0, Λ0; OT )|T ≥ u, Z, D ] =   
+
+> ∫∞
+> u
+
+g(β; t, Z, D )dF (t|Z, D )
+
+S(u|Z, D ) .
+
+This implies 
+
+d[ξ0(β; u, Z, D )S(u|Z, D )] = −g(β, Λ0; u, Z, D )dF (u|Z, D ).
+
+Note that S(−∞| Z, D ) = 1 , S (∞| Z, D ) = 0 , we have 
+
+E 
+
+> [
+
+hG(T |Z, D )
+
+G0(T |Z, D )g(β0, Λ0; T, Z, D )
+
+> ∣∣∣∣
+
+Z, D 
+
+> ]
+
+= 
+
+> ∫∞−∞
+
+hG(u|Z, D )
+
+G0(u|Z, D )g(β, Λ0; u, Z, D )dF (u|Z, D )= − 
+
+> ∫∞−∞
+
+hG(u|Z, D )
+
+G0(u|Z, D )d[ξ0(β; u, Z, D )S(u|Z, D )] = − hG(u|Z, D )
+
+G0(u|Z, D )ξ0(β; u, Z, D )S(u|Z, D )
+
+> ∣∣∣∣
+> ∞−∞
+
++ 
+
+> ∫∞−∞
+
+ξ0(β; u, Z, D )S(u|Z, D )d hG(u|Z, D )
+
+G0(u|Z, D )= hG(−∞| Z, D )
+
+G0(−∞| Z, D )ξ0(β; −∞ , Z, D ) +  
+
+> ∫∞−∞
+
+ξ0(β; u, Z, D )S(u|Z, D )d hG(u|Z, D )
+
+G0(u|Z, D ). (S3) On the other hand, 
+
+E 
+
+> [∫T
+> −∞
+
+ξ0(β0; u, Z, D )d hG(u|Z, D )
+
+G0(u|Z, D )
+
+> ∣∣∣∣
+
+Z, D 
+
+> ]
+
+=E 
+
+> [∫∞−∞
+
+I(T ≥ u)ξ0(β0; u, Z, D )d hG(u|Z, D )
+
+G0(u|Z, D )
+
+> ∣∣∣∣
+
+Z, D 
+
+> ]
+
+= 
+
+> ∫∞−∞
+
+E [I(T ≥ u)|Z, D ] ξ0(β0; u, Z, D )d hG(u|Z, D )
+
+G0(u|Z, D )= 
+
+> ∫∞−∞
+
+ξ0(β0; u, Z, D )S(u|Z, D )d hG(u|Z, D )
+
+G0(u|Z, D ). (S4) Then (S2) becomes 
+
+− E∂ψ (β0, G 0 + th G; O)
+
+∂t 
+
+> ∣∣∣∣t=0
+
+=E 
+
+> (
+
+hG(T |Z, D )
+
+G0(T |Z, D )g(β0, Λ0; OT ) − hG(−∞| Z, D )
+
+G0(−∞| Z, D )ξ0(β0; −∞ , Z, D )
+
+− 
+
+> ∫T
+> −∞
+
+ξ0(β0; u, Z, D )d hG(u|Z, D )
+
+G0(u|Z, D )
+
+> )
+
+=E
+
+> (
+
+E 
+
+> [
+
+hG(T |Z, D )
+
+G0(T |Z, D )g(β0, Λ0; OT ) − 
+
+> ∫∞−∞
+
+I(T ≥ u)ξ0(β0; u, Z, D )d hG(u|Z, D )
+
+G0(u|Z, D )
+
+> ∣∣∣∣
+
+Z, D 
+
+> ])
+
+− E 
+
+> (
+
+hG(−∞| Z, D )
+
+G0(−∞| Z, D )ξ0(β0; −∞ , Z, D )
+
+> )
+
+35 =E
+
+( hG(−∞| Z, D )
+
+G0(−∞| Z, D )ξ0(β; −∞ , Z, D ) + 
+
+∫ ∞−∞ 
+
+ξ0(β; u, Z, D )S(u|Z, D )d hG(u|Z, D )
+
+G0(u|Z, D )
+
+)
+
+= − E
+
+(∫ ∞−∞ 
+
+ξ0(β; u, Z, D )S(u|Z, D )d hG(u|Z, D )
+
+G0(u|Z, D ) − hG(−∞| Z, D )
+
+G0(−∞| Z, D )ξ0(β; −∞ , Z, D )
+
+)
+
+=0 .
+
+Thus ψ is Neyman orthogonal to G.Finally, we prove ψ is Neyman orthogonal to ϑk, ωk, and ζ. For ϑk,
+
+E∂ψ (β0, η0; O)
+
+∂ϑ k
+
+∣∣∣∣ϑk =ϑk, 0
+
+=E∂ψ (β0, η0; O)
+
+∂g (β0, Λ0; O)
+
+∂g (β0, Λ0; O)
+
+∂ϑ k
+
+∣∣∣∣ϑk =ϑk, 0
+
+= − E
+
+[ δG0(Y |Z, D )Ik(Z; ζ0)Vk
+
+]
+
+= − E
+
+[
+
+E
+
+( δG0(Y |Z, D )|T, Z, D 
+
+)
+
+Ik(Z; ζ0)Vk
+
+]
+
+= − E [
+
+Ik(Z; ζ0)(1 , I1: k−1(Z)⊤)]
+
+=0 .
+
+Similarly, 
+
+E∂ψ (β0, η0; O)
+
+∂ω k
+
+∣∣∣∣ωk =ωk, 0
+
+= E
+
+[ δG0(Y |Z, D )Ik(Z; ζ0)Vkβ
+
+]
+
+= 0 .
+
+Under structural model, we have 
+
+E(T |Z) = α0 +
+
+> k−1
+
+∑
+
+> j=1
+
+Ij (Z)⊤αj +
+
+> p
+
+∑
+
+> j=k
+
+Ij (Z; ζ)⊤αj ,
+
+and 
+
+E(D|Z) = ι0 +
+
+> k−1
+
+∑
+
+> j=1
+
+Ij (Z)⊤ιj +
+
+> p
+
+∑
+
+> j=k
+
+Ij (Z; ζ)⊤ιj .
+
+Here we have centered the interaction terms of order k and higher. Correspondingly, in our setup, the nuisance component is ϑk = ( α0, . . . , α k−1) and ωk = ( ι0, . . . , ι k−1). This implies 
+
+E [( T − Vkϑk) − β(D − Vkωk)|Z] = 
+
+> p
+
+∑
+
+> j=k
+
+Ij (Z; ζ)⊤(αj − βι j )
+
+For ζ, we have 
+
+E∂ψ k(β0, η0; O)
+
+∂ζ l
+
+∣∣∣∣ζl=ζl, 0
+
+=E∂ψ (β0, η0; O)
+
+∂g (β0, Λ0; O)
+
+∂g (β0, Λ0; O)
+
+∂ζ l
+
+∣∣∣∣ζl=ζl, 0
+
+36 =E 
+
+> [
+
+δG0(Y |Z, D )
+
+∂Ik(Z; ζ)
+
+∂ζ l
+
+{(Y − Vkϑk) − β(D − Vkωk)}
+
+> ]
+
+=E
+
+> [
+
+E 
+
+> (
+
+δG0(Y |Z, D )|T, Z, D  
+
+> )
+
+∂Ik(Z; ζ)
+
+∂ζ l
+
+E{(T − Vkϑk) − β(D − Vkωk)|Z}
+
+> ]
+
+=E 
+
+> 
+
+∂Ik(Z; ζ)
+
+∂ζ lp∑
+
+> j=k
+
+Ij (Z; ζ)⊤(αj − βι j )
+
+> 
+
+Taking the derivative of a centered k-th order interaction term Ik(Z; ζ) with respect to ζl yields either zero or a sum of centered (k − 1) -th order interaction terms that do not involve ζl. Note that the remaining term Ij (Z; ζ) involves centered interactions of order at least k. Because we assume mutual independence among the components of 
+
+Z, each higher-order term must contain at least one variable that does not appear in the derivative part. Consequently, the expectation of such a product is zero. Thus ψ is Neyman orthogonal to all nuisances in η.(ii). When G0 is correctly specified, but ξ is misspecified, we have 
+
+E 
+
+> [
+
+δG0(Y |Z, D ){g(β0, Λ0; O) − ξ(β0; Y, Z, D )} + ξ(β0; −∞ , Z, D ) +  
+
+> ∫Y
+> −∞
+
+dξ (β0; u, Z, D )
+
+G0(u|Z, D )
+
+> ]
+
+=E
+
+> [
+
+E 
+
+> (
+
+δG0(Y |Z, D ){g(β0, Λ0; O) − ξ(β0; Y, Z, D )}
+
+> ∣∣∣∣
+
+T, Z, D 
+
+> )]
+
++ E
+
+> [
+
+E
+
+> (
+
+ξ(β0; −∞ , Z, D ) +  
+
+> ∫Y
+> −∞
+
+dξ (β0; u, Z, D )
+
+G0(u|Z, D )
+
+> ∣∣∣∣
+
+T, Z, D 
+
+> )]
+
+=E
+
+> [
+
+E 
+
+> (
+
+δG0(T |Z, D )
+
+> ∣∣∣∣
+
+T, Z, D 
+
+> )
+
+{g(β0, Λ0; OT ) − ξ(β0; T, Z, D )}
+
+> ]
+
++ E
+
+> [
+
+ξ(β0; −∞ , Z, D ) +  
+
+> ∫∞−∞
+
+I(T ≥ u)E 
+
+> (
+
+I(C ≥ u)
+
+G0(u|Z, D )
+
+> ∣∣∣∣
+
+T, Z, D 
+
+> )
+
+dξ (β0; u, Z, D )
+
+> ]
+
+=E
+
+> [
+
+g(β0, Λ0; OT ) − ξ(β0; T, Z, D ) + ξ(β0; −∞ , Z, D ) +  
+
+> ∫T
+> −∞
+
+dξ (β0; u, Z, D )
+
+> ]
+
+=E [g(β0, Λ0; OT )] =0 .
+
+On the other hand, when G is misspecified but ξ0 is correctly specified, we have 
+
+E 
+
+> [
+
+δG(Y |Z, D ){g(β0, Λ0; O) − ξ0(β0; Y, Z, D )} + ξ0(β0; −∞ , Z, D ) +  
+
+> ∫Y
+> −∞
+
+dξ 0(β0; u, Z, D )
+
+G(u|Z, D )
+
+> ]
+
+=E
+
+> [
+
+E 
+
+> (
+
+δG(Y |Z, D ){g(β0, Λ0; O) − ξ0(β0; Y, Z, D )}
+
+> ∣∣∣∣
+
+T, Z, D 
+
+> )]
+
++ E
+
+> [
+
+E
+
+> (
+
+ξ0(β0; −∞ , Z, D ) +  
+
+> ∫Y
+> −∞
+
+dξ 0(β0; u, Z, D )
+
+G(u|Z, D )
+
+> ∣∣∣∣
+
+T, Z, D 
+
+> )]
+
+=E
+
+> [
+
+E 
+
+> (
+
+δG(Y |Z, D )
+
+> ∣∣∣∣
+
+T, Z, D 
+
+> )
+
+{g(β0, Λ0; O) − ξ0(β0; Y, Z, D )}
+
+> ]
+
+37 + E
+
+> [
+
+ξ0(β0; −∞ , Z, D ) +  
+
+> ∫∞−∞
+
+I(T ≥ u)E 
+
+> (
+
+I(C ≥ u)
+
+G(u|Z, D )
+
+> ∣∣∣∣
+
+T, Z, D 
+
+> )
+
+dξ 0(β0; u, Z, D )
+
+> ]
+
+=E 
+
+> [
+
+G0(T |Z, D )
+
+G(T |Z, D ) {g(β0, Λ0; OT ) − ξ0(β0; T, Z, D )} + ξ0(β0; −∞ , Z, D )+ 
+
+> ∫T
+> −∞
+
+G0(u|Z, D )
+
+G(u|Z, D ) dξ 0(β0; u, Z, D )
+
+> ]
+
+=E 
+
+> [
+
+G0(T |Z, D )
+
+G(T |Z, D ) g(β0, Λ0; OT ) − G0(T |Z, D )
+
+G(T |Z, D ) ξ0(β0; T, Z, D ) + ξ0(β0; −∞ , Z, D )
+
+> ]
+
++ E
+
+> [
+
+ξ0(β0; u, Z, D )G0(u|Z, D )
+
+G(u|Z, D )
+
+> ∣∣∣∣
+> T
+> 0
+
+− 
+
+> ∫T
+> −∞
+
+ξ0(β0; u, Z, D )dG0(u|Z, D )
+
+G(u|Z, D )
+
+> ]
+
+=E 
+
+> [
+
+G0(T |Z, D )
+
+G(T |Z, D ) g(β0, Λ0; OT ) + ξ0(β0; −∞ , Z, D )
+
+> ]
+
++ E
+
+> [
+
+−ξ0(β0; −∞ , Z, D )G0(−∞| Z, D )
+
+G(−∞| Z, D ) − 
+
+> ∫T
+> −∞
+
+ξ0(β0; u, Z, D )dG0(u|Z, D )
+
+G(u|Z, D )
+
+> ]
+
+.
+
+Similar to (S3), we have 
+
+E 
+
+> [
+
+G0(T |Z, D )
+
+G(T |Z, D ) g(β0, Λ0; OT )
+
+> ∣∣∣∣
+
+Z, D 
+
+> ]
+
+=G0(−∞| Z, D )
+
+G(−∞| Z, D ) ξ0(β0; −∞ , Z, D ) +  
+
+> ∫∞−∞
+
+ξ0(β0; u, Z, D )S(u|Z, D )dG0(T |Z, D )
+
+G(T |Z, D ) ,
+
+and 
+
+E 
+
+> [∫T
+> −∞
+
+ξ0(β0; u, Z, D )dG0(u|Z, D )
+
+G(u|Z, D )
+
+> ∣∣∣∣
+
+Z, D 
+
+> ]
+
+= 
+
+> ∫∞−∞
+
+ξ0(β0; u, Z, D )S(u|Z, D )dG0(u|Z, D )
+
+G(u|Z, D ) .
+
+Then (S2) becomes 
+
+E 
+
+> [
+
+G0(T |Z, D )
+
+G(T |Z, D ) g(β0, Λ0; OT ) + ξ0(β0; −∞ , Z, D )
+
+> ]
+
++ E
+
+> [
+
+−ξ0(β0; −∞ , Z, D )G0(−∞| Z, D )
+
+G(−∞| Z, D ) − 
+
+> ∫T
+> −∞
+
+ξ0(β0; u, Z, D )dG0(u|Z, D )
+
+G(u|Z, D )
+
+> ]
+
+=E
+
+> [
+
+E 
+
+> (
+
+G0(T |Z, D )
+
+G(T |Z, D ) g(β0, Λ0; OT ) + ξ0(β0; −∞ , Z, D )
+
+> ∣∣∣∣
+
+Z, D 
+
+> )]
+
++ E
+
+> [
+
+E
+
+> (
+
+−ξ0(β0; −∞ , Z, D )G0(−∞| Z, D )
+
+G(−∞| Z, D ) − 
+
+> ∫T
+> −∞
+
+ξ0(β0; u, Z, D )dG0(u|Z, D )
+
+G(u|Z, D )
+
+> ∣∣∣∣
+
+Z, D 
+
+> )]
+
+=E 
+
+> [
+
+G0(−∞| Z, D )
+
+G(−∞| Z, D ) ξ0(β0; −∞ , Z, D ) +  
+
+> ∫∞−∞
+
+ξ0(β0; u, Z, D )S(u|Z, D )dG0(u|Z, D )
+
+G(u|Z, D )
+
+> ]
+
++ E
+
+> [
+
+−G0(−∞| Z, D )
+
+G(−∞| Z, D ) ξ0(β0; −∞ , Z, D ) − 
+
+> ∫∞−∞
+
+ξ0(β0; u, Z, D )S(u|Z, D )dG0(u|Z, D )
+
+G(u|Z, D )
+
+> ]
+
++ E [ξ0(β0; −∞ , Z, D )] =E [ξ0(β0; −∞ , Z, D )] 
+
+38 =E [E (g(β0, Λ0; OT )|T ≥ −∞ , Z, D )] =0 .
+
+Thus, Eψ = 0 either ξ0 or G0 is correctly specified. 
+
+Remark 1. From Theorem 2, we can deduce that ψ′ is also Neyman orthogonal to η.
+
+ψ′
+
+> k
+
+(η0; O) = δG0(Y |Z, D ){g′
+
+> k
+
+(Λ0; O)−ξ′
+
+> k, 0
+
+(Y, Z, D )}+ξ′
+
+> k, 0
+
+(−∞ , Z, D )+  
+
+> ∫Y
+> −∞
+
+dξ ′
+
+> k, 0
+
+(u, Z, D )
+
+G0(u|Z, D ) ,
+
+where 
+
+g′
+
+> k
+
+(O) = −I k(Z; ζ)( D − Vkωk).
+
+Because gk and ξk is linear in β, g′
+
+> k
+
+(Λ0; O) and ξ′
+
+> k, 0
+
+(0 , Z, D ) do not rely on β. Also the nuisances in ψ′
+
+> k
+
+(η0; O) do not contain ϑk. For ξ and G, the proof in Theorem 2 does not rely on the specific form of g, and thus the same result holds if we replace g with g′. For 
+
+ωk and ζ, we have 
+
+E∂ψ ′(η0; O)
+
+∂ω k 
+
+> ∣∣∣∣ωk=ωk, 0
+
+= E 
+
+> [
+
+δG0(Y |Z, D )Ik(Z; ζ0)Vk
+
+> ]
+
+= 0 ,
+
+and 
+
+E∂ψ ′(η0; O)
+
+∂ζ l
+
+> ∣∣∣∣ζl=ζl, 0
+
+= E 
+
+> 
+
+∂Ij (Z; ζ)
+
+∂ζ lp∑
+
+> j=k
+
+Ij (Z; ζ)⊤αj 
+
+> 
+
+= 0 .
+
+Therefore, ψ′ is also Neyman orthogonal to η.
+
+# S3 Proof of Theorem 3 
+
+We first introduce some useful notation. Let ¯ψ(β, η) = 1 /n ∑ni=1 ψ(β, η; Oi), ¯Ω( β, η) = 1/n ∑ni=1 ψ(β, η; Oi)ψ(β, η; Oi)⊤, Ω( β, η) = Eψ(β, η; O)ψ(β, η; O)⊤. Let P denote the true probability measure and Pn the empirical measure based on n observations. Define 
+
+Dηf (η0) to be the pathway derivative of f at the direction η0.Before introducing lemmas and the proof of Theorems, we introduce some additional regularity conditions. 
+
+Condition 3 (Bounded higher-order moments) . (i). E(T 8), E(D8), and Z are bounded; (ii). {E(∥ψ(β0, η0; O)∥4) + E(∥ψ′
+
+(η0; O)∥4)}m/n =o(1); (iii). There exists l > 2 such that n1/l {E(sup β∈B ∥ψ(β, η0; O)∥l)}1/l (m + μn)/√n → 0.
+
+Condition 4 (Bounded eigenvalue) . There exists a positive constant c such that 1/c ≤
+
+λmin (Ω( β, η0)) < λ max (Ω( β, η0)) ≤ c for all β ∈ B , and λmax E(ψ′
+
+(η0; O)ψ′
+
+(η0; O)⊤) ≤ c.
+
+39 Condition 3 (i) and Condition 4 impose basic regularity conditions ensuring that the key observable quantities and matrices remain well behaved. In particular, they require bounded eighth moments for T and D, bounded support for Z, and uniformly bounded eigenvalues of the covariance matrix Ω( β, η0). These conditions guarantee that the moment functions and associated weighting matrices do not degenerate as the sample size increases. Condition 3 (ii) and (iii) place additional restrictions on the AIPCW moment function ψ(β, η; O) and its derivative. These constraints are especially relevant in settings where the number of moment functions m increases with n or when the interactions generate weak identifying information. They ensure that the empirical processes generated by the score and its derivative remain sufficiently well controlled so that the stochastic expansions used in establishing the asymptotic distribution remain valid. Similar types of moment and growth conditions are standard in the weak IV and many instrument GEL literature; see, for example, Assumption 6 in Newey and Windmeijer (2009) and Assumptions 5 and 6 in Ye et al. (2024). 
+
+Condition 5 (GEL function) . (i). ρ(·) is concave and three times continuously differentiable; (ii). ρ(0) = 0 , and ρ′
+
+(0) = ρ′′ 
+
+(0) = −1.
+
+Condition 5 (i) requires the GEL function ρ(·) to be concave and three-times continuously differentiable, which provides the smoothness needed for a third-order Taylor expansion of the criterion function. Condition 5 (ii) is a normalization condition that sets the scale and centering of the GEL objective at zero by imposing ρ(0) = 0 
+
+and ρ′(0) = ρ′′ (0) = −1. These properties are standard in the GEL literature and are consistent with the regularity conditions imposed in Newey and Smith (2004). 
+
+Lemma S2. Under Conditions 1, there exists a positive constant c > 0 such that for all 
+
+β ∈ B ,
+
+|β − β0| ≤ c
+
+√nμn
+
+∥Eψ(β, η0; O)∥.
+
+Proof. From the linear expansion of Eψ(β, η0; O) around β0,
+
+Eψ(β, η0; O) − Eψ(β0, η0; O) = ( β − β0)ψ∗,
+
+Since Eψ(β0, η0; O) = 0 , we have Eψ(β, η0; O) = ( β − β0)ψ∗. Hence, 
+
+√nμn
+
+∥Eψ(β, η0; O)∥ =
+
+√nμn
+
+|β − β0|∥ ψ∗∥.
+
+Condition 1 implies that √n∥ψ∗∥/μ n is bounded away from zero and infinity. Therefore, there exists c > 0 such that 
+
+|β − β0| ≤ c
+
+√nμn
+
+∥Eψ(β, η0; O)∥.
+
+40 Lemma S3. Under Conditions 1-4, there exists a constant c > 0 and a random variable ̂
+
+M = Op(1) such that for all β′, β ∈ B ,
+
+√nμn
+
+∥Eψ(β′, η0; O) − Eψ(β, η0; O)∥ ≤ c|β′ − β|,
+
+and √nμn
+
+∥ ¯ψ(β′, η0) − ¯ψ(β, η0)∥ ≤ ̂ M |β′ − β|.
+
+Proof. By the linearity of Eψ(β, η0; O) in β, we have 
+
+Eψ(β′, η0; O) − Eψ(β, η0; O) = ( β′ − β)ψ∗,
+
+which yields 
+
+√nμn
+
+∥Eψ(β′, η0; O) − Eψ(β, η0; O)∥ =
+
+√nμn
+
+|β′ − β|∥ ψ∗∥ ≤ c|β′ − β|.
+
+Moreover, 
+
+¯ψ(β′, η0; O) − ¯ψ(β, η0; O) = {Eψ(β′, η0; O) − Eψ(β, η0; O)}
+
++ { ¯ψ(β′, η0) − Eψ(β′, η0; O)} − { ¯ψ(β, η0) − Eψ(β, η0; O)}.
+
+Hence, 
+
+√nμn
+
+∥ ¯ψ(β′, η0) − ¯ψ(β, η0)∥ ≤ c|β′ − β| +
+
+√nμn
+
+sup 
+
+> β∈B
+
+∥ ¯ψ(β, η0) − Eψ(β, η0; O)∥.
+
+By a uniform law of large numbers and Conditions 1–4, 
+
+sup 
+
+> β∈B
+
+∥ ¯ψ(β, η0) − Eψ(β, η0; O)∥ = Op 
+
+> (√
+
+mn
+
+> )
+
+,
+
+and since m/μ 2 
+
+> n
+
+is bounded, 
+
+√nμn
+
+sup 
+
+> β∈B
+
+∥ ¯ψ(β, η0) − Eψ(β, η0; O)∥ = Op(1) .
+
+Therefore, there exists a ̂ M = Op(1) such that for all β′, β ∈ B ,
+
+√nμn
+
+∥ ¯ψ(β′, η0) − ¯ψ(β, η0)∥ ≤ ̂ M |β′ − β|,
+
+which completes the proof. 41 Lemma S4. Under Condition 3, there exists a positive constant c such that for all 
+
+a, b ∈ Rm and β′, β ∈ B ,
+
+|a⊤{Ω( β′, η0) − Ω( β, η0)}b| ≤ c∥a∥∥ b∥| β′ − β|.
+
+Proof. By the linearity of ψ(β, η0; O) in β,
+
+ψ(β′, η0; O) = ψ(β, η0; O) + ( β′ − β)ψ′(η0; O),
+
+Then, 
+
+Ω( β′, η0) − Ω( β, η0) = E{ψ(β′, η0)ψ(β′, η0)⊤ − ψ(β, η0)ψ(β, η0)⊤}
+
+= ( β′ − β)2E{ψ′(η0)ψ′(η0)⊤}
+
++ ( β′ − β)E{ψ′(η0)ψ(β, η0)⊤} + ( β′ − β)E{ψ(β, η0)ψ′(η0)⊤}.
+
+Hence, for any a, b ∈ Rm,
+
+|a⊤{Ω( β′, η0) − Ω( β, η0)}b| ≤ | β′ − β|2∥a∥∥ E(ψ′(β0, η0)ψ′(β0, η0)⊤)∥∥ b∥
+
++ 2 |β′ − β|∥ a∥∥ E(ψ′(β0, η0)ψ(β0, η0)⊤)∥∥ b∥.
+
+Condition 3 ensures the matrix E(ψ′(β0, η0)ψ(β0, η0)⊤) have uniformly bounded spectral norms, and the parameter space B of β is a compact set, so there exists a constant c > 0
+
+such that |a⊤{Ω( β′, η0) − Ω( β, η0)}b| ≤ c∥a∥∥ b∥| β′ − β|.
+
+Lemma S5. Under Condition 1-4, (i). ∥∥∥ ¯ψ (β0,̂ η) − ¯ψ (β0, η0)∥∥∥ = op(n−1/2);(ii). ∥∥∥ ¯ψ′(̂η) − ¯ψ′ (η0)∥∥∥ = op(n−1/2);(iii). sup β∈B  
+
+> ∥∥∥
+
+¯ψ(̂η) − ¯ψ (β, η0)∥∥∥ = op(n−1/2);(iv). sup β∈B ∥ ¯ψ(β, ̂ η)∥ = op(μn/√n), ∥ ¯ψ(β0,̂ η)∥ = op(
+
+> √
+
+m/n ).Proof. (i). The moment function ψ is a m-dimensional vector. We begin by studying each entry ψj and then turn to the analysis of the entire vector. We first show that ψ
+
+is Lipschitz continuous in η. Since ψ is linear in Λ and ξ, ψ is Lipschitz continuous in these components. For the component G, note that for any two functions G1 and G2, 
+
+> [
+
+δG1
+
+{g − ξ0(Y |Z, D )} + ξ0(−∞| Z, D ) +  
+
+> ∫Y
+> −∞
+
+dξ 0(u|Z, D )
+
+G1
+
+> ]
+
+− 
+
+> [
+
+δG2
+
+{g − ξ0(Y |Z, D )} + ξ0(−∞| Z, D ) +  
+
+> ∫Y
+> −∞
+
+dξ 0(u|Z, D )
+
+G2
+
+> ]
+
+=δ{g − ξ0(Y |Z, D )}(G1 − G2)
+
+G1G2
+
++ 
+
+> ∫Y
+> −∞
+
+dξ 0(u|Z, D )
+
+G1G2
+
+(G1 − G2).
+
+Because G is uniformly bounded away from zero from Assumption 3, both terms on the right-hand side are bounded by a constant multiple of ∥G1 − G2∥, which implies that 42 ψ is Lipschitz continuous in G. Combining these results, ψ is Lipschitz continuous in 
+
+η = ( Λ, ξ, G ), and the Lipschitz coefficient is EL(O) = (1+ |Y |+|D|+∥h(Z)∥) = O(√m).Since we employ sample splitting so that the sample used to construct the moment functions is independent of the sample used to estimate the nuisance functions. Then we have 
+
+P [√nm (Pn − P)( ψj (β0,̂ η; O) − ψj (β0, η0; O)) > ϵ ]
+
+≤ mVar( ψj (β0,̂ η; O) − ψj (β0, η0; O)) 
+
+ϵ2
+
+≤ mL (O)2∥̂η − η0∥2
+
+=
+
+> √
+
+m3/n 
+
+= o(1) ,
+
+which implies 
+
+(Pn − P)( ψj (β0,̂ η; O) − ψj (β0, η0; O)) = op(n−1/2m−1/2). (S5) Furthermore, 
+
+P(ψj (β0,̂ η; O) − ψj (β0, η0; O)) = EDηψj (β0, η0; O) ( ̂ η − η0) + EDηη ψj (β0, η0; O) ( ̂ η − η0)2 + op(∥̂ η − η0∥2).
+
+We have shown that the nuisances in the moment function ψ are all Neyman orthogonal, meaning that the expectation of the first-order derivative of ψ with respect to each nuisance parameter is zero, i.e., EDηψj (β0, η0; O) ( ̂ η − η0) = 0 . Therefore, we have 
+
+P(ψj (β0,̂ η; O) − ψj (β0, η0; O)) = Op(∥̂η − η0∥2) = op(n−1/2m−1/2).
+
+Together with (S5), we have 
+
+¯ψj (β0,̂ η) − ¯ψj (β0, η0) = ( Pn − P + P)( ψj (β0,̂ η) − ψj (β0, η0)) = op(n−1/2m−1/2).
+
+Since ψ consists of m moment functions, it follows that ∥ ¯ψ(β0,̂ η)− ¯ψ(β0, η0)∥ = op(n−1/2).(ii). Note that ψ′ is also Neyman orthogonal to η according to Remark 1, so we can apply the same argument to prove  
+
+> ∥∥∥
+
+¯ψ′(̂η) − ¯ψ′ (η0) 
+
+> ∥∥∥
+
+= op(n−1/2) as that in part (i), with 
+
+ψ replaced by ψ′.(iii). Since ψ is linear in β, we have 
+
+sup  
+
+> β∈B
+> ∥∥∥
+
+¯ψ (β, ̂ η) − ¯ψ (β, η0)∥∥∥
+
+43 = sup 
+
+> β∈B
+
+∥∥∥ ¯ψ (β, ̂ η) − ¯ψ (β0,̂ η) + ¯ψ (β0,̂ η) − ¯ψ (β0, η0) + ¯ψ (β0, η0) − ¯ψ (β, η0)∥∥∥
+
+≤ sup 
+
+> β∈B
+
+∥∥∥( ¯ψ′(̂η) − ¯ψ′(η0))( β − β0)∥∥∥ + ∥∥∥ ¯ψ (β0,̂ η) − ¯ψ (β0, η0)∥∥∥
+
+= op
+
+(
+
+n−1/2)
+
+.
+
+(iv). By Condition 4, we have 
+
+n E{∥ ¯ψ(β0, η0)∥2}
+
+m ≤ tr(Ω 0)
+
+m ≤ c. 
+
+By Markov’s inequality, it follows that 
+
+∥ ¯ψ(β0, η0)∥ = Op
+
+(√ mn
+
+)
+
+.
+
+Furthermore, by Lemma S3 and Lemma S5 (iii), we have 
+
+sup 
+
+> β∈B
+
+∥ ¯ψ(β, ̂ η)∥
+
+= sup 
+
+> β∈B
+
+∥ ¯ψ(β, ̂ η) − ¯ψ(β, η0) + ¯ψ(β, η0) − ¯ψ(β0, η0) + ¯ψ(β0, η0)∥≤ sup 
+
+> β∈B
+
+∥ ¯ψ(β, ̂ η) − ¯ψ(β, η0)∥ + sup 
+
+> β∈B
+
+∥ ¯ψ(β, η0) − ¯ψ(β0, η0)∥ + ∥ ¯ψ(β0, η0)∥≤ op(n−1/2) + Op
+
+(
+
+μn/√n)
+
++ Op
+
+(√ 
+
+m/n 
+
+)
+
+= Op
+
+(
+
+μn/√n)
+
+.
+
+For ∥ ¯ψ(β0,̂ η)∥, the second term in the above decomposition, sup β∈B ∥ ¯ψ(β, η0)− ¯ψ(β0, η0)∥,is zero, we can similarly obtain 
+
+∥ ¯ψ(β0,̂ η)∥
+
+= ∥ ¯ψ(β0,̂ η) − ¯ψ(β0, η0) + ¯ψ(β0, η0)∥≤ ∥ ¯ψ(β0,̂ η) − ¯ψ(β0, η0)∥ + ∥ ¯ψ(β0, η0)∥≤ op(n−1/2) + Op
+
+(√ 
+
+m/n 
+
+)
+
+= Op
+
+(√ 
+
+m/n 
+
+)
+
+.
+
+This completes the proof of Lemma S5. 
+
+Lemma S6. Under Conditions 1-4, (i). ∥∥∥ ¯Ω ( β0,̂ η) − Ω0
+
+∥∥∥ = op(1 /√m);(ii). ∥∥∥n−1 ∑ni=1 ψ(β0,̂ η; Oi)ψ′(̂η; Oi)⊤ − E {
+
+ψ(β0, η0; O)ψ′(η0; O)⊤}∥ ∥∥ = op(1 /√m);(iii). ∥∥∥n−1 ∑ni=1 ψ′(̂ η; Oi)ψ′(̂η; Oi)⊤ − E {
+
+ψ′(η0; O)ψ′(η0; O)⊤}∥ ∥∥ = op(1 /√m);(iv). sup β∈B 
+
+∥∥∥ ¯Ω( β, ̂ η) − Ω ( β, η0)
+
+∥∥∥ = op(1 /√m);
+
+44 (v). sup β∈B 
+
+∥∥∥n−1 ∑ni=1 ψ(β, ̂ η; Oi)ψ′(̂η; Oi)⊤ − E {
+
+ψ(β, η0; O)ψ′(η0; O)⊤}∥ ∥∥ =
+
+op(1 /√m).Proof. (i). First, we have ∥ ¯Ω ( β0,̂ η) − Ω0∥ ≤ ∥ ¯Ω ( β0,̂ η) − ¯Ω ( β0, η0) ∥ + ∥ ¯Ω ( β0, η0) − Ω0∥.The matrix concentration inequality in Tropp (2016) gives that 
+
+∥ ¯Ω ( β0, η0) − Ω0∥ = Op(
+
+√
+
+m log( m)/n ) = op(1 /√m)
+
+under m3/n → 0. Similarly, we have 
+
+∥ 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+Dηψ(β0, η0; Oi)Dηψ(β0, η0; Oi)⊤−EDηψ(β0, η0; Oi)Dηψ(β0, η0; Oi)⊤∥ = op(1 /√m)
+
+and 
+
+∥ 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+ψ(β0, η0; Oi)ψ(β0, η0; Oi)⊤ − Eψ(β0, η0; Oi)ψ(β0, η0; Oi)⊤∥ = op(1 /√m),
+
+Then Taylor’s expansion gives that 
+
+∥ ¯Ω ( β0,̂ η) − ¯Ω ( β0, η0) ∥
+
+=∥Dη ¯Ω ( β0, η0) ∥∥ ̂η − η0∥ + op(∥̂ η − η0∥)=2 ∥ 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+Dηψ(β0, η0; Oi)ψ(β0, η0; Oi)⊤∥∥ ̂η − η0∥ + op(∥̂ η − η0∥)
+
+≤2∥ 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+Dηψ(β0, η0; Oi)Dηψ(β0, η0; Oi)⊤∥12 ∥ 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+ψ(β0, η0; Oi)ψ(β0, η0; Oi)⊤∥12 ∥̂ η − η0∥
+
++ op(∥̂ η − η0∥)
+
+≤2∥EDηψ(β0, η0; Oi)Dηψ(β0, η0; Oi)⊤∥12 ∥Eψ(β0, η0; Oi)ψ(β0, η0; Oi)⊤∥12 ∥̂ η − η0∥
+
++ op(∥̂ η − η0∥)=Op(1) Op(1) op(( nm )−1/4)=op(1 /√m),
+
+where the last step comes from m3/n → 0. So we obtain ∥∥∥ ¯Ω ( β0,̂ η) − Ω0
+
+∥∥∥ = op(1 /√m).(ii). The proof follows the same steps as in part (i), the only difference is changing ψ
+
+into ψ′, and the details are omitted here. (iv). According to Lemma S5, Lemma S6 and Taylor expansion, we have 
+
+sup 
+
+> β∈B
+
+∥∥∥ ¯Ω( β, ̂ η) − Ω0 (β, η0)∥∥∥
+
+= sup 
+
+> β∈B
+
+∥∥∥ ¯Ω( β, ̂ η) − ¯Ω( β0,̂ η) + ¯Ω( β0,̂ η) − Ω( β0, η0) + Ω( β0, η0) − Ω ( β, η0)∥∥∥
+
+≤ sup 
+
+> β∈B
+
+∥∥∥∥
+
+2
+
+n
+
+> n
+
+∑
+
+> i=1
+
+ψ(β0,̂ η; Oi)ψ′(̂η; Oi)⊤(β − β0) + 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+ψ′(̂η; Oi)ψ′(̂ η; Oi)⊤(β − β0)2
+
+45 −2E{ψ(β0, η0; Oi)ψ′(η0; Oi)⊤}(β − β0) − E{ψ′(η0; Oi)ψ′(η0; Oi)⊤}(β − β0)2
+
+∥∥∥∥
+
++∥ ¯Ω( β0,̂ η) − Ω( β0, η0)∥≤ 2 sup 
+
+> β∈B
+
+|β − β0|
+
+∥∥∥∥∥
+
+1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+ψ(β0,̂ η; Oi)ψ′(̂η; Oi)⊤ − E{ψ(β0, η0; Oi)ψ′(η0; Oi)⊤}
+
+∥∥∥∥∥
+
++ sup 
+
+> β∈B
+
+|β − β0|2
+
+∥∥∥∥∥
+
+1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+ψ′(η0; Oi)ψ′(̂ η; Oi)⊤ − E{ψ′(η0; Oi)ψ′(η0; Oi)⊤}
+
+∥∥∥∥∥
+
++∥ ¯Ω( β0,̂ η) − Ω( β0, η0)∥
+
+= op(1 /√m).
+
+A useful implication of this conclusion here is sup β∈B ∥ ¯Ω( β, ̂ η)∥ ≤ sup β∈B ∥ ¯Ω( β, ̂ η) −
+
+Ω( β, η0)∥ + sup β∈B ∥Ω( β, η0)∥ = Op(1) .(v). The proof is similar to the proof of (iv) and is omitted here. Define P (λ, β, η) = 1 /n ∑ni=1 ρ(λ⊤ψ(β, η; Oi)) , λ(β, η) = argmax λ∈L(β, η) P (λ, β, η)
+
+Lemma S7. Under Conditions 1-5, (i) sup β∈B ∥λ(β, ̂ η)∥ = Op(μn/√n),
+
+sup β∈B ∥λ(β, η0)∥ = Op(μn/√n), and ∥λ(β0, η0)∥ = Op(
+
+√
+
+m/n ).(ii) ∥λ(β0,̂ η)−λ(β0, η0)∥ = op(n−1/2), and sup β∈B ∥λ(β, ̂ η)−λ(β, η0)∥ = op(μn/√n).Proof. (i) Let κ = max i≤n sup β∈B ∥ψ(β, η0; Oi)∥. Standard maximal inequalities yield 
+
+κ = Op
+
+(
+
+n1/ι E{
+
+sup 
+
+> β∈B
+
+∥ψ(β, η0; O)∥ι}1/ι 
+
+)
+
+for any ι > 2.
+
+By a mean value expansion in η,
+
+E{
+
+sup 
+
+> β∈B
+
+∥ψ(β, ̂ η; O)∥ι}1/ι 
+
+= E{
+
+sup 
+
+> β∈B
+
+∥ψ(β, η0; O)∥ι}1/ι 
+
++ Op
+
+(
+
+∥̂ η − η0∥)
+
+,
+
+hence with ι > 2, ∥̂η − η0∥ = op(n−1/4m−1/4) and Condition 3, 
+
+n1/ι E{
+
+sup 
+
+> β∈B
+
+∥ψ(β, ̂ η; O)∥ι}1/ι m + μn
+
+√nn1/ι E{
+
+sup 
+
+> β∈B
+
+∥ψ(β, η0; O)∥ι}1/ι m + μn
+
+√n + n1/ι ∥̂ η − η0∥m + μn
+
+√n
+
+= op(1) .
+
+We can choose κn such that κn = o(κ−1) and μn/√n = o(κn), and set Ln = {λ :
+
+∥λ∥ ≤ κn}. For any λ ∈ Ln, we have 
+
+sup 
+
+> i≤n, β ∈B
+
+∣∣∣λ⊤ψ(β, ̂ η; Oi)∣∣∣ ≤ ∥ λ∥ψ(β, ̂ η; Oi)∥∥ ≤ κnκ = op(1) . (S6) 46 A Taylor expansion of ρ at zero gives that for each i,
+
+ρ (
+
+λ⊤ψ(β, ̂ η; Oi))
+
+= −λ⊤ψ(β, ̂ η; Oi) + 12 ρ′′ (¯ xi)λ⊤ψ(β, ̂ η; Oi)ψ(β, ̂ η; Oi)⊤λ,
+
+with ¯xi between 0 and λ⊤ψ(β, ̂ η; Oi). Therefore 
+
+P (λ, β, ̂ η) = −λ⊤ ¯ψ(β, ̂ η) + 12 ρ′′ (¯ x)λ⊤ ¯Ω( β, ̂ η)λ,
+
+with ∥ ¯Ω( β, ̂ η)∥ bounded between c1 and c2, and ρ′′ (¯ x) bounded between −c2 and −c1 for some positive constant c1 and c2 because ¯x = op(1) and ρ′′ (0) = −1. Since ρ is a concave function, any local maximizer is global maximizer. Maximization over Ln yields 
+
+0 = P (0 , β, ̂ η) ≤ P (
+
+λ(β, ̂ η), β, ̂ η)
+
+≤ ∥ λ(β, ̂ η)∥∥ ¯ψ(β, ̂ η)∥ − c∥λ(β, ̂ η)∥2,
+
+for some c > 0, which implies ∥λ(β, ̂ η)∥ ≤ c∥ ¯ψ(β, ̂ η)∥. Lemma S5 then gives 
+
+sup 
+
+> β∈B
+
+∥λ(β, ̂ η)∥ ≤ c sup 
+
+> β∈B
+
+∥ ¯ψ(β, ̂ η)∥ = Op(μn/√n) = op(κn), (S7) so the maximizer lies in Ln and is the global maximizer over the whole domain. The same argument with η0 gives sup β∈B ∥λ(β, η0)∥ = Op(μn/√n). Since ∥ ¯ψ(β0, η0)∥ =
+
+Op(
+
+> √
+
+m/n ), (S7) yields ∥λ(β0, η0)∥ = Op(
+
+> √
+
+m/n ).(ii). The first order condition of λ implies that 
+
+1
+
+n
+
+> n∑
+> i=1
+
+∂ρ (λ(β0,̂ η)⊤ψ(β0,̂ η; Oi)) 
+
+∂λ = 1
+
+n
+
+> n∑
+> i=1
+
+ρ′ (
+
+λ(β0,̂ η)⊤ψ(β0,̂ η; Oi))
+
+ψ(β0,̂ η; Oi) = 0 .
+
+A Taylor expansion of ρ′ at zero gives 
+
+0 = 1
+
+n
+
+> n∑
+> i=1
+
+ρ′ (
+
+λ(β0,̂ η)⊤ψ(β0,̂ η; Oi))
+
+ψ(β0,̂ η; Oi)= 1
+
+n
+
+> n∑
+> i=1
+
+ρ′(0) ψ(β0,̂ η; Oi) + 1
+
+n
+
+> n∑
+> i=1
+
+ρ′′ (0) ψ(β0,̂ η; Oi)ψ(β0,̂ η; Oi)⊤λ(β0,̂ η) + R
+
+= − ¯ψ(β0,̂ η) − ¯Ω( β0,̂ η)λ(β0,̂ η) + R, (S8) where 
+
+R = 12n
+
+> n∑
+> i=1
+
+ρ′′′ (¯ xi)(
+
+λ(β0,̂ η)⊤ψ(β0,̂ η; Oi))2
+
+ψ(β0,̂ η; Oi),
+
+with ¯xi between 0 and λ(β0,̂ η)⊤ψ(β0,̂ η; Oi). Using (S6), the boundedness of ρ′′′ (¯ xi), and part (i), 
+
+∥R∥
+
+47 ≤c sup 
+
+> i≤n
+
+∥ψ(β0,̂ η; Oi)∥∥ λ(β0,̂ η)∥2∥ ¯Ω( β0,̂ η)∥
+
+=Op
+
+(
+
+n1/ι {E∥ψ(β0,̂ η; O)∥ι}1/ι )
+
+Op(μ2
+
+> n
+
+/n )Op(1) =op(μn/√n). (S9) Hence (S8) implies 
+
+λ(β0,̂ η) = − ¯Ω( β0,̂ η)−1 ¯ψ(β0,̂ η) + op(μn/√n),
+
+and 
+
+λ(β0, η0) = − ¯Ω( β0, η0)−1 ¯ψ(β0, η0) + op(μn/√n).
+
+By Lemmas S5 and S6, 
+
+∥λ(β0,̂ η) − λ(β0, η0)∥≤∥ ¯Ω( β0, η0)−1 ¯ψ(β0, η0) − ¯Ω( β0,̂ η)−1 ¯ψ(β0,̂ η)∥ + op(μn/√n)
+
+≤∥ ( ¯Ω( β0, η0)−1 − ¯Ω( β0,̂ η)−1) ¯ψ(β0, η0)∥ + ∥ ¯Ω( β0,̂ η)−1( ¯ψ(β0, η0) − ¯ψ(β0,̂ η)) ∥ + op(μn/√n)=op(1 /√m)Op(μn/√n) + Op(1) op(1 /√n) + op(μn/√n)=op(μn/√n),
+
+The uniform bound follows by the same argument with β in place of β0, which gives 
+
+sup β∈B ∥λ(β, ̂ η) − λ(β, η0)∥ = op(μn/√n).
+
+Lemma S8. Let ˜Q(β, η) = Eψ(β, η)⊤Ω( β, η)−1Eψ(β, η)/2 + m/ (2 n). Under Conditions 1–5, 
+
+sup 
+
+> β∈B
+
+∣∣∣ ˜Q(β, η0) −̂ Q(β, ̂ η)∣∣∣ = op
+
+( μ2
+
+> n
+
+n
+
+)
+
+.
+
+Proof. By the Taylor expansion of ρ at zero, we have ̂
+
+Q(β, ̂ η) = 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+ρ (
+
+λ(β, ̂ η)⊤ψ(β, ̂ η; Oi))
+
+= 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+[
+
+ρ(0) + ρ′(0) λ(β, ̂ η)⊤ψ(β, ̂ η; Oi)
+
+]
+
++ 12n
+
+> n
+
+∑
+
+> i=1
+
+ρ′′ (0) λ(β, ̂ η)⊤ψ(β, ̂ η; Oi)ψ(β, ̂ η; Oi)⊤λ(β, ̂ η) + r, (S10) where the remainder term is 
+
+r = 16n
+
+> n
+
+∑
+
+> i=1
+
+ρ′′′ (¯ xi)(
+
+λ(β, ̂ η)⊤ψ(β, ̂ η; Oi))3
+
+,
+
+and each ¯xi lies between 0 and λ(β, ̂ η)⊤ψ(β, ̂ η; Oi). To bound r, note that ∥λ(β, ̂ η)∥ =
+
+48 Op(μn/√n) and max i≤n sup β∈B ∥ψ(β, ̂ η; Oi)∥ = Op(κ). Since ρ′′′ (¯ xi) is bounded, we have 
+
+|r| ≤ c∥λ(β, ̂ η)∥ max  
+
+> i≤n
+
+sup 
+
+> β∈B
+
+∥ψ(β, ̂ η; Oi)∥λ(β, ̂ η)⊤ ¯Ω( β, ̂ η)λ(β, ̂ η)= Op 
+
+> (
+
+μn
+
+√nκ
+
+> )
+
+Op 
+
+> (
+
+μ2
+
+> n
+
+n
+
+> )
+
+= op 
+
+> (
+
+μ2
+
+> n
+
+n
+
+> )
+
+. (S11) From (S9) and (S11), substituting λ(β, ̂ η) = − ¯Ω( β, ̂ η)−1 ¯ψ(β, ̂ η) + R with ∥R∥ =
+
+op(μn/√n) into (S10), we have ̂
+
+Q(β, ̂ η)= − 1
+
+n
+
+> n∑
+> i=1
+
+(− ¯ψ(β, ̂ η) + R)⊤ ¯Ω( β, ̂ η)−1ψ(β, ̂ η; Oi)
+
+− 12n
+
+> n∑
+> i=1
+
+(− ¯ψ(β, ̂ η) + R)⊤ ¯Ω( β, ̂ η)−1ψ(β, ̂ η; Oi)ψ(β, ̂ η; Oi)⊤ ¯Ω( β, ̂ η)−1(− ¯ψ(β, ̂ η) + R) + r
+
+=12 ¯ψ(β, ̂ η)⊤ ¯Ω( β, ̂ η)−1 ¯ψ(β, ̂ η) + op 
+
+> (
+
+μ2
+
+> n
+
+n
+
+> )
+
+. (S12) Furthermore, Lemma 7 in Ye et al. (2024) shows that 
+
+sup 
+
+> β∈B
+> ∣∣∣∣
+
+12 ¯ψ(β, ̂ η)⊤ ¯Ω( β, ̂ η)−1 ¯ψ(β, ̂ η) − ˜Q(β, η0) 
+
+> ∣∣∣∣
+
+= op 
+
+> (
+
+μ2
+
+> n
+
+n
+
+> )
+
+.
+
+Combining the above results yields 
+
+sup 
+
+> β∈B
+> ∣∣∣̂
+
+Q(β, ̂ η) − ˜Q(β, η0)∣∣∣ = op 
+
+> (
+
+μ2
+
+> n
+
+n
+
+> )
+
+,
+
+which completes the proof. With these useful Lemmas, we can now turn to prove Theorem 3. 
+
+Proof. We first show consistency. By Lemma S2, it suffices to prove that 
+
+√n∥Eψ(̂ β, η0)∥/μ n = op(1) . First, we have Eψ(β0, η0) = E{ψ(β0, η0; O)} = 0 , so 
+
+> ˜
+
+Q(β0, η0) = 12Eψ(β0, η0)⊤ ˜Ω( β0, η0)−1Eψ(β0, η0) + m
+
+2n = m
+
+2n.
+
+Using Lemma S3 and Condition 4, we have 
+
+∥̂β − β0∥2 ≤ nμ2
+
+> n
+
+∥Eψ(̂ β, η0)∥2
+
+≤ c nμ2
+
+> n
+
+Eψ(̂β, η0)⊤Ω( ̂β, η0)−1Eψ(̂β, η0) + m
+
+2n − m
+
+2n
+
+≤ c nμ2
+
+> n
+> { ˜
+
+Q(̂β, η0) − ˜Q(β0, η0)}
+
+49 ≤ c nμ2
+
+> n
+
+{ ˜Q(̂β, η0) −̂ Q(̂β, ̂ η) + ̂ Q(̂β, ̂ η) −̂ Q(β0,̂ η) + ̂ Q(β0,̂ η) − ˜Q(β0, η0)}
+
+.
+
+By Lemma S8 and the fact that ̂ β minimizes ̂ Q(β, ̂ η), i.e., ̂ Q(̂β, ̂ η) ≤̂ Q(β0,̂ η), so 
+
+∥̂ β − β0∥2 ≤ c nμ2
+
+> n
+
+op
+
+( μ2
+
+> n
+
+n
+
+)
+
+= op(1) ,
+
+which establishes the consistency. We now turn to asymptotic normality. Consider the first order condition 
+
+∂̂ Q(β, ̂ η)/∂β |β=̂β = 0 . Taylor expansion around β0 yields 
+
+0 = nμn
+
+∂̂ Q(β, ̂ η)
+
+∂β 
+
+∣∣∣∣∣β=̂β
+
+= nμn
+
+∂̂ Q(β, ̂ η)
+
+∂β 
+
+∣∣∣∣∣β=β0
+
++ nμ2
+
+> n
+
+∂2̂ Q(β, ̂ η)
+
+∂β 2
+
+∣∣∣∣∣β= ¯β
+
+μn(̂β − β0), (S13) where ¯β lies between β0 and ̂ β.We first analyze ∂̂ Q(β, ̂ η)/∂β |β=β0 . The first order condition for λ implies 
+
+∂̂ Q(β, ̂ η)
+
+∂λ = 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+ρ′ (
+
+λ(β0,̂ η)⊤ψ(β0,̂ η; Oi))
+
+ψ(β0,̂ η; Oi) = 0 . (S14) Define ̂
+
+Ui = ψ′(̂η; Oi) − ψ∗ − 1
+
+n
+
+> n
+
+∑
+
+> j=1
+
+{
+
+ψ(β0,̂ η; Oj )ψ′(̂η; Oj )⊤} ¯Ω( β0,̂ η)−1ψ(β0,̂ η; Oi).
+
+Combining (S14), Lemma S7, we obtain 
+
+∂̂ Q(β, ̂ η)
+
+∂β 
+
+∣∣∣∣∣β=β0
+
+= 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+ρ′(λ(β0,̂ η)⊤ψ(β0,̂ η; Oi)) λ(β0,̂ η)⊤ψ′(̂η; Oi)+ 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+ρ′ (
+
+λ(β0,̂ η)⊤ψ(β0,̂ η; Oi))
+
+ψ(β0,̂ η; Oi)⊤ ∂λ(β0,̂ η)
+
+∂β 
+
+= 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+{− 1 − λ(β0,̂ η)⊤ψ(β0,̂ η; Oi) + r}{− ¯ψ(β0,̂ η)⊤ ¯Ω( β0,̂ η)−1 + R}ψ′(̂η; Oi)= − ¯ψ(β0,̂ η)⊤ ¯Ω( β0,̂ η)−1
+
+{ 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+ψ(β0,̂ η; Oi)ψ′(̂η; Oi)⊤
+
+}
+
+¯Ω( β0,̂ η)−1 ¯ψ(β0,̂ η)+ ¯ψ′(̂η)⊤ ¯Ω( β0,̂ η)−1 ¯ψ(β0,̂ η) + op(μn/n )=ψ∗⊤ ¯Ω( β0,̂ η)−1 ¯ψ(β0,̂ η) + 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+̂
+
+U ⊤ 
+
+> i
+
+¯Ω( β0,̂ η)−1 ¯ψ(β0,̂ η) + op(μn/n ). (S15) 50 Lemma A12 in Newey and Windmeijer (2009) gives 
+
+nμn
+
+{
+
+ψ∗⊤ Ω( β0, η0)−1 ¯ψ(β0, η0) + 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+U ⊤ 
+
+> i
+
+Ω( β0, η0)−1 ¯ψ(β0, η0) + op(1) 
+
+}
+
+> d
+
+−→ N (0 , H + V ).
+
+(S16) The expression in (S15) differs from (S16) only through the nuisance term: ̂ η instead of 
+
+η0. We then show that 
+
+ψ∗⊤ Ω( β0, η0)−1 ¯ψ(β0, η0) − ψ∗⊤ ¯Ω( β0,̂ η)−1 ¯ψ(β0,̂ η) = op
+
+( μn
+
+n
+
+)
+
+, (S17) and 
+
+1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+U ⊤ 
+
+> i
+
+Ω( β0, η0)−1 ¯ψ(β0, η0) − 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+̂
+
+U ⊤ 
+
+> i
+
+¯Ω( β0,̂ η)−1 ¯ψ(β0,̂ η) = op
+
+( μn
+
+n
+
+)
+
+. (S18) For (S17), using Condition 4 and Lemmas S5 and S6, 
+
+ψ∗⊤ Ω( β0, η0)−1 ¯ψ(β0, η0) − ψ∗⊤ ¯Ω( β0,̂ η)−1 ¯ψ(β0,̂ η)=ψ∗⊤ Ω( β0, η0)−1{ ¯ψ(β0, η0) − ¯ψ(β0,̂ η)}
+
++ ψ∗⊤ {Ω( β0, η0)−1 − ¯Ω( β0,̂ η)−1} ¯ψ(β0,̂ η)=Op(μn/√n)op(n−1/2) + Op(μn/√n)op(
+
+√
+
+1/m )Op(
+
+√
+
+m/n )=op(μn/n ).
+
+By the definitions of Ui and ̂ Ui, we have 
+
+∥∥∥∥∥
+
+1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+(̂Ui − Ui)
+
+∥∥∥∥∥
+
+≤ ∥ ¯ψ′(̂η) − ¯ψ′(η0)∥
+
++
+
+∥∥∥∥{ 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+ψ(β0,̂ η; Oi)ψ′(̂ η; Oi)⊤
+
+}
+
+¯Ω( β0,̂ η)−1 ¯ψ(β0,̂ η)
+
+−E{ψ(β0, η0; O)ψ′(η0; O)⊤}Ω( β0, η0)−1 ¯ψ(β0, η0)
+
+∥∥∥∥
+
+= ∥ ¯ψ′(̂η) − ¯ψ′(η0)∥
+
++
+
+∥∥∥∥[ 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+ψ(β0,̂ η; Oi)ψ′(̂η; Oi)⊤ − E{ψ(β0, η0; O)ψ′(η0; O)⊤}
+
+]
+
+Ω( β0,̂ η)−1 ¯ψ(β0,̂ η)
+
+∥∥∥∥
+
++
+
+∥∥∥∥E{ψ(β0, η0; O)ψ′(η0; O)⊤}{ ¯Ω( β0,̂ η)−1 − Ω( β0, η0)−1} ¯ψ(β0,̂ η)
+
+∥∥∥∥
+
++
+
+∥∥∥∥E{ψ(β0, η0; O)ψ′(η0; O)⊤}Ω( β0, η0)−1{ ¯ψ(β0,̂ η) − ¯ψ(β0, η0)}
+
+∥∥∥∥
+
+= op(n−1/2) + op
+
+( 1
+
+√m
+
+)
+
+Op
+
+( μn
+
+√n
+
+)
+
++ op
+
+( 1
+
+√m
+
+)
+
+Op
+
+( μn
+
+√n
+
+)
+
++ op(n−1/2)= op
+
+( μn
+
+√mn 
+
+)
+
++ op(n−1/2). (S19) 51 Moreover, we have 
+
+∥∥∥∥
+
+1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+Ui
+
+∥∥∥∥
+
+≤ ∥ ¯ψ′(̂η)∥ + ∥ψ∗∥ + ∥∥∥E{ψ(β0, η0; O)ψ∗⊤ }Ω−10 ¯ψ(β0, η0)∥∥∥
+
+= Op
+
+( μn
+
+√n
+
+)
+
+. (S20) For (S18), based on Condition 4, Lemmas S5, S6 and (S20), we obtain 
+
+1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+U ⊤ 
+
+> i
+
+Ω( β0, η0)−1 ¯ψ(β0, η0) − 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+̂
+
+U ⊤ 
+
+> i
+
+¯Ω( β0,̂ η)−1 ¯ψ(β0,̂ η)= 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+U ⊤ 
+
+> i
+
+Ω( β0, η0)−1{ ¯ψ(β0, η0) − ¯ψ(β0,̂ η)}
+
++ 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+U ⊤ 
+
+> i
+
+{Ω( β0, η0)−1 − ¯Ω( β0,̂ η)−1} ¯ψ(β0,̂ η)+ 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+(Ui −̂ Ui)⊤ ¯Ω( β0,̂ η)−1 ¯ψ(β0,̂ η)= Op
+
+( μn
+
+√n
+
+)
+
+Op(1) op
+
+( 1
+
+√n
+
+)
+
++ Op
+
+( μn
+
+√n
+
+)
+
+op
+
+( 1
+
+√m
+
+)
+
+Op
+
+( √m
+
+√n
+
+)
+
++op
+
+( μn
+
+√mn 
+
+)
+
+Op(1) Op
+
+( √m
+
+√n
+
+)
+
+= op(μn/n ).
+
+Combining (S15)–(S18), we obtain 
+
+nμn
+
+∂̂ Q(β, ̂ η)
+
+∂β 
+
+∣∣∣∣∣β=β0
+
+> d
+
+−→ N (0 , H + Λ). (S21) Next we show 
+
+sup 
+
+> β∈B
+
+nμ2
+
+> n
+
+∂2̂ Q(β, ̂ η)
+
+∂β 2 → H. 
+
+Define 
+
+Vψψ (β, η) = 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+ρ′′ (λ(β, η)⊤ψ(β, η; Oi)) ψ(β, η; Oi)ψ(β, η; Oi)⊤,
+
+Vψψ ′ (β, η) = 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+ρ′′ (λ(β, η)⊤ψ(β, η; Oi)) ψ(β, η; Oi)ψ′(η; Oi)⊤,
+
+Vvψψ ′ (β, η) = 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+ρ′′ (v)ψ′(η; Oi)ψ′(η; Oi)⊤,
+
+Vψ′ψ′ (β, η) = 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+ρ′′ (λ(β, η)⊤ψ(β, η; Oi)) ψ′(η; Oi)ψ′(η; Oi)⊤.
+
+52 Then 
+
+∂2̂ Q(β, η)
+
+∂β 2
+
+= 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+ρ′′ (λ(β, η)⊤ψ(β, η; Oi)) {λ(β, η)⊤ψ′(η; Oi)}
+
+{
+
+λ(β, η)⊤ψ′(η; Oi) + ∂λ(β, η)⊤
+
+∂β ψ(β, η; Oi)
+
+}
+
++ 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+ρ′(λ(β, η)⊤ψ(β, η; Oi)) ∂λ(β, η)⊤
+
+∂β ψ′(η; Oi)= λ(β, η)⊤Vψ′ψ′ (β, η)λ(β, η) + λ(β, η)⊤Vψψ ′ (β, η)∂λ(β, η)
+
+∂β 
+
++ 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+{− 1 + ρ′′ (¯ v1)λ(β, η)⊤ψ(β, η; Oi)}∂λ(β, η)⊤
+
+∂β ψ′(η; Oi)= λ(β, η)⊤Vψ′ψ′ (β, η)λ(β, η) + λ(β, η)⊤Vψψ ′ (β, η)∂λ(β, η)
+
+∂β 
+
++λ(β, η)⊤V ¯v1 
+
+> ψψ ′
+
+(β, η)∂λ(β, η)
+
+∂β − ∂λ(β, η)⊤
+
+∂β ¯ψ′(η)
+
+≡ D1(η) + D2(η) + D3(η) + D4(η), (S22) where |¯v1| ≤ | λ(β, ̂ η)⊤ψ(β, ̂ η; Oi)|. The derivative of λ(β, η) with respect to β can be obtained from the implicit function theorem: 
+
+∂λ(β, η)
+
+∂β = −V ψψ (β, η)−1
+
+{
+
+Vψψ ′ (β, η)λ(β, η) + 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+ρ′(λ(β, η)⊤ψ(β, η; Oi)) ψ′(η; Oi)
+
+}
+
+= −V ψψ (β, η)−1[
+
+{V ψψ ′ (β, η) + V ¯v2 
+
+> ψψ ′
+
+(β, η)}λ(β, η) − ψ′(η; Oi)]
+
+.
+
+We now show sup β∈B |Di(̂η) − Di(η0)| = op(μ2
+
+> n
+
+/n ) for i = 1 , 2, 3, 4. Using a Taylor expansion of ρ′′ at 0, we have 
+
+∥V ψψ (β, η0) + ¯Ω( β, η0)∥
+
+=
+
+∥∥∥∥
+
+1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+{ρ′′ (λ(β, η0)⊤ψ(β, η0; Oi)) − ρ′′ (0) }ψ(β, η0; Oi)ψ(β, η0; Oi)⊤
+
+∥∥∥∥
+
+=
+
+∥∥∥∥
+
+1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+ρ′′′ 
+
+(x)λ(β, η0)⊤ψ(β, η0; Oi)ψ(β, η0; Oi)ψ(β, η0; Oi)⊤
+
+∥∥∥∥
+
+≤ c max  
+
+> i≤n
+
+|λ(β, η0)⊤ψ(β, η0; Oi)| 1
+
+n
+
+> n
+
+∑
+
+> i=1
+
+∥ψ(β, η0; Oi)ψ(β, η0; Oi)⊤∥
+
+= op(1) Op(1) = op(1) ,
+
+where |x| ≤ | λ(β, η0)⊤ψ(β, η0; Oi)|. Similarly, ∥V ψψ (β, ̂ η)+ ¯Ω( β, ̂ η)∥ = op(1) . Combining with Lemma S6, it follows that 
+
+∥V ψψ (β, ̂ η) − V ψψ (β, η0)∥
+
+53 ≤ ∥V ψψ (β, ̂ η) + ¯Ω( β, ̂ η)∥ + ∥ ¯Ω( β, ̂ η) − ¯Ω( β, η0)∥ + ∥V ψψ (β, η0) + ¯Ω( β, η0)∥
+
+= op(1) .
+
+Analogous arguments give ∥V ψψ ′ (β, ̂ η)−V ψψ ′ (β, η0)∥ = op(1) , ∥V vψψ ′ (β, ̂ η)−V vψψ ′ (β, η0)∥ =
+
+op(1) , and ∥V ψ′ψ′ (β, ̂ η) − V ψ′ψ′ (β, η0)∥ = op(1) . Therefore, 
+
+sup 
+
+> β∈B
+
+|D1(̂ η) − D1(η0)|
+
+= sup 
+
+> β∈B
+
+|{ λ(β, ̂ η) − λ(β, η0)}⊤Vψ′ψ′ (β, ̂ η){λ(β, ̂ η) + λ(β, η0)}| 
+
++ sup 
+
+> β∈B
+
+|λ(β, ̂ η)⊤{V ψ′ψ′ (β, ̂ η) − V ψ′ψ′ (β, η0)}λ(β, η0)|
+
+= op(μn/√n)Op(1) Op(μn/√n) + Op(μn/√n)op(1) Op(μn/√n)= op(μ2
+
+> n
+
+/n ).
+
+For D2 and D3, it is enough to show sup β∈B ∥∂λ(β, ̂ η)/∂β − ∂λ(β, η0)/∂β ∥ = op(μn/√n)
+
+and sup β∈B ∥∂λ(β, η)/∂β ∥ = Op(μn/√n). Then we can repeat the argument for D1 with 
+
+λ replaced by ∂λ/∂β . Based on Lemmas S5 and S7, 
+
+sup 
+
+> β∈B
+
+∥∥∥∥
+
+∂λ(β, η)
+
+∂β 
+
+∥∥∥∥
+
+≤ sup 
+
+> β∈B
+
+∥V ψψ (β, η)−1{V ψψ ′ (β, η) + V ¯v2 
+
+> ψψ ′
+
+(β, η)}λ(β, η)∥
+
++ sup 
+
+> β∈B
+
+∥V ψψ (β, η)−1ψ′(η; Oi)∥
+
+= Op(1) Op(μn/√n) + Op(1) Op(μn/√n)= Op(μn/√n).
+
+Similarly, sup β∈B ∥∂λ(β, ̂ η)/∂β − ∂λ(β, η0)/∂β ∥ = op(μn/√n), which implies 
+
+sup β∈B |Di(̂η) − Di(η0)| = op(μ2
+
+> n
+
+/n ) for i = 2 , 3. For D4, we have 
+
+sup 
+
+> β∈B
+
+|D4(̂ η) − D4(η0)|≤ sup 
+
+> β∈B
+
+∣∣∣∣
+
+∂λ(β, ̂ η)⊤
+
+∂β {ψ′(̂η) − ψ′(η0)}
+
+∣∣∣∣
+
++ sup 
+
+> β∈B
+
+∣∣∣∣{ ∂λ(β, ̂ η)⊤
+
+∂β − ∂λ(β, η0)⊤
+
+∂β 
+
+}
+
+ψ′(η0)
+
+∣∣∣∣
+
+= op(μ2
+
+> n
+
+/n ).
+
+Combining the bounds for D1 to D4, we obtain 
+
+sup 
+
+> β∈B
+
+∣∣∣∣
+
+∂2̂ Q(β, ̂ η)
+
+∂β 2 − ∂2̂ Q(β, η0)
+
+∂β 2
+
+∣∣∣∣ = op(μ2
+
+> n
+
+/n ).
+
+54 Lemma 13 in Newey and Windmeijer (2009) implies 
+
+sup 
+
+> β∈B
+
+nμ2
+
+> n
+> ∣∣∣∣
+
+∂2̂ Q(β, η0)
+
+∂β 2 
+
+> ∣∣∣∣
+
+→ H, 
+
+which yields 
+
+sup 
+
+> β∈B
+
+nμ2
+
+> n
+> ∣∣∣∣
+
+∂2̂ Q(β, ̂ η)
+
+∂β 2 
+
+> ∣∣∣∣
+
+= sup 
+
+> β∈B
+> ∣∣∣∣
+
+∂2̂ Q(β, ̂ η)
+
+∂β 2 − ∂2̂ Q(β, η0)
+
+∂β 2 
+
+> ∣∣∣∣
+
++ sup 
+
+> β∈B
+> ∣∣∣∣
+
+∂2̂ Q(β, η0)
+
+∂β 2 
+
+> ∣∣∣∣
+
+→ H. (S23) Finally, combining (S13), (S21) and (S23), the asymptotic normality of ̂ β follows: 
+
+μn(̂ β − β0)
+
+> √
+
+H−1(H + V )H−1
+
+> d
+
+−→ N (0 , 1) .
+
+# S4 Proof of Theorem 4 
+
+The proof of Theorem 4 in Newey and Windmeijer (2009) implies that 
+
+2n̂Q(β0, η0) − m
+
+√2m → N (0 , 1) .
+
+Next we will prove 2n̂ Q(̂β, ̂ η) − 2n̂Q(β0, η0) = op(m). Taylor expansion at β0 gives that 
+
+2n̂Q(̂ β, ̂ η) − 2n̂ Q(β0,̂ η)= 2nμn
+
+∂̂ Q(β0,̂ η)
+
+∂β μn(̂β − β0) + 2nμ2
+
+> n
+
+∂2̂ Q( ¯β, ̂ η)
+
+∂β 2 μ2
+
+> n
+
+(̂β − β0)2
+
+= Op(1) , (S24) where the last line comes from (S21) and (S23). Since ∥ ¯ψ(β0,̂ η)∥ = op(
+
+> √
+
+m/n ), by replacing β with β0, the remainder term in (S11) becomes 
+
+|r| ≤ c∥λ(β0,̂ η)∥ max  
+
+> i≤n
+
+sup 
+
+> β∈B
+
+∥ψ(β0,̂ η; Oi)∥λ(β0,̂ η)⊤ ¯Ω( β0,̂ η)λ(β0,̂ η)= Op 
+
+> (√
+
+mn κ
+
+> )
+
+Op 
+
+> (
+
+m2
+
+n
+
+> )
+
+= op 
+
+> (
+
+√mn
+
+> )
+
+. (S25) and thus (S12) becomes ̂
+
+Q(β0,̂ η) = 12 ¯ψ(β0,̂ η)⊤ ¯Ω( β0,̂ η)−1 ¯ψ(β0,̂ η) + op
+
+> (
+
+√m/n )
+
+. (S26) 55 Then we have 
+
+|2n̂ Q(β0,̂ η) − 2n̂ Q(β0, η0)|
+
+= n| ¯ψ(β0,̂ η)⊤ ¯Ω( β0,̂ η) ¯ψ(β0,̂ η) − ¯ψ(β0, η0)⊤ ¯Ω( β0, η0) ¯ψ(β0, η0)| + op(√m)= n∥ ¯ψ(β0,̂ η) − ¯ψ(β0, η0)∥∥ ¯Ω( β0,̂ η)∥∥ ¯ψ(β0,̂ η)∥
+
++n∥ ¯ψ(β0, η0)∥∥ ¯Ω( β0,̂ η) − ¯Ω( β0, η0)∥∥ ¯ψ(β0,̂ η)∥
+
++n∥ ¯ψ(β0,̂ η) − ¯ψ(β0, η0)∥∥ ¯Ω( β0, η0)∥∥ ¯ψ(β0, η0)∥ + op
+
+> (
+
+√m)
+
+= no p(1 /√n)Op(1) Op(
+
+> √
+
+m/n ) + nO p(
+
+> √
+
+m/n )op(1 /√m)Op(
+
+> √
+
+m/n )+nO p(
+
+> √
+
+m/n )Op(1) op(1 /√n) + op
+
+> (
+
+√m)
+
+= op
+
+> (
+
+√m)
+
+. (S27) Together with (S24) and (S27), we have 
+
+2n̂ Q(̂β, ̂ η) − 2n̂Q(β0, η0)
+
+> √
+
+2( m − 1) = 2n̂ Q(̂β, ̂ η) − 2n̂Q(β0,̂ η) + 2 n̂ Q(β0,̂ η) − 2n̂ Q(β0, η0)
+
+> √
+
+2( m − 1) = op(1) .
+
+Therefore, 
+
+2n̂ Q(̂β, ̂ η) − (m − 1) 
+
+> √
+
+2( m − 1) = 2n̂ Q(̂β, ̂ η) − 2n̂Q(β0, η0) + 2 n̂ Q(β0, η0) − (m − 1) 
+
+> √
+
+2( m − 1) =
+
+√2m
+
+> √
+
+2( m − 1) 2n̂Q(β0, η0) − m
+
+√2m + 1
+
+> √
+
+2( m − 1) + op(1) 
+
+as m, n → ∞ . Consequently, the preceding arguments imply that 
+
+P (
+
+2n̂ Q(̂β, ̂ η) ≥ χ21−α(m − 1) )
+
+= P 
+
+> 
+
+2n̂ Q(̂β, ̂ η) − (m − 1) 
+
+> √
+
+2( m − 1) ≥ χ21−α(m − 1) − (m − 1) 
+
+> √
+
+2( m − 1)  
+
+> 
+
+→ α. 
+
+# S5 Additional simulation results 
+
+In this section, we further examine the performance of the competing methods under a range of simulation settings, including censoring rates of 0.2, 0.4, and 0.6, Cases 1–4, numbers of instrumental variables equal to 10 and 20, and sample sizes of 10,000 and 56 20,000. The results are broadly consistent with those reported in the main text. Across all scenarios considered, the proposed framework exhibits relatively small bias and achieves coverage probabilities close to the nominal level. In contrast, the standard AFT model shows substantial bias throughout. Table S5 reports the empirical type I error rates of the overidentification test at the nominal level of 0.05, based on 500 simulation replications. The results are presented across different censoring rates. Overall, the empirical type I error rates are reasonably close to the nominal level, indicating that the proposed method maintains satisfactory size control. 57 Table S3: Performance of the proposed estimators for n = 10 ,000 across Cases 1-4, varying censoring rates, and instrument dimensions p = 10 and p = 20 . CR is the censoring rate, BIAS denotes percentage finite-sample bias, SD the empirical standard deviation, SE the average estimated standard error, and CP the empirical coverage probability of the 95% confidence interval. 
+
+p = 10 p = 20 
+
+CR Method Bias SD SE CP Bias SD SE CP Case 1 0.2 CUE 0.238% 0.093 0.087 0.932 -0.511% 0.066 0.071 0.968 EL 0.236% 0.091 0.085 0.926 -0.291% 0.064 0.066 0.952 ET 0.263% 0.091 0.086 0.934 -0.448% 0.064 0.067 0.956 AFT -24.163% 0.462 0.008 0.000 -78.848% 0.418 0.014 0.000 0.4 CUE -0.239% 0.430 0.407 0.938 -0.859% 0.311 0.335 0.960 EL 0.247% 0.419 0.396 0.932 0.152% 0.293 0.319 0.956 ET 0.111% 0.419 0.396 0.940 -0.459% 0.301 0.312 0.958 AFT -23.247% 0.455 0.008 0.000 -74.455% 0.446 0.014 0.000 0.6 CUE 3.797% 1.152 1.147 0.942 -6.032% 0.890 0.972 0.966 EL 5.602% 1.104 1.113 0.942 -1.370% 0.807 0.868 0.944 ET 4.595% 1.129 1.105 0.938 -4.170% 0.850 0.884 0.952 AFT -16.933% 0.410 0.007 0.000 -61.855% 0.497 0.012 0.000 Case 2 0.2 CUE 0.618% 0.082 0.088 0.976 -0.429% 0.072 0.072 0.960 EL 0.544% 0.081 0.085 0.966 -0.366% 0.068 0.066 0.936 ET 0.549% 0.082 0.086 0.970 -0.328% 0.070 0.067 0.944 AFT -32.038% 0.554 0.011 0.000 -96.333% 0.201 0.017 0.000 0.4 CUE 2.718% 0.377 0.407 0.968 0.909% 0.333 0.338 0.958 EL 3.031% 0.367 0.396 0.966 1.310% 0.318 0.309 0.940 ET 2.585% 0.372 0.396 0.962 1.040% 0.324 0.314 0.952 AFT -26.041% 0.533 0.010 0.000 -91.610% 0.295 0.016 0.000 0.6 CUE -3.046% 1.137 1.146 0.950 4.491% 0.887 0.977 0.960 EL -2.171% 1.079 1.107 0.952 6.186% 0.802 0.872 0.946 ET -2.865% 1.109 1.104 0.948 4.963% 0.847 0.886 0.952 AFT -20.131% 0.502 0.009 0.000 -84.937% 0.378 0.016 0.000 Case 3 0.2 CUE -0.047% 0.086 0.088 0.962 -0.292% 0.066 0.072 0.958 EL -0.040% 0.085 0.086 0.970 -0.198% 0.063 0.066 0.950 ET -0.035% 0.085 0.086 0.968 -0.228% 0.064 0.067 0.956 AFT -66.156% 0.498 0.014 0.008 -99.328% 0.083 0.014 0.002 0.4 CUE 2.035% 0.415 0.406 0.940 -0.491% 0.319 0.337 0.966 EL 2.433% 0.407 0.395 0.936 -0.171% 0.298 0.308 0.956 ET 2.290% 0.411 0.396 0.932 -0.439% 0.310 0.313 0.958 AFT -60.861% 0.514 0.013 0.008 -98.907% 0.106 0.014 0.000 0.6 CUE 0.988% 1.097 1.143 0.960 -2.274% 0.917 0.974 0.956 EL 2.152% 1.044 1.104 0.952 0.824% 0.816 0.866 0.946 ET 1.300% 1.072 1.102 0.948 -1.298% 0.875 0.884 0.952 AFT -51.823% 0.526 0.012 0.025 -97.702% 0.151 0.014 0.004 Case 4 0.2 CUE 0.995% 0.091 0.088 0.948 0.063% 0.070 0.072 0.960 EL 0.943% 0.089 0.086 0.940 0.065% 0.068 0.066 0.938 ET 1.006% 0.089 0.086 0.942 0.031% 0.069 0.067 0.946 AFT -80.035% 0.444 0.017 0.000 -100.005% 0.001 0.014 0.000 0.4 CUE 1.945% 0.411 0.408 0.952 -1.067% 0.329 0.337 0.948 EL 2.159% 0.404 0.397 0.952 -0.376% 0.307 0.307 0.946 ET 2.014% 0.406 0.397 0.948 -0.757% 0.318 0.313 0.948 AFT -77.323% 0.464 0.016 0.000 -100.001% 0.000 0.014 0.000 0.6 CUE -2.733% 1.094 1.145 0.962 0.696% 0.852 0.976 0.972 EL -1.047% 1.064 1.111 0.966 0.908% 0.775 0.864 0.940 ET -1.919% 1.078 1.105 0.960 0.902% 0.816 0.886 0.962 AFT -69.221% 0.515 0.015 0.000 -100.000% 0.000 0.014 0.000 
+
+58 Table S4: Performance of the proposed estimators for n = 20 ,000 across Cases 1-4, varying censoring rates, and instrument dimensions p = 10 and p = 20 . CR is the censoring rate, BIAS denotes percentage finite-sample bias, SD the empirical standard deviation, SE the average estimated standard error, and CP the empirical coverage probability of the 95% confidence. 
+
+p = 10 p = 20 
+
+CR Method Bias SD SE CP Bias SD SE CP Case 1 0.2 CUE 0.576% 0.073 0.073 0.950 -0.151% 0.056 0.057 0.962 EL 0.499% 0.072 0.072 0.946 -0.090% 0.055 0.055 0.964 ET 0.528% 0.072 0.072 0.954 -0.140% 0.056 0.055 0.956 AFT -13.476% 0.395 0.004 0.000 -72.815% 0.458 0.010 0.000 0.4 CUE 1.581% 0.340 0.337 0.946 0.543% 0.268 0.266 0.946 EL 1.642% 0.336 0.333 0.940 0.663% 0.258 0.254 0.942 ET 1.702% 0.337 0.333 0.938 0.521% 0.262 0.256 0.946 AFT -11.454% 0.374 0.004 0.000 -62.752% 0.499 0.009 0.000 0.6 CUE 5.802% 0.898 0.936 0.958 -7.738% 0.703 0.753 0.962 EL 6.088% 0.877 0.921 0.956 -6.248% 0.668 0.727 0.962 ET 5.870% 0.889 0.920 0.952 -7.171% 0.688 0.716 0.956 AFT -6.363% 0.311 0.004 0.000 -50.439% 0.517 0.008 0.000 Case 2 0.2 CUE -0.105% 0.071 0.073 0.956 0.008% 0.056 0.057 0.950 EL -0.061% 0.070 0.072 0.962 0.004% 0.053 0.055 0.954 ET -0.084% 0.070 0.072 0.958 -0.049% 0.054 0.055 0.946 AFT -21.251% 0.534 0.007 0.000 -92.551% 0.284 0.012 0.000 0.4 CUE 2.167% 0.335 0.338 0.950 -0.304% 0.261 0.266 0.952 EL 2.305% 0.331 0.333 0.954 0.223% 0.253 0.255 0.946 ET 2.272% 0.333 0.334 0.948 -0.063% 0.257 0.256 0.950 AFT -16.765% 0.510 0.007 0.000 -89.184% 0.335 0.012 0.000 0.6 CUE -2.284% 0.902 0.939 0.954 -3.884% 0.739 0.750 0.954 EL -1.597% 0.886 0.923 0.962 -2.501% 0.703 0.714 0.954 ET -1.777% 0.896 0.922 0.956 -3.420% 0.719 0.715 0.950 AFT -8.930% 0.451 0.006 0.000 -81.710% 0.415 0.011 0.000 Case 3 0.2 CUE -1.169% 0.069 0.073 0.954 -0.293% 0.057 0.057 0.952 EL -1.176% 0.067 0.072 0.958 -0.251% 0.055 0.055 0.954 ET -1.247% 0.068 0.072 0.960 -0.273% 0.056 0.056 0.950 AFT -52.628% 0.534 0.008 0.010 -98.657% 0.119 0.010 0.000 0.4 CUE -2.906% 0.338 0.337 0.952 -1.338% 0.264 0.267 0.962 EL -2.999% 0.332 0.332 0.952 -1.056% 0.255 0.255 0.962 ET -2.960% 0.335 0.332 0.952 -1.068% 0.261 0.257 0.958 AFT -49.924% 0.535 0.008 0.014 -98.025% 0.143 0.010 0.000 0.6 CUE -4.286% 0.945 0.936 0.946 1.154% 0.746 0.753 0.954 EL -3.770% 0.920 0.920 0.946 2.145% 0.705 0.711 0.946 ET -4.027% 0.931 0.919 0.942 2.006% 0.727 0.717 0.952 AFT -44.363% 0.530 0.008 0.017 -98.113% 0.138 0.010 0.002 Case 4 0.2 CUE -0.379% 0.071 0.073 0.954 -0.430% 0.055 0.058 0.972 EL -0.310% 0.071 0.072 0.958 -0.440% 0.053 0.055 0.972 ET -0.390% 0.071 0.072 0.956 -0.393% 0.054 0.056 0.972 AFT -74.667% 0.493 0.011 0.000 -100.000% 0.000 0.011 0.000 0.4 CUE -1.012% 0.339 0.337 0.964 -1.149% 0.260 0.267 0.960 EL -0.798% 0.334 0.332 0.962 -0.926% 0.249 0.256 0.960 ET -0.957% 0.336 0.332 0.962 -1.105% 0.255 0.257 0.956 AFT -73.573% 0.498 0.011 0.000 -100.001% 0.000 0.010 0.000 0.6 CUE -5.448% 0.919 0.936 0.954 -4.456% 0.711 0.754 0.956 EL -5.275% 0.900 0.921 0.958 -2.833% 0.669 0.713 0.954 ET -5.708% 0.910 0.919 0.954 -3.730% 0.691 0.717 0.954 AFT -68.377% 0.527 0.011 0.000 -99.726% 0.057 0.010 0.000 
+
+59 Table S5: Empirical Type I error rates for the overidentification test under different censoring rate with n = 10000 and p = 10 . CR represents the censoring rate. CR=0.2 CR=0.4 CR=0.6 Case 1 CUE 0.080 0.052 0.074 EL 0.070 0.044 0.060 ET 0.078 0.058 0.078 Case 2 CUE 0.074 0.066 0.066 EL 0.060 0.062 0.046 ET 0.074 0.068 0.064 Case 3 CUE 0.066 0.052 0.060 EL 0.064 0.052 0.042 ET 0.074 0.054 0.054 Case 4 CUE 0.062 0.062 0.074 EL 0.050 0.050 0.060 ET 0.072 0.068 0.088 60

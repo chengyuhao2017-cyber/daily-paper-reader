@@ -1,0 +1,3713 @@
+Title: Change-point estimation for Weibull time series with copula-based Markov models
+
+URL Source: https://arxiv.org/pdf/2605.29541v1
+
+Published Time: Fri, 29 May 2026 01:00:19 GMT
+
+Number of Pages: 44
+
+Markdown Content:
+# Change-point estimation for Weibull time series with copula-based Markov models 
+
+Li-Hsien Sun ∗
+
+, Zong-Yuan Huang †
+
+, Yi-Ling Huang ‡
+
+, Chi-Yang Chiu §
+
+, Ning Ning ¶
+
+May 29, 2026 
+
+Abstract 
+
+We study offline change-point estimation for time series data exhibiting nonlinear serial dependence. To address this problem, we propose a copula-based Markov chain model with Weibull marginal distributions, which is suitable for modeling nonnegative data such as event times and volatility measures. Nonlinear dependence is incorporated through the Clayton and Joe copulas, allowing the model to capture asymmetric lower-tail and upper-tail dependence structures, respectively. We derive the corresponding likelihood function and estimate the change point and model parameters using maxi-mum likelihood estimation implemented through the Newton–Raphson algorithm. Con-fidence intervals are constructed via a parametric bootstrap Monte Carlo procedure. Extensive numerical studies are conducted to evaluate the finite-sample performance and robustness of the proposed method under different dependence structures and cop-ula misspecification scenarios. The results demonstrate that the proposed estimators perform well in terms of RMSE and relative error, particularly for the estimation of the change point. An empirical application to the VIX index during the COVID-19 pan-demic further illustrates the practical usefulness of the proposed approach in detecting structural changes in both the marginal distributions and serial dependence structure. 
+
+Keywords: Change-point estimation; Copula-based Markov chain; Monte Carlo simu-lation; Weibull distribution; Maximum likelihood estimation. 
+
+## 1 Introduction 
+
+Detecting change-points in sequential data is an important problem in statistical appli-cations because structural changes often reflect significant shifts in the underlying data-generating mechanism. Change-point analysis has been widely applied in many areas, including finance [13], climatology [18], reliability studies, and medical research [16]. In 
+
+> ∗
+
+Corresponding author . Graduate Institute of Statistics, National Central University, Chung-Li, Taiwan, 32001 lihsiensun@ncu.edu.tw . Work supported by NSTC-112-2628-M-008-002-MY3 
+
+> †
+
+Graduate Institute of Statistics, National Central University, Chung-Li, Taiwan, 32001 
+
+> ‡
+
+Graduate Institute of Statistics, National Central University, Chung-Li, Taiwan, 32001 
+
+> §
+
+Division of Biostatistics, Department of Preventive Medicine, University of Tennessee Health Science Center, Memphis, Tennessee, USA 
+
+> ¶
+
+Corresponding author . Department of Statistics, Texas A&M University, College Statione, USA. pat-ning@tamu.edu 
+
+1
+
+> arXiv:2605.29541v1 [stat.ME] 28 May 2026
+
+general, change-point methodology can be divided into two categories: offline estimation and online monitoring. Offline change-point analysis aims to estimate structural changes retrospectively using a complete dataset observed over a fixed time horizon, whereas on-line monitoring procedures are designed to detect changes sequentially in real time as new observations become available. Most classical change-point methods are developed under assumptions of independent observations or linear dependence structures, such as autoregressive models [24]. Under these settings, change-points are commonly estimated through likelihood-based methods, particularly maximum likelihood estimation (MLE). However, linear dependence assump-tions are often inadequate for describing the nonlinear and asymmetric dependence struc-tures frequently observed in practical time series data [15, 7]. To overcome this limitation, copula-based Markov chain models provide a flexible framework for modeling nonlinear serial dependence [2, 11]. By separating the marginal distributions from the dependence structure, copula models allow greater modeling flexibility and can capture asymmetric lower- and upper-tail dependence that conventional linear models fail to describe. More-over, copula-based Markov models satisfy strict stationarity under mild regularity conditions and have been shown to perform well in nonlinear time series settings; see, for example, [1] and [6]. In this paper, we propose a copula-based Markov chain model with Weibull marginal distributions for offline change-point estimation in nonnegative time series exhibiting non-linear dependence. The Weibull distribution is widely used in survival analysis, reliability modeling, and duration analysis because of its flexibility in accommodating different haz-ard rate behaviors. To capture asymmetric tail dependence structures, we incorporate the Clayton and Joe copulas into the Markov framework, where the Clayton copula is ca-pable of modeling stronger lower-tail dependence and the Joe copula captures upper-tail dependence. This framework allows us to simultaneously model nonlinear serial dependence and structural changes in the marginal distributions and dependence structures. Related copula-based approaches have been considered in the literature. For example, Emura and Murotani [5] proposed estimation procedures for copula-based dependent truncation mod-els, while Sun et al. [21] developed Bayesian inference methods for copula-based Markov time series models with Student’s t marginals. For statistical inference, we develop a likelihood-based estimation procedure using max-imum likelihood estimation. Since the likelihood function is not differentiable with respect to the change point, we employ a profile likelihood approach combined with the Newton– Raphson algorithm to obtain the parameter estimates numerically [4, 22]. To ensure nu-merical stability under parameter constraints, a suitable re-parameterization technique is adopted. In addition, confidence intervals for both the model parameters and the change point are constructed using a parametric bootstrap Monte Carlo procedure. The finite-sample performance of the proposed method is investigated through extensive simulation studies under different sample sizes, dependence strengths, change-point locations, and copula misspecification scenarios. The simulation results demonstrate that the proposed estimators perform well in terms of RMSE and relative error (RE), particularly for the estimation of the change point. The results also show that the proposed procedure remains relatively robust under moderate copula misspecification, although the estimation of tail dependence parameters becomes more sensitive when the copula family is misspecified. 2To illustrate the practical usefulness of the proposed framework, we apply the model to the VIX index during the COVID-19 pandemic period. The VIX index, commonly referred to as the “fear index,” measures market expectations of future volatility over a 30-day horizon and is widely used as an indicator of financial market uncertainty. The empirical results identify structural changes associated with the onset of the COVID-19 pandemic and show that the Clayton copula-based Markov model provides the best fit according to the Akaike Information Criterion (AIC), suggesting the presence of stronger downside dependence during periods of market stress. The remainder of this paper is organized as follows. Section 2 introduces the proposed copula-based Markov chain model with Weibull marginal distributions and a single change point. Section 3 presents the likelihood-based estimation procedure, the Newton–Raphson algorithm, and the bootstrap Monte Carlo interval estimation method. Section 4 reports the simulation studies and investigates the effects of dependence strength and copula misspec-ification. Section 5 presents the empirical analysis of the VIX data during the COVID-19 pandemic. Finally, Section 6 concludes the paper and discusses possible directions for future research. 
+
+## 2 The Proposed Model 
+
+We describe the copula-based Markov Weibull time series with one structural change. We first introduce the Weibull distribution and then the copula functions. Finally, we propose the conditional density for the likelihood inference based on copulas and marginals. 
+
+2.1 Weibull distribution Marginals 
+
+Let X be a random variable driven by the Weibull distribution with the scale parameter 
+
+λ > 0 and the shape parameter k > 0, respectively. The cumulative distribution function (CDF) is 
+
+F (x) = 1 − e−( xλ )k
+
+, x ≥ 0,
+
+and the probability density function (PDF) is 
+
+f (x) = kλ
+
+ xλ
+
+k−1
+
+e−( xλ )k
+
+, x ≥ 0.
+
+The mean and variance are E(X) = λΓ  1 + 1
+
+> k
+
+ and Var( X) = λ2
+
+h
+
+Γ  1 + 2
+
+> k
+
+ − Γ  1 + 1
+
+> k
+
+2i
+
+,respectively. The shape parameter k has a more significant impact on the distribution because it directly determines the fundamental shape and characteristics of the distribution, including whether a peak exists, the direction of skewness, and the presence of long tails. When 
+
+k > 1, the distribution becomes more symmetric and exhibits a distinct peak, meaning that the data is more concentrated, resembling a normal distribution. When k < 1, the distribution is right-skewed, with a pronounced long-tail effect. On the other hand, the scale parameter λ only affects the translation and stretching of the distribution. As λ increases, the distribution spreads out more, but its shape remains unchanged. 3When the scale parameter is fixed, the estimation of the shape parameter is relatively stable, and the estimation error remains small. This is because the scale parameter primar-ily affects the spread of the distribution without altering its overall shape characteristics. In contrast, when the shape parameter is fixed, increasing the scale parameter leads to a wider data distribution and a broader range of sample observations. As a result, the esti-mation process becomes more sensitive to random fluctuations, which in turn increases the estimation error. 
+
+2.2 Copulas and Serial Dependence 
+
+A copula is a multivariate distribution function whose marginal distributions are uniform [19]. Copula functions are widely used to characterize the dependence structure among multiple random variables. In this study, we focus on bivariate copulas within the Markov model framework, as they effectively capture tail dependence. In particular, the Clayton copula [3] emphasizes lower-tail dependence, whereas the Joe copula [10] is well suited for modeling upper-tail dependence. The Clayton copula [3] is defined by 
+
+Cα(u, v ) = max  u−α + v−α − 1, 0 −1/α , 0 ≤ u, v ≤ 1,
+
+where the dependence parameter satisfies α ∈ (−1, ∞) \ { 0}. A positive value of α cor-responds to positive dependence, whereas a negative value indicates negative dependence. The density function of the Clayton copula is given by 
+
+cα(u, v ) = (1 + α)u−(1+ α)v−(1+ α)  u−α + v−α − 1−( 1 
+
+> α+2
+
+) I u−α + v−α − 1 > 0 ,
+
+where I(·) denotes the indicator function. Moreover, the Joe copula [10] is defined as 
+
+Cα(u, v ) = 1 − [(1 − u)α + (1 − v)α − (1 − u)α(1 − v)α]1/α ,
+
+where the dependence parameter satisfies α ≥ 1. Its corresponding density function is 
+
+cα(u, v ) = J (u, v, α ) 1 
+
+> α−2
+
+(1 − u)α−1(1 − v)α−1 [( α − 1) + J (u, v, α )] ,
+
+with 
+
+J (u, v, α ) = (1 − u)α + (1 − v)α − (1 − u)α(1 − v)α.
+
+Note that the Joe copula is only capable of modeling positive dependence. In both copula families, larger values of |α| correspond to stronger dependence. 
+
+2.3 Copula-based Markov Models 
+
+We focus on the Weibull distribution as the marginal distribution, which is characterized by two parameters, γ = ( λ, k ). Consider a time series {Xt : t = 1 , 2, . . . , T }, where T represents the length of data. We propose a copula-based Markov chain model for a Weibull time series with a two-stage structure: 
+
+X1, X 2, . . . , X τ ∼ Fγ0 → Weibull( λ0, k 0),Xτ +1 , X τ +2 , . . . , X T ∼ Fγ1 → Weibull( λ1, k 1),
+
+4where Fγ0 and Fγ1 denote Weibull distributions with parameters γ0 = ( λ0, k 0) and γ1 =(λ1, k 1), respectively, and τ represents a change point. The Markov property is defined as 
+
+P (Xt = xt | Xt−1 = xt−1, X t−2 = xt−2, . . . ) = P (Xt = xt | Xt−1 = xt−1), ∀t. 
+
+That is, Xt depends only on the previous observation Xt−1, and the dependence structure between consecutive observations is modeled using copulas. To accommodate sequential data with a single change point, we specify the joint distributions of two consecutive obser-vations as follows: 
+
+P (Xt−1 ≤ xt−1, X t ≤ xt) = Cα0 (Fγ0 (xt−1), F γ0 (xt)) , t = 2 , 3, . . . , τ, P (Xτ ≤ xτ , X τ +1 ≤ xτ +1 ) = Cα01 (Fγ0 (xτ ), F γ1 (xτ +1 )) ,P (Xt−1 ≤ xt−1, X t ≤ xt) = Cα1 (Fγ1 (xt−1), F γ1 (xt)) , t = τ + 2 , . . . , T, 
+
+where Fγ (·) denotes the CDF with parameter γ, and Cα(·, ·) denotes the copula function with dependence parameter α. Under the proposed model, observations from X1 to Xτ
+
+correspond to the period before the change point, where the marginal distribution follows Weibull( λ0, k 0) with dependence parameter α0. Observations from Xτ +1 to XT correspond to the period after the change point, where the marginal distribution follows Weibull( λ1, k 1)with dependence parameter α1. The dependence between Xτ and Xτ +1 is characterized by the parameter α01 . Accordingly, the conditional PDFs are given by 
+
+f (xt | xt−1) = cα0 (Fγ0 (xt−1), F γ0 (xt)) fγ0 (xt), t = 2 , 3, . . . , τ, f (xτ +1 | xτ ) = cα01 (Fγ0 (xτ ), F γ1 (xτ +1 )) fγ1 (xτ +1 ),f (xt | xt−1) = cα1 (Fγ1 (xt−1), F γ1 (xt)) fγ1 (xt), t = τ + 2 , . . . , T, 
+
+where fγ (·) denotes the PDF with parameter γ, and cα(·, ·) is the corresponding copula density function. 
+
+## 3 Parameter Estimation 
+
+In this section, we develop the likelihood-based estimation procedure for the proposed copula-based change-point model and describe the corresponding Monte Carlo bootstrap method for interval estimation. Specifically, maximum likelihood estimation is carried out using the Newton–Raphson algorithm, while confidence intervals for the model parame-ters and the change point are constructed through a parametric bootstrap Monte Carlo procedure. 
+
+3.1 Parameter Space 
+
+The parameter space is defined as Θ = 
+
+n
+
+(λ0, λ 1, k 0, k 1, α 0, α 1, τ ) | λ0, λ 1 ∈ (0 , ∞), k 0, k 1 ∈ (0 , ∞), α 0, α 1 ∈ (αmin , α max ),τ ∈ { 3, 4, ..., T − 3}
+
+o
+
+.
+
+5Here, αmin and αmax denote the admissible bounds for the copula dependence parameters. For example, one may choose αmin = −1 and αmax = 1000, which corresponds approxi-mately to Kendall’s τ approaching one for both the Clayton and Joe copulas. Note that estimation of the dependence parameter α requires at least three time points to identify a structural change. Consequently, for the pair ( Xτ , X τ +1 ) at the change point, the depen-dence parameter α01 cannot be reliably estimated. Therefore, we assume that α01 is fixed and known. In practice, setting α01 = 2 is a reasonable choice, as suggested by [4]; see also Remark 1 in [22]. 
+
+3.2 Maximum Likelihood Estimation 
+
+The corresponding log-likelihood function is 
+
+ℓ(θ) = 
+
+> τ
+
+X
+
+> t=1
+
+log( fγ0 (xt)) + 
+
+> T
+
+X 
+
+> t=τ+1
+
+log( fγ1 (xt)) +  
+
+> τ−1
+
+X
+
+> t=1
+
+log[ cα0 (Fγ0 (xt), F γ0 (xt+1 ))] + log[ cα01 (Fγ0 (xτ ), F γ1 (xτ +1 ))] +  
+
+> T−1
+
+X 
+
+> t=τ+1
+
+log[ cα1 (Fγ1 (xt), F γ1 (xt+1 ))] (1) where θ = {λ0, λ 1, k 0, k 1, α 0, α 1, τ }. Here, Fγ0 (·), Fγ1 (·), fγ0 (·), and fγ1 (·) are the dis-tribution functions and the corresponding density functions of the Weibull distribution, respectively. We employ the Newton-Raphson algorithm to compute the maximum likelihood es-timates using (1). However, since the log-likelihood function is not differentiable at the change point τ , we adopt a two-stage procedure following [4, 22]. In the first stage, we fix the change-point value τ and then apply the Newton-Raphson algorithm to estimate the remaining parameters as follows: (ˆk0, ˆk1, ˆλ0, ˆλ1, ˆα0, ˆα1) τ = argmax 
+
+> (k0,k 1,λ 0,λ 1,α 0,α 1)
+
+ℓ(k0, k 1, λ 0, λ 1, α 0, α 1 | τ ).
+
+Next, through the obtained ( ˆk0, ˆk1, ˆλ0, ˆλ1, ˆα0, ˆα1) τ , the maximum likelihood estimates for 
+
+τ is obtained by ˆτ = argmax   
+
+> τ∈{ 3,4,...,T −3}
+
+ℓ(τ |ˆk0, ˆk1, ˆλ0, ˆλ1, ˆα0, ˆα1).
+
+To address convergence issues arising from the constrained parameters in the Newton-Raphson algorithm, we adopt the re-parameterization method suggested in [14]. The log-likelihood function is re-parameterized as ˜ℓ(K0, K 1, Λ0, Λ1, A 0, A 1) = ℓ(k0, k 1, λ 0, λ 1, α 0, α 1),
+
+where K0 = log( k0), K1 = log( k1), Λ 0 = log( λ0), Λ 1 = log( λ1), A0 = log( α0 + 1), and 
+
+A1 = log( α1 + 1). This transformation ensures that K0, K 1, Λ0, Λ1, A 0, A 1 ∈ (−∞ , ∞). The partial derivatives are obtained via the chain rule (see the supplementary material [20] for details). The Newton-Raphson algorithm proceeds as follows: Step (1): Set the convergence tolerance ε > 0. 6Step (2): Choose initial values ( k(0) 0 , k (0) 1 , λ (0) 0 , λ (0) 1 , α (0) 0 , α (0) 1 ). Step (3): Transform the initial values to the unconstrained parameters: 
+
+K(0) 0 = log k(0) 0 , K(0) 1 = log k(0) 1 , Λ(0) 0 = log λ(0) 0 , Λ(0) 1 = log λ(0) 1 ,A(0) 0 = log( α(0) 0 + 1) , A(0) 1 = log( α(0) 1 + 1) .
+
+Step (4): At iteration k = 0 , 1, 2, . . . , compute the gradient vector G(k) and the Hessian matrix H(k) of ˜ℓ evaluated at ( K(k)0 , K (k)1 , Λ(k)0 , Λ(k)1 , A (k)0 , A (k)1 ), where 
+
+H =
+
+
+
+∂2 ˜ℓ∂K 20
+
+∂2 ˜ℓ∂K 0∂K 1
+
+∂2 ˜ℓ∂K 0∂Λ0
+
+∂2 ˜ℓ∂K 0∂Λ1
+
+∂2 ˜ℓ∂K 0∂A 0
+
+∂2 ˜ℓ∂K 0∂A 1
+
+∂2 ˜ℓ∂K 1∂K 0
+
+∂2 ˜ℓ∂K 21
+
+∂2 ˜ℓ∂K 1∂Λ0
+
+∂2 ˜ℓ∂K 1∂Λ1
+
+∂2 ˜ℓ∂K 1∂A 0
+
+∂2 ˜ℓ∂K 1∂A 1
+
+∂2 ˜ℓ∂Λ0∂K 0
+
+∂2 ˜ℓ∂Λ0∂K 1
+
+∂2 ˜ℓ∂Λ20
+
+∂2 ˜ℓ∂Λ0∂Λ1
+
+∂2 ˜ℓ∂Λ0∂A 0
+
+∂2 ˜ℓ∂Λ0∂A 1
+
+∂2 ˜ℓ∂Λ1∂K 0
+
+∂2 ˜ℓ∂Λ1∂K 1
+
+∂2 ˜ℓ∂Λ1∂Λ0
+
+∂2 ˜ℓ∂Λ21
+
+∂2 ˜ℓ∂Λ1∂A 0
+
+∂2 ˜ℓ∂Λ1∂A 1
+
+∂2 ˜ℓ∂A 0∂K 0
+
+∂2 ˜ℓ∂A 0∂K 1
+
+∂2 ˜ℓ∂A 0∂Λ0
+
+∂2 ˜ℓ∂A 0∂Λ1
+
+∂2 ˜ℓ∂A 20
+
+∂2 ˜ℓ∂A 0∂A 1
+
+∂2 ˜ℓ∂A 1∂K 0
+
+∂2 ˜ℓ∂A 1∂K 1
+
+∂2 ˜ℓ∂A 1∂Λ0
+
+∂2 ˜ℓ∂A 1∂Λ1
+
+∂2 ˜ℓ∂A 1∂A 0
+
+∂2 ˜ℓ∂A 21
+
+
+
+,G =
+
+h ∂ ˜ℓ∂K 0
+
+∂ ˜ℓ∂K 1
+
+∂ ˜ℓ∂Λ0
+
+∂ ˜ℓ∂Λ1
+
+∂ ˜ℓ∂A 0
+
+∂ ˜ℓ∂A 1
+
+iT
+
+.
+
+Update the parameter vector: 
+
+I(k+1) = I(k) −
+
+
+
+H(k)−1
+
+G(k),
+
+where I(k) = ( K(k)0 , K (k)1 , Λ(k)0 , Λ(k)1 , A (k)0 , A (k)1 )⊤.Step (5): Repeat until the convergence criterion is satisfied: max 
+
+n
+
+|K(k+1) 0 − K(k)0 |, |K(k+1) 1 − K(k)1 |, |Λ(k+1) 0 − Λ(k)0 |,
+
+|Λ(k+1) 1 − Λ(k)1 |, |A(k+1) 0 − A(k)0 |, |A(k+1) 1 − A(k)1 |
+
+o
+
+< ε. 
+
+Step (6): Upon convergence, set ( ˆK0, ˆK1, ˆΛ0, ˆΛ1, ˆA0, ˆA1) = I(k+1) and transform back to the original parameters if needed. 
+
+3.3 Interval Estimation 
+
+We then construct confidence intervals (CIs) using the parametric bootstrap method [23], which is a Monte Carlo procedure. The detailed steps are as follows: 7Step (i): Fit the proposed model to the observed data {X1, . . . , X T } and obtain the maximum likelihood estimators (MLEs). Denote the resulting estimates by ˆθ = ( ˆK0, ˆK1, ˆΛ0, ˆΛ1, ˆA0, ˆA1).
+
+Step (ii): For each replication b = 1 , . . . , B :
+
+• Generate a bootstrap sample {X(b)1 , . . . , X (b) 
+
+> T
+
+} by Monte Carlo simulation from the fitted model using the parameter estimates ˆθ obtained in Step (i). 
+
+• Refit the model to the bootstrap sample {X(b)1 , . . . , X (b) 
+
+> T
+
+} and obtain the bootstrap estimates ˆθ(b) =   ˆK(b)0 , ˆK(b)1 , ˆΛ(b)0 , ˆΛ(b)1 , ˆA(b)0 , ˆA(b)1
+
+.
+
+Step (iii): Repeat Step (ii) B times (where B is a large number, e.g., 1000 or more) to obtain B independent bootstrap replications ˆθ(b), b = 1 , . . . , B .Step (iv): For each continuous model parameter θ ∈ { K0, K 1, Λ0, Λ1, A 0, A 1}, construct the 100(1 − α)% percentile bootstrap confidence interval by ordering the B
+
+bootstrap estimates and taking the  α 
+
+> 2
+
+B-th and (1 − α 
+
+> 2
+
+)B-th ordered values. Step (v): Identify the set of distinct bootstrap estimates {a1, . . . , a ˜NB }, where ˜NB ≤ B
+
+is the number of unique values among {ˆτ (b) : b = 1 , . . . , B }.Step (vi): Arrange these distinct values in ascending order: {a(1) < a (2) < · · · < a ( ˜NB )}.Step (vii): Select the smallest contiguous subset {a(1) , . . . , a ( ˜Nτ )} such that at least (1 − α)proportion of all bootstrap estimates ˆ τ (b) (i.e., at least (1 − α)B replications) fall within [ a(1) , a ( ˜Nτ )]. This interval is the 100(1 − α)% bootstrap confidence interval for τ .
+
+## 4 Simulation Studies 
+
+We conduct an extensive simulation study to evaluate the performance and robustness of the proposed estimation procedure. The experiments consider various sample sizes, different locations of the change point, multiple dependence structures, different strengths of serial dependence, and scenarios involving copula model misspecification. 
+
+4.1 Simulation Setting 
+
+We consider sample sizes T = 100 and T = 250, with change-points τ occurring at various positions within the series. Each scenario is independently replicated R = 500 times. In each replication, the observations {X1, X 2, . . . , X T } are generated from a copula-based Markov model with a single change-point in both the marginal distributions and the dependence structure. The data before the change-point, {X1, . . . , X τ }, are generated from the Weibull 8distribution with parameters ( k0, λ 0) = (1 .8, 1.2) and copula parameter α0. The data after the change-point, {Xτ +1 , . . . , X T }, follow the Weibull distribution with parameters (k1, λ 1) = (2 .1, 1.5) and copula parameter α1. The transition copula parameter between the two regimes is denoted by α01 .We examine two levels of dependence strength under both the Clayton and Joe copulas: 
+
+• Weak to moderate dependence: ( α0, α 01 , α 1) = (2 , 2, 2), corresponding to Kendall’s 
+
+τ ≈ 0.50 (Clayton) and τ ≈ 0.426 (Joe). 
+
+• Strong dependence: (α0, α 01 , α 1) = (8 , 8, 8), corresponding to Kendall’s τ ≈ 0.80 (Clayton) and τ ≈ 0.883 (Joe). Additionally, we investigate the effect of varying the transition parameter α01 while keeping the within-regime dependence fixed, to better understand its impact on the estimation of the change-point τ and the model parameters. The change-point τ and all model parameters are estimated via the MLE method. To assess the performance of the estimators, we compute the following metrics, where θ denotes the true parameter value and ˆθi is the estimate from the i-th replication: RMSE( ˆθ) = 
+
+vuut 1
+
+R
+
+> R
+
+X
+
+> i=1
+
+(ˆθi − θ)2, RE( ˆθ) = RMSE( ˆθ)
+
+θ ,
+
+and the empirical average ˆE( ˆθ) = 1
+
+R
+
+> R
+
+X
+
+> i=1
+
+ˆθi.
+
+Figure 1 shows a representative time series plot from the simulated data, exhibiting noticeable fluctuations, multiple oscillations, and several spikes, which indicate the presence of structural changes in both the marginal distributions and the serial dependence structure. 
+
+4.2 Simulation Results 
+
+From Table 1, we observe that the estimation performance for all parameters is generally better under weak dependence, as reflected by the smaller RMSE values. For example, in the case of the Clayton copula, the RMSE of ˆ τ is 1.5588 (with RE equal to 0.0125) when ( α0, α 01 , α 1) = (2 , 2, 2). In contrast, the RMSE increases slightly to 1.6125 (with RE equal to 0.0129) when ( α0, α 01 , α 1) = (8 , 8, 8). A similar pattern is observed for the Joe copula. Specifically, when ( α0, α 01 , α 1) = (2 , 2, 2), the RMSE of ˆ τ is 1.1958 (with RE equal to 0.0096), whereas the RMSE increases to 1.4526 (with RE equal to 0.0116) when (α0, α 01 , α 1) = (8 , 8, 8). We next consider scenarios with different change points τ . Tables 2–5 show that when the change occurs at an early stage, such as τ = 25 or τ = 50, the RMSE of ˆ τ tends to be larger. In addition, the estimation of the distribution before the change point deteriorates, as reflected by the increased RMSE values. For instance, under the Clayton copula with (α0, α 01 , α 1) = (2 , 2, 2), the RMSE of ˆ τ is 1.9131 (RE = 0.0765) when τ = 25, compared 9Figure 1: The time series plot of the simulated dataset. with 1.5588 (RE = 0.0125) when τ = 125. A similar phenomenon is observed under the Joe copula with the same parameter setting, where the RMSE decreases from 1.5232 (RE = 0.0609) for τ = 25 to 1.1958 (RE = 0.0096) for τ = 125. The same tendency is evident when the dependence parameters are set to (8 , 8, 8). In the Clayton copula case, the RMSE of ˆ τ is 1.8735 (RE = 0.0749) when τ = 25, while the RMSE values for τ = 83 and τ = 125 are 1.4491 (RE = 0.0175) and 1.6125 (RE = 0.0129), respectively. Likewise, under the Joe copula, the RMSE values are 1.4730 (RE = 0.0589), 1.3892 (RE = 0.0167), and 1.4526 (RE = 0.0116) for τ = 25, τ = 83, and τ = 125, respectively. Although the RMSE values do not decrease monotonically, the relative error becomes substantially smaller as τ increases. Moreover, when τ = 25, the parameters 
+
+k0, λ0, and α0 exhibit poorer estimation performance, as indicated by their larger RMSE values. These results suggest that the sample sizes before and after the change point, which depend on τ , play an important role in estimation accuracy. In particular, the RMSE and RE generally improve as the effective sample size increases. Next, we investigate the case of different values of α01 . Since only one pair of observa-tions, namely ( Xτ , X τ +1 ), is available for estimating α01 , this parameter is not identifiable. Therefore, in practical applications, α01 is treated as a fixed and known quantity in the modeling framework. However, because the true value of α01 is generally unknown in prac-tice, we conduct a sensitivity analysis to evaluate the robustness of the proposed model under possible misspecification. In this study, the assumed value used for estimation is denoted by αas 
+
+> 01
+
+.Tables 6–9 report the results of the sensitivity analysis, where the assumed dependence parameter αas  
+
+> 01
+
+takes values 1, 2, 4, and 8, while the true parameter setting is ( α0, α 01 , α 1) = (2 , 2, 2) or (8 , 8, 8). Overall, the estimation of the change point τ remains relatively stable 10 and close to the true value in most scenarios. For example, under the Clayton copula with (α0, α 01 , α 1) = (2 , 2, 2), the RMSE of ˆ τ is 1.5673 (RE = 0.0125) when αas  
+
+> 01
+
+= 1, 1.5588 (RE = 0.0125) when αas  
+
+> 01
+
+= 2, and 1.4595 (RE = 0.0117) when αas  
+
+> 01
+
+= 4. However, the RMSE increases to 1.7176 (RE = 0.0137) when αas  
+
+> 01
+
+= 8. Similarly, under the Joe copula with ( α0, α 01 , α 1) = (2 , 2, 2), the RMSE of ˆ τ equals 1.2767 (RE = 0.0102), 1.1958 (RE = 0.0096), 1.3453 (RE = 0.0108), and 1.7000 (RE = 0.0136) for αas  
+
+> 01
+
+= 1 , 2, 4, and 8, respectively. A similar pattern is observed when the true dependence parameters are (8 , 8, 8). Un-der the Clayton copula, the RMSE of ˆ τ is 1.6032 (RE = 0.0128), 1.6101 (RE = 0.0129), 1.6425 (RE = 0.0131), and 1.6125 (RE = 0.0129) for αas  
+
+> 01
+
+= 1 , 2, 4, and 8, respectively. Under the Joe copula, the corresponding RMSE values are 1.3341 (RE = 0.0107), 1.2922 (RE = 0.0103), 1.4248 (RE = 0.0114), and 1.4526 (RE = 0.0116). These results indicate that the estimation procedure is relatively robust to moderate misspecification of α01 , al-though stronger assumed dependence may lead to some deterioration in estimation accuracy. Therefore, selecting αas  
+
+> 01
+
+between 1 and 4 appears to be a reasonable practical strategy. Tables 10 and 11 summarize the estimation results under different sample sizes. In general, increasing the sample size leads to smaller RMSE and RE values, indicating im-proved estimation accuracy and consistency. For instance, under the Clayton copula with (α0, α 01 , α 1) = (2 , 2, 2), increasing the sample size from 100 to 250 reduces the RMSE of ˆ τ
+
+from 1.6912 to 1.5588, while the RE decreases from 0.0338 to 0.0125. Similarly, under the Joe copula with the same parameter setting, the RMSE of ˆ τ decreases from 1.4142 to 1.1958, and the RE decreases from 0.0283 to 0.0096. For the stronger dependence setting (8 , 8, 8), the Clayton copula shows a reduction in RMSE from 1.9950 to 1.6125 (RE decreases from 0.0399 to 0.0129), whereas under the Joe copula the RMSE changes from 1.2961 to 1.4526 while the RE decreases from 0.0259 to 0.0116. Overall, these results support the consistency of the proposed estimators as the sample size increases. 
+
+4.3 Model misspecification test 
+
+In this section, we investigate the effects of copula misspecification through a cross-comparison study between the Clayton and Joe copulas. Specifically, we first generate data using either the Clayton copula or the Joe copula, and then fit both copula models to the generated data in order to evaluate the impact of model misspecification. Table 12 summarizes the estimation results together with the corresponding RMSE and RE values. Under the correctly specified models, the parameter estimates are generally close to their true values, with relatively small RMSE and RE values. For example, under the Clayton copula, the RMSE and RE of ˆ τ are 1.5588 and 0.0125, respectively, while under the Joe copula they are 1.1958 and 0.0096. These results indicate accurate and stable estimation when the copula model is correctly specified. Under model misspecification, the RMSE values for ˆ τ increase, although the corre-sponding RE values remain relatively small. For instance, when data generated from the Joe copula are analyzed using the Clayton copula model, the RMSE and RE of ˆ τ become 1.9287 and 0.0154, respectively. Similarly, when data generated from the Clayton copula are fitted using the Joe copula model, the RMSE and RE increase to 3.5846 and 0.0287, respectively. Although the RMSE in the latter case is noticeably larger than that obtained 11 Table 1: The results of parameter estimation under different copulas. 
+
+Copula (α0, α01 , α1) Parameter True value ˆE( ·) RMSE( ·) RE( ·)
+
+Clayton (2,2,2) τ 125 124.75 1.5588 0.0125 
+
+k0 1.8 1.7843 0.2571 0.1428 
+
+k1 2.1 2.2184 0.3616 0.1722 
+
+λ0 1.2 1.1493 0.1595 0.1329 
+
+λ1 1.5 1.5276 0.1635 0.1090 
+
+α0 2 2.1556 0.6248 0.3124 
+
+α1 2 1.9370 0.6095 0.3048 Clayton (8,8,8) τ 125 124.66 1.6125 0.0129 
+
+k0 1.8 1.9041 0.5741 0.3189 
+
+k1 2.1 2.4262 0.7456 0.3550 
+
+λ0 1.2 1.2047 0.3937 0.3281 
+
+λ1 1.5 1.5481 0.2956 0.1971 
+
+α0 8 8.8051 4.4219 0.5527 
+
+α1 8 7.6146 5.3206 0.6651 Joe (2,2,2) τ 125 125.11 1.1958 0.0096 
+
+k0 1.8 1.8318 0.1577 0.0876 
+
+k1 2.1 2.1258 0.1835 0.0874 
+
+λ0 1.2 1.1928 0.1469 0.1224 
+
+λ1 1.5 1.5133 0.1690 0.1127 
+
+α0 2 2.0079 0.4824 0.2412 
+
+α1 2 2.0316 0.4646 0.2323 Joe (8,8,8) τ 125 125.31 1.4526 0.0116 
+
+k0 1.8 1.8361 0.2878 0.1599 
+
+k1 2.1 2.1421 0.2699 0.1285 
+
+λ0 1.2 1.1656 0.4649 0.3874 
+
+λ1 1.5 1.4118 0.3601 0.2401 
+
+α0 8 8.8307 8.2639 1.0330 
+
+α1 8 7.6063 4.1442 0.5180 12 Table 2: The simulation results of the Clayton copula at α = 2 for different settings of τ
+
+over various time periods. 
+
+(α0, α01 , α1) Parameter True value ˆE( ·) RMSE( ·) RE( ·) (α0, α01 , α1) Parameter True value ˆE( ·) RMSE( ·) RE( ·)
+
+(2,2,2) τ 25 24.18 1.9131 0.0765 (2,2,2) τ 50 49.71 1.7349 0.0347 
+
+k0 1.8 2.201 1.0260 0.5700 k0 1.8 1.8826 0.4499 0.2499 
+
+k1 2.1 2.1932 0.2925 0.1393 k1 2.1 2.1541 0.2877 0.1370 
+
+λ0 1.2 1.3400 1.6586 1.3822 λ0 1.2 1.1553 0.2350 0.1958 
+
+λ1 1.5 1.5126 0.1286 0.0857 λ1 1.5 1.5096 0.1375 0.0917 
+
+α0 2 2.2685 1.5984 0.7992 α0 2 2.1859 0.9138 0.4569 
+
+α1 2 1.9249 0.6700 0.3350 α1 2 1.9152 0.6287 0.3144 (2,2,2) τ 83 82.53 1.6643 0.0201 (2,2,2) τ 125 124.75 1.5588 0.0125 
+
+k0 1.8 1.8052 0.3484 0.1936 k0 1.8 1.7843 0.2571 0.1428 
+
+k1 2.1 2.1784 0.2996 0.1427 k1 2.1 2.2184 0.3616 0.1722 
+
+λ0 1.2 1.1431 0.1934 0.1612 λ0 1.2 1.1493 0.1595 0.1329 
+
+λ1 1.5 1.5169 0.1383 0.0922 λ1 1.5 1.5276 0.1635 0.1090 
+
+α0 2 2.1727 0.8129 0.4065 α0 2 2.1556 0.6248 0.3124 
+
+α1 2 1.9698 0.5332 0.2666 α1 2 1.9370 0.6095 0.3048 Table 3: The simulation results of the Joe copula at α = 2 for different settings of τ over various time periods. 
+
+(α0, α01 , α1) Parameter True value ˆE( ·) RMSE( ·) RE( ·) (α0, α01 , α1) Parameter True value ˆE( ·) RMSE( ·) RE( ·)
+
+(2,2,2) τ 25 25.32 1.5232 0.0609 (2,2,2) τ 50 50.10 1.5360 0.0307 
+
+k0 1.8 2.0525 0.5978 0.3321 k0 1.8 1.9062 0.3168 0.1760 
+
+k1 2.1 2.1083 0.1235 0.0588 k1 2.1 2.1088 0.1453 0.0692 
+
+λ0 1.2 1.2339 0.4567 0.3806 λ0 1.2 1.2555 0.3066 0.2555 
+
+λ1 1.5 1.4938 0.1041 0.0694 λ1 1.5 1.4935 0.1194 0.0796 
+
+α0 2 2.2730 2.4456 1.2228 α0 2 2.2329 1.2064 0.6032 
+
+α1 2 1.9907 0.2634 0.1317 α1 2 1.9924 0.2944 0.1472 (2,2,2) τ 83 82.98 1.4212 0.0171 (2,2,2) τ 125 125.11 1.1958 0.0096 
+
+k0 1.8 1.8501 0.1954 0.1086 k0 1.8 1.8318 0.1577 0.0876 
+
+k1 2.1 2.1100 0.1516 0.0722 k1 2.1 2.1258 0.1835 0.0874 
+
+λ0 1.2 1.2051 0.1769 0.1474 λ0 1.2 1.1928 0.1469 0.1224 
+
+λ1 1.5 1.4981 0.1278 0.0852 λ1 1.5 1.5133 0.1690 0.1127 
+
+α0 2 2.0473 0.6185 0.3093 α0 2 2.0079 0.4824 0.2412 
+
+α1 2 2.0054 0.3528 0.1764 α1 2 2.0316 0.4646 0.2323 13 Table 4: The simulation results of the Clayton copula at α = 8 for different settings of τ
+
+over various time periods. 
+
+(α0, α01 , α1) Parameter True value ˆE( ·) RMSE( ·) RE( ·) (α0, α01 , α1) Parameter True value ˆE( ·) RMSE( ·) RE( ·)
+
+(8,8,8) τ 25 24.53 1.8735 0.0749 (8,8,8) τ 50 49.67 1.4036 0.0281 
+
+k0 1.8 2.5857 2.6980 1.4989 k0 1.8 2.0309 1.3880 0.7711 
+
+k1 2.1 2.1081 0.4474 0.2130 k1 2.1 2.2328 0.4843 0.2306 
+
+λ0 1.2 1.1225 0.4603 0.3836 λ0 1.2 1.1451 0.4312 0.3593 
+
+λ1 1.5 1.5237 0.2851 0.1901 λ1 1.5 1.5317 0.2801 0.1867 
+
+α0 8 7.0462 5.3786 0.6723 α0 8 7.4623 4.3433 0.5429 
+
+α1 8 9.1058 5.9327 0.7416 α1 8 8.0903 3.3648 0.4206 (8,8,8) τ 83 82.88 1.4491 0.0175 (8,8,8) τ 125 124.66 1.6125 0.0129 
+
+k0 1.8 1.9063 0.8175 0.4542 k0 1.8 1.9041 0.5741 0.3189 
+
+k1 2.1 2.288 0.6307 0.3003 k1 2.1 2.4262 0.7456 0.3550 
+
+λ0 1.2 1.3287 0.6535 0.5446 λ0 1.2 1.2047 0.3937 0.3281 
+
+λ1 1.5 1.5747 0.6389 0.4259 λ1 1.5 1.5481 0.2956 0.1971 
+
+α0 8 8.0425 4.3691 0.5461 α0 8 8.8051 4.4219 0.5527 
+
+α1 8 8.1918 4.3615 0.5452 α1 8 7.6146 5.3206 0.6651 Table 5: The simulation results of the Joe copula at α = 8 for different settings of τ over various time periods. 
+
+(α0, α01 , α1) Parameter True value ˆE( ·) RMSE( ·) RE( ·) (α0, α01 , α1) Parameter True value ˆE( ·) RMSE( ·) RE( ·)
+
+(8,8,8) τ 25 25.01 1.473 0.0589 (8,8,8) τ 50 50.46 1.5556 0.0311 
+
+k0 1.8 2.5502 3.1625 1.7569 k0 1.8 2.0821 0.8704 0.4836 
+
+k1 2.1 2.1272 0.2035 0.0969 k1 2.1 2.1239 0.2140 0.1019 
+
+λ0 1.2 1.0661 0.5196 0.4330 λ0 1.2 1.1293 0.5330 0.4442 
+
+λ1 1.5 1.4543 0.3207 0.2138 λ1 1.5 1.4201 0.3208 0.2139 
+
+α0 8 6.6829 7.5038 0.9380 α0 8 8.4361 9.0974 1.1372 
+
+α1 8 7.9564 3.9159 0.4895 α1 8 7.5707 3.8232 0.4779 (8,8,8) τ 83 83.19 1.3892 0.0167 (8,8,8) τ 125 125.31 1.4526 0.0116 
+
+k0 1.8 1.8958 0.4262 0.2368 k0 1.8 1.8361 0.2878 0.1599 
+
+k1 2.1 2.1394 0.2423 0.1154 k1 2.1 2.1421 0.2699 0.1285 
+
+λ0 1.2 1.1527 0.4564 0.3803 λ0 1.2 1.1656 0.4649 0.3874 
+
+λ1 1.5 1.4172 0.3249 0.2166 λ1 1.5 1.4118 0.3601 0.2401 
+
+α0 8 8.7261 7.4880 0.9360 α0 8 8.8307 8.2639 1.0330 
+
+α1 8 7.5329 3.7293 0.4662 α1 8 7.6063 4.1442 0.5180 14 Table 6: The simulation results of the Clayton copula at α = 2 under different states of αas 
+
+> 01
+
+(α0, αas 
+
+> 01
+
+, α1) Parameter True value ˆE( ·) RMSE( ·) RE( ·) (α0, αas 
+
+> 01
+
+, α1) Parameter True value ˆE( ·) RMSE( ·) RE( ·)
+
+(2,1,2) τ 125 124.78 1.5673 0.0125 (2,2,2) τ 125 124.75 1.5588 0.0125 
+
+k0 1.8 1.7924 0.2460 0.1367 k0 1.8 1.7843 0.2571 0.1428 
+
+k1 2.1 2.2034 0.3548 0.1690 k1 2.1 2.2184 0.3616 0.1722 
+
+λ0 1.2 1.1553 0.1517 0.1264 λ0 1.2 1.1493 0.1595 0.1329 
+
+λ1 1.5 1.5199 0.1599 0.1066 λ1 1.5 1.5276 0.1635 0.1090 
+
+α0 2 2.1364 0.5966 0.2983 α0 2 2.1556 0.6248 0.3124 
+
+α1 2 1.9580 0.5874 0.2937 α1 2 1.9370 0.6095 0.3048 (2,4,2) τ 125 124.83 1.4595 0.0117 (2,8,2) τ 125 124.79 1.7176 0.0137 
+
+k0 1.8 1.7757 0.2689 0.1494 k0 1.8 1.7807 0.2707 0.1504 
+
+k1 2.1 2.2324 0.3634 0.1730 k1 2.1 2.2408 0.3811 0.1815 
+
+λ0 1.2 1.1458 0.1673 0.1394 λ0 1.2 1.1491 0.1654 0.1378 
+
+λ1 1.5 1.5343 0.1646 0.1097 λ1 1.5 1.5369 0.1768 0.1179 
+
+α0 2 2.1859 0.7037 0.3519 α0 2 2.1652 0.6487 0.3244 
+
+α1 2 1.9142 0.6134 0.3067 α1 2 1.9094 0.6549 0.3275 
+
+Table 7: The simulation results of the Joe copula at α = 2 under different states of αas 
+
+> 01
+
+(α0, αas 
+
+> 01
+
+, α1) Parameter True value ˆE( ·) RMSE( ·) RE( ·) (α0, αas 
+
+> 01
+
+, α1) Parameter True value ˆE( ·) RMSE( ·) RE( ·)
+
+(2,1,2) τ 125 125.15 1.2767 0.0102 (2,2,2) τ 125 125.11 1.1958 0.0096 
+
+k0 1.8 1.8276 0.1559 0.0866 k0 1.8 1.8318 0.1577 0.0876 
+
+k1 2.1 2.1278 0.1831 0.0872 k1 2.1 2.1258 0.1835 0.0874 
+
+λ0 1.2 1.1978 0.1322 0.1102 λ0 1.2 1.1928 0.1469 0.1224 
+
+λ1 1.5 1.4923 0.1417 0.0945 λ1 1.5 1.5133 0.1690 0.1127 
+
+α0 2 2.0191 0.4121 0.2061 α0 2 2.0079 0.4824 0.2412 
+
+α1 2 1.9797 0.3329 0.1665 α1 2 2.0316 0.4646 0.2323 (2,4,2) τ 125 125.19 1.3453 0.0108 (2,8,2) τ 125 125.43 1.7000 0.0136 
+
+k0 1.8 1.8330 0.1584 0.0880 k0 1.8 1.8368 0.1572 0.0873 
+
+k1 2.1 2.1289 0.1845 0.0879 k1 2.1 2.1215 0.1775 0.0845 
+
+λ0 1.2 1.2034 0.1745 0.1454 λ0 1.2 1.1871 0.1357 0.1131 
+
+λ1 1.5 1.5021 0.1976 0.1317 λ1 1.5 1.5142 0.2324 0.1549 
+
+α0 2 2.0293 0.5949 0.2975 α0 2 1.9711 0.4250 0.2125 
+
+α1 2 2.0076 0.5675 0.2838 α1 2 2.0601 0.8009 0.4005 
+
+15 Table 8: The simulation results of the Clayton copula at α = 8 under different states of αas 
+
+> 01
+
+(α0, αas 
+
+> 01
+
+, α1) Parameter True value ˆE( ·) RMSE( ·) RE( ·) (α0, αas 
+
+> 01
+
+, α1) Parameter True value ˆE( ·) RMSE( ·) RE( ·)
+
+(8,1,8) τ 125 124.68 1.6032 0.0128 (8,2,8) τ 125 124.63 1.6101 0.0129 
+
+k0 1.8 1.9085 0.5586 0.3103 k0 1.8 1.9022 0.5985 0.3325 
+
+k1 2.1 2.3786 0.7517 0.358 k1 2.1 2.4011 0.7429 0.3538 
+
+λ0 1.2 1.1884 0.3307 0.2756 λ0 1.2 1.2264 0.3931 0.3276 
+
+λ1 1.5 1.5048 0.282 0.1880 λ1 1.5 1.5430 0.3459 0.2306 
+
+α0 8 8.7792 4.6308 0.5789 α0 8 8.7630 4.3912 0.5489 
+
+α1 8 7.8808 3.9276 0.4910 α1 8 7.6166 3.5148 0.4394 (8,4,8) τ 125 124.56 1.6425 0.0131 (8,8,8) τ 125 124.66 1.6125 0.0129 
+
+k0 1.8 1.9133 0.6251 0.3473 k0 1.8 1.9041 0.5741 0.3189 
+
+k1 2.1 2.3987 0.6781 0.3229 k1 2.1 2.4262 0.7456 0.3550 
+
+λ0 1.2 1.2208 0.4050 0.3375 λ0 1.2 1.2047 0.3937 0.3281 
+
+λ1 1.5 1.5264 0.2758 0.1839 λ1 1.5 1.5481 0.2956 0.1971 
+
+α0 8 8.8334 4.4737 0.5592 α0 8 8.8051 4.4219 0.5527 
+
+α1 8 7.6232 4.6115 0.5764 α1 8 7.6146 5.3206 0.6651 
+
+Table 9: The simulation results of the Joe copula at α = 8 under different states of αas 
+
+> 01
+
+(α0, αas 
+
+> 01
+
+, α1) Parameter True value ˆE( ·) RMSE( ·) RE( ·) (α0, αas 
+
+> 01
+
+, α1) Parameter True value ˆE( ·) RMSE( ·) RE( ·)
+
+(8,1,8) τ 125 125.14 1.3341 0.0107 (8,2,8) τ 125 125.11 1.2922 0.0103 
+
+k0 1.8 1.8345 0.2872 0.1596 k0 1.8 1.8366 0.2818 0.1566 
+
+k1 2.1 2.1417 0.2625 0.1250 k1 2.1 2.1415 0.2639 0.1257 
+
+λ0 1.2 1.2062 0.3846 0.3205 λ0 1.2 1.1576 0.3192 0.2660 
+
+λ1 1.5 1.4994 0.3976 0.2651 λ1 1.5 1.4390 0.3438 0.2292 
+
+α0 8 9.2725 7.0972 0.8872 α0 8 8.4427 5.1568 0.6446 
+
+α1 8 8.7075 5.1904 0.6488 α1 8 7.8928 4.3075 0.5384 (8,4,8) τ 125 125.21 1.4248 0.0114 (8,8,8) τ 125 125.31 1.4526 0.0116 
+
+k0 1.8 1.8328 0.2889 0.1605 k0 1.8 1.8361 0.2878 0.1599 
+
+k1 2.1 2.1434 0.2661 0.1267 k1 2.1 2.1421 0.2699 0.1285 
+
+λ0 1.2 1.1825 0.3999 0.3333 λ0 1.2 1.1656 0.4649 0.3874 
+
+λ1 1.5 1.4237 0.3226 0.2151 λ1 1.5 1.4118 0.3601 0.2401 
+
+α0 8 8.9355 6.3297 0.7912 α0 8 8.8307 8.2639 1.0330 
+
+α1 8 7.6546 3.7183 0.4648 α1 8 7.6063 4.1442 0.5180 
+
+16 Table 10: The simulation results of the Clayton copula under different sample sizes. 
+
+(α0, α01 , α1) Sample size Parameter True value ˆE( ·) RMSE( ·) RE( ·) (α0, α01 , α1) Sample size Parameter True value ˆE( ·) RMSE( ·) RE( ·)
+
+(2,2,2) 100 τ 50 49.68 1.6912 0.0338 (2,2,2) 250 τ 125 124.75 1.5588 0.0125 
+
+k0 1.8 1.9881 0.5066 0.2814 k0 1.8 1.7843 0.2571 0.1428 
+
+k1 2.1 2.3163 0.5434 0.2588 k1 2.1 2.2184 0.3616 0.1722 
+
+λ0 1.2 1.1741 0.2529 0.2108 λ0 1.2 1.1493 0.1595 0.1329 
+
+λ1 1.5 1.5300 0.2341 0.1561 λ1 1.5 1.5276 0.1635 0.1090 
+
+α0 2 1.9745 0.9156 0.4575 α0 2 2.1556 0.6248 0.3124 
+
+α1 2 1.9308 0.8456 0.4228 α1 2 1.9370 0.6095 0.3048 (8,8,8) 100 τ 50 49.63 1.995 0.0399 (8,8,8) 250 τ 125 124.66 1.6125 0.0129 
+
+k0 1.8 2.7239 1.4117 0.7843 k0 1.8 1.9041 0.5741 0.3189 
+
+k1 2.1 2.8480 1.3531 0.6443 k1 2.1 2.4262 0.7456 0.3550 
+
+λ0 1.2 1.3053 0.5542 0.4618 λ0 1.2 1.2047 0.3937 0.3281 
+
+λ1 1.5 1.5202 0.4569 0.3046 λ1 1.5 1.5481 0.2956 0.1971 
+
+α0 8 6.7081 4.9274 0.6159 α0 8 8.8051 4.4219 0.5527 
+
+α1 8 7.3796 7.1606 0.8951 α1 8 7.6146 5.3206 0.6651 Table 11: The simulation results of the Joe copula under different sample sizes. 
+
+(α0, α01 , α1) Sample size Parameter True value ˆE( ·) RMSE( ·) RE( ·) (α0, α01 , α1) Sample size Parameter True value ˆE( ·) RMSE( ·) RE( ·)
+
+(2,2,2) 100 τ 50 50.16 1.4142 0.0283 (2,2,2) 250 τ 125 125.11 1.1958 0.0096 
+
+k0 1.8 1.8655 0.2684 0.1491 k0 1.8 1.8318 0.1577 0.0876 
+
+k1 2.1 2.2448 0.3876 0.1846 k1 2.1 2.1258 0.1835 0.0874 
+
+λ0 1.2 1.2356 0.2681 0.2234 λ0 1.2 1.1928 0.1469 0.1224 
+
+λ1 1.5 1.5231 0.2622 0.1748 λ1 1.5 1.5133 0.1690 0.1127 
+
+α0 2 2.1153 0.8516 0.4258 α0 2 2.0079 0.4824 0.2412 
+
+α1 2 1.9765 0.7361 0.3681 α1 2 2.0316 0.4646 0.2323 (8,8,8) 100 τ 50 50.14 1.2961 0.0259 (8,8,8) 250 τ 125 125.31 1.4526 0.0116 
+
+k0 1.8 2.0247 0.6827 0.3818 k0 1.8 1.8361 0.2878 0.1599 
+
+k1 2.1 2.5443 0.9949 0.4738 k1 2.1 2.1421 0.2699 0.1285 
+
+λ0 1.2 1.1402 0.4588 0.3823 λ0 1.2 1.1656 0.4649 0.3874 
+
+λ1 1.5 1.4374 0.4776 0.3184 λ1 1.5 1.4118 0.3601 0.2401 
+
+α0 8 7.9298 6.5711 0.8214 α0 8 8.8307 8.2639 1.0330 
+
+α1 8 7.2307 5.2488 0.6561 α1 8 7.6063 4.1442 0.5180 17 under the correctly specified models, the associated RE remains below 0.03. Moreover, the estimated values of ˆ τ remain close to the true change point value of 125 in all cases. These findings suggest that the proposed procedure remains reasonably robust to copula misspecification in estimating the change point. On the other hand, the dependence parameters α0 and α1, which characterize the tail dependence structure of the copula, are more sensitive to model misspecification. In the misspecified settings, the RE values for these parameters increase substantially. For exam-ple, when the Joe copula data are fitted using the Clayton copula model, the RE values for 
+
+αC 
+
+> 0
+
+and αC 
+
+> 1
+
+are 0.7715 and 0.7382, respectively. Likewise, when the Clayton copula data are analyzed using the Joe copula model, the RE values for αJ 
+
+> 0
+
+and αJ 
+
+> 1
+
+increase further to 0.9770 and 1.2028. These results indicate that the tail dependence parameters are considerably more affected by copula misspecification than the change point estimator itself. Overall, the results demonstrate that the proposed method provides relatively stable estimation for the change point τ even under copula misspecification, as evidenced by the consistently small RE values for ˆ τ . However, the estimation of the dependence parameters associated with the copula tail structure becomes less reliable when the copula family is misspecified. This highlights the importance of selecting an appropriate copula model when the primary interest lies in accurately capturing tail dependence behavior. Table 12: The simulation Results for cross comparison Clayton and Joe copulas.                                                                                                                                      
+
+> (α0,α01 ,α1)True model Proposed model Parameter True value ˆE( ·)RMSE( ·)RE( ·)
+> (2,2,2) Clayton Clayton τ125 124.75 1.5588 0.0125
+> k01.8 1.7843 0.2571 0.1428
+> k12.1 2.2184 0.3616 0.1722
+> λ01.2 1.1493 0.1595 0.1329
+> λ11.5 1.5276 0.1635 0.1090
+> αC
+> 022.1556 0.6248 0.3124
+> αC
+> 121.9370 0.6095 0.3048 (2,2,2) Joe Clayton τ125 124.64 1.9287 0.0154
+> k01.8 1.9237 0.2597 0.1443
+> k12.1 2.2577 0.3248 0.1547
+> λ01.2 1.2438 0.1810 0.1508
+> λ11.5 1.5956 0.2441 0.1627
+> αC
+> 021.4784 1.5429 0.7715
+> αC
+> 121.5503 1.4763 0.7382 (2,2,2) Joe Joe τ125 125.11 1.1958 0.0096
+> k01.8 1.8318 0.1577 0.0876
+> k12.1 2.1258 0.1835 0.0874
+> λ01.2 1.1928 0.1469 0.1224
+> λ11.5 1.5133 0.1690 0.1127
+> αJ
+> 022.0079 0.4824 0.2412
+> αJ
+> 122.0316 0.4646 0.2323 (2,2,2) Clayton Joe τ125 124.61 3.5846 0.0287
+> k01.8 1.9551 0.2525 0.1403
+> k12.1 2.3605 0.4039 0.1923
+> λ01.2 1.3727 0.2075 0.1729
+> λ11.5 1.7512 0.2609 0.1739
+> αJ
+> 022.6941 1.9539 0.9770
+> αJ
+> 123.1591 2.4055 1.2028
+
+18 5 Empirical Study 
+
+In this section, we consider two datasets for detecting structural change and then identifying the change point. 
+
+5.1 VIX Analysis 
+
+In this section, we investigate the structural change in the financial market during the global COVID-19 outbreak in 2020. To measure market uncertainty, we consider the VIX index, which is a widely used indicator of the market’s expectation of the 30-day volatility of the S&P 500 index. The study period ranges from September 1, 2019, to August 31, 2020, covering the onset and early development of the COVID-19 pandemic. The data set was obtained from Yahoo Finance ( finance.yahoo.com ). We apply the proposed copula-based Markov models with both the Clayton and Joe copulas, and the corresponding maximum likelihood estimators are computed using the Newton–Raphson (NR) method. Model se-lection is performed using the AIC, where the preferred model is chosen by minimizing the AIC value. A structural change in the VIX series is visually evident around March 2020 due to the dramatic increase in market volatility; see Figure 2. The VIX data contain 251 observations during the study period. Figure 2 suggests that the change point may occur between time points 105 and 147. During this period, the World Health Organization (WHO) declared the COVID-19 outbreak a “Public Health Emergency of International Concern” on January 30, 2020, followed by rapid global market reactions. Consequently, a substantial structural change in the volatility dynamics is expected. Tables 13 and 14 summarize the parameter estimates, estimated change points, and AIC values. The estimated change points remain relatively stable under different assumed values of αas 
+
+> 01
+
+, which is consistent with the findings from the simulation studies. Based on the minimum AIC criterion, the estimated change point is ˆ τ = 121 under the Clayton copula model and ˆ τ = 120 under the Joe copula model. Furthermore, the confidence interval for the change point under the Clayton copula is (119 , 124), while the corresponding interval under the Joe copula is (116 , 123). In addition, since the confidence intervals for the distribution parameters before and after the change point do not overlap, the results indicate that the structural change is jointly driven by shifts in these parameters. Although the estimated change points are similar under both copula models, the Clayton copula-based Markov model yields a smaller AIC value, indicating a better fit for the VIX data. This suggests that the VIX series exhibits stronger lower-tail dependence rather than upper-tail dependence during the COVID-19 period. Therefore, we conclude that the structural change associated with the COVID-19 outbreak began around February 25, 2020, which is consistent with the timing of major pandemic-related announcements and the subsequent escalation in financial market uncertainty. The detected change point reflects not only a shift in the volatility level, but also a change in the underlying dependence structure. In particular, the Clayton copula is capable of capturing stronger lower-tail dependence, which became more pronounced as the VIX surged in response to widespread market sell-offs and heightened downside risk during the pandemic. 19 Figure 2: The VIX index from 2019/09/01 to 2020/08/31 during the 2020 COVID-19. 
+
+Figure 3: The VIX index during the 2020 COVID-19 under change point detection from 2019/09/01 to 2020/08/31. 20 Table 13: Parameter estimates of proposed model for 2020 COVID-19 under Clayton copula. 
+
+αas  
+
+> 01
+
+Parameter Estiamtion 95% CI AIC αas  
+
+> 01
+
+Parameter Estiamtion 95% CI AIC 
+
+1 τ 121 (119,124) 1215.6 2 τ 120 (115,122) 1223.7 
+
+k0 8.4292 (6.2797,11.6014) k0 8.4915 (6.1112,11.2432) 
+
+k1 2.6127 (2.3636,4.2084) k1 2.6706 (2.4771,4.3814) 
+
+λ0 14.7426 (14.2776,15.6305) λ0 15.0603 (14.0889,15.7472) 
+
+λ1 36.5852 (32.9747,43.6509) λ1 36.9278 (34.1271,44.4948) 
+
+α0 2.2035 (1.1428,3.4832) α0 2.2633 (1.482,3.5088) 
+
+α1 2.5334 (1.2294,4.0044) α1 2.4411 (1.1486,3.9389) 4 τ 122 (116,124) 1229.25 8 τ 121 (116,126) 1237.78 
+
+k0 8.5881 (6.0412,12.6219) k0 8.6087 (6.1695,12.7079) 
+
+k1 2.5601 (2.3514,4.3137) k1 2.5307 (2.2438,4.3706) 
+
+λ0 14.5974 (14.1604,15.4452) λ0 14.7906 (14.3267,15.6693) 
+
+λ1 35.9475 (32.7155,42.8871) λ1 35.6501 (31.8384,42.8142) 
+
+α0 2.2686 (1.1847,3.5609) α0 2.3615 (1.2348,3.7944) 
+
+α1 2.4314 (1.17044,4.2901) α1 2.5746 (1.2164,4.2111) Table 14: Parameter estimates of proposed model for 2020 COVID-19 under Joe copula. 
+
+αas  
+
+> 01
+
+Parameter Estiamtion 95% CI AIC αas  
+
+> 01
+
+Parameter Estiamtion 95% CI AIC 
+
+1 τ 122 (119,126) 1423.97 2 τ 120 (116,123) 1413.54 
+
+k0 8.8519 (8.2919,11.3165) k0 8.7972 (8.1996,11.2017) 
+
+k1 2.4926 (1.858,2.869) k1 2.4346 (1.8025,2.8249) 
+
+λ0 14.9374 (14.3125,15.5461) λ0 15.1171 (14.3881,15.5124) 
+
+λ1 35.5120 (25.002,64.8539) λ1 35.0213 (25.9564,64.0358) 
+
+α0 2.6730 (1.4724,3.0615) α0 2.7115 (1.4892,3.0856) 
+
+α1 5.2230 (3.0353,23.402) α1 5.1877 (3.2883,23.0474) 4 τ 120 (116,124) 1424.94 8 τ 122 (117,129) 1436.85 
+
+k0 8.7618 (8.3019,11.9403) k0 8.7498 (7.9316,11.1136) 
+
+k1 2.4536 (1.8848,2.8185) k1 2.4558 (1.8563,2.8997) 
+
+λ0 14.9829 (14.241,15.6379) λ0 15.0321 (14.5758,16.3488) 
+
+λ1 35.4578 (25.7716,65.9046) λ1 34.0728 (24.9675,66.4435) 
+
+α0 2.7269 (1.4524,3.1531) α0 2.7378 (1.3698,3.1832) 
+
+α1 5.1679 (2.9879,23.467) α1 4.9487 (3.0011,25.0849) 21 5.2 Interarrival time 
+
+In practice, a VIX value exceeding 30 is commonly interpreted as an indication of heightened market fear and increasing financial risk [12]. It is often regarded as a warning signal that the market has entered a panic regime characterized by elevated uncertainty and substantial volatility. In such situations, investors may anticipate continued increases in market risk, which can lead to large-scale sell-offs and potential market instability. Figure 4 illustrates the VIX series from January 1, 2018, to December 31, 2024. The top panel displays the original VIX series, the middle panel shows the temporal trend of the interarrival times T ,and the bottom panel presents the observed interarrival data points. Motivated by this interpretation, we define a VIX value exceeding 30 as an indication that the market expects substantially greater future volatility. Based on the VIX data from January 1, 2018, to December 31, 2024, we record the occurrence times at which the VIX exceeds the threshold value of 30. If the VIX remains below 30, the elapsed time continues to accumulate until the threshold is exceeded, at which point the waiting time is recorded as an interarrival interval T , defined by 
+
+T = inf {t : VIX > 30 }.
+
+A total of 139 interarrival times are obtained from the data. Using the AIC for model selection, Table 16 shows that the estimated structural change point occurs at ˆ τ = 8 under the Clayton copula model and at ˆ τ = 7 under the Joe copula model. The corresponding confidence interval for the change point under the Clayton copula model is (3 , 31), whereas the interval under the Joe copula model is (4 , 39). Consistent with the findings in Section 5.1, the Clayton copula-based Markov model produces a smaller AIC value, indicating a better fit for the interarrival time data. In Figure 5, the red vertical line represents the estimated change point ˆ τ .Based on these results, we conclude that the structural change associated with the COVID-19 outbreak began around March 2, 2020, which is broadly consistent with the findings in Section 5.1. The detected structural change is likely related to the World Health Organization (WHO) announcements concerning the global spread of COVID-19 and the resulting escalation in financial market uncertainty. 
+
+## 6 Conclusion and Future Research 
+
+In this paper, we investigated offline change-point estimation for time series data exhibiting nonlinear serial dependence. To address this problem, we proposed a copula-based Markov chain model with Weibull marginal distributions, incorporating the Clayton and Joe copulas to capture asymmetric lower- and upper-tail dependence structures. The corresponding likelihood function was derived, and the maximum likelihood estimators for the change point and model parameters were obtained using the Newton–Raphson algorithm. Extensive simulation studies were conducted to evaluate the finite-sample performance and robustness of the proposed method under a variety of parameter settings, including different sample sizes, change-point locations, dependence strengths, and copula misspecifi-cation scenarios. The simulation results demonstrated that the proposed estimators perform well in terms of RMSE and RE, particularly for the estimation of the change point, where 22 Figure 4: Time series trend of the VIX index.(top) Time series of interarrival times.(middle) Sequential T (Bottom). 
+
+Figure 5: Detection of structural change in the VIX (Top) in inter arrival times (Middle), and sequential T (Bottom). 23 Table 15: Parameter estimates of proposed model for 2020 COVID-19. 
+
+Clayton copula Joe copula 
+
+αas  
+
+> 01
+
+Parameter Estiamtion 95% CI AIC αas  
+
+> 01
+
+Parameter Estiamtion 95% CI AIC 
+
+0.5 τ 7 (3,33) 434.43 1 τ 6 (3,43) 753.45 
+
+k0 0.3319 (0.3261,0.3378) k0 0.4233 (0.3299,0.5432) 
+
+k1 0.6571 (0.6553,0.657) k1 0.5956 (0.553,0.6656) 
+
+λ0 8.8597 (7.3637,10.6596) λ0 7.8106 (4.5699,13.3495) 
+
+λ1 19.9971 (19.9575,20.0367) λ1 3.8316 (2.8776,5.1018) 
+
+α0 0.0189 (0.001348,0.2652) α0 1.0021 (1.0014,1.097) 
+
+α1 0.047 (0.04605,0.0479) α1 1.00069 (1.0004,1.0013) 1 τ 7 (3,33) 435.45 1.5 τ 6 (3,45) 762.17 
+
+k0 0.2687 (0.2667,0.2706) k0 0.4231 (0.3299,0.5427) 
+
+k1 0.6567 (0.6549,0.6586) k1 0.595 (0.5325,0.6649) 
+
+λ0 7.2436 (7.1647,7.3233) λ0 7.8621 (5.0611,13.4346) 
+
+λ1 19.9989 (19.9594,20.0386) λ1 3.7967 (2.8514,5.0553) 
+
+α0 0.0144 (0.01407,0.01476) α0 1.0049 (1.0027,1.0916) 
+
+α1 0.0469 (0.046004,0.0478) α1 1.00021 (1.000114,1.00392) 2 τ 8 (3,31) 412.66 2 τ 7 (4,39) 746.53 
+
+k0 0.3567 (0.3126,0.4068) k0 0.4213 (0.3127,0.4568) 
+
+k1 0.6343 (0.6322,0.6364) k1 0.5968 (0.5009,0.6746) 
+
+λ0 8.7576 (7.9661,9.0097) λ0 9.1286 (4.8303,13.7978) 
+
+λ1 13.0062 (12.8379,13.1766) λ1 3.8402 (2.7407,5.6415) 
+
+α0 0.0206 (0.00314,0.13571) α0 1.0283 (1.003139,1.03571) 
+
+α1 0.0508 (0.04971,0.05191) α1 1.0042 (1.002568,1.05191) 24 the relative errors remained small even under moderate model misspecification. Sensitivity analysis with respect to the dependence parameter α01 further showed that the proposed procedure is reasonably robust to misspecification of the serial dependence parameter. In addition, the cross-comparison study between the Clayton and Joe copulas revealed that, although misspecification affects the estimation of the tail dependence parameters, the es-timation of the change point itself remains relatively stable. An empirical application to the VIX index during the COVID-19 pandemic further illustrated the effectiveness of the proposed framework in detecting meaningful structural changes in financial market volatility. The estimated change points were consistent with major pandemic-related events and announcements, and the Clayton copula-based Markov model provided the best fit according to the AIC. The analysis also demonstrated the importance of accounting for asymmetric tail dependence when modeling financial time series during periods of market stress. Overall, the results indicate that copula-based Markov chain models provide a flexible and reliable framework for change-point estimation in Weibull time series with nonlinear dependence structures. Several directions for future research are worth pursuing. First, the proposed framework may be extended to accommodate multiple change points by modi-fying the model structure accordingly. Second, alternative copula families, such as Gaus-sian, Gumbel, or survival-Gumbel copulas, may be considered to capture different forms of dependence and tail behavior. Third, more flexible marginal distributions may also be incorporated to improve model adaptability in practical applications. However, likelihood-based estimation under more complicated copula structures may become computationally demanding. In such settings, Bayesian approaches or simulation-based methods may pro-vide useful alternatives for parameter estimation and statistical inference [8, 9, 17]. These extensions represent promising directions for future investigation. 
+
+## A Derivatives of the Transformed Log-Likelihood Function 
+
+The first- and second-order derivatives of the transformed log-likelihood function are ob-tained by applying the chain rule to the re-parameterized variables introduced in Section 3. The corresponding expressions are given as follows: 
+
+∂ ˜ℓ∂K 0
+
+= ∂ℓ ∂k 0
+
+× ∂∂K 0
+
+(eK0 ) = eK0 ∂ℓ ∂k 0
+
+,∂ ˜ℓ∂K 1
+
+= ∂ℓ ∂k 1
+
+× ∂∂K 1
+
+(eK1 ) = eK1 ∂ℓ ∂k 1
+
+,∂ ˜ℓ∂Λ0
+
+= ∂ℓ ∂λ 0
+
+× ∂∂Λ0
+
+ eΛ0  = eΛ0 ∂ℓ ∂λ 0
+
+,∂ ˜ℓ∂Λ1
+
+= ∂ℓ ∂λ 1
+
+× ∂∂Λ1
+
+ eΛ1  = eΛ1 ∂ℓ ∂λ 1
+
+,∂ ˜ℓ∂A 0
+
+= ∂ℓ ∂α 0
+
+× ∂∂A 0
+
+(eA0 − 1) = eA0 ∂ℓ ∂α 0
+
+,∂ ˜ℓ∂A 1
+
+= ∂ℓ ∂α 1
+
+× ∂∂A 1
+
+(eA1 − 1) = eA1 ∂ℓ ∂α 1
+
+,
+
+25 ,
+
+∂2 ˜ℓ∂K 0∂K 0
+
+= ∂2ℓ∂k 20
+
+× ( ∂∂K 0
+
+(eK0 )) 2 + ∂∂k 0
+
+× ∂2
+
+∂K 20
+
+(eK0 ) = e2K0 ∂2ℓ∂k 20
+
++ eK0 ∂ℓ ∂k 0
+
+,∂2 ˜ℓ∂K 0∂K 1
+
+= ∂2ℓ∂k 0∂k 1
+
+× ∂∂K 0
+
+(eK0 ) × ∂∂K 1
+
+(eK1 ) = 0 ,∂2 ˜ℓ∂K 0∂Λ0
+
+= ∂2ℓ∂k 0∂λ 0
+
+× ∂∂K 0
+
+ eK0  × ∂∂Λ0
+
+ eΛ0  = e(K0+Λ 0) ∂2ℓ∂k 0∂λ 0
+
+,∂2 ˜ℓ∂K 0∂Λ1
+
+= ∂2ℓ∂k 0∂λ 1
+
+× ∂∂K 0
+
+ eK0  × ∂∂Λ1
+
+ eΛ1  = 0 ,∂2 ˜ℓ∂K 0∂A0
+
+= ∂2ℓ∂k 0∂α 0
+
+× ∂∂K 0
+
+ eK0  × ∂∂A0
+
+ eA0 − 1 = e(K0+A0) ∂2ℓ∂k 0∂α 0
+
+,∂2 ˜ℓ∂K 0∂A1
+
+= ∂2ℓ∂k 0∂α 1
+
+× ∂∂K 0
+
+ eK0  × ∂∂A1
+
+ eA1 − 1 = 0 ,
+
+,
+
+∂2 ˜ℓ∂K 1∂K 0
+
+= ∂2ℓ∂k 1∂k 0
+
+× ∂∂K 1
+
+(eK1 ) × ∂∂K 0
+
+(eK0 ) = 0 ,∂2 ˜ℓ∂K 1∂K 1
+
+= ∂2ℓ∂k 21
+
+× ( ∂∂K 1
+
+(eK1 )) 2 + ∂∂k 1
+
+× ∂2
+
+∂K 21
+
+(eK1 ) = e2K1 ∂2ℓ∂k 21
+
++ eK1 ∂ℓ ∂k 1
+
+,∂2 ˜ℓ∂K 1∂Λ0
+
+= ∂2ℓ∂k 1∂λ 0
+
+× ∂∂K 1
+
+ eK1  × ∂∂Λ0
+
+ eΛ0  = 0 ,∂2 ˜ℓ∂K 1∂Λ1
+
+= ∂2ℓ∂k 1∂λ 1
+
+× ∂∂K 1
+
+ eK1  × ∂∂Λ1
+
+ eΛ1  = e(K1+Λ 1) ∂2ℓ∂k 1∂λ 1
+
+,∂2 ˜ℓ∂K 1∂A0
+
+= ∂2ℓ∂k 1∂α 0
+
+× ∂∂K 1
+
+ eK1  × ∂∂A0
+
+ eA0 − 1 = 0 ,∂2 ˜ℓ∂K 1∂A1
+
+= ∂2ℓ∂k 1∂α 1
+
+× ∂∂K 1
+
+ eK1  × ∂∂A1
+
+ eA1 − 1 = e(K1+A1) ∂2ℓ∂k 1∂α 1
+
+,
+
+,26 ∂2 ˜ℓ∂Λ0∂Λ0
+
+= ∂2ℓ∂λ 20
+
+× ( ∂∂Λ0
+
+(eΛ0 )) 2 + ∂∂λ 0
+
+× ∂2
+
+∂Λ20
+
+(eΛ0 ) = e2Λ 0 ∂2ℓ∂λ 20
+
++ eΛ0 ∂ℓ ∂λ 0
+
+,∂2 ˜ℓ∂Λ0∂Λ1
+
+= ∂2ℓ∂λ 0∂λ 1
+
+× ∂∂Λ0
+
+(eΛ0 ) × ∂∂Λ1
+
+(eΛ1 ) = 0 ,∂2 ˜ℓ∂Λ0∂K 0
+
+= ∂2ℓ∂λ 0∂k 0
+
+× ∂∂Λ0
+
+ eΛ0  × ∂∂K 0
+
+ eK0  = e(Λ 0+K0) ∂2ℓ∂λ 0∂k 0
+
+,∂2 ˜ℓ∂Λ0∂K 1
+
+= ∂2ℓ∂λ 0∂k 1
+
+× ∂∂Λ0
+
+ eΛ0  × ∂∂K 1
+
+ eK1  = 0 ,∂2 ˜ℓ∂Λ0∂A0
+
+= ∂2ℓ∂λ 0∂α 0
+
+× ∂∂Λ0
+
+ eΛ0  × ∂∂A0
+
+ eA0 − 1 = e(Λ 0+A0) ∂2ℓ∂λ 0∂α 0
+
+,∂2 ˜ℓ∂Λ0∂A1
+
+= ∂2ℓ∂λ 0∂α 1
+
+× ∂∂Λ0
+
+ eΛ0  × ∂∂A1
+
+ eA1 − 1 = 0 ,∂2 ˜ℓ∂Λ1∂Λ0
+
+= ∂2ℓ∂λ 1∂λ 0
+
+× ∂∂Λ1
+
+(eΛ1 ) × ∂∂Λ0
+
+(eΛ0 ) = 0 ,∂2 ˜ℓ∂Λ1∂Λ1
+
+= ∂2ℓ∂λ 21
+
+× ( ∂∂Λ1
+
+(eΛ1 )) 2 + ∂∂λ 1
+
+× ∂2
+
+∂Λ21
+
+(eΛ1 ) = e2Λ 1 ∂2ℓ∂λ 21
+
++ eΛ1 ∂ℓ ∂λ 1
+
+,∂2 ˜ℓ∂Λ1∂K 0
+
+= ∂2ℓ∂λ 1∂k 0
+
+× ∂∂Λ1
+
+ eΛ1  × ∂∂K 0
+
+ eK0  = 0 ,∂2 ˜ℓ∂Λ1∂K 1
+
+= ∂2ℓ∂λ 1∂k 1
+
+× ∂∂Λ1
+
+ eΛ1  × ∂∂K 1
+
+ eK1  = e(Λ 1+K1) ∂2ℓ∂λ 1∂k 1
+
+,∂2 ˜ℓ∂Λ1∂A0
+
+= ∂2ℓ∂λ 1∂α 0
+
+× ∂∂Λ1
+
+ eΛ1  × ∂∂A0
+
+ eA0 − 1 = 0 ,∂2 ˜ℓ∂Λ1∂A1
+
+= ∂2ℓ∂λ 1∂α 1
+
+× ∂∂Λ1
+
+ eΛ1  × ∂∂A1
+
+ eA1 − 1 = e(Λ 1+A1) ∂2ℓ∂λ 1∂α 1
+
+,
+
+,
+
+∂2 ˜ℓ∂A0∂K 0
+
+= ∂2ℓ∂α 0∂k 0
+
+× ∂∂A0
+
+ eA0 − 1 × ∂∂K 0
+
+ eK0  = e(A0+K0) ∂2ℓ∂α 0∂k 0
+
+,∂2 ˜ℓ∂A0∂K 1
+
+= ∂2ℓ∂α 0∂k 1
+
+× ∂∂A0
+
+ eA0 − 1 × ∂∂K 1
+
+ eK1  = 0 ,∂2 ˜ℓ∂A0∂Λ0
+
+= ∂2ℓ∂α 0∂λ 0
+
+× ∂∂A0
+
+ eA0 − 1 × ∂∂Λ0
+
+ eΛ0  = e(A0+Λ 0) ∂2ℓ∂α 0∂λ 0
+
+,∂2 ˜ℓ∂A0∂Λ1
+
+= ∂2ℓ∂α 0∂λ 1
+
+× ∂∂A0
+
+ eA0 − 1 × ∂∂Λ1
+
+ eΛ1  = 0 ,∂2 ˜ℓ∂A0∂A0
+
+= ∂2ℓ∂α 20
+
+× ( ∂∂A0
+
+ eA0 − 1)2 + ∂∂α 0
+
+× ∂2
+
+∂A20
+
+(eA0 − 1) = e2A0 ∂2ℓ∂α 20
+
++ eA0 ∂ℓ α0
+
+,∂2 ˜ℓ∂A0∂A1
+
+= ∂2ℓ∂α 0∂α 1
+
+× ∂∂A0
+
+(eA0 − 1) × ∂∂A1
+
+(eA1 − 1) = 0 ,
+
+,27 ∂2 ˜ℓ∂A1∂K 0
+
+= ∂2ℓ∂α 1∂k 1
+
+× ∂∂A1
+
+ eA1 − 1 × ∂∂K 0
+
+ eK0  = 0 ,∂2 ˜ℓ∂A1∂K 1
+
+= ∂2ℓ∂α 1∂k 0
+
+× ∂∂A1
+
+ eA1 − 1 × ∂∂K 1
+
+ eK1  = e(A1+K1) ∂2ℓ∂α 1∂k 1
+
+,∂2 ˜ℓ∂A1∂Λ0
+
+= ∂2ℓ∂α 1∂λ 0
+
+× ∂∂A1
+
+ eA1 − 1 × ∂∂Λ0
+
+ eΛ0  = 0 ,∂2 ˜ℓ∂A1∂Λ1
+
+= ∂2ℓ∂α 1∂λ 1
+
+× ∂∂A1
+
+ eA1 − 1 × ∂∂Λ1
+
+ eΛ1  = e(A1+Λ 1) ∂2ℓ∂α 1∂λ 1
+
+,∂2 ˜ℓ∂A1∂A0
+
+= ∂2ℓ∂α 1∂α 0
+
+× ∂∂A1
+
+(eA1 − 1) × ∂∂A0
+
+(eA0 − 1) = 0 ,∂2 ˜ℓ∂A1∂A1
+
+= ∂2ℓ∂α 21
+
+× ( ∂∂A1
+
+ eA1 − 1)2 + ∂∂α 1
+
+× ∂2
+
+∂A21
+
+(eA1 − 1) = e2A1 ∂2ℓ∂α 21
+
++ eA1 ∂ℓ α1
+
+.
+
+## B Derivatives of the Copula Log-Likelihood Function 
+
+B.1 First- and Second-Order Derivatives for the Clayton Copula 
+
+In this appendix, we present the first- and second-order derivatives of the copula log-likelihood function associated with the Clayton copula. These derivatives are required for implementing the Newton–Raphson algorithm described in Section 3. The first-order derivatives of the log-likelihood function are given by 
+
+∂α0 ℓ = 
+
+> τ−1
+
+X
+
+> t=1
+
+(
+
+11 + α0
+
+− log  H0(xt) − log  H0(xt+1 ) + log  H0(xt)−α0 + H0(xt+1 )−α0 − 1
+
+α20
+
++
+
+ 1
+
+α0
+
++ 2 
+
+ H0(xt)−α0 log  H0(xt) + H0(xt+1 )−α0 log  H0(xt+1 )
+
+H0(xt)−α0 + H0(xt+1 )−α0 − 1
+
+
+
+,∂α1 ℓ = 
+
+> T−1
+
+X 
+
+> t=τ+1
+
+(
+
+11 + α1
+
+− log  H1(xt) − log  H1(xt+1 ) + log  H1(xt)−α1 + H1(xt+1 )−α1 − 1
+
+α21
+
++
+
+ 1
+
+α1
+
++ 2 
+
+ H1(xt)−α1 log  H1(xt) + H1(xt+1 )−α1 log  H1(xt+1 )
+
+H1(xt)−α1 + H1(xt+1 )−α1 − 1
+
+
+
+,∂k0 ℓ =
+
+> τ
+
+X
+
+> t=1
+
+∂k0 h0(xt)
+
+h0(xt) + 
+
+> τ−1
+
+X
+
+> t=1
+
+
+
+−(1 + α0) ∂k0 H0(xt)
+
+H0(xt) − (1 + α0) ∂k0 H0(xt+1 )
+
+H0(xt+1 )+(1 + 2 α0) H0(xt)−α0−1∂k0 H0(xt) + H0(xt+1 )−α0−1∂k0 H0(xt+1 )
+
+H0(xt)−α0 + H0(xt+1 )−α0 − 1
+
+)
+
+− (1 + α01 ) ∂k0 H0(xτ )
+
+H0(xτ )+ (1 + 2 α01 ) H0(xτ )−α01 −1∂k0 H0(xτ )
+
+H0(xτ )−α01 + H1(xτ +1 )−α01 − 1 ,
+
+28 ∂k1 ℓ =
+
+TX
+
+t=τ +1 
+
+∂k1 h1(xt)
+
+h1(xt) +
+
+T −1X
+
+t=τ +1 
+
+(
+
+− (1 + α1) ∂k1 H1(xt)
+
+H1(xt) − (1 + α1) ∂k1 H1(xt+1 )
+
+H1(xt+1 )+ (1 + 2 α1) H1(xt)−α1−1∂k1 H1(xt) + H1(xt+1 )−α1−1∂k1 H1(xt+1 )
+
+H1(xt)−α1 + H1(xt+1 )−α1 − 1
+
+)
+
+− (1 + α01 ) ∂k1 H1(xτ +1 )
+
+H1(xτ +1 )+ (1 + 2 α01 ) H1(xτ +1 )−α01 −1∂k1 H1(xτ +1 )
+
+H0(xτ )−α01 + H1(xτ +1 )−α01 − 1 ,∂λ0 ℓ=
+
+τX
+
+t=1 
+
+∂λ0 h0(xt)
+
+h0(xt) +
+
+τ −1X
+
+t=1 
+
+(
+
+− (1 + α0) ∂λ0 H0(xt)
+
+H0(xt) − (1 + α0) ∂λ0 H0(xt+1 )
+
+H0(xt+1 )+(1 + 2 α0) H0(xt)−α0−1∂λ0 H0(xt) + H0(xt+1 )−α0−1∂λ0 H0(xt+1 )
+
+H0(xt)−α0 + H0(xt+1 )−α0 − 1
+
+)
+
+− (1 + α01 ) ∂λ0 H0(xτ )
+
+H0(xτ )+ (1 + 2 α01 ) H0(xτ )−α01 −1∂λ0 H0(xτ )
+
+H0(xτ )−α01 + H1(xτ +1 )−α01 − 1 ,∂λ1 ℓ=
+
+TX
+
+t=τ +1 
+
+∂λ1 h1(xt)
+
+h1(xt) +
+
+T −1X
+
+t=τ +1 
+
+
+
+−(1 + α1) ∂λ1 H1(xt)
+
+H1(xt) − (1 + α1) ∂λ1 H1(xt+1 )
+
+H1(xt+1 )+(1 + 2 α1) H1(xt)−α1−1∂λ1 H1(xt) + H1(xt+1 )−α1−1∂λ1 H1(xt+1 )
+
+H1(xt)−α1 + H1(xt+1 )−α1 − 1
+
+)
+
+− (1 + α01 ) ∂λ1 H1(xτ +1 )
+
+H1(xτ +1 )+ (1 + 2 α01 ) H1(xτ +1 )−α01 −1∂λ1 H1(xτ +1 )
+
+H1(xτ )−α01 + H1(xτ +1 )−α01 − 1 ,
+
+where 
+
+∂k0 h0(x) = 1
+
+λ0
+
+ xλ0
+
+k0−1
+
+e−
+
+ xλ0
+
+k0
+
+"
+
+1 + k0 ln 
+
+ xλ0
+
+
+
+− k0
+
+ xλ0
+
+k0
+
+ln 
+
+ xλ0
+
+#
+
+,∂k1 h1(x) = 1
+
+λ1
+
+ xλ1
+
+k1−1
+
+e−
+
+ xλ1
+
+k1
+
+"
+
+1 + k1 ln 
+
+ xλ1
+
+
+
+− k1
+
+ xλ1
+
+k1
+
+ln 
+
+ xλ1
+
+#
+
+,∂λ0 h0(x) = k20
+
+λ20
+
+ xλ0
+
+k0−1
+
+e−
+
+ xλ0
+
+k0
+
+" xλ0
+
+k0
+
+− 1
+
+#
+
+,∂λ1 h1(x) = k21
+
+λ21
+
+ xλ1
+
+k1−1
+
+e−
+
+ xλ1
+
+k1
+
+" xλ1
+
+k1
+
+− 1
+
+#
+
+,∂k0 H0(x) = e−
+
+ xλ0
+
+k0  xλ0
+
+k0
+
+ln 
+
+ xλ0
+
+
+
+, ∂k1 H1(y) = e−
+
+ xλ1
+
+k1  xλ1
+
+k1
+
+ln 
+
+ xλ1
+
+
+
+,
+
+29 ∂λ0 H0(x) = e−
+
+ xλ0
+
+k0  xλ0
+
+k0  k0
+
+λ0
+
+
+
+, ∂λ1 H1(x) = e−
+
+ xλ1
+
+k1  xλ1
+
+k1  k1
+
+λ1
+
+
+
+.
+
+The second-order derivatives of log-likelihood function are given by 
+
+∂α0,α 0 ℓ =
+
+τ −1X
+
+t=1 
+
+n
+
+− 1(1 + α0)2 − 2
+
+α30
+
+log( H0(xt)−α0 + H0(xt+1 )−α0 − 1) 
+
+− 2
+
+α20
+
+H0(xt)−α0 log( H0(xt)) + H0(xt+1 )−α0 log( H0(xt+1 )) 
+
+H0(xt)−α0 + H0(xt+1 )−α0 − 1
+
+− ( 1
+
+α0
+
++ 2) (H0(xt)−α0 (log( H0(xt))) 2
+
+(H0(xt)−α0 + H0(xt+1 )−α0 − 1) 2
+
+− ( 1
+
+α0
+
++ 2) H0(xt+1 )−α0 (log (H0(xt+1 ))) 2)( H0(xt)−α0 + H0(xt+1 )−α0 − 1) (H0(xt)−α0 + H0(xt+1 )−α0 − 1) 2
+
++( 1
+
+α0
+
++ 2) (H0(xt)−α0 log( H0(xt)) + H0(xt+1 )−α0 log( H0(xt+1 ))) 2
+
+(H0(xt)−α0 + H0(xt+1 )−α0 − 1) 2
+
+
+
+∂α0,α 1 ℓ =0 
+
+∂α0,k 0 ℓ =
+
+τ −1X
+
+t=1 
+
+
+
+− ∂k0 H0(xt)
+
+H0(xt) − ∂k0 H0(xt+1 )
+
+H0(xt+1 )+ 2 H0(yt)−α0−1∂k0 H0(xt) + H0(xt+1 )−α0−1∂k0 H0(xt+1 )
+
+H0(xt)−α0 + H0(xt+1 )−α0 − 1+ (1 + 2 α0)[ − H0(xt)−α0−1∂k0 H0(xt) log H0(xt) + H0(xt+1 )−α0−1∂k0 H0(xt+1 ) log H0(xt+1 )
+
+H0(xt)−α0 + H0(xt+1 )−α0 − 1 ]+(1 + 2 α0)[ (H0(xt)−α0−1∂k0 H0(xt) + H0(xt+1 )−α0−1∂k0 H0(xt+1 )) (H0(xt)−α0 + H0(xt+1 )−α0 − 1) 2
+
+× (H0(xt)−α0 log H0(xt) + H0(xt+1 )−α0 log H0(xt+1 ))] 
+
+
+
+∂α0,k 1 ℓ =0 
+
+∂α0,λ 0 ℓ =
+
+τ −1X
+
+t=1 
+
+
+
+− ∂λ0 H0(xt)
+
+H0(xt) − ∂λ0 H0(xt+1 )
+
+H0(xt+1 )+ 2 H0(xt)−α0−1∂λ0 H0(xt) + H0(xt+1 )−α0−1∂λ0 H0(xt+1 )
+
+H0(xt)−α0 + H0(xt+1 )−α0 − 1+ (1 + 2 α0)[ − H0(xt)−α0−1∂λ0 H0(xt) log H0(xt) + H0(xt+1 )−α0−1∂λ0 H0(xt+1 ) log H0(xt+1 )
+
+H0(xt)−α0 + H0(xt+1 )−α0 − 1 ]+(1 + 2 α0)[ (H0(xt)−α0−1∂λ0 H0(xt) + H0(xt+1 )−α0−1∂λ0 H0(xt+1 )) (H0(xt)−α0 + H0(xt+1 )−α0 − 1) 2
+
+× (H0(xt)−α0 log H0(xt) + H0(xt+1 )−α0 log H0(xt+1 ))] 
+
+
+
+,∂α0,λ 1 ℓ =0 ,
+
+30 ∂α1,α 1 ℓ =
+
+TX
+
+t=τ +1 
+
+
+
+− 1(1 + α1)2 − 2
+
+α31
+
+log( H1(xt)−α1 + H1(xt+1 )−α1 − 1) 
+
+− 2
+
+α21
+
+H1(xt)−α1 log( H1(xt)) + H1(xt+1 )−α1 log( H1(xt+1 )) 
+
+H1(xt)−α1 + H1(xt+1 )−α1 − 1
+
+− ( 1
+
+α1
+
++ 2) (H1(xt)−α1 (log( H1(xt))) 2
+
+(H1(xt)−α1 + H1(xt+1 )−α1 − 1) 2
+
+− ( 1
+
+α1
+
++ 2) H1(xt+1 )−α1 (log( H1(xt+1 ))) 2)( H1(xt)−α1 + H1(xt+1 )−α1 − 1) (H1(xt)−α1 + H1(xt+1 )−α1 − 1) 2
+
++( 1
+
+α1
+
++ 2) (H1(xt)−α1 log( H1(xt)) + H1(xt+1 )−α1 log( H1(xt+1 ))) 2
+
+(H1(xt)−α1 + H1(xt+1 )−α1 − 1) 2
+
+
+
+∂α1,k 0 ℓ =0 ,∂α1,k 1 ℓ =
+
+TX
+
+t=τ +1 
+
+
+
+− ∂k1 H1(xt)
+
+H1(xt) − ∂k1 H1(xt+1 )
+
+H1(xt+1 )+2 H1(xt)−α1−1∂k1 H1(xt) + H1(xt+1 )−α1−1∂k1 H1(xt+1 )
+
+H1(xt)−α1 + H1(xt+1 )−α1 − 1+(1 + 2 α1)[ − H1(xt)−α1−1∂k1 H1(xt) log H1(xt) + H1(xt+1 )−α1−1∂k1 H1(xt+1 ) log H1(xt+1 )
+
+H1(xt)−α1 + H1(xt+1 )−α1 − 1 ]+(1 + 2 α1)[ (H1(xt)−α1−1∂k1 H1(xt) + H1(xt+1 )−α1−1∂k1 H1(xt+1 )) (H1(xt)−α1 + H1(xt+1 )−α1 − 1) 2
+
+× (H1(xt)−α1 log H1(xt) + H1(xt+1 )−α1 log H1(xt+1 ))] 
+
+)
+
+∂α1,λ 0 ℓ =0 
+
+∂α1,λ 1 ℓ =
+
+TX
+
+t=τ +1 
+
+
+
+− ∂λ1 H1(xt)
+
+H1(xt) − ∂λ1 H1(xt+1 )
+
+H1(xt+1 )+2 H1(xt)−α1−1∂λ1 H1(xt) + H1(xt+1 )−α1−1∂λ1 H1(xt+1 )
+
+H1(xt)−α1 + H1(xt+1 )−α1 − 1+(1 + 2 α1)[ − H1(xt)−α1−1∂λ1 H1(xt) log H1(xt) + H1(xt+1 )−α1−1∂λ1 H1(xt+1 ) log H1(xt+1 )
+
+H1(xt)−α1 + H1(xt+1 )−α1 − 1 ]+(1 + 2 α1)[ (H1(xt)−α1−1∂λ1 H1(xt) + H1(xt+1 )−α1−1∂λ1 H1(xt+1 )) (H1(xt)−α1 + H1(xt+1 )−α1 − 1) 2
+
+× (H1(xt)−α1 log H1(xt) + H1(xt+1 )−α1 log H1(xt+1 ))] 
+
+)
+
+31 ∂k0,k 0 ℓ =
+
+τX
+
+t=1 
+
+ ∂k0,k 0 h0(xt)
+
+h0(xt) − ∂k0 h0(xt)2
+
+h0(xt)2
+
+
+
++
+
+τ −1X
+
+t=1 
+
+
+
+−(1 + α0)( ∂k0,k 0 H0(xt)
+
+H0(xt) − ∂k0 H0(xt)2
+
+H0(xt)2 )
+
+− (1 + α0)( ∂k0,k 0 H0(xt+1 )
+
+H0(xt+1 ) − ∂k0 H0(xt+1 )2
+
+H0(xt+1 )2 )
+
+− (1 + 2 α0)(1 + α0) (H0(xt)−α0−2∂k0 H0(xt)2 + H0(xt+1 )−α0−2∂k0 H0(xt+1 )2)
+
+H0(xt)α0 + H0(xt+1 )α0 − 1+ (1 + 2 α0) (H0(xt)−α0−1∂k0,k 0 H0(xt) + H0(xt+1 )−α0−1∂k0,k 0 H0(xt+1 )) 
+
+H0(xt)α0 + H0(xt+1 )α0 − 1+ α0(1 + 2 α0) (H0(xt)−α0−1∂k0 H0(xt) + H0(xt+1 )−α0−1∂k0 H0(xt+1 )) 2
+
+(H0(xt)α0 + H0(xt+1 )α0 − 1) 2
+
+− (1 + α01 )( ∂k0,k 0 H0(xτ )
+
+H0(xτ ) − ∂k0 H0(xτ )2
+
+H0(xτ )2 )
+
+− (1 + 2 α01 )(1 + α01 ) H0(xτ )−α01 −2∂k0 H0(xτ )2
+
+H0(xτ )−α01 + H1(xτ +1 )−α01 −
+
++ (1 + 2 α01 ) H0(xτ )−α01 −1∂k0,k 0 H0(xτ )
+
+H0(xτ )−α01 + H1(xτ +1 )−α01 − 1+ α01 (1 + 2 α01 ) (H0(xτ )−α01 −1∂k0 H0(xτ )) 2
+
+(H0(xτ )−α01 + H1(xτ +1 )−α01 − 1) 2
+
+∂k0,k 1 ℓ =α01 (1 + 2 α01 ) H0(xτ )−α01 −1∂k0 H0(xτ )H1(xτ +1 )−α01 −1∂k1 H1(xτ +1 )(H0(xτ )−α01 + H1(xτ +1 )−α01 − 1) 2
+
+∂k0,λ 0 ℓ =
+
+τX
+
+t=1 
+
+ ∂k0,λ 0 h0(xt)
+
+h0(xt) − ∂k0 h0(xt)∂λ0 h0(xt)
+
+h0(xt)2
+
+
+
++
+
+τ −1X
+
+t=1 
+
+
+
+− (1 + α0)( ∂k0,λ 0 H0(xt)
+
+H0(xt) − ∂k0 H0(xt)∂λ0 H0(xt)
+
+H0(xt)2 )
+
+− (1 + α0)( ∂k0,λ 0 H0(xt+1 )
+
+H0(xt+1 ) − ∂k0 H0(xt+1 )∂λ0 H0(xt+1 )
+
+H0(xt+1 )2 )
+
+− (1 + 2 α0)(1 + α0) (H0(xt)−α0−2∂k0 H0(xt)∂λ0 H0(xt) + H0(xt+1 )−α0−2∂k0 H0(xt+1 )∂λ0 H0(xt)) 
+
+H0(xt)α0 + H0(xt+1 )α0 − 1+ (1 + 2 α0) (H0(xt)−α0−1∂k0,λ 0 H0(xt) + H0(xt+1 )−α0−1∂k0,λ 0 H0(xt+1 )) 
+
+H0(xt)α0 + H0(xt+1 )α0 − 1+ α0(1 + 2 α0) (H0(xt)−α0−1∂k0 H0(xt) + H0(xt+1 )−α0−1∂k0 H0(xt+1 )) (H0(xt)α0 + H0(xt+1 )α0 − 1) 2
+
+×  H0(xt)−α0−1∂λ0 H0(xt) + H0(xt+1 )−α0−1∂λ0 H0(xt+1 )) 
+
+− (1 + α01 )( ∂k0,λ 0 H0(xτ )
+
+H0(yτ ) − ∂k0 H0(xτ )∂λ0 H0(xτ )
+
+H0(xτ )2 )
+
+− (1 + 2 α01 )(1 + α01 ) H0(xτ )−α01 −2∂k0 H0(xτ )∂λ0 H0(xτ )
+
+H0(xτ )−α01 + H1(xτ +1 )−α01 − 1+ (1 + 2 α01 ) H0(xτ )−α01 −1∂k0,λ 0 H0(xτ )
+
+H0(xτ )−α01 + H1(xτ +1 )−α01 − 1 + α01 (1 + 2 α01 ) H0(xτ )−2α01 −2∂k0 H0(xτ )∂λ0 H0(xτ )(H0(xτ )−α01 + H1(xτ +1 )−α01 − 1) 2
+
+32 ∂k0,λ 1 ℓ =α01 (1 + 2 α01 ) H0(xτ )−α01 −1∂k0 H0(xτ )H1(xτ +1 )−α01 −1∂λ1 H1(xτ +1 )(H0(xτ )−α01 + H1(xτ +1 )−α01 − 1) 2
+
+∂k1,k 1 ℓ =
+
+TX
+
+t=τ +1 
+
+ ∂k1,k 1 h1(xt)
+
+h1(xt) − ∂k1 h1(xt)2
+
+h1(xt)2
+
+
+
++
+
+T −1X
+
+t=τ +1 
+
+
+
+−(1 + α1)( ∂k1,k 1 H1(xt)
+
+H1(xt) − ∂k1 H1(xt)2
+
+H1(xt)2 )
+
+− (1 + α1)( ∂k1,k 1 H1(xt+1 )
+
+H1(xt+1 ) − ∂k1 H1(xt+1 )2
+
+H1(xt+1 )2 )
+
+− (1 + 2 α1)(1 + α1) (H1(xt)−α1−2∂k1 H1(xt)2 + H1(xt+1 )−α1−2∂k1 H1(xt+1 )2)
+
+H1(xt)α1 + H1(xt+1 )α1 − 1+ (1 + 2 α1) (H1(xt)−α1−1∂k1,k 1 H1(xt) + H1(xt+1 )−α1−1∂k1,k 1 H1(xt+1 )) 
+
+H1(xt)α1 + H1(xt+1 )α1 − 1+ α1(1 + 2 α1) (H1(xt)−α1−1∂k1 H1(xt) + H1(xt+1 )−α1−1∂k1 H1(xt+1 )) 2
+
+(H1(xt)α1 + H1(xt+1 )α1 − 1) 2
+
+− (1 + α01 )( ∂k1,k 1 H1(xτ +1 )
+
+H1(xτ +1 ) − ∂k1 H1(xτ +1 )2
+
+H1(xτ +1 )2 )
+
+− (1 + 2 α01 )(1 + α01 ) H1(xτ +1 )−α01 −2∂k1 H1(xτ +1 )2
+
+H0(xτ )−α01 + H1(xτ +1 )−α01 − 1+ (1 + 2 α01 ) H1(xτ +1 )−α01 −1∂k1,k 1 H1(xτ +1 )
+
+H0(xτ )−α01 + H1(xτ +1 )−α01 − 1+ α01 (1 + 2 α01 ) (H1(xτ +1 )−α01 −1∂k1 H1(xτ +1 )) 2
+
+(H0(xτ )−α01 + H1(xτ +1 )−α01 − 1) 2
+
+∂k1,λ 0 ℓ =α01 (1 + 2 α01 ) H1(xτ +1 )−α01 −1∂k1 H1(xτ +1 )H0(xτ )−α01 −1∂λ0 H0(xτ )(H0(xτ )−α01 + H1(xτ +1 )−α01 − 1) 2
+
+33 ∂k1,λ 1 ℓ=
+
+TX
+
+t=τ +1 
+
+ ∂k1,λ 1 h1(xt)
+
+h1(xt) − ∂k1 h1(xt)∂λ1 h1(xt)
+
+h1(xt)2
+
+
+
++
+
+T −1X
+
+t=τ +1 
+
+
+
+− (1 + α1)( ∂k1,λ 1 H1(xt)
+
+H1(xt) − ∂k1 H1(xt)∂λ1 H1(xt)
+
+H1(xt)2 )
+
+− (1 + α1)( ∂k1,λ 1 H1(xt+1 )
+
+H1(xt+1 ) − ∂k1 H1(xt+1 )∂λ1 H1(xt+1 )
+
+H1(xt+1 )2 )
+
+− (1 + 2 α1)(1 + α1) (H1(xt)−α1−2∂k1 H1(xt)∂λ1 H1(xt) + H1(xt+1 )−α1−2∂k1 H1(xt+1 )∂λ1 H1(xt)) 
+
+H1(xt)α1 + H1(xt+1 )α1 − 1+ (1 + 2 α1) (H1(xt)−α1−1∂k1,λ 1 H1(xt) + H1(xt+1 )−α1−1∂k1,λ 1 H1(xt+1 )) 
+
+H1(xt)α1 + H1(xt+1 )α1 − 1+ α1(1 + 2 α1) (H1(xt)−α1−1∂k1 H1(xt) + H1(xt+1 )−α1−1∂k1 H1(xt+1 )) (H1(xt)α1 + H1(xt+1 )α1 − 1) 2
+
+×  H1(xt)−α1−1∂λ1 H1(xt) + H1(xt+1 )−α1−1∂λ1 H1(xt+1 )) 
+
+− (1 + α01 )( ∂k1,λ 1 H1(xτ +1 )
+
+H1(xτ +1 ) − ∂k1 H1(xτ +1 )∂λ1 H1(xτ +1 )
+
+H1(xτ +1 )2 )
+
+− (1 + 2 α01 )(1 + α01 ) H1(xτ +1 )−α01 −2∂k1 H1(xτ +1 )∂λ1 H1(xτ +1 )
+
+H0(xτ )−α01 + H1(xτ +1 )−α01 − 1+ (1 + 2 α01 ) H1(xτ +1 )−α01 −1∂k1,λ 1 H1(xτ +1 )
+
+H0(xτ )−α01 + H1(xτ +1 )−α01 − 1+ α01 (1 + 2 α01 ) H1(xτ +1 )−2α01 −2∂k1 H1(xτ +1 )∂λ1 H1(xτ +1 )(H0(xτ )−α01 + H1(xτ +1 )−α01 − 1) 2
+
+∂λ0,λ 0 ℓ =
+
+τX
+
+t=1 
+
+ ∂λ0,λ 0 h0(xt)
+
+h0(xt) − ∂λ0 h0(xt)2
+
+h0(xt)2
+
+
+
++
+
+τ −1X
+
+t=1 
+
+
+
+−(1 + α0)( ∂λ0,λ 0 H0(xt)
+
+H0(xt) − ∂λ0 H0(xt)2
+
+H0(xt)2 )
+
+− (1 + α0)( ∂λ0,λ 0 H0(xt+1 )
+
+H0(xt+1 ) − ∂λ0 H0(xt+1 )2
+
+H0(xt+1 )2 )
+
+− (1 + 2 α0)(1 + α0) (H0(xt)−α0−2∂λ0 H0(xt)2 + H0(xt+1 )−α0−2∂λ0 H0(xt+1 )2)
+
+H0(xt)α0 + H0(xt+1 )α0 − 1+ (1 + 2 α0) (H0(xt)−α0−1∂λ0,λ 0 H0(xt) + H0(xt+1 )−α0−1∂λ0,λ 0 H0(xt+1 )) 
+
+H0(xt)α0 + H0(xt+1 )α0 − 1+ α0(1 + 2 α0) (H0(xt)−α0−1∂λ0 H0(xt) + H0(xt+1 )−α0−1∂λ0 H0(xt+1 )) 2
+
+(H0(xt)α0 + H0(xt+1 )α0 − 1) 2
+
+− (1 + α01 )( ∂λ0,λ 0 H0(xτ )
+
+H0(xτ ) − ∂λ0 H0(xτ )2
+
+H0(xτ )2 )
+
+− (1 + 2 α01 )(1 + α01 ) H0(xτ )−α01 −2∂λ0 H0(xτ )2
+
+H0(xτ )−α01 + H1(xτ +1 )−α01 −
+
++ (1 + 2 α01 ) H0(xτ )−α01 −1∂λ0,λ 0 H0(xτ )
+
+H0(xτ )−α01 + H1(xτ +1 )−α01 − 1+ α01 (1 + 2 α01 ) (H0(xτ )−α01 −1∂λ0 H0(xτ )) 2
+
+(H0(xτ )−α01 + H1(xτ +1 )−α01 − 1) 2
+
+34 ∂λ0,λ 1 ℓ =α01 (1 + 2 α01 ) G0(xτ )−α01 −1∂λ0 H0(xτ )H1(xτ +1 )−α01 −1∂λ1 H1(xτ +1 )(H0(xτ )−α01 + H1(xτ +1 )−α01 − 1) 2
+
+∂λ1,λ 1 ℓ =
+
+TX
+
+t=τ +1 
+
+ ∂λ1,λ 1 h1(xt)
+
+h1(xt) − ∂λ1 h1(xt)2
+
+h1(xt)2
+
+
+
++
+
+T −1X
+
+t=τ +1 
+
+
+
+−(1 + α1)( ∂λ1,λ 1 H1(xt)
+
+H1(xt) − ∂λ1 H1(xt)2
+
+H1(xt)2 )
+
+− (1 + α1)( ∂λ1,λ 1 H1(xt+1 )
+
+H1(xt+1 ) − ∂λ1 H1(xt+1 )2
+
+H1(xt+1 )2 )
+
+− (1 + 2 α1)(1 + α1) (H1(xt)−α1−2∂λ1 H1(xt)2 + H1(xt+1 )−α1−2∂λ1 H1(xt+1 )2)
+
+H1(xt)α1 + H1(xt+1 )α1 − 1+ (1 + 2 α1) (H1(xt)−α1−1∂λ1,λ 1 H1(xt) + H1(xt+1 )−α1−1∂λ1,λ 1 H1(xt+1 )) 
+
+H1(xt)α1 + H1(xt+1 )α1 − 1+ α1(1 + 2 α1) (H1(xt)−α1−1∂λ1 H1(xt) + H1(xt+1 )−α1−1∂λ1 H1(xt+1 )) 2
+
+(H1(xt)α1 + H1(xt+1 )α1 − 1) 2
+
+− (1 + α01 )( ∂λ1,λ 1 H1(xτ +1 )
+
+H1(xτ +1 ) − ∂λ1 H1(xτ +1 )2
+
+H1(xτ +1 )2 )
+
+− (1 + 2 α01 )(1 + α01 ) H1(xτ +1 )−α01 −2∂λ1 H1(xτ +1 )2
+
+H0(xτ )−α01 + H1(xτ +1 )−α01 − 1+ (1 + 2 α01 ) H1(xτ +1 )−α01 −1∂λ1,λ 1 H1(xτ +1 )
+
+H0(xτ )−α01 + H1(xτ +1 )−α01 − 1+ α01 (1 + 2 α01 ) (H1(xτ +1 )−α01 −1∂λ1 H1(xτ +1 )) 2
+
+(H0(xτ )−α01 + H1(xτ +1 )−α01 − 1) 2
+
+35 where 
+
+∂k0,k 0 h0(x) = 1
+
+λ0
+
+ xλ0
+
+k0−1
+
+e− 
+
+> xλ0
+> k0
+
+ln 
+
+ xλ0
+
+ (
+
+2 + k0 ln 
+
+ xλ0
+
+ "
+
+1 −
+
+ xλ0
+
+2k0
+
+−
+
+ xλ0
+
+k0
+
+#) 
+
+∂k1,k 1 h1(x) = 1
+
+λ1
+
+ xλ1
+
+k1−1
+
+e− 
+
+> xλ1
+> k1
+
+ln 
+
+ xλ1
+
+ (
+
+2 + k1 ln 
+
+ xλ1
+
+ "
+
+1 −
+
+ xλ1
+
+2k1
+
+−
+
+ xλ1
+
+k1
+
+#) 
+
+∂k0,λ 0 h0(x) = 
+
+ xλ0
+
+k0−1
+
+e−  
+
+> xλ0
+> k0
+
+
+
+1 + k0 ln 
+
+ xλ0
+
+
+
++ 1 − 2k0
+
+λ20
+
++ k0
+
+ xλ0
+
+k0 
+
+− ln 
+
+ xλ0
+
+
+
++ k0
+
+λ20
+
+
+
++ k0
+
+λ20
+
+ln 
+
+ xλ0
+
+ " xλ0
+
+k0
+
+(1 + k0) + (1 − k0)
+
+#
+
+− k20
+
+λ20
+
+ xλ0
+
+2k0
+
+ln 
+
+ xλ0
+
+ 
+
+∂k1,λ 1 h1(x) = 
+
+ xλ1
+
+k1−1
+
+e−  
+
+> xλ1
+> k1
+
+
+
+1 + k1 ln 
+
+ xλ1
+
+
+
++ 1 − 2k1
+
+λ21
+
++ k1
+
+ xλ1
+
+k1 
+
+− ln 
+
+ xλ1
+
+
+
++ k1
+
+λ21
+
+
+
++ k1
+
+λ21
+
+ln 
+
+ xλ1
+
+ " xλ1
+
+k1
+
+(1 + k1) + (1 − k1)
+
+#
+
+− k21
+
+λ21
+
+ xλ1
+
+2k1
+
+ln 
+
+ xλ1
+
+ 
+
+∂λ0,λ 0 h0(x) = k20
+
+λ30
+
+e− 
+
+> xλ0
+> k0
+
+(
+
+−(k0 + 1) 
+
+" xλ0
+
+k0
+
+− 1
+
+#
+
++ k0
+
+ xλ0
+
+k0−1 " xλ0
+
+2k0−1
+
+−
+
+ xλ0
+
+k0
+
+− 1
+
+#) 
+
+∂λ1,λ 1 h1(x) = k21
+
+λ31
+
+e− 
+
+> xλ1
+> k1
+
+(
+
+−(k1 + 1) 
+
+" xλ1
+
+k1
+
+− 1
+
+#
+
++ k1
+
+ xλ1
+
+k1−1 " xλ1
+
+2k1−1
+
+−
+
+ xλ1
+
+k1
+
+− 1
+
+#) 
+
+.
+
+B.2 First- and Second-Order Derivatives for the Joe Copula 
+
+The Joe copula is defined by 
+
+Cα(u, v ) = 1 − J(u, v, α )1/α ,
+
+where 
+
+J(u, v, α ) = (1 − u)α + (1 − v)α − (1 − u)α(1 − v)α.
+
+The corresponding copula density function is 
+
+cα(u, v ) = J(u, v, α ) 1 
+
+> α−2
+
+(1 − u)α−1(1 − v)α−1 [( α − 1) + J(u, v, α )] .
+
+Hence, the log-density function can be written as log cα(u, v ) = 
+
+ 1
+
+α − 2
+
+
+
+log J(u, v, α )+( α−1) log(1 −u)+( α−1) log(1 −v)+log [( α − 1) + J(u, v, α )] .
+
+For notational simplicity, let 
+
+Htk = Hk(xt), Ht+1  
+
+> k
+
+= Hk(xt+1 ), k = 0 , 1.
+
+The corresponding first- and second-order derivatives are given as follows: 
+
+∂α log cα(Ht
+
+> 0
+
+, H t+1 0 ) = − 1
+
+α2 log J +
+
+ 1
+
+α − 2
+
+ ∂αJJ + log(1 − Ht
+
+> 0
+
+) + log(1 − Ht+1 0 ) + 1 + ∂αJα − 1 + J
+
+36 ∂k log cα(Ht
+
+> 0
+
+, H t+1 0 ) = 
+
+ 1
+
+α − 2
+
+ ∂kJ(∂kHt 
+
+> 0
+
++ ∂kHt+1 0 )
+
+J
+
++ ( α − 1) 
+
+ ∂kHt
+
+> 0
+
+1 − Ht
+
+> 0
+
++ ∂kHt+1 0
+
+1 − Ht+1 0
+
+
+
++ ∂kJ(∂kHt 
+
+> 0
+
++ ∂kHt+1 0 )
+
+α − 1 + J∂λ log cα(Ht
+
+> 0
+
+, H t+1 0 ) = 
+
+ 1
+
+α − 2
+
+ ∂λJ(∂λHt 
+
+> 0
+
++ ∂λHt+1 0 )
+
+J
+
++ ( α − 1) 
+
+ ∂λHt
+
+> 0
+
+1 − Ht
+
+> 0
+
++ ∂λHt+1 0
+
+1 − Ht+1 0
+
+
+
++ ∂λJ(∂λHt 
+
+> 0
+
++ ∂λHt+1 0 )
+
+α − 1 + J∂αα log cα(Ht
+
+> 0
+
+, H t+1 0 ) = 2
+
+α3 log J − 1
+
+α2
+
+∂αJJ +
+
+ 1
+
+α − 2
+
+ ∂αα JJ − ∂αJ2
+
+J2
+
++ ∂αα J(α − 1 + J) − ∂αJ(1 + ∂αJ)(α − 1 + J)2
+
+∂αk log cα(Ht
+
+> 0
+
+, H t+1 0 ) = − 1
+
+α2
+
+∂kJ(∂kHt 
+
+> 0
+
++ ∂kHt+1 0 )
+
+J − ∂kHt
+
+> 0
+
+1 − Ht
+
+> 0
+
+− ∂kHt+1 0
+
+1 − Ht+1 0
+
++ ∂αk J  ∂αk Ht 
+
+> 0
+
++ ∂αk Ht+1 0
+
+ J − ∂αJ∂ kJ  ∂kHt 
+
+> 0
+
++ ∂kHt+1 0
+
+
+
+J2
+
++ ∂αk J  ∂αk Ht 
+
+> 0
+
++ ∂αk Ht+1 0
+
+ (α − 1 + J) − (1 + ∂αJ)∂kJ  ∂kHt 
+
+> 0
+
++ ∂kHt+1 0
+
+
+
+(α − 1 + J)2
+
+∂αλ log cα(Ht
+
+> 0
+
+, H t+1 0 ) = − 1
+
+α2
+
+∂λJ(∂λHl 
+
+> 0
+
++ ∂λHl+1 0 )
+
+J − ∂λHt
+
+> 0
+
+1 − Ht
+
+> 0
+
+− ∂λHt+1 0
+
+1 − Ht+1 0
+
+++ ∂αλ J(∂αλ Ht 
+
+> 0
+
++ ∂αλ Ht+1 0 )J − ∂αJ∂ λJ(∂λHt 
+
+> 0
+
++ ∂λHt+1 0 )
+
+J2
+
+∂αλ J  ∂αλ Ht 
+
+> 0
+
++ ∂αλ Ht+1 0
+
+ (α − 1 + J) − (1 + ∂αJ)∂λJ  ∂λHt 
+
+> 0
+
++ ∂λHt+1 0
+
+
+
+(α − 1 + J)2
+
+∂kλ log cα(Ht
+
+> 0
+
+, H t+1 0 ) = 
+
+( ∂kλ J  ∂λGt 
+
+> 0
+
++ ∂λHt+1 0
+
+   ∂kHt 
+
+> 0
+
++ ∂kHt+1 0
+
+ + ∂kJ  ∂kλ Ht 
+
+> 0
+
++ ∂kλ Ht+1 0
+
+ JJ2
+
+− ∂kJ∂ λJ  ∂λHt 
+
+> 0
+
++ ∂λHt+1 0
+
+   ∂kHt 
+
+> 0
+
++ ∂kHt+1 0
+
+
+
+J2
+
+)  1
+
+α − 2
+
+
+
++ ( α − 1) ∂kλ Ht
+
+> 0
+
+ 1 − Ht
+
+> 0
+
+ + ∂kHt
+
+> 0
+
+∂λHt
+
+> 0
+
+(1 − Ht
+
+> 0
+
+)2 + ∂kλ Ht+1 0
+
+ 1 − Ht+1 0
+
+ + ∂kHt+1 0 ∂λHt+1 0
+
+ 1 − Ht+1 0
+
+2
+
+!
+
++ {∂kλ J  ∂λHt 
+
+> 0
+
++ ∂λHt+1 0
+
+   ∂kHt 
+
+> 0
+
++ ∂kHt+1 0
+
+ + ∂kJ  ∂kλ Ht 
+
+> 0
+
++ ∂kλ Ht+1 0
+
+}(α − 1 + J)(α − 1 + J)2
+
+− ∂kJ∂ λJ  ∂λHt 
+
+> 0
+
++ ∂λHt+1 0
+
+   ∂kHt 
+
+> 0
+
++ ∂kHt+1 0
+
+
+
+(α − 1 + J)2
+
+37 where 
+
+∂αJ(Ht
+
+> 0
+
+, H t+1 0 , α ) = α{(1 − Ht
+
+> 0
+
+)α−1 + (1 − Ht+1 0 )α−1 − [(1 − Ht
+
+> 0
+
+)(1 − Ht+1 0 )] α−1}
+
+∂kJ (Ht
+
+> 0
+
+, H t+1 0 , α ) = − α(1 − Ht
+
+> 0
+
+)α−1∂kHt 
+
+> 0
+
+− α(1 − Ht+1 0 )α−1∂kHt+1 0
+
++ α(1 − Ht
+
+> 0
+
+)α−1∂kHt
+
+> 0
+
+(1 − Ht+1 0 )α + α(1 − Ht
+
+> 0
+
+)α∂kHt+1 0 (1 − Ht+1 0 )α−1
+
+∂λJ (Ht
+
+> 0
+
+, H t+1 0 , α ) = − α(1 − Ht
+
+> 0
+
+)α−1∂λHt 
+
+> 0
+
+− α(1 − Ht+1 0 )α−1∂λHt+1 0
+
++ α(1 − Ht
+
+> 0
+
+)α−1∂λHt
+
+> 0
+
+(1 − Ht+1 0 )α + α(1 − Ht
+
+> 0
+
+)α∂λHt+1 0 (1 − Ht+1 0 )α−1
+
+∂αα J (Ht
+
+> 0
+
+, H t+1 0 , α ) = α(α − 1) {(1 − Ht
+
+> 0
+
+)α−2 + (1 − Ht+1 0 )α−2 − [(1 − Ht
+
+> 0
+
+)(1 − Ht+1 0 )] α−2}
+
+∂αk J (Ht
+
+> 0
+
+, H t+1 0 , α ) = − α(1 − Ht
+
+> 0
+
+)α−1∂kHt 
+
+> 0
+
+− α(1 − Ht+1 0 )α−1∂kHt+1 0
+
++ α(1 − Ht
+
+> 0
+
+)α−1∂kHt
+
+> 0
+
+(1 − Ht+1 0 )α + α(1 − Ht
+
+> 0
+
+)α∂kHt+1 0 (1 − Ht+1 0 )α−1
+
+∂kλ J (Ht
+
+> 0
+
+, H t+1 0 , α ) = α(α − 1)(1 − Ht
+
+> 0
+
+)α−2∂kHt
+
+> 0
+
+∂λHt 
+
+> 0
+
+− α(1 − Ht
+
+> 0
+
+)α−1∂kλ Ht
+
+> 0
+
++ α(α − 1)(1 − Ht+1 0 )α−2∂kHt+1 0 ∂λHt+1 0 − α(1 − Ht+1 0 )α−1∂kλ Ht+1 0
+
+− α(α − 1)(1 − Ht
+
+> 0
+
+)α−2∂kHt
+
+> 0
+
+∂λHt
+
+> 0
+
+(1 − Ht+1 0 )α
+
++ α(1 − Ht
+
+> 0
+
+)α−1∂kλ Ht
+
+> 0
+
+(1 − Ht+1 0 )α
+
+− α2(1 − Ht
+
+> 0
+
+)α−1(1 − Ht+1 0 )α−1(∂kHt
+
+> 0
+
+∂λHt+1 0 + ∂λHt
+
+> 0
+
+∂kHt+1 0 )
+
+− α(α − 1)(1 − Ht
+
+> 0
+
+)α(1 − Ht+1 0 )α−2∂kHt+1 0 ∂λHt+1 0
+
++ α(1 − Ht
+
+> 0
+
+)α−1(1 − Ht+1 0 )α−1∂kλ Ht+1 0
+
+According to the previous results, we can obtain the first and the second derivatives for 
+
+ℓ(θ) = log L(θ) given by 
+
+∂α0 ℓ(θ) =  
+
+> τ−1
+
+X
+
+> t=1
+
+∂α0 cα0 (H0(xt), H 0(xt+1 )) 
+
+cα0 (H0(xt), H 0(xt+1 )) 
+
+∂α1 ℓ(θ) =  
+
+> T−1
+
+X 
+
+> t=τ+1
+
+∂α1 cα1 (H1(xt), H 1(xt+1 )) 
+
+cα1 (H1(xt), H 1(xt+1 )) 
+
+∂k0 ℓ(θ) = 
+
+> τ
+
+X
+
+> t=1
+
+∂k0 h0(xt)
+
+h0(xt) + 
+
+> τ−1
+
+X
+
+> t=1
+
+∂k0 cα0 (H0(xt), H 0(xt+1 )) 
+
+cα0 (H0(xt), H 0(xt+1 )) + ∂k0 cα01 (H0(xτ ), H 1(xτ +1 )) 
+
+cα01 (H0(xτ ), H 1(xτ +1 )) 
+
+∂k1 ℓ(θ) = 
+
+> T
+
+X 
+
+> t=τ+1
+
+∂k1 h1(xt)
+
+h1(xt) + 
+
+> T−1
+
+X 
+
+> t=τ+1
+
+∂k1 cα1 (H1(xt), H 1(xt+1 )) 
+
+cα1 (H1(xt), H 1(xt+1 )) + ∂k1 cα01 (H0(xτ ), H 1(xτ +1 )) 
+
+cα01 (H0(xτ ), H 1(xτ +1 )) 
+
+∂λ0 ℓ(θ) = 
+
+> τ
+
+X
+
+> t=1
+
+∂λ0 h0(xt)
+
+h0(xt) + 
+
+> τ−1
+
+X
+
+> t=1
+
+∂λ0 cα0 (H0(xt), H 0(xt+1 )) 
+
+cα0 (H0(xt), H 0(xt+1 )) + ∂λ0 cα01 (H0(xτ ), H 1(xτ +1 )) 
+
+cα01 (H0(xτ ), H 1(xτ +1 )) 
+
+∂λ1 ℓ(θ) = 
+
+> T
+
+X 
+
+> t=τ+1
+
+∂λ1 h1(xt)
+
+h1(xt) + 
+
+> T−1
+
+X 
+
+> t=τ+1
+
+∂λ1 cα1 (H1(xt), H 1(xt+1 )) 
+
+cα1 (H1(xt), H 1(xt+1 )) + ∂λ1 cα01 (H0(xτ ), H 1(xτ +1 )) 
+
+cα01 (H0(xτ ), H 1(xτ +1 )) 38 ∂α0α0 ℓ(θ) = 
+
+τ −1X
+
+t=1 
+
+∂α0α0 cα0 (H0(xt), H 0(xt+1 )) cα0 (H0(xt), H 0(xt+1 )) − [∂α0 cα0 (H0(xt), H 0(xt+1 ))] 2
+
+[cα0 (H0(xt), H 0(xt+1 ))] 2
+
+∂α1α1 ℓ(θ) = 
+
+TX
+
+t=τ +1 
+
+∂α1α1 cα1 (H1(xt), H 1(xt+1 )) cα1 (H1(xt), H 1(xt+1 )) − [∂α1 cα1 (H1(xt), H 1(xt+1 ))] 2
+
+[cα1 (H1(xt), H 1(xt+1 ))] 2
+
+∂α0α1 ℓ(θ) = 0 
+
+∂α0k0 ℓ(θ) = 
+
+τ −1X
+
+t=1 
+
+∂α0k0 cα0 (H0(xt), H 0(xt+1 )) cα0 (H0(xt), H 0(xt+1 )) [cα0 (H0(xt), H 0(xt+1 ))] 2
+
+−
+
+τ −1X
+
+t=1 
+
+∂α0 cα0 (H0(xt), H 0(xt+1 )) ∂k0 cα0 (H0(xt), H 0(xt+1 )) [cα0 (H0(xt), H 0(xt+1 ))] 2
+
+∂α1k1 ℓ(θ) = 
+
+TX
+
+t=τ +1 
+
+∂α1k1 cα1 (H1(xt), H 1(xt+1 )) cα1 (H1(xt), H 1(xt+1 )) [cα1 (H1(xt), H 1(xt+1 ))] 2
+
+−
+
+TX
+
+t=τ +1 
+
+∂α1 cα1 (H1(xt), H 1(xt+1 )) ∂k1 cα1 (H1(xt), H 1(xt+1 )) [cα1 (H1(xt), H 1(xt+1 ))] 2
+
+∂α0k1 ℓ(θ) = 0 
+
+∂α1k0 ℓ(θ) = 0 
+
+∂α0λ0 ℓ(θ) = 
+
+τ −1X
+
+t=1 
+
+∂α0λ0 cα0 (H0(xt), H 0(xt+1 )) cα0 (H0(xt), H 0(xt+1 )) [cα0 (H0(xt), H 0(xt+1 ))] 2
+
+−
+
+τ −1X
+
+t=1 
+
+∂α0 cα0 (H0(xt), H 0(xt+1 )) ∂λ0 cα0 (H0(xt), H 0(xt+1 )) [cα0 (H0(xt), H 0(xt+1 ))] 2
+
+∂α1λ1 ℓ(θ) = 
+
+TX
+
+t=τ +1 
+
+∂α1λ1 cα1 (H1(xt), H 1(xt+1 )) cα1 (H1(xt), H 1(xt+1 )) [cα1 (H1(xt), H 1(xt+1 ))] 2
+
+−
+
+TX
+
+t=τ +1 
+
+∂α1 cα1 (H1(xt), H 1(xt+1 )) ∂λ1 cα1 (H1(xt), H 1(xt+1 )) [cα1 (H1(xt), H 1(xt+1 ))] 2
+
+∂α0λ1 ℓ(θ) = 0 
+
+∂α1λ0 ℓ(θ) = 0 
+
+∂k0k0 ℓ(θ) = 
+
+τX
+
+t=1 
+
+∂k0k0 h0(xt)h0(xt) − [∂k0 h0(xt)] 2
+
+[h0(xt)] 2
+
++
+
+τ −1X
+
+t=1 
+
+∂k0k0 cα0
+
+ H0(xt), H 0(xt+1 )cα0
+
+ H0(xt), H 0(xt+1 ) − ∂k0 cα0
+
+ H0(xt), H 0(xt+1 ) 2
+
+h
+
+cα0
+
+ H0(xt), H 0(xt+1 ) 2i
+
++ ∂k0k0 cα01 
+
+ H0(xτ ), H 1(xτ +1 )cα01 
+
+ H0(xτ ), H 1(xτ +1 ) − ∂k0 cα01 
+
+ H0(xτ ), H 1(xτ +1 ) 2
+
+cα01 
+
+ H0(xτ ), H 1(xτ +1 ) 2
+
+39 ∂k0k1 ℓ(θ) = ∂k0k1 cα01 (H0(xτ ), H 1(xτ +1 )) cα01 (H0(xτ ), H 1(xτ +1 )) [cα01 (H0(xτ ), H 1(xτ +1 ))] 2
+
+− ∂k0 cα01 (H0(xτ ), H 1(xτ +1 )) ∂k1 cα01 (H0(xτ ), H 1(xτ +1 )) [cα01 (H0(xτ ), H 1(xτ +1 ))] 2
+
+∂k1k1 ℓ(θ) = 
+
+TX
+
+t=τ +1 
+
+∂k1k1 h1(xt)h1(xt) − [∂k1 h1(xt)] 2
+
+[h1(xt)] 2
+
++
+
+T −1X
+
+t=τ +1 
+
+∂k1k1 cα1
+
+ H1(xt), H 1(xt+1 )cα1
+
+ H1(xt), H 1(xt+1 ) − ∂k1 cα1
+
+ H1(xt), H 1(xt+1 ) 2
+
+cα1
+
+ H1(xt), H 1(xt+1 ) 2
+
++ ∂k1k1 cα01 
+
+ H0(xτ ), H 1(xτ +1 )cα01 
+
+ H0(xτ ), H 1(xτ +1 ) − ∂k1 cα01 
+
+ H0(xτ ), H 1(xτ +1 ) 2
+
+h
+
+cα01 
+
+ H0(xτ ), H 1(xτ +1 ) 2i2
+
+∂λ0λ0 ℓ(θ) = 
+
+τX
+
+t=1 
+
+∂λ0λ0 h0(xt)h0(xt) − [∂λ0 h0(xt)] 2
+
+[h0(xt)] 2
+
++
+
+τ −1X
+
+t=1 
+
+∂λ0λ0 cα0 (H0(xt), H 0(xt+1 )) cα0 (H0(xt), H 0(xt+1 )) − [∂λ0 cα0 (H0(xt), H 0(xt+1 ))] 2
+
+[cα0 (H0(xt), H 0(xt+1 ))] 2
+
++ ∂λ0λ0 cα01 (H0(xτ ), H 1(xτ +1 )) cα01 (H0(xτ ), H 1(xτ +1 )) − [∂λ0 cα01 (H0(xτ ), H 1(xτ +1 ))] 2
+
+[cα01 (H0(xτ ), H 1(xτ +1 ))] 2
+
+∂λ0λ1 ℓ(θ) = ∂λ0λ1 cα01 (H0(xτ ), H 1(xτ +1 )) cα01 (H0(xτ ), H 1(xτ +1 )) [cα01 (H0(xτ ), H 1(xτ +1 ))] 2
+
+− ∂λ0 cα01 (H0(xτ ), H 1(xτ +1 )) ∂λ1 cα01 (H0(xτ ), H 1(xτ +1 )) [cα01 (H0(xτ ), H 1(xτ +1 ))] 2
+
+∂λ1λ1 ℓ(θ) = 
+
+TX
+
+t=τ
+
+∂λ1λ1 h1(xt)h1(xt) − [∂λ1 h1(xt)] 2
+
+[h1(xt)] 2
+
++
+
+T −1X
+
+t=τ +1 
+
+∂λ1λ1 cα1 (H1(xt), H 1(xt+1 )) cα1 (H1(xt), H 1(xt+1 )) − [∂λ1 cα1 (H1(xt), H 1(xt+1 ))] 2
+
+[cα1 (H1(xt), H 1(xt+1 ))] 2
+
++ ∂λ1λ1 cα01 (H0(xτ ), H 1(xτ +1 )) cα01 (H0(xτ ), H 1(xτ +1 )) − [∂λ1 cα01 (H0(xτ ), H 1(xτ +1 ))] 2
+
+[cα01 (H0(xτ ), H 1(xτ +1 ))] 2
+
+40 ∂k0λ0 ℓ(θ) = 
+
+> τ
+
+X
+
+> t=1
+
+∂k0λ0 h0(xt)h0(xt) − ∂k0 h0(xt)∂λ0 h0(xt)[h0(xt)] 2 + 
+
+> τ−1
+
+X
+
+> t=1
+
+∂k0λ0 cα0 (H0(xt), H 0(xt+1 )) cα0 (H0(xt), H 0(xt+1 )) [cα0 (H0(xt), H 0(xt+1 ))] 2
+
+− 
+
+> τ−1
+
+X
+
+> t=1
+
+∂k0 cα0 (H0(xt), H 0(xt+1 )) ∂λ0 cα0 (H0(xt), H 0(xt+1 )) [cα0 (H0(xt), H 0(xt+1 ))] 2
+
++ ∂k0λ0 cα01 (H0(xτ ), H 1(xτ +1 )) cα01 (H0(xτ ), H 1(xτ +1 )) [cα01 (H0(xτ ), H 1(xτ +1 ))] 2
+
+− ∂k0 cα01 (H0(xτ ), H 1(xτ +1 )) ∂λ0 cα01 (H0(xτ ), H 1(xτ +1 )) [cα01 (H0(xτ ), H 1(xτ +1 ))] 2
+
+∂k0λ1 ℓ(θ) = ∂k0λ1 cα01 (H0(xτ ), H 1(xτ +1 )) cα01 (H0(xτ ), H 1(xτ +1 )) [cα01 (H0(xτ ), H 1(xτ +1 ))] 2
+
+− ∂k0 cα01 (H0(xτ ), H 1(xτ +1 )) ∂λ1 cα01 (H0(xτ ), H 1(xτ +1 )) [cα01 (H0(xτ ), H 1(xτ +1 ))] 2
+
+∂k1λ0 ℓ(θ) = ∂k1λ0 cα01 (H0(xτ ), H 1(xτ +1 )) cα01 (H0(xτ ), H 1(xτ +1 )) [cα01 (H0(xτ ), H 1(xτ +1 ))] 2
+
+− ∂k1 cα01 (H0(xτ ), H 1(xτ +1 )) ∂λ0 cα01 (H0(xτ ), H 1(xτ +1 )) [cα01 (H0(xτ ), H 1(xτ +1 ))] 2
+
+∂k1λ1 ℓ(θ) = 
+
+> T
+
+X 
+
+> t=τ+1
+
+∂k1λ1 h1(xt)h1(xt) − ∂k1 h1(xt)∂λ1 h1(xt)[h1(xt)] 2
+
++ 
+
+> T−1
+
+X 
+
+> t=τ+1
+
+∂k1λ1 cα1 (H1(xt), H 1(xt+1 )) cα1 (H1(xt), H 1(xt+1 )) [cα1 (H1(xt), H 1(xt+1 ))] 2
+
+− 
+
+> T−1
+
+X 
+
+> t=τ+1
+
+∂k1 cα1 (H1(xt), H 1(xt+1 )) ∂λ1 cα1 (H1(xt), H 1(xt+1 )) [cα1 (H1(xt), H 1(xt+1 ))] 2
+
++ ∂k1λ1 cα01 (H0(xτ ), H 1(xτ +1 )) cα01 (H0(xτ ), H 1(xτ +1 )) [cα01 (H0(xτ ), H 1(xτ +1 ))] 2
+
+− ∂k1 cα01 (H0(xτ ), H 1(xτ +1 )) ∂λ1 cα01 (H0(xτ ), H 1(xτ +1 )) [cα01 (H0(xτ ), H 1(xτ +1 ))] 2
+
+## C VIX Interarrival Times Above Threshold 30 
+
+This section presents the interarrival times associated with VIX values exceeding the thresh-old level of 30 during the period from 2018 to 2024, which is commonly interpreted as a signal of elevated market fear and financial uncertainty. 41 Breakthrough date T value Breakthrough date T value Breakthrough date T value Breakthrough date T value 2018-02-05 34 2020-04-09 1 2020-06-25 1 2022-03-11 12018-02-08 3 2020-04-13 4 2020-06-26 1 2022-03-14 32018-12-21 316 2020-04-14 1 2020-06-29 3 2022-04-26 43 2018-12-24 3 2020-04-15 1 2020-06-30 1 2022-04-27 12018-12-26 2 2020-04-16 1 2020-07-13 13 2022-04-29 22020-02-27 428 2020-04-17 1 2020-09-03 52 2022-05-02 32020-02-28 1 2020-04-20 1 2020-09-04 1 2022-05-05 32020-03-02 1 2020-04-21 1 2020-09-08 4 2022-05-06 12020-03-03 1 2020-04-22 1 2020-10-26 48 2022-05-09 32020-03-04 1 2020-04-23 1 2020-10-27 1 2022-05-10 12020-03-05 1 2020-04-24 1 2020-10-28 1 2022-05-11 12020-03-06 1 2020-04-27 1 2020-10-29 1 2022-05-12 12020-03-09 1 2020-04-28 1 2020-10-30 1 2022-05-18 62020-03-10 1 2020-04-29 1 2020-11-02 1 2022-06-13 26 2020-03-11 1 2020-04-30 1 2020-11-03 1 2022-06-14 12020-03-12 1 2020-05-01 1 2021-01-27 85 2022-06-16 22020-03-13 1 2020-05-04 1 2021-01-28 1 2022-06-17 12020-03-16 1 2020-05-05 1 2021-01-29 1 2022-06-21 42020-03-17 1 2020-05-06 1 2021-02-01 3 2022-09-26 97 2020-03-18 1 2020-05-07 1 2021-12-01 303 2022-09-27 12020-03-19 1 2020-05-12 5 2021-12-03 2 2022-09-28 12020-03-20 1 2020-05-13 1 2022-01-25 53 2022-09-29 12020-03-23 1 2020-05-14 1 2022-01-26 1 2022-09-30 12020-03-24 1 2020-05-15 1 2022-01-27 1 2022-10-03 32020-03-25 1 2020-05-19 4 2022-02-23 27 2022-10-06 32020-03-26 1 2020-06-11 23 2022-02-24 1 2022-10-07 12020-03-27 1 2020-06-12 1 2022-02-28 4 2022-10-10 32020-03-30 1 2020-06-15 3 2022-03-01 1 2022-10-11 12020-03-31 1 2020-06-16 1 2022-03-02 1 2022-10-12 12020-04-01 1 2020-06-17 1 2022-03-03 1 2022-10-13 12020-04-02 1 2020-06-18 1 2022-03-04 1 2022-10-14 32020-04-03 1 2020-06-19 1 2022-03-07 1 2022-10-17 12020-04-06 1 2020-06-22 3 2022-03-08 1 2022-10-18 12020-04-07 1 2020-06-23 1 2022-03-09 1 2022-10-19 12020-04-08 1 2020-06-24 1 2022-03-10 1
+
+42 References 
+
+[1] B. K. Beare. Copulas and temporal dependence. Econometrica , 78(1):395–410, 2010. [2] X. Chen and Y. Fan. Estimation of copula-based semiparametric time series models. 
+
+Journal of Econometrics , 130(2):307–335, 2006. [3] D. G. Clayton. A model for association in bivariate life tables and its application in epidemiological studies of familial tendency in chronic disease incidence. Biometrika ,65(1):141–151, 1978. [4] T. Emura, C.-C Lai, and L.-H. Sun. Change point estimation under a copula-based markov chain model for binomial time series. Econometrics and Statistics , 28:120–137, 2023. [5] T. Emura and K. Murotani. An algorithm for estimating survival under a copula-based dependent truncation model. Test , 24:734–751, 2015. [6] X.W. Huang and T. Emura. Model diagnostic procedures for copula-based markov chain models for statistical process control. Communications in Statistics-Simulation and Computation , 50(8):2345–2367, 2021. [7] Edward Ionides, Ning Ning, and Jesse Wheeler. An iterated block particle filter for inference on coupled dynamic systems with shared and unit-specific parameters. Sta-tistica Sinica , 34:1–22, 2024. [8] S Rao Jammalamadaka, Jinwen Qiu, and Ning Ning. Multivariate Bayesian Structural Time Series Model. Journal of Machine Learning Research , 2018. [9] S Rao Jammalamadaka, Jinwen Qiu, and Ning Ning. Predicting a Stock Portfolio with the Multivariate Bayesian Structural Time Series Model: Do News or Emotions Matter? International Journal of Artificial Intelligence , 17(2):81–104, 2019. [10] H. Joe. Parametric families of multivariate distributions with given margins. 46 (2), 262–282. Journal of Multivariate Analysis , 46(2):262–282, 1993. [11] H. Joe. Multivariate models and multivariate dependence concepts . CRC press, 1997. [12] J. Kuepper. CBOE volatility index (vix): What does it measure in investing? Investo-pedia , 2024. [13] M. Lavielle and G. Teyssiere. Adaptive detection of multiple change-points in asset price volatility. In Long Memory in Economics , pages 129–156. Springer, 2007. [14] I. L MacDonald. Does newton–raphson really fail? Statistical Methods in Medical Research , 23(3):308–311, 2014. [15] Ning Ning and Edward Ionides. Iterated Block Particle Filter for High-dimensional Pa-rameter Learning: Beating the Curse of Dimensionality. Journal of Machine Learning Research , 2023. 43 [16] C. Parpoula. A distribution-free control charting technique based on change-point analysis for detection of epidemics. Statistical Methods in Medical Research , 31(6):1067– 1084, 2022. [17] Jinwen Qiu, S Rao Jammalamadaka, and Ning Ning. Multivariate time series analysis from a Bayesian machine learning perspective. Annals of Mathematics and Artificial Intelligence , 88(10):1061–1082, 2020. [18] J. Reeves, J. Chen, X. L. Wang, R. Lund, and Q. Q. Lu. A review and comparison of changepoint detection techniques for climate data. Journal of Applied Meteorology and Climatology , 46(6):900–915, 2007. [19] M Sklar. Fonctions de r´ epartition ` a n dimensions et leurs marges. In Annales de l’ISUP , volume 8, pages 229–231, 1959. [20] L.-H. Sun, Z.-Y. Huang, Y.-L.. Huang, C.-Y. Chiu, and N. Ning. Online supplement for ”Change-point estimation for weibull time series data with copula-based markov chain models (https://sites.google.com/view/lhsun/publication). National Central Univer-sity , 2026. [21] L.-H. Sun, C.-S. Lee, and T. Emura. A Bayesian inference for time series via copula-based markov chain models. Communications in Statistics-Simulation and Computa-tion , 49(11):2897–2913, 2020. [22] L.-H. Sun, Y.-K. Wang, L.-H. Liu, T Emura, and C.-Y. Chiu. Change-point estimation for gaussian time series data with copula-based markov chain models. Computational Statistics , 40:1541–1581, 2025. [23] R. J. Tibshirani and B. Efron. An introduction to the bootstrap. Monographs on statistics and applied probability , 57(1):1–436, 1993. [24] D. H. Timmer and J. J. Pignatiello Jr. Change point estimates for the parameters of an AR(1) process. Quality and Reliability Engineering International , 19(4):355–369, 2003. 44

@@ -1,0 +1,2549 @@
+Title: Distributional Portfolio Optimization (DPO): A Unified Framework for Distributions over Weights, Returns, and Parameters
+
+URL Source: https://arxiv.org/pdf/2605.30464v1
+
+Published Time: Mon, 01 Jun 2026 00:05:19 GMT
+
+Number of Pages: 51
+
+Markdown Content:
+# Distributional Portfolio Optimization (DPO): A Unified Framework for Distributions over Weights, Returns, and Parameters 
+
+Miquel Noguer i Alonso Artificial Intelligence Finance Institute (AIFI) June 1, 2026 
+
+Abstract 
+
+Classical portfolio optimization treats expected returns, covariances, and allocations as de-terministic. Modern practice replaces at least one by a distribution—a posterior over param-eters, a law of future returns, a stochastic allocation policy, or a distributional-robustness set. We call distributional portfolio optimization (DPO) the unified framework in which weights, returns, and parameters are all modelled as probability measures, organized around the joint coupling Γ θ (dw, dr ) of allocations and returns and its marginal triple ( W, R, P ). The contribution is synthetic and structural: we organize Bayesian, robust, chance-constrained, stochastic-allocation, and distributional-RL portfolio methods through this coupling and prove boundary results connecting them. These include a portfolio special-ization of the Wasserstein–CVaR duality of Mohajerin Esfahani and Kuhn (2018), reduc-ing the linear-loss case to empirical CVaR plus the dual-norm penalty ( ε/α )∥w∥∗; a static no-randomization theorem; a Bayesian credible-radius calibration of Wasserstein DRO (a posterior calibration of the ambiguity radius, distinct from the distribution-free coverage radius); a Gaussian-isotropic second-order conservatism bound with first-order tightness in nonsmooth models; a conditional two-sided rate W1(Rpred  
+
+> n
+
+, R bθn ) = Θ( n−(1+ α⋆)/2) governed by the local boundary H¨ older exponent α⋆ ∈ [0 , 1]; and a risk-shifted distributional Bellman contraction at rate γ + λL ρ.Numerical experiments are illustrative. A controlled calibration experiment shows that across factor DGPs at K ∈ { 10 , 25 , 50 } the credible-radius rule lands within 3–7 bp of the oracle out-of-sample tail risk and strictly beats a 24-month validation-tuned radius while spending no validation data. On a K = 25 DJIA backtest, equal-weight 1 /N , no-view Black–Litterman, and Ledoit–Wolf shrinkage attain higher Sharpe than every distributional method both gross and net of cost; the operational claim is therefore confined to calibration-without-validation and turnover, not raw-return dominance over shrinkage or naive baselines. 
+
+Keywords: portfolio optimization, distributionally robust optimization, Bayesian portfolio choice, CVaR, coherent risk measures, Wasserstein distance, reinforcement learning, Dirich-let policy, Markov decision process. 
+
+1
+
+> arXiv:2605.30464v1 [q-fin.PM] 28 May 2026
+
+# Contents 
+
+1 Introduction 3
+
+1.1 The distributional triple . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 41.2 Contributions and organization . . . . . . . . . . . . . . . . . . . . . . . . . . . . 51.3 Relationship to RLPO . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 6
+
+2 Measure-theoretic preliminaries 7
+
+2.1 State spaces and probability measures . . . . . . . . . . . . . . . . . . . . . . . . 72.2 Parameter space . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 82.3 Utility and risk functionals . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 82.4 The Wasserstein geometry on Pp(RK ) . . . . . . . . . . . . . . . . . . . . . . . . 82.5 Standing assumptions . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 92.6 Notation guide . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 9
+
+3 The distributional triple: taxonomy 10 
+
+3.1 The induced portfolio-outcome distribution . . . . . . . . . . . . . . . . . . . . . 11 3.2 Taxonomy table . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 12 
+
+4 Parameter distributions: Bayesian DPO 13 
+
+4.1 The Bayesian portfolio problem . . . . . . . . . . . . . . . . . . . . . . . . . . . . 13 4.2 Black–Litterman as a special case . . . . . . . . . . . . . . . . . . . . . . . . . . . 13 4.3 Utility-tilted posteriors . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 14 4.4 Posterior concentration and asymptotic plug-in equivalence . . . . . . . . . . . . 14 
+
+5 Return distributions: coherent risk and tail modeling 15 
+
+5.1 CVaR and the Rockafellar–Uryasev theorem . . . . . . . . . . . . . . . . . . . . . 15 5.2 Kusuoka and distortion representations . . . . . . . . . . . . . . . . . . . . . . . . 15 5.3 Entropic value-at-risk and KL duality . . . . . . . . . . . . . . . . . . . . . . . . 16 
+
+6 Distributionally robust DPO 16 
+
+6.1 Moment-based ambiguity . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 16 6.2 Wasserstein DRO: linear-loss case . . . . . . . . . . . . . . . . . . . . . . . . . . . 16 6.3 Wasserstein DRO of CVaR . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 17 6.4 Finite-sample DRO guarantees . . . . . . . . . . . . . . . . . . . . . . . . . . . . 18 6.5 ϕ-divergence ambiguity and EVaR–KL duality . . . . . . . . . . . . . . . . . . . 18 6.6 Comparison and tractability . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 18 
+
+7 Chance-constrained DPO 18 
+
+7.1 Gaussian reformulation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 18 7.2 CVaR inner approximation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 19 7.3 Scenario approximation: Calafiore–Campi . . . . . . . . . . . . . . . . . . . . . . 19 
+
+8 Weight distributions: stochastic allocations 19 
+
+8.1 Static randomization cannot improve concave risk-adjusted utility . . . . . . . . 19 8.2 Dirichlet policies on the simplex . . . . . . . . . . . . . . . . . . . . . . . . . . . . 20 8.3 Long-only alternatives and a true long–short construction . . . . . . . . . . . . . 21 8.4 Hierarchical allocations: HRP, RA-HRP, Bayesian HRP . . . . . . . . . . . . . . 21 
+
+9 Distributional reinforcement learning for portfolios 22 
+
+9.1 The portfolio MDP and distributional Bellman operator . . . . . . . . . . . . . . 22 9.2 Parameterizations . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 23 9.3 Risk-sensitive distributional control . . . . . . . . . . . . . . . . . . . . . . . . . . 23 210 Synthesis: domination and second-order conservatism 26 
+
+10.1 Domination . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 26 10.2 Posterior credible sets induce Wasserstein ambiguity sets . . . . . . . . . . . . . . 27 10.3 Gaussian-isotropic case: posterior mixing is second order . . . . . . . . . . . . . . 28 10.4 When is the first-order Bayesian–DRO bound tight? A taxonomy . . . . . . . . . 29 10.5 Conditional two-sided Bayes–Wasserstein rate via boundary H¨ older regularity . . 31 10.6 Implications for practice . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 35 10.7 The Gaussian–NIW Lipschitz constant . . . . . . . . . . . . . . . . . . . . . . . . 35 
+
+11 Numerical illustrations 35 
+
+11.1 Empirical equity backtest at K = 25, n = 60 . . . . . . . . . . . . . . . . . . . . 36 11.2 Experiment 1: Bayes–DRO convergence and second-order conservatism . . . . . . 39 11.3 Experiment 2: Wasserstein-DRO sensitivity . . . . . . . . . . . . . . . . . . . . . 41 11.4 Experiment 3: distributional Bellman contraction . . . . . . . . . . . . . . . . . . 42 11.5 Experiment 4: High-dimensional sensitivity, calibrated K = 50 DGP . . . . . . . 43 11.6 Experiment 5: calibration without validation . . . . . . . . . . . . . . . . . . . . 44 
+
+12 Limitations and open problems 46 13 Conclusion 47 A Point-in-time DJIA membership schedule 48 
+
+# 1 Introduction 
+
+The classical Markowitz problem (Markowitz, 1952) max  
+
+> w∈W
+
+w⊤μ − γ
+
+2 w⊤Σw (1) takes three inputs—the expected return μ, the covariance Σ, and the feasible set W—and produces a single allocation w⋆. Every quantity on both sides is treated as deterministic. The justification for using (1) as a proxy for expected-utility maximization extends beyond Gaussian returns: as formalized by Benveniste et al. (2024), the maximum-expected-utility allocation coincides with the mean–variance allocation for any standard concave utility whenever the return distribution lies in the mean–variance-equivalent (MVE) class, encompassing all elliptical distributions and a broad family of asymmetric ones. The DPO framework developed below preserves this universality at its base case ( W, P degenerate) and extends to settings where one or more of W, R, P are non-trivial. In realistic practice, none of them are: 
+
+• the parameters ( μ, Σ) are estimated from data, hence random; a Bayesian approach re-places them by a posterior distribution; 
+
+• the return vector itself is random, and a full description requires more than first two moments—higher-order moments, tail behavior, and asymmetric dependence all contribute to utility and risk functionals; 
+
+• the weights w may themselves be modeled stochastically—as a sampling distribution on 
+
+W for resampled efficiency, or as a stochastic policy for a reinforcement-learning agent. Each of these generalizations has been developed independently in a distinct literature: Bayesian portfolio theory (Jorion, 1986; Black and Litterman, 1992; Avramov and Zhou, 2010), 3coherent risk measures (Artzner et al., 1999; Rockafellar and Uryasev, 2000), distributionally robust optimization (Delage and Ye, 2010; Mohajerin Esfahani and Kuhn, 2018), chance-constrained programming (Charnes and Cooper, 1959; Pr´ ekopa, 1995), random portfolios (Michaud, 1998; Burns, 2007), hierarchical risk parity and its return-adjusted variant (L´ opez de Prado, 2016; Noguer i Alonso, 2025), and distributional reinforcement learning (Bellemare et al., 2017; Dabney et al., 2018b). These subliteratures rarely communicate with one another despite a shared structure: in each, the object being optimized over is a probability measure rather than a vector. The present paper collects these threads under a single analytical framework—distributional portfolio optimization. The aims are threefold: (i) make precise the shared mathematical structure—the distributional triple ( W, R, P ); (ii) identify duality and domination relations connecting methods originally posed as alternatives; and (iii) derive finite-sample guarantees, contraction arguments, and posterior-concentration results that make the framework amenable to rigorous asymptotic analysis. The framework is complementary to the reinforcement-learning portfolio optimization (RLPO) theory described in §1.3, with which it shares notation; where RLPO emphasizes the dynamic Markov decision process underlying portfolio rebalancing, DPO emphasizes the single-period or averaged distributional structure of the decision problem. 
+
+Positioning relative to existing work. The contribution is primarily synthetic and struc-tural. Classical mean–variance and Bayesian portfolio theory provide the deterministic and posterior-predictive faces of the framework. Coherent and spectral risk theory provide the law-invariant scalar risk functionals. Wasserstein DRO supplies ambiguity sets and dual regu-larization formulas. Stochastic allocation methods, including resampling and Dirichlet policies, make the allocation law nontrivial. Distributional RL extends the same scalar-outcome logic to dynamic return distributions. The present paper does not claim to subsume these liter-atures; rather, it provides a common notation in which their assumptions, equivalences, and non-equivalences can be compared directly. The technical contributions sit at the boundaries be-tween these subliteratures—Bayesian-to-Wasserstein bridges, no-randomization theorems, dis-tributional Bellman contraction with action-coupled rewards, and first- versus second-order tightness examples—rather than within any single subliterature. 
+
+1.1 The distributional triple 
+
+The defining observation of DPO is that every portfolio problem has three orthogonal sources of randomness, collected into a distributional triple: (W, R, P ) : W ∈ P (W), R ∈ P (RK ), P ∈ P (Θ) ,
+
+where W is a distribution over weights, R a distribution over returns, and P a distribution over the parameters governing R. Each point in the triple encodes a different problem class: 
+
+• (W = δw, R, P = δθ): classical Markowitz with known parameters. 
+
+• (W = δw, R, P ): Bayesian portfolio optimization, with predictive return R = R Rθ dP (θ). 
+
+• (W = δw, R ∈ A , P ): distributionally robust portfolio optimization. 
+
+• (W̸ = δ, R, P ): random portfolios, RL policies, Dirichlet weight priors. 
+
+• (W, R, P ) all non-trivial: hierarchical Bayesian models with stochastic policies, the full generalization. The triple is not merely bookkeeping. It organizes the literature (Section 3), isolates which duality theorems apply to which setting, and reveals geometric structure through the Fisher– Rao and Wasserstein metrics on each marginal. 4The structure of the framework is: (W, R, P )
+
+| {z }
+
+> inputs IP #
+
+−−→ Y ⋆W,R,P ∈ P (R)
+
+| {z }
+
+> induced outcome
+> u,ρ
+
+−−→ V ∈ R| {z } 
+
+> objective
+
+. (2) The induced outcome distribution is the scalar object on which all utility and risk functionals act, and the pipeline (2) organizes the rest of the paper. 
+
+1.2 Contributions and organization 
+
+The main contributions are: 
+
+• a measure-theoretic formulation of DPO on Polish spaces (Section 2); 
+
+• a unified treatment through the distributional triple, including the explicit identification of the induced portfolio-outcome distribution as the scalar object on which all utility and risk functionals act (Section 3); 
+
+• rigorous existence, limit, and concentration results for Bayesian DPO via utility-tilted posteriors (Section 4); 
+
+• for completeness, a self-contained restatement of the law-invariant risk and duality toolkit we build on—Rockafellar–Uryasev, Kusuoka, spectral, and distortion representations (Sec-tion 5), the Mohajerin Esfahani and Kuhn (2018, Cor. 5.1) Wasserstein duality together with its explicit portfolio-CVaR conic specialization (Theorem 6.6, Proposition 6.8) and finite-sample guarantees (Section 6), and Charnes–Cooper / Calafiore–Campi chance con-straints with an explicit e/ (e − 1)-form scenario bound (Section 7); none of the underlying duality theorems is claimed as new, and the only local increment in these sections is the portfolio-CVaR specialization; 
+
+• a self-contained treatment of Dirichlet and logistic-normal policy classes, with score, en-tropy, expected-utility, and policy-gradient identities, and a static no-randomization the-orem (Theorem 8.1) delimiting when stochastic allocations are useful (Section 8); 
+
+• a complete proof of contraction for the distributional Bellman operator in the maximal 
+
+p-Wasserstein metric, together with a risk-shifted distributional Bellman contraction (The-orem 9.8) at rate γ + λL ρ, where Lρ is the W1-Lipschitz modulus of the one-step Markov risk functional and Mρ < ∞ is its bounded baseline (Section 9); 
+
+• a domination theorem (Theorem 10.1) bounding Bayesian risk-averse utility maximization by Wasserstein DRO with an explicit data-driven radius, a Gaussian-isotropic calculation (Proposition 10.11) showing that the first-order radius may be conservative by one order in symmetric location models, a formal second-order Bayes–DRO radius (Proposition 10.13) for the centered symmetric case, a first-order tightness proposition (Proposition 10.18) for affine-deterministic and locally non-smooth models, a sufficient modulus-of-smoothness bound (Theorem 10.20), and a conditional two-sided Bayes–Wasserstein rate theorem (Theorem 10.26) showing that, under posterior-moment, tail-negligibility, and explicit lower-witness hypotheses, 
+
+W1(Rpred  
+
+> n
+
+, R bθn ) = Θ 
+
+
+
+n−(1+ α⋆n)/2
+
+,
+
+where α⋆n = inf θ∈B(bθn,r n) α⋆(θ) ∈ [0 , 1] is the conservative local boundary H¨ older exponent around the realized posterior center (Section 10); 
+
+• the Bures–Wasserstein Lipschitz constant for the Gaussian–NIW model promoted to a Proposition with explicit constants (Proposition 10.29, Section 10); 5• numerical and empirical illustrations consistent with the theoretical predictions, including a Ledoit–Wolf-shrinkage baseline that frames the high-dimensional regime as an empirical question rather than an established dominance claim (Section 11). The paper’s novel mathematical content is concentrated in Section 10: the Bayes– Wasserstein domination (Theorem 10.1), the second-order conservatism calculation (Proposi-tion 10.11), and the conditional two-sided rate theorem (Theorem 10.26). Sections 5–7 are background we unify; Sections 8–9 are largely recapitulation, with the static no-randomization theorem (Theorem 8.1) and the risk-shifted contraction (Theorem 9.8) as the local increments. A companion paper (Noguer i Alonso, 2026) develops the dynamic-control side of this pic-ture, casting portfolio choice as risk-sensitive policy optimization. The dynamic-control analog (RLPO) is described in §1.3 below. 
+
+What is new here. The paper does not claim that Bayesian portfolio choice, coherent risk, Wasserstein DRO, stochastic policies, or distributional reinforcement learning are individually new. Its contribution is to formulate these objects as faces of a single coupled distributional portfolio problem, to distinguish the marginal uncertainty triple ( W, R, P ) from the decision-relevant joint coupling Γ θ, and to prove a collection of boundary results that make the connec-tions mathematically explicit: outcome-law sufficiency, static no-randomization, Wasserstein– CVaR regularization, Bayesian credible-radius calibration of DRO balls, a conditional two-sided Bayes–Wasserstein rate theorem parameterized by the boundary H¨ older exponent α⋆ ∈ [0 , 1], a distributional Bellman contraction in a portfolio MDP, and a risk-shifted distributional Bellman contraction at rate γ + λL ρ. The CVaR conic program is an explicit specialization of Mohajerin Esfahani and Kuhn (2018, Cor. 5.1), not a new duality theorem; the contribution of this part is the explicit portfolio specialization and computational identification: for the canonical linear-loss CVaR problem, Wasserstein robustness is equivalent to empirical CVaR plus the dual-norm penalty ( ε/α )∥w∥∗.
+
+1.3 Relationship to RLPO 
+
+The reinforcement-learning portfolio optimization (RLPO) framework formulates portfolio re-balancing as a Markov decision process ( S, A, P, R, γ ) with policy π(· | s) and value function 
+
+V π(s) = Eπ
+
+X
+
+> t≥0
+
+γtRt s0 = s
+
+ .
+
+DPO and RLPO should be viewed as parallel cross-sections of a common dynamic–distributional theory rather than as literal reductions of one another. Two observations make the relationship precise. 
+
+First, the static DPO objective carries a law-invariant scalar risk functional ρ that has no direct γ = 0 analog in RLPO. Setting γ = 0 in RLPO reduces the value function to single-period expected-reward maximization arg max w E[R(s, w, s ′) | s], which is risk-neutral; recovering the static DPO with a static ρ from RLPO requires encoding ρ as a one-period Markov risk measure in the sense of Ruszczy´ nski (2010) and stopping the recursion at T = 1. The two formulations are therefore dual: the static-decision face emphasizes the law-invariant scalar functional, the dynamic-control face emphasizes the recursion. The correct relationship is one-period RLPO + static law-invariant risk/utility functional ⇝ static DPO .
+
+Second, under the parallel identification of state and information set, the DPO triple spe-cializes the dynamic objects: 6• the RLPO state s corresponds to the information set at the decision time, and the DPO parameter law P to the posterior over ( μ, Σ) given s;
+
+• the RLPO policy π(· | s) corresponds to the DPO weight distribution W conditional on the observed state, collapsing to δw⋆(s) for a deterministic policy; 
+
+• the RLPO one-period reward R(s, w, s ′) = w⊤r′ − c(w, w +) is a draw from R ∈ P (RK ). Conversely, DPO extends to the dynamic setting by letting all three of ( W, R, P ) carry a time index. The distributional Bellman theory of Section 9 is the explicit dynamic extension, and Theorem 9.2 provides the γ-contraction of the return-distribution operator.                                           
+
+> Object Static (DPO) Dynamic (RLPO) Weights W∈ P (W){Wt(· | st)}t≥0, policy kernel Returns R∈ P (RK){R(st, w t, s t+1 )}t≥0, transition kernel Parameters P∈ P (Θ) {Pt}t≥0, posterior at each step Risk functional ρon P(R)nested Markov risk measure {ρt}
+> Outcome Y⋆= IP #(W⊗R)Zπ(s, w ) = Law P(P
+> tγtrt|s0, w 0)Recursion N/A (single period) Zπ=TπZπ, contraction in Wp(Thm. 9.2)
+> γ= 0 limit static decision problem;
+> ρ,Padded on top one-period expected reward, no risk augmentation
+
+Table 1: Static distributional triple (DPO) versus its time-indexed dynamic counterpart (RLPO). Neither framework is a literal reduction of the other: DPO carries a static law-invariant 
+
+ρ that requires nesting to embed in RLPO, and RLPO carries a recursion that is absent from the static formulation. The two are parallel cross-sections of a common dynamic–distributional theory. 
+
+# 2 Measure-theoretic preliminaries 
+
+We fix notation and collect facts used throughout. Standard references are Billingsley (2012), Villani (2009), and Bogachev (2007). 
+
+2.1 State spaces and probability measures 
+
+Notation. Throughout, W ⊂ RK denotes the feasible set of portfolio weights and w ∈ W arealized portfolio vector. We use W ∈ P (W) for the law of a stochastic allocation; in dynamic policy contexts the same object is also called the policy and denoted π. The DPO triple is (W, R, P ) ∈ P (W) × P (RK ) × P (Θ) ,
+
+with W the weight distribution, R the return distribution (typically Rθ the conditional law given 
+
+θ), and P the parameter distribution. We reserve the calligraphic W exclusively for the feasible set so that W and W never refer to the same object, and we write w ∼ W for a draw from the weight law. The Polish probability-space machinery applies on W, RK , and Θ symmetrically. Let (Ω , F, Pr) be a complete probability space. The asset universe has K < ∞ assets, returns r ∈ RK , weights w ∈ RK . The feasible set W ⊆ RK is non-empty convex compact; long-only problems take W = ∆ K−1. For a Polish space ( X, d X ) with Borel σ-algebra B(X), 
+
+P(X) denotes Borel probability measures, equipped with weak convergence. The subset Pp(X)of measures with finite pth moment is equipped with the p-Wasserstein metric 
+
+Wp(μ, ν ) = inf 
+
+> π∈Π( μ,ν )
+
+Z 
+
+> X×X
+
+dX (x, y )p dπ (x, y )
+
+1/p 
+
+, p ≥ 1. (3) (Pp(X), W p) is itself Polish. 72.2 Parameter space 
+
+The parameters θ ∈ Θ live in a finite-dimensional Euclidean open set Θ ⊆ Rdθ (or, in semi-parametric settings, a Banach space with separable predual). The map θ 7 → Rθ is Borel mea-surable; continuity and Lipschitz regularity in Wasserstein distance are imposed as needed at each use. 
+
+2.3 Utility and risk functionals 
+
+A utility function u : R → R is concave, non-decreasing, continuous. Expected utility under 
+
+R ∈ P (RK ) is 
+
+U (w; R) = 
+
+Z
+
+> RK
+
+u(r⊤w) dR (r), (4) well-defined whenever u−(r⊤w) ∈ L1(R). 
+
+Definition 2.1 (Coherent risk measure on losses; Artzner et al., 1999) . A functional ρ :
+
+L∞(Ω , F, Pr) → R is a coherent risk measure on losses if for all X, Y ∈ L∞:(i) Monotonicity: X ≤ Y a.s. implies ρ(X) ≤ ρ(Y ). (ii) Translation equivariance: ρ(X + c) = ρ(X) + c for c ∈ R.(iii) Positive homogeneity: ρ(λX ) = λρ (X) for λ ≥ 0. (iv) Subadditivity: ρ(X + Y ) ≤ ρ(X) + ρ(Y ). A risk measure is convex if (iii) is dropped and (iv) replaced by ρ(λX + (1 − λ)Y ) ≤ λρ (X) + (1 − λ)ρ(Y ) for λ ∈ [0 , 1]. Throughout the paper, ρ is applied to a loss L, so high L is bad and high ρ(L) flags risky positions. 
+
+Example 2.2 (Canonical coherent risk measures) . The following are coherent on L∞ under the loss convention: CVaR at level α ∈ (0 , 1), CVaR α(L) = α−1 R α 
+
+> 0
+
+VaR u(L) du with VaR u(L) = inf {ℓ : Pr( L ≤ ℓ) ≥ 1 − u}; entropic VaR, EVaR α(L) = inf η> 0 η log( α−1E[eL/η ]); worst-case loss, 
+
+ρsup (L) = ess sup L; and any finite mixture P 
+
+> i
+
+λiρi with λi ≥ 0 and each ρi coherent. 
+
+Theorem 2.3 (Dual representation; F¨ ollmer and Schied, 2011) . Let ρ : L∞ → R be a coherent risk measure on losses satisfying the Fatou property. Then there exists a non-empty convex weakly closed set Q ⊆ P (Ω) of probability measures absolutely continuous w.r.t. Pr such that 
+
+ρ(X) = sup 
+
+> Q∈Q
+
+EQ[X]. (5) 
+
+Conversely, every functional of this form is coherent under the loss convention and has the Fatou property. 
+
+The set Q is the dual representation of ρ. Theorem 2.3 is the bridge between coherent-risk and distributionally-robust portfolio theories. 
+
+2.4 The Wasserstein geometry on Pp(RK )
+
+Proposition 2.4 (Kantorovich–Rubinstein duality) . For μ, ν ∈ P 1(RK ),
+
+W1(μ, ν ) = sup 
+
+Z 
+
+f dμ −
+
+Z
+
+f dν : f : RK → R, Lip( f ) ≤ 1
+
+
+
+.
+
+Proposition 2.5 (Lipschitz integral bound) . If f : RK → R is L-Lipschitz, then for any 
+
+μ, ν ∈ P 1(RK ), | R f dμ − R f dν | ≤ L · W1(μ, ν ).
+
+Proposition 2.6 (Completeness) . (Pp(RK ), W p) is a complete separable metric space. μn → μ
+
+in Wp iff μn → μ weakly and R ∥x∥p dμ n → R ∥x∥p dμ .
+
+82.5 Standing assumptions 
+
+Assumption 2.7 (Standing regularity) . Unless stated otherwise, the following are imposed throughout the paper. (i) The feasible set W ⊂ RK is non-empty, convex, compact, with BW := sup w∈W ∥w∥ < ∞.(ii) Return laws lie in P1(RK ), and the conditional model θ 7 → Rθ is Borel measurable. (iii) The utility u : R → R is non-decreasing, concave, and continuous; when Wasserstein-continuity is required, u is assumed Lu-Lipschitz. (iv) Risk measures act on losses L(w, r ) = −r⊤w. Unless otherwise stated, ρ is a law-invariant convex risk measure on losses (Definition 2.1), lower semicontinuous with respect to W1
+
+convergence on P1(R). (v) In static product-form problems, the allocation draw and return draw are conditionally independent given the information set and parameter: Γ θ(dw, dr ) = Wθ(dw )Rθ(dr ). This is a modelling restriction, not part of the definition of DPO. In state-dependent policies, Bayesian policies, Thompson sampling, hierarchical randomization, or dynamic portfolio problems, we allow a general coupling Γ θ ∈ P (W × RK ), whose marginals are the weight law and return law. 
+
+Remark 2.8 (Compactness is mild) . Compactness of W covers the long-only simplex, box con-straints, leverage caps, and long–short portfolios with bounded gross exposure. It excludes unbounded leverage, which is economically ill-posed without transaction-cost or margin fric-tions. 
+
+2.6 Notation guide 
+
+Several symbols carry context-dependent meaning across the static and dynamic sections. Ta-ble 2 fixes the conventions. 
+
+Convention on overloaded symbols. The symbol P denotes the parameter law through-out Sections 4–8. In Section 9 on dynamic distributional control, we write P for the Markov transition kernel of the underlying MDP to avoid collision with the parameter-law notation; the meaning is also reaffirmed locally. Similarly, γ is used as the risk-aversion coefficient in static objectives and as the discount factor in the dynamic Bellman equations; the static and dynamic sections are non-interleaved, so no formula combines both meanings of γ.9Symbol Meaning in static DPO ( §§ 4–8) Meaning in dynamic/RL ( §9)                                                                 
+
+> Wfeasible portfolio set action space A
+> wportfolio weights current action
+> Wor Qlaw of stochastic weights policy-induced action law
+> Rreturn law —
+> Rθreturn law conditional on parameter θ—
+> Pparameter / posterior law —
+> P—transition kernel
+> Pnposterior after nobservations —
+> Rpred , R pred
+> npredictive return law RRθdP n—Γθjoint coupling on W × RKgiven θ—
+> γrisk-aversion coefficient discount factor
+> ρlaw-invariant risk functional on scalar losses —
+> Ycond Γ,θ induced scalar outcome IP #Γθ(parameter-fixed) —
+> Y⋆
+> Γinduced scalar outcome IP #¯Γ (parameter-mixed) —
+> Y⋆W,R,P product-form synonym for Y⋆
+> Γwhen Γ = W⊗R—
+> Zπ—return-distribution function under π
+> Tπ—distributional Bellman operator
+> Wp—supremal Wasserstein metric on Zp
+
+Table 2: Notation guide. 
+
+# 3 The distributional triple: taxonomy 
+
+We collect existing portfolio methodologies into a single taxonomy indexed by the marginal triple ( W, R, P ), while emphasizing that the mathematically complete primitive is the joint coupling Γ θ(dw, dr ) of allocations and returns. 
+
+Definition 3.1 (DPO problem: coupled primitive and marginal triple) . Let W ⊂ RK be the feasible allocation set, let u : R → R be a utility, let ρ be a law-invariant risk functional on scalar losses, let γ ≥ 0 be a risk-aversion coefficient, and let P ∈ P (Θ) be a parameter law. The most general single-period DPO primitive is a Markov kernel θ 7 → Γθ ∈ P (W × RK ), where Γ θ is the joint law of the allocation w and return vector r conditional on θ. Write Γ Wθ
+
+and Γ Rθ for its two marginals. The integrated joint law is ¯Γ( dw, dr ) := 
+
+Z
+
+> Θ
+
+Γθ(dw, dr ) dP (θ).
+
+The marginal triple associated with the coupled model is ( ¯W , ¯R, P ), ¯W (A) := ¯Γ( A × RK ), ¯R(B) := ¯Γ( W × B).
+
+The triple is useful as a taxonomy of marginal uncertainty sources, but the decision-relevant primitive is the coupling Γ θ. Marginals alone do not generally identify the law of the portfolio outcome (Remark 3.3). The product-form DPO model is the special case Γ θ(dw, dr ) = Wθ(dw )Rθ(dr ). If Wθ ≡ W
+
+does not depend on θ, then ¯Γ( dw, dr ) = W (dw )Rpred (dr ) with Rpred := R 
+
+> Θ
+
+Rθ dP (θ), which recovers the product law used in the static sections. The ex-ante DPO value is 
+
+V ex (Γ , P ) = 
+
+Z
+
+u(y) dY ⋆ 
+
+> Γ
+
+(y) − γρ (−Y ⋆ 
+
+> Γ
+
+), (6) and the conditional DPO value is 
+
+V cond (Γ , P ) = 
+
+Z
+
+> Θ
+
+Z 
+
+u(y) dY cond Γ,θ (y) − γρ (−Y cond Γ,θ )
+
+
+
+dP (θ), (7) with Y cond Γ,θ and Y ⋆ 
+
+> Γ
+
+defined in Definition 3.2 below. For a linear utility and a nonlinear law-invariant ρ, V ex and V cond generally differ. 10 The ex-ante objective evaluates utility and risk against the marginal predictive law, treat-ing posterior uncertainty as additional “volatility” in the return mixture. The conditional objective evaluates utility and risk separately under each θ and averages, exposing parameter-by-parameter sensitivity. Both are economically defensible; we use the ex-ante form by default and flag the conditional form where it differs. 
+
+3.1 The induced portfolio-outcome distribution 
+
+The coupling Γ θ captures the distributional inputs, but every utility and risk functional ulti-mately operates on a derived scalar random variable: the portfolio return Y = r⊤w.
+
+Definition 3.2 (Induced portfolio-outcome distribution) . Let IP : RK × RK → R, IP( w, r ) = 
+
+r⊤w. For a coupled DPO primitive Γ θ, define the conditional scalar portfolio-outcome law 
+
+Y cond Γ,θ := IP #Γθ ∈ P (R),
+
+and the ex-ante (parameter-mixed) scalar portfolio-outcome law 
+
+Y ⋆ 
+
+> Γ
+
+:= IP # ¯Γ ∈ P (R). (8) In the product-form case Γ θ = W ⊗ Rθ, Y ⋆ 
+
+> Γ
+
+= IP #(W ⊗ Rpred ), which is the scalar outcome law used throughout the independent static model. We retain the notation Y ⋆W,R,P for this product-form case when the marginal triple ( W, R, P ) uniquely determines the coupling. 
+
+Remark 3.3 (Marginals do not identify the outcome law) . The marginal triple ( W, R, P ) does not determine the law of r⊤w unless a coupling is specified. For example, in the scalar long– short case let W = R = 12 δ−1 + 12 δ1. The comonotone coupling Γ + = 12 δ(−1,−1) + 12 δ(1 ,1) and the countermonotone coupling Γ − = 12 δ(−1,1) + 12 δ(1 ,−1) have the same marginals W and R, but 
+
+rw = 1 Γ +-a.s. and rw = −1 Γ −-a.s. Thus the product law W ⊗ R is not innocuous: it is an independence assumption. The coupled law Γ, rather than the marginal triple alone, is the mathematically complete object. We use Y cond Γ,θ for the conditional version (parameter-fixed) and Y ⋆ 
+
+> Γ
+
+for the aggregate (parameter-mixed). When P = δθ the two coincide. 
+
+Proposition 3.4 (Sufficiency of the induced law for ex-ante objectives) . Let ρ be any law-invariant risk functional on P(R) (coherent, convex, distortion, or spectral). Then for any DPO triple (W, R, P ) and the linear loss L(w, r ) = −r⊤w, the ex-ante value V ex (W, R, P ) in 
+
+(6) depends on (W, R, P ) only through Y ⋆W,R,P . In particular, two DPO triples that induce the same Y ⋆ yield identical V ex . The same statement does not hold for the conditional value V cond 
+
+in (7) unless ρ is affine on P(R) or Rθ is P -a.s. constant in θ.Proof. The ex-ante objective is a function of the law of r⊤w under w ∼ W , r ∼ Rpred , which is exactly Y ⋆W,R,P ; law-invariance of ρ and the integral against u then give the claim. For the negative claim, take ρ = CVaR α and two triples with W = δw fixed: one with Rθ ≡ R0 and another with Rθ ∈ { R+, R −} each on a half of P such that ( R+ + R−)/2 = R0. The ex-ante values agree, but V cond generally does not by Jensen’s inequality applied to the convex CVaR. 
+
+Proposition 3.5 (Wasserstein ambiguity lifts to outcome ambiguity) . Let A ⊆ P (RK ) be a 
+
+W1-ambiguity set of return laws with radius ε centered at ˆRn, and for each R ∈ A let YR =IP #(W ⊗ R) with W held fixed. The map R 7 → YR is Lipschitz with constant cW := Ew∼W ∥w∥∗,where ∥ · ∥ ∗ is the dual of the ground norm underlying W1. Hence sup R∈A W1(YR, Y ˆRn ) ≤
+
+cW · sup R∈A W1(R, ˆRn) ≤ cW ε, and the induced outcome ambiguity set is contained in the closed W1-ball of radius cW ε centered at Y ˆRn .
+
+11 Proof. Fix R, R ′ ∈ P (RK ) and let π be an optimal coupling realizing W1(R, R ′). Draw w ∼ W
+
+independently of ( r, r ′) ∼ π; set y = r⊤w, y′ = r′⊤ w. Then y ∼ YR, y′ ∼ YR′ . By the dual-norm inequality |(r − r′)⊤w| ≤ ∥ r − r′∥∥ w∥∗, E|y − y′| ≤ cW · W1(R, R ′). The primal definition of W1
+
+gives W1(YR, Y R′ ) ≤ cW W1(R, R ′). Specializing and taking the supremum yields the claim. 
+
+Theorem 3.6 (Joint continuity of the induced outcome law) . Let W ⊂ RK be compact, W, W ′ ∈P1(W), R, R ′ ∈ P 1(RK ), and let YW,R = IP #(W ⊗ R). Then 
+
+W1(YW,R , Y W ′,R ′ ) ≤ m1(R)W1(W, W ′) + BW W1(R, R ′),
+
+where m1(R) = R ∥r∥dR (r) and BW = sup w∈W ∥w∥. Consequently, if Wn → W and Rn → R
+
+in W1 with sup n m1(Rn) < ∞, then YWn,R n → YW,R in W1.Proof. Take any couplings ( w, w ′) of ( W, W ′) and ( r, r ′) of ( R, R ′), independent of one another, and form the product coupling. Then |w⊤r − w′⊤ r′| ≤ ∥ w − w′∥∥ r∥ + ∥w′∥∥ r − r′∥ by the dual-norm inequality. Taking expectations, E|w⊤r − w′⊤ r′| ≤ E∥r∥ · E∥w − w′∥ + BW · E∥r − r′∥.The pair ( w⊤r, w ′⊤ r′) is a coupling of ( YW,R , Y W ′,R ′ ), so the primal definition of W1 on R gives the result. 
+
+Theorem 3.7 (Existence of DPO optimizers; Lipschitz-utility version) . Let W ⊂ RK be com-pact and let R ∈ P 1(RK ) be fixed. For Q ∈ P (W), define YQ,R := IP #(Q ⊗ R). Assume that 
+
+γ ≥ 0, that u : R → R is Lu-Lipschitz and continuous, and that ρ is lower semicontinuous with respect to W1-convergence on P1(R). Then the static product-form problem 
+
+sup 
+
+> Q∈P (W)
+
+n
+
+Ew∼Q,r ∼R[u(r⊤w)] − γρ (−YQ,R )
+
+o
+
+(9) 
+
+admits an optimizer Q⋆ ∈ P (W). Restricting to deterministic allocations Q = δw, the determin-istic problem sup w∈W {ER[u(r⊤w)] − γρ (−r⊤w)} also admits an optimizer. If u is continuous but not Lipschitz, the same conclusion holds under the stronger assumption that R has compact support. Proof. Since W is compact, P(W) is compact under weak convergence, and on a compact metric space weak convergence coincides with W1-convergence. Let Qn → Q in W1. Couple wn ∼ Qn
+
+and w ∼ Q optimally and draw r ∼ R independently. Then |E[u(r⊤wn)] − E[u(r⊤w)] | ≤ 
+
+LuER∥r∥· E∥wn −w∥ → 0. Hence the expected-utility term is continuous in Q. By the continuity of Q 7 → YQ,R in W1 (Theorem 3.6) and lower semicontinuity of ρ, the map Q 7 → − γρ (−YQ,R )is upper semicontinuous. The objective is therefore upper semicontinuous on the compact set 
+
+P(W); Weierstrass gives existence. 
+
+3.2 Taxonomy table 
+
+Table 3: Portfolio methodologies as points in ( W, R, P ). “ δ” denotes a point mass.                                                                 
+
+> Method WRPDescription Markowitz δwRθ(mean–cov. law) δθDeterministic params/weights Mean–CVaR δwyes δθRisk functional of R
+> Black–Litterman δwGaussian posterior Bayesian linear views Bayesian δwpredictive posterior Full posterior predictive Robust δwambiguity δθWorst case over R∈ A
+> Wasserstein DRO δwWp-ball δθAmbiguity as transport ball Chance-constrained δwyes δθProbabilistic loss bound Resampled efficiency Wyes posterior Michaud-type resampling HRP δwΣ only δθHierarchical recursive bisection RA-HRP δwmean+cov δθor post. Return-adjusted HRP Bayesian HRP WGaussian posterior Hierarchical stochastic tree Dirichlet RL policy W= Dir( αθ(s)) yes δθStochastic policy class Distributional RL δwper step full return δθLearn Law(return)
+
+12 Three observations follow from Table 3. First, most of the modern portfolio literature inhabits faces of the marginal triple where exactly one of W, R, P is non-trivial; interior cells where two or more uncertainty sources are simultaneously non-trivial remain comparatively underexplored. Second, several boundaries between cells are rigorous limits when the limiting operation is specified precisely: Dirichlet policies collapse to deterministic weights as concentration diverges; utility-tilted posteriors approach optimistic or worst-case criteria as the tilt parameter tends to infinity; and CVaR or chance-constrained formulations can be linked through conservative penalty limits. A flat prior alone, however, does not generically produce a worst-case robust objective. Third, the duality results of Sections 6 and 10 establish operational bridges between cells that look distinct, but these bridges should be read as domination or calibration results rather than literal equivalences. 
+
+# 4 Parameter distributions: Bayesian DPO 
+
+The Bayesian face of DPO elevates P to a first-class object. Given r | θ ∼ Rθ and prior θ ∼ P0,the posterior Pn = P (· | r1: n) defines the predictive 
+
+Rpred  
+
+> n
+
+(A) = 
+
+Z
+
+> Θ
+
+Rθ(A) dP n(θ), A ∈ B (RK ). (10) 
+
+4.1 The Bayesian portfolio problem 
+
+Proposition 4.1 (Fubini reduction) . Under integrability of u(r⊤w) w.r.t. Pn(θ) ⊗ Rθ(r),
+
+Eθ∼Pn Er∼Rθ [u(r⊤w)] = Er∼Rpred  
+
+> n
+
+[u(r⊤w)] .
+
+Proposition 4.2 (Gaussian–NIW predictive is multivariate t) . Let r1, . . . , r n | μ, Σ iid 
+
+∼ N (μ, Σ) 
+
+with prior (μ, Σ) ∼ NIW( μ0, λ 0, Ψ0, ν 0), ν0 > K − 1. Then the posterior is NIW( μn, λ n, Ψn, ν n)
+
+with λn = λ0 + n, νn = ν0 + n,
+
+μn = λ0μ0 + n¯rλn
+
+, Ψn = Ψ 0 + S + λ0nλn
+
+(¯ r − μ0)(¯ r − μ0)⊤,
+
+and the predictive is multivariate Student’s t with νn − K + 1 > 0 degrees of freedom: 
+
+Rpred  
+
+> n
+
+= tK
+
+
+
+νn − K + 1 , μ n, λn + 1 
+
+λn(νn − K + 1) Ψn
+
+
+
+. (11) 
+
+Remark 4.3 (Multivariate t is MVE; preservation of universality) . The predictive in (11) is elliptical, hence MVE in the sense of Benveniste et al. (2024): the Bayesian-optimal portfolio coincides with the mean–variance allocation computed from the predictive mean and scale ma-trix, for any standard concave utility. Bayesian DPO under Gaussian–NIW conjugacy inherits the universality of deterministic Markowitz despite heavier tails. For the mean–variance inter-pretation to be well-defined, we additionally require νn − K + 1 > 2 (i.e. νn > K + 1), ensuring that the predictive multivariate t has finite second moments; the existence of the density only requires νn − K + 1 > 0. 
+
+4.2 Black–Litterman as a special case 
+
+Black–Litterman fits the present framework as Bayesian DPO with (W, R, P ) =(δ, Gaussian , Gaussian). The prior is μ ∼ N (π, τ Σ) and the view equation is P μ = q + ϵ
+
+with ϵ ∼ N (0 , Ω). The posterior is μ | views ∼ N (μBL , ΣBL ) with the standard formulas of Black and Litterman (1992). The predictive law is N (μBL , Σ + Σ BL ), and the associated mean–variance portfolio is wBL = ( γΣeff )−1μBL .13 4.3 Utility-tilted posteriors 
+
+When the decision-relevant quantity is the portfolio rather than the parameters, Kadane (1995) and Polson and Tew (2000) advocate the utility-tilted posterior 
+
+P un (dθ ; w) ∝ exp( λU (w; Rθ)) Pn(dθ ), (12) with U (w; Rθ) = Er∼Rθ [u(r⊤w)] and sharpness λ > 0. 
+
+Assumption 4.4 (Uniform exponential envelope) . For each ¯λ < ∞, EPn [exp {¯λU #(θ)}] < ∞,where U#(θ) := sup w∈W |U (w; Rθ)|. Equivalently, for every compact Λ ⊂ [0 , ∞) there exists 
+
+MΛ ∈ L1(Pn) such that, for all λ ∈ Λ and all w ∈ W , exp {λ|U (w; Rθ)|} ≤ MΛ(θ) Pn-a.s. 
+
+Theorem 4.5 (Existence and limits of the tilted portfolio) . Let u be concave and non-decreasing, let W be compact and convex, and suppose that w 7 → U (w; Rθ) is continuous for Pn-a.e. θ.Assume the uniform exponential envelope of Assumption 4.4. For λ > 0, define 
+
+V + 
+
+> λ
+
+(w) := 1
+
+λ log EPn [exp {λU (w; Rθ)}] , V − 
+
+> λ
+
+(w) := − 1
+
+λ log EPn [exp {− λU (w; Rθ)}] ,
+
+with V +0 (w) = V − 
+
+> 0
+
+(w) := EPn [U (w; Rθ)] . Then, for every λ ≥ 0, both V + 
+
+> λ
+
+and V − 
+
+> λ
+
+are con-tinuous on W and admit maximizers. For each fixed w, λ 7 → V + 
+
+> λ
+
+(w) is non-decreasing and 
+
+λ 7 → V − 
+
+> λ
+
+(w) is non-increasing; V − 
+
+> λ
+
+(w) ≤ V ± 
+
+> 0
+
+(w) ≤ V + 
+
+> λ
+
+(w) for all λ ≥ 0. If the enve-lope condition holds for all λ > 0, then the large-tilt limits hold in the extended-real sense: 
+
+lim λ→∞ V + 
+
+> λ
+
+(w) = ess sup Pn U (w; Rθ), lim λ→∞ V − 
+
+> λ
+
+(w) = ess inf Pn U (w; Rθ).Proof. Continuity follows from dominated convergence under the envelope. Monotonicity is the standard property of entropic certainty equivalents. The limits as λ → ∞ are the log-Laplace principle applied to X = ±U (w; Rθ). 
+
+Remark 4.6 (Verification for standard utilities) . Bounded-above utility controls only the upper tail relevant to V + 
+
+> λ
+
+; it does not by itself verify the two-sided envelope in Assumption 4.4. For example, CARA utility u(x) = −e−ax is bounded above by zero, but it can be arbitrarily negative when x is sufficiently negative. Therefore the robust tilt V − 
+
+> λ
+
+still requires lower-tail control. A convenient sufficient condition is any one of: (i) returns are uniformly bounded on the posterior support; (ii) the parameter posterior is restricted to a compact set on which sup w∈W ERθ [ec|r⊤w|] < ∞ for the required range of c; (iii) the problem is solved after return truncation. For log and CRRA utilities, the domain restriction 1 + r⊤w > 0 must also be enforced Rθ-a.s. Finally, the large-tilt limits in Theorem 4.5 are extended-real limits. In unbounded-support models, ess sup Pn U (w; Rθ) may be + ∞ or ess inf Pn U (w; Rθ) may be −∞ , even when V ± 
+
+> λ
+
+(w)is finite for each finite λ. The theorem identifies the limiting criterion but does not imply that the limiting optimizer is finite or attained without additional compactness or tail assumptions. 
+
+4.4 Posterior concentration and asymptotic plug-in equivalence 
+
+Assumption 4.7 (Posterior concentration) . There exist M > 0 and θ⋆ ∈ Θ such that for all sufficiently large n, EPn [∥θ − θ⋆∥] ≤ M n −1/2.In a correctly specified, regular parametric model with a non-singular Fisher information and a prior that places positive mass in a neighbourhood of the true parameter, Assumption 4.7 follows from the Bernstein–von Mises theorem together with standard uniform integrability of the posterior (see, e.g., van der Vaart, 2000, Ch. 10). Under misspecification, θ⋆ is the KL-projection of the data-generating distribution onto the parametric family; Kleijn and van der Vaart (2012) establish a Bernstein–von Mises-type theorem at θ⋆ in Hellinger or KL contraction, 14 but obtaining the displayed posterior first-moment bound EPn ∥θ − θ⋆∥ = O(n−1/2) additionally requires uniform integrability of ∥θ − θ⋆∥ under Pn. We therefore treat Assumption 4.7 as a hypothesis to be verified case by case: in well-specified Gaussian–NIW models it follows directly from the conjugate posterior, and in misspecified models it is known to hold for sufficiently regular parameterizations with subgaussian score, with M depending on the model bias and the curvature of the KL projection. 
+
+Remark 4.8 (Failure modes of the parametric rate) . Four failure modes worth flagging: (1) rank-deficient samples ( n < K ); (2) heavy-tailed returns with infinite fourth moment; (3) persistent (near-unit-root) processes; (4) structurally misspecified covariance. The data-driven radius εn
+
+in Theorem 10.1 is computed from the posterior and self-corrects. 
+
+Remark 4.9 (Asymptotic plug-in equivalence as a special case of Theorem 10.1) . The asymp-totic plug-in equivalence stated in earlier versions of this paper as a stand-alone proposition is a quantitative specialization of the Bayesian–DRO domination of Theorem 10.1: under Assump-tion 4.7 and a local Lipschitz model map, the first-order radius εWn = O(n−1/2) controls the plug-in–predictive gap on Lipschitz losses, and combining this with the standard posterior bias bound ∥ˆθ − θ⋆∥ = Op(n−1/2) yields the rate |ERpred  
+
+> n
+
+[ℓ] − ERθ⋆ [ℓ]| = O(n−1/2) for Lipschitz losses 
+
+ℓ. We therefore do not state it as an independent proposition. 
+
+# 5 Return distributions: coherent risk and tail modeling 
+
+When R is non-trivial and P is degenerate, DPO reduces to optimizing a functional of R. The key analytical device is the dual representation of the chosen risk measure. 
+
+5.1 CVaR and the Rockafellar–Uryasev theorem 
+
+Theorem 5.1 (Rockafellar and Uryasev, 2000) . Let L(w, r ) = −r⊤w and 
+
+Fα(w, η ) = η + 1
+
+α Er∼R[( L(w, r ) − η)+]. (13) 
+
+Then CVaR α(L(w, ·)) = min η∈R Fα(w, η ), and the minimizer is η⋆(w) = VaR α(L(w, ·)) . The functional Fα is jointly convex in (w, η ) for the linear loss. 
+
+For finitely-supported R = 1
+
+> S
+
+P 
+
+> s
+
+δrs , mean–CVaR optimization is the LP min 
+
+> w∈W ,η ∈R,z ∈RS
+> ≥0
+
+η + 1
+
+αS 
+
+X
+
+> s
+
+zs s.t. zs ≥ − r⊤ 
+
+> s
+
+w − η. (14) 
+
+5.2 Kusuoka and distortion representations 
+
+Theorem 5.2 (Kusuoka representation; Kusuoka, 2001) . Let ρ : L∞ → R be law-invariant, coherent on losses, and satisfy the Fatou property on a non-atomic probability space. Then there exists a non-empty convex weakly closed set M of probability measures on (0 , 1] such that 
+
+ρ(L) = sup 
+
+> φ∈M
+
+Z
+
+> (0 ,1]
+
+CVaR u(L) dφ (u). (15) Two parametric subfamilies realize Theorem 5.2 with closed forms. 
+
+Spectral risk measures. For a non-increasing right-continuous density φ : [0 , 1] → R+ with R 10 φ(u) du = 1, the spectral risk (Acerbi, 2002) is ρφ(L) = R 10 VaR u(L)φ(u) du .15 Distortion risk measures. For a concave increasing distortion g : [0 , 1] → [0 , 1] with 
+
+g(0) = 0, g(1) = 1, the distortion risk on a loss L (Wang, 2000) is ρg(L) = R ∞ 
+
+> 0
+
+g(SL(x)) dx +
+
+R 0
+
+> −∞
+
+(g(SL(x)) − 1) dx , where SL(x) = Pr( L > x ). 
+
+Example 5.3 (Three canonical distortions) . (i) CVaR: gCVaR (u) = min( u/α, 1); (ii) Wang transform: gλ(u) = Φ(Φ −1(u) + λ) for λ ≥ 0, giving ρgλ (L) = μL + λσ L for L ∼ N (μL, σ 2
+
+> L
+
+); (iii) Proportional hazards: gP H (u) = uβ for β ∈ (0 , 1]. 
+
+5.3 Entropic value-at-risk and KL duality 
+
+Definition 5.4 (EVaR; Ahmadi-Javid, 2012) . For α ∈ (0 , 1), EVaR α(L) = inf η> 0 η log( α−1E[eL/η ]). EVaR is coherent on L∞ and satisfies VaR α ≤ CVaR α ≤ EVaR α.
+
+# 6 Distributionally robust DPO 
+
+DRO replaces a single R by an ambiguity set A ⊆ P (RK ) and solves max  
+
+> w∈W
+
+inf  
+
+> R∈A
+
+Er∼R[u(r⊤w)] or min  
+
+> w∈W
+
+sup 
+
+> R∈A
+
+ρR(−r⊤w). (16) 
+
+6.1 Moment-based ambiguity 
+
+Definition 6.1 (Delage–Ye ambiguity) . For μ ∈ RK , Σ ≻ 0, κ ≥ 0, 
+
+Amom (μ, Σ, κ ) = {R ∈ P 2(RK ) : ( ER[r] − μ)⊤Σ−1(ER[r] − μ) ≤ κ, Cov R(r) ⪯ Σ}.
+
+Theorem 6.2 (Delage and Ye, 2010) . For piecewise-linear concave u(x) = min k{akx + bk}, the inner worst-case expectation reduces to an SDP with O(K2) variables and O(K2) constraints. The outer maximization over w ∈ W preserves convexity for polyhedral W.
+
+6.2 Wasserstein DRO: linear-loss case 
+
+Definition 6.3 (Wasserstein ambiguity) . Given ˆRn = n−1 Pni=1 δri and ε ≥ 0, 
+
+Ap(ε) = {R ∈ P p(RK ) : Wp(R, ˆRn) ≤ ε}.
+
+Theorem 6.4 (Wasserstein DRO duality; Mohajerin Esfahani and Kuhn, 2018, p = 1) . For any upper semicontinuous loss ℓ(w, ·) : RK → R with at most linear growth in r,
+
+sup 
+
+> R∈A 1(ε)
+
+Er∼R[ℓ(w, r )] = inf 
+
+> λ≥0
+
+(
+
+λε + 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+sup 
+
+> r′∈RK
+
+ℓ(w, r ′) − λ∥r′ − ri∥)
+
+. (17) 
+
+Corollary 6.5 (Affine loss closed form) . For the linear loss ℓw(r) = −r⊤w with ℓs-norm ground metric (dual norm ∥ · ∥ (s∗)), 
+
+sup 
+
+> R∈A 1(ε)
+
+ER[−r⊤w] = E ˆRn [−r⊤w] + ε∥w∥(s∗), (18) 
+
+or equivalently inf R∈A 1(ε) ER[r⊤w] = E ˆRn [r⊤w] − ε∥w∥(s∗).
+
+16 6.3 Wasserstein DRO of CVaR 
+
+The piecewise-linear-convex case of Mohajerin Esfahani and Kuhn (2018, Cor. 5.1) extends Theorem 6.4 to CVaR for a generic convex loss. The contribution of this subsection is the specialization to the canonical CVaR loss with the standard ℓs ground norm and the resulting explicit closed form (Corollary 6.7) and conic program (Proposition 6.8). The reformulation is the form required for implementation on commodity solvers; we do not claim a duality theorem beyond Mohajerin Esfahani–Kuhn Cor. 5.1. 
+
+Theorem 6.6 (Wasserstein DRO of CVaR) . For the piecewise-linear loss L(w, r ) = −r⊤w and the Rockafellar–Uryasev representation (13) , the worst-case CVaR over A1(ε) with ℓs ground metric admits the closed form 
+
+sup 
+
+> R∈A 1(ε)
+
+CVaR Rα (L(w, ·)) = inf 
+
+> η∈R
+
+
+
+η + 1
+
+α E ˆRn [( L(w, r ) − η)+] + εα ∥w∥(s∗)
+
+
+
+. (19) 
+
+Proof. The Rockafellar–Uryasev integrand can be written as the maximum of two affine func-tions of the return vector: 
+
+θRU (r; τ, w ) := τ + 1
+
+α (−r⊤w − τ )+
+
+= max 
+
+
+
+τ, 
+
+
+
+1 − 1
+
+α
+
+
+
+τ − 1
+
+α r⊤w
+
+
+
+.
+
+Thus the two slope vectors in the notation of Mohajerin Esfahani and Kuhn (2018, Cor. 5.1) are a1 = 0 and a2 = −w/α , so max j ∥aj ∥s∗ = ∥w∥s∗ /α . Applying that corollary to the robust CVaR epigraph gives directly sup 
+
+> R∈A 1(ε)
+
+CVaR Rα (−r⊤w) = inf  
+
+> τ∈R
+
+(
+
+1
+
+n
+
+> n
+
+X
+
+> i=1
+
+θRU (ri; τ, w ) + εα ∥w∥s∗
+
+)
+
+= inf  
+
+> τ∈R
+
+(
+
+τ + 1
+
+αn 
+
+> n
+
+X
+
+> i=1
+
+(−r⊤ 
+
+> i
+
+w − τ )+ + εα ∥w∥s∗
+
+)
+
+,
+
+which is (19). This is not obtained by first proving a fixed-τ robust-expectation identity and then exchanging sup R with inf τ ; the strong-duality/minimax step for this piecewise-affine convex loss class is exactly the content supplied by Mohajerin Esfahani and Kuhn (2018, Cor. 5.1). Renaming the auxiliary variable τ back to η yields the displayed statement. 
+
+Corollary 6.7 (Worst-case CVaR is regularized empirical CVaR) . For the linear loss L =
+
+−r⊤w,
+
+sup 
+
+> R∈A 1(ε)
+
+CVaR Rα (L(w, ·)) = CVaR ˆRn 
+
+> α
+
+(L(w, ·)) + εα ∥w∥(s∗).
+
+Proposition 6.8 (Explicit Wasserstein-CVaR program) . The Wasserstein-CVaR DRO portfo-lio problem is equivalent to the conic program 
+
+min  
+
+> w,η,z,t
+
+η + 1
+
+αn 
+
+> n
+
+X
+
+> i=1
+
+zi + εα t
+
+s.t. zi ≥ − r⊤ 
+
+> i
+
+w − η, i = 1 , . . . , n, zi ≥ 0, i = 1 , . . . , n, 
+
+∥w∥∗ ≤ t, w ∈ W .
+
+(20) 
+
+For ∥ · ∥ ∗ = ∥ · ∥ 2, this is an SOCP; for ∥ · ∥ 1 or ∥ · ∥ ∞, an LP. 
+
+17 6.4 Finite-sample DRO guarantees 
+
+Theorem 6.9 (Mohajerin Esfahani and Kuhn, 2018; sharp rate from Fournier and Guillin, 2015) . Under light-tail conditions on R⋆, there exist c1, c 2 > 0 such that for any δ ∈ (0 , 1) ,
+
+εn(δ) = ( c1 log( c2/δ )/n )1/ max( K, 2) satisfies Pr( W1( ˆRn, R ⋆) ≤ εn(δ)) ≥ 1 − δ. The exponent 
+
+1/ max( K, 2) matches the sharp rate of E[W1( ˆRn, R ⋆)] established for absolutely continuous R⋆
+
+in Fournier and Guillin (2015, Theorem 1). At the critical dimension K = 2 , logarithmic factors can appear depending on the moment and concentration regime; since the empirical application has K = 25 , this critical-dimensional refinement does not affect the interpretation here. 
+
+6.5 ϕ-divergence ambiguity and EVaR–KL duality 
+
+Definition 6.10 (ϕ-divergence ambiguity) . For convex ϕ : R+ → R with ϕ(1) = 0, Dϕ(R∥R0) = R ϕ(dR/dR 0)dR 0 and Aϕ(η) = {R ≪ R0 : Dϕ(R∥R0) ≤ η}.
+
+Proposition 6.11 (KL-DRO and EVaR; Ben-Tal et al., 2013) . Let AKL (η) = {R ≪ R0 :KL( R∥R0) ≤ η} and ℓ = −r⊤w. Then 
+
+sup 
+
+> R∈A KL (η)
+
+ER[ℓ] = inf 
+
+> λ> 0
+
+{λ log ER0 [eℓ/λ ] + λη }, (21) 
+
+which coincides with EVaR α(ℓ) at confidence level α = e−η, equivalently η = log(1 /α ): the entropic penalty λη in (21) is exactly the η log( α−1) term in Definition 5.4 after the substitution 
+
+η 7 → λ. KL radius and EVaR confidence level are therefore two parameterizations of the same one-parameter family of coherent risk measures. 
+
+6.6 Comparison and tractability 
+
+Table 4: Comparison of DRO ambiguity structures.                     
+
+> Ambiguity Data fit Regularizer Tractability Moment (Delage–Ye) μ, Σ only SDP convex SDP Wasserstein, linear loss surrounds ˆRndual-norm on wLP/QP/SOCP Wasserstein, CVaR (Thm. 6.6) surrounds ˆRnε/α dual-norm LP/SOCP KL / ϕ-div abs. continuity vs R0entropic convex, closed form
+
+# 7 Chance-constrained DPO 
+
+The canonical chance-constrained portfolio problem (Charnes and Cooper, 1959) is max  
+
+> w∈W
+
+ER[r⊤w] s.t. Pr  
+
+> R
+
+(r⊤w ≤ − a) ≤ ε, (22) with significance level ε ∈ (0 , 1) and loss bound a > 0. 
+
+7.1 Gaussian reformulation 
+
+Proposition 7.1 (Gaussian SOC reduction) . If r ∼ N (μ, Σ) with Σ ≻ 0, the chance constraint in (22) is equivalent to the SOC constraint 
+
+μ⊤w − Φ−1(1 − ε)√w⊤Σw ≥ − a, (23) 
+
+which is convex for ε < 1/2.
+
+18 7.2 CVaR inner approximation 
+
+Proposition 7.2 (CVaR convex inner approximation) . For every R ∈ P 1(RK ), CVaR ε(−r⊤w) ≤
+
+a ⇒ Pr R(r⊤w ≤ − a) ≤ ε. The converse fails in general. Remark 7.3 (Quantitative tightness gap) . For continuous R, the CVaR inner approximation is tight only when the ε-tail is concentrated at one point. The conservatism gap is ∆ ε(w) := CVaR ε(−r⊤w) − VaR ε(−r⊤w), the average tail excess above the ε-quantile. For tail laws in the ( ξ, β )-generalized-Pareto class above VaR ε, ∆ ε(w) = β/ (1 − ξ). Gaussian tails ( ξ → 0) give ∆ε → 0 as ε → 0+; heavy-tailed Pareto-α (ξ = 1 /α ) gives ∆ ε = VaR ε /(α − 1), which does not vanish—the regime where chance-constrained portfolio choice is most consequential, motivating the joint use of CVaR with Wasserstein DRO. 
+
+7.3 Scenario approximation: Calafiore–Campi 
+
+Theorem 7.4 (Calafiore and Campi, 2005; explicit constant from Campi and Garatti, 2008) .
+
+Let {rs}Ss=1 be iid from R, and consider 
+
+max  
+
+> w∈W
+
+¯μ⊤w s.t. − r⊤ 
+
+> s
+
+w ≤ a, ∀s = 1 , . . . , S. (24) 
+
+Let d be the Helly (support-rank) dimension. Then for ε, δ ∈ (0 , 1) , Pr S {Pr R(−r⊤wS > a ) >ε} ≤ Pd−1
+
+> j=0
+
+ Sj
+
+εj (1 −ε)S−j (Calafiore and Campi, 2005). The optimized exponential–polynomial trade-off in this binomial tail yields the explicit conservative sufficient condition 
+
+S ≥ ee − 1 · d − 1 + log(1 /δ )
+
+ε (25) 
+
+(Campi and Garatti, 2008, Thm. 1). Remark 7.5 (Effective dimensions and the explicit constant) . Long-only simplex ∆ K−1: d =
+
+K − 1. Box [ ℓ, u ]K without budget: d = K. Box plus budget: d = K − 1. Sector budgets with 
+
+m equalities: d = K − m. The Helly dimension d is defined under the standard nondegeneracy assumption that the optimum is unique with probability one under P S ; at vertex degeneracies (multiple binding constraints supporting the same optimal value) d can be smaller than the tabulated formulas suggest, in which case the scenario bound (25) is only conservative. The factor e/ (e − 1) ≈ 1.582 in (25) comes from optimizing the trade-off between the polynomial and exponential factors in the binomial tail. 
+
+# 8 Weight distributions: stochastic allocations 
+
+We turn to the setting where W is non-trivial. The first question is whether stochastic allo-cation can improve a static risk-adjusted objective relative to its mean. The answer is no, in considerable generality; this delimits when stochastic policies are genuinely valuable. 
+
+8.1 Static randomization cannot improve concave risk-adjusted utility 
+
+Theorem 8.1 (Static no-randomization under ex-ante independent randomization) . Let Q ∈P(W) be a stochastic allocation law with mean ¯w := EQ[w] ∈ W , which is feasible because W
+
+is convex and compact. Suppose the allocation draw w ∼ Q is made ex ante and independently of the return draw r ∼ R. Suppose γ ≥ 0, u is concave and non-decreasing, and ρ is a law-invariant convex risk measure satisfying dilatation monotonicity: ρ(E[L | G ]) ≤ ρ(L) for every integrable loss L and every sub-σ-algebra G. Then 
+
+Er∼R[u(r⊤ ¯w)] − γρ (−r⊤ ¯w) ≥ Ew∼Q,r ∼R[u(r⊤w)] − γρ (−r⊤w),
+
+where the right-hand side is evaluated under the product law Q ⊗ R.
+
+19 Proof. Utility. Pointwise in r, concavity gives Ew∼Qu(r⊤w) ≤ u(r⊤EQ[w]) = u(r⊤ ¯w). Integrate over R.
+
+Risk. Set L = −r⊤w on the product space and condition on r. Independence gives E[L | r] = 
+
+−r⊤ ¯w. By dilatation monotonicity, ρ(−r⊤ ¯w) = ρ(E[L | r]) ≤ ρ(L) = ρ(−r⊤w). Combining yields the claim. CVaR, EVaR, entropic risk, and the worst-case loss all satisfy dilatation monotonicity (F¨ ollmer and Schied, 2011, §4.5). On an atomless probability space, dilatation monotonicity is automatic for law-invariant convex risk measures (F¨ ollmer and Schied, 2011, Theorem 4.59); Cherny (2006) provides a direct proof. The hypothesis in Theorem 8.1 is therefore not an ad-ditional restriction beyond law-invariance and convexity. On an atomless space the result thus reduces to the statement that ex-ante independent randomization cannot help a concave-utility / convex-risk objective—a measure-theoretic sharpening of folklore, included here because it delimits the role of the stochastic-allocation classes of §8 rather than because the argument is itself new. 
+
+Remark 8.2 (When stochastic weights matter) . Theorem 8.1 does not make stochastic poli-cies useless; it sharpens their role. Randomized weights are valuable when at least one of: (i) exploration in dynamic RL; (ii) entropy regularization; (iii) nonconvex or discrete alloca-tion constraints; (iv) transaction-cost frictions creating path dependence; (v) model averaging across heterogeneous strategies; (vi) hierarchical allocation where randomness is realized before conditioning on a latent regime. 
+
+8.2 Dirichlet policies on the simplex 
+
+Definition 8.3 (Dirichlet policy) . For W = ∆ K−1 and a state space S, a Dirichlet policy is the kernel 
+
+Wθ(· | s) = Dir( αθ(s)) , αθ(s) = softplus( fθ(s)) + ϵ1 ∈ RK>0, (26) for a network fθ : S → RK and floor ϵ > 0. The state-dependent concentration is α0,θ (s) = P 
+
+> i
+
+αi,θ (s). 
+
+Proposition 8.4 (Score, entropy, moments) . For Wθ(· | s) = Dir( αθ(s)) : (i) Score: 
+
+∇θ log Wθ(w | s) = PKi=1 [log wi − ψ(αi,θ (s)) + ψ(α0,θ (s))] ∇θαi,θ (s); (ii) Entropy: H(Wθ(· | 
+
+s)) = log B(α) + ( α0 − K)ψ(α0) − PKi=1 (αi − 1) ψ(αi); (iii) Moments: E[wi] = αi/α 0,
+
+Var( wi) = αi(α0 − αi)/(α20(α0 + 1)) , Cov( wi, w j ) = −αiαj /(α20(α0 + 1)) for i̸ = j.
+
+Proposition 8.5 (Expected utility under a Dirichlet policy: a tractable bound) . Let u be concave, W = Dir( α) with α0 = P 
+
+> i
+
+αi, and R have finite second moment. Define ¯w = α/α 0
+
+and ΣW = Cov W (w). Then (i) (Upper bound, Jensen in w): Ew∼W Er∼R[u(r⊤w)] ≤ Er∼R[u(r⊤ ¯w)] .(ii) (Lower bound, second-order Taylor): if u is twice continuously differentiable on I with 
+
+|u′′ (x)| ≤ M2 for x ∈ I, and r⊤w ∈ I for W ⊗ R-a.e. (w, r ), then 
+
+Ew∼WEr∼R[u(r⊤w)] ≥ Er∼R[u(r⊤ ¯w)] − M2 
+
+> 2
+
+Er∼R[r⊤ΣW r].
+
+(iii) (Policy gradient, REINFORCE): for the differentiable parameterization α = αθ(s),
+
+∇θEw∼WθEr∼R[u(r⊤w)] = Ew, r 
+
+h
+
+u(r⊤w) ∇θ log Wθ(w | s)
+
+i
+
+.
+
+Remark 8.6 (On the constant M2). For bounded support supp( R) ⊆ [−rmax , r max ]K and long-only W = ∆ K−1, standard utilities admit explicit M2 on I = [ −rmax , r max ]: log utility (valid 20 when rmax < 1) gives M log 2 = (1 − rmax )−2; CRRA gives M CRRA 2 = γ(1 − rmax )−1−γ ; CARA gives M CARA 2 = a2ear max , valid on all of R.The constants M2 above are worst-case curvature bounds over the full interval. For log utility, (1 − rmax )−2 is attained only at the lower endpoint x = −rmax , so the resulting variance penalty  
+
+> M2
+> 2
+
+ER[r⊤ΣW r] is a conservative global lower bound rather than a tight practical approximation; a tighter local constant M2(r) = sup |x|≤| r| |u′′ (x)| can be substituted when the predictive law is concentrated away from the domain boundary. 
+
+8.3 Long-only alternatives and a true long–short construction 
+
+Definition 8.7 (Logistic-normal simplex policy) . A logistic-normal simplex policy is w =softmax( z), z ∼ N (μθ(s), Σθ(s)). This is a long-only stochastic allocation; it is not long–short. 
+
+Definition 8.8 (Two-book long–short policy) . Let w+ ∼ Dir( α+ 
+
+> θ
+
+(s)) and w− ∼ Dir( α− 
+
+> θ
+
+(s)) be independent draws on the simplex, let q(s) ≥ 0 be a state-dependent short-leverage, and let (A+, A−) be a fixed disjoint partition of the asset universe such that supp( α+ 
+
+> θ
+
+(s)) ⊆ A +, supp( α− 
+
+> θ
+
+(s)) ⊆ A −. (27) Define w = (1 + q(s)) w+ − q(s)w− ∈ RK . Then 1⊤w = 1 and ∥w∥1 = 1 + 2 q(s). 
+
+Remark 8.9 (On the disjoint-supports condition) . The disjoint-supports condition (27) is a theoretical convenience that yields a clean closed form and a budget-preserving construction. Most empirically interesting long–short equity strategies violate disjointness: the same asset can appear in both books at different weights through factor crowding, sector rotation, or pairs trading. A more general construction allows overlapping books with a netting operator 
+
+w = (1 + q)w+ − qw − followed by projection onto {w : 1⊤w = 1 , ∥w∥1 ≤ 1 + 2 q}; the explicit formulas (27) then become inequality constraints rather than identities. We do not pursue the overlapping variant here. 
+
+8.4 Hierarchical allocations: HRP, RA-HRP, Bayesian HRP 
+
+HRP. L´ opez de Prado (2016) builds a binary tree T on the asset universe via hierarchical clustering of the correlation matrix. At each internal node with children ( L, R ) and risk con-tributions ( vL, v R), ϕL = vR/(vL + vR), ϕR = vL/(vL + vR). HRP uses only Σ and produces deterministic wHRP ∈ ∆K−1.
+
+RA-HRP. Noguer i Alonso (2025) extends HRP by replacing the inverse-variance split with a risk-adjusted-return split: ϕL = ( μL/v L)/(μL/v L + μR/v R). 
+
+Bayesian HRP. A fully distributional version replaces each split by a Beta prior ϕv ∼
+
+Beta( τ v R, τ v L) at every internal node of T , with concentration τ > 0. 
+
+Proposition 8.10 (Bayesian HRP recovers HRP/RA-HRP in the high-concentration limit) . Let 
+
+wBHRP (τ ) ∈ ∆K−1 denote a draw from the Bayesian HRP leaf-weight law with concentration τ .Then as τ → ∞ , wBHRP (τ ) L2
+
+−→ wHRP (resp. wRA -HRP ). Proof. For each internal node v of the tree T , the split fraction ϕv,τ ∼ Beta( τ α v, τ β v) with 
+
+αv, β v the node-mean parameters. The Beta distribution has mean E[ϕv,τ ] = αv/(αv +βv) =: ¯ϕv
+
+independently of τ , and variance Var[ ϕv,τ ] = αvβv
+
+(αv + βv)2 (τ (αv + βv) + 1) = O(τ −1).
+
+21 Hence ϕv,τ → ¯ϕv in L2 as τ → ∞ . Independence across nodes is the standing hypothesis on the prior. For a leaf ℓ at depth dℓ, the leaf weight is the finite product wℓ,τ = Q 
+
+> v∈path( ℓ)
+
+ψv,τ , where 
+
+ψv,τ ∈ { ϕv,τ , 1−ϕv,τ } depending on path direction. The deterministic limit is ¯ wℓ = Q 
+
+> v∈path( ℓ)
+
+¯ψv.Because all factors and partial products are bounded by one, the telescoping identity 
+
+> m
+
+Y
+
+> j=1
+
+aj −
+
+> m
+
+Y
+
+> j=1
+
+bj =
+
+> m
+
+X
+
+> j=1
+
+Y
+
+> i<j
+
+ai
+
+ (aj − bj )
+
+Y
+
+> i>j
+
+bi
+
+
+
+gives 
+
+∥wℓ,τ − ¯wℓ∥L2 ≤
+
+> dℓ
+
+X
+
+> j=1
+
+∥ψj,τ − ¯ψj ∥L2 = O
+
+
+
+dℓ τ −1/2
+
+,
+
+where dℓ is the depth of leaf ℓ in the tree. For balanced HRP dℓ = Θ(log K); for the worst-case unbalanced tree dℓ = O(K). The hidden constant in O(τ −1/2) is therefore O(log K) in the balanced case and O(K) in the worst case; the depth factor affects the prefactor of the rate but not the rate exponent. Since the tree has finitely many leaves, convergence holds in L2
+
+for the entire allocation vector. The RA-HRP case is identical with the corresponding split parameters. 
+
+# 9 Distributional reinforcement learning for portfolios 
+
+Standard RLPO learns Qπ(s, w ) = Eπ[P 
+
+> t
+
+γtRt | s0 = s, w 0 = w]. Distributional RL (Bellemare et al., 2017) learns the full return distribution Zπ(s, w ) = Law( P 
+
+> t
+
+γtRt | s0 = s, w 0 = w). 
+
+9.1 The portfolio MDP and distributional Bellman operator 
+
+Let ( S, A, P, γ ) be a discounted portfolio MDP with A = W. To allow turnover penalties, the one-period reward is allowed to depend on the current action, next state, and next action: 
+
+g(s, w, s ′, w ′) := w⊤r(s, s ′) − c(w, w ′). The transition is s′ ∼ P(· | s, w ), and the next action is 
+
+w′ ∼ π(· | s′). For p ≥ 1, define the complete metric space 
+
+Zp := 
+
+
+
+Z : S × A → P p(R) : Z measurable, sup 
+
+> s,w
+
+Z
+
+|x|pdZ (s, w )( x) < ∞
+
+
+
+,
+
+equipped with the supremal Wasserstein metric W p(Z, Z ′) := sup (s,w )∈S×A Wp(Z(s, w ), Z ′(s, w )). 
+
+Definition 9.1 (Distributional Bellman operator) . For a fixed policy π, the operator T π : Zp →Zp is defined as follows. For each ( s, w ), ( T πZ)( s, w ) is the law of 
+
+g(s, w, s ′, w ′) + γG, (28) where s′ ∼ P(· | s, w ), w′ ∼ π(· | s′), and G | (s′, w ′) ∼ Z(s′, w ′), with G conditionally independent of the transition–policy draw given ( s′, w ′). 
+
+Theorem 9.2 (Distributional Bellman contraction for portfolio rewards) . Assume |g(s, w, s ′, w ′)| ≤ 
+
+Rmax < ∞ for all admissible (s, w, s ′, w ′). Then T π maps Zp into itself and is a γ-contraction: 
+
+W p(T πZ, T πZ′) ≤ γW p(Z, Z ′). Consequently, T π admits a unique fixed point Zπ ∈ Z p, and for any Z0 ∈ Z p the iterates Zk+1 = T πZk converge to Zπ in W p.
+
+22 Proof. Fix ( s, w ). Let μ(s, w ) and μ′(s, w ) denote ( T πZ)( s, w ) and ( T πZ′)( s, w ). Draw ( s′, w ′)from P(· | s, w ) ⊗ π(· | s′) as shared randomness in both. Conditional on ( s′, w ′), let Π ⋆s′,w ′ be the optimal coupling between Z(s′, w ′) and Z′(s′, w ′) realizing the infimum in (3). Existence of a Borel-measurable selector ( s′, w ′) 7 → Π⋆s′,w ′ follows from the measurable selection theorem for optimal transport plans (Villani, 2009, Cor. 5.22) (see also Ambrosio et al. (2008, Lem. 1.2.3) for a self-contained proof using Γ-convergence). Draw ( G, G ′) | (s′, w ′) ∼ Π⋆s′,w ′ and define X := g(s, w, s ′, w ′)+ γG , X′ := g(s, w, s ′, w ′)+ γG ′.Then X ∼ μ(s, w ) and X′ ∼ μ′(s, w ). By Fubini–Tonelli, 
+
+E[|X − X′|p] = γpEs′,w ′ [W pp (Z(s′, w ′), Z ′(s′, w ′))] ≤ γpW pp(Z, Z ′).
+
+The primal definition gives W pp (μ(s, w ), μ ′(s, w )) ≤ γpW pp(Z, Z ′). Taking pth root and supre-mum yields the contraction. 
+
+Remark 9.3 (Scope of the action-coupled reward extension) . The reward g(s, w, s ′, w ′) in Defi-nition 9.1 is allowed to depend on the current action w, the next state s′, and the next action 
+
+w′, which accommodates turnover frictions of the form c(w, w ′). This generality is notational rather than substantive: the synchronous coupling at ( s′, w ′) used in the proof of Theorem 9.2 is exactly the standard distributional-Bellman argument of Bellemare et al. (2017) and Dab-ney et al. (2018b), and the contraction constant remains γ regardless of whether g depends on (w, w ′). An honestly new contraction result for genuinely action-coupled costs would require either state augmentation to track past actions (which destroys the Markov structure on S
+
+alone) or a state-dependent Lipschitz bound on g yielding a non-uniform contraction rate. The-orem 9.2 as stated does neither; it records the dynamic recursion in the form used downstream and does not claim a contraction phenomenon attributable to turnover frictions per se. 
+
+9.2 Parameterizations 
+
+Three standard parameterizations of Zθ(s, w ) are used in practice and carry over unchanged to the portfolio MDP: the categorical C51 representation on a fixed support {zk} ⊂ [Vmin , V max ]with grid projection after each Bellman update (Bellemare et al., 2017); the quantile QR-DQN representation at levels τk = ( k − 1/2) /N trained by the quantile-regression loss Lτ (u) = ( τ −
+
+1{u < 0})u (Dabney et al., 2018b); and the implicit IQN representation qθ(s, w, τ ), τ ∼ U (0 , 1) (Dabney et al., 2018a). We use these as black-box function classes; the contraction theory below is independent of the choice. 
+
+9.3 Risk-sensitive distributional control 
+
+The distributional Bellman recursion of Section 9.1 is risk-neutral: the value of Zπ(s, w ) is summarized by its mean. Risk-sensitive control replaces the mean by a law-invariant scalar functional of Zπ. Two formulations coexist in the literature: the static formulation, which applies a scalar risk measure to the total-return law Zπ(s0, w 0) at time zero, and the dynamic 
+
+formulation, which uses a nested sequence of one-step risk measures and is time-consistent. 
+
+Definition 9.4 (Static risk-sensitive distributional policy) . Let Zπ(s, a ) denote the return distribution under policy π and let A0 ∼ π(· | s0). For a law-invariant risk measure ρ on losses, define 
+
+Jρ(π) = E[Zπ(s0, A 0)] − λρ (−Zπ(s0, A 0)) , λ ≥ 0,
+
+and π⋆ρ ∈ arg max π Jρ(π). The static objective is not in general the value function of a Markov decision process, because most law-invariant risk measures (CVaR, EVaR, spectral risk) lack the recursion-compatible decomposition that makes the Bellman equation work. The dynamic counterpart fixes this by nesting a one-step risk measure ρ1 at each transition, in the sense of Ruszczy´ nski (2010). 23 Definition 9.5 (One-step Markov risk functional with W1-Lipschitz modulus) . A one-step Markov risk functional is a family {ρ1
+
+> s,a
+
+}(s,a )∈S×A of law-invariant convex risk functionals on 
+
+P1(R) such that ( s, a ) 7 → ρ1 
+
+> s,a
+
+is Borel measurable and there exist finite constants Lρ < ∞ and 
+
+Mρ < ∞ satisfying 
+
+ρ1
+
+> s,a
+
+(μ) − ρ1
+
+> s,a
+
+(ν) ≤ LρW1(μ, ν ), μ, ν ∈ P 1(R),
+
+and sup 
+
+> (s,a )∈S×A
+
+|ρ1
+
+> s,a
+
+(δ0)| ≤ Mρ,
+
+uniformly over ( s, a ) ∈ S × A.The constant Lρ is not normalized to be smaller than one, and Mρ is a bounded-baseline condition. The contraction condition below is imposed directly on the combined modulus γ +
+
+λL ρ; the baseline constant is used only to ensure that the operator maps Zp into itself. 
+
+Definition 9.6 (Risk-shifted distributional Bellman operator) . For a one-step Markov risk functional ρ1 with finite W1-Lipschitz modulus Lρ, and for a fixed policy π, define T πρ : Zp → Z p
+
+by declaring ( T πρ Z)( s, w ) to be the law of 
+
+g(s, w, s ′, w ′) − λ ρ 1
+
+> s′,w ′
+
+ −Z(s′, w ′) + γG, 
+
+where s′ ∼ P (· | s, w ), w′ ∼ π(· | s′), and G | (s′, w ′) ∼ Z(s′, w ′), conditionally independently of the transition–policy draw given ( s′, w ′). 
+
+Remark 9.7 (Interpretation of the risk-shifted operator) . The operator T πρ should be interpreted as a risk-shifted distributional Bellman operator. It is not the most general time-consistent Markov risk recursion of Ruszczy´ nski (2010), because the continuation distribution is still prop-agated explicitly through the random draw G. The theorem below proves that adding a one-step law-invariant risk adjustment preserves contraction provided γ + λL ρ < 1. Thus the result is a sufficient contraction condition for a distributional risk-shifted recursion, not a complete dynamic-risk representation theorem. 
+
+Theorem 9.8 (Risk-shifted distributional Bellman contraction) . Assume |g(s, w, s ′, w ′)| ≤ 
+
+Rmax < ∞ for all admissible (s, w, s ′, w ′). Let ρ1 be a one-step Markov risk functional with finite W1-Lipschitz modulus Lρ and finite baseline Mρ. If 
+
+κ := γ + λL ρ < 1,
+
+then T πρ maps Zp into itself and is a κ-contraction in the supremal Wasserstein metric: 
+
+W p(T πρ Z, T πρ Z′) ≤ κ W p(Z, Z ′), Z, Z ′ ∈ Z p.
+
+Consequently, T πρ admits a unique fixed point Zπρ ∈ Z p, and the iterates Zk+1 = T πρ Zk converge to Zπρ in W p from any Z0 ∈ Z p.Proof. First, T πρ Z ∈ Z p. Indeed, for Z ∈ Z p,
+
+|ρ1 
+
+> s′,w ′
+
+(−Z(s′, w ′)) | ≤ Mρ + LρW1(Z(s′, w ′), δ 0),
+
+and W1(Z(s′, w ′), δ 0) ≤ (E|G|p)1/p . Together with the boundedness of g and the definition of 
+
+Zp, this gives a uniform p-moment bound. Now fix ( s, w ). Couple the transition–policy draw ( s′, w ′) identically in both arguments. Conditional on ( s′, w ′), let ( G, G ′) be an optimal Wp-coupling of Z(s′, w ′) and Z′(s′, w ′) (Borel-measurable selector by Villani (2009, Cor. 5.22)). Define 
+
+X := g(s, w, s ′, w ′) − λρ 1 
+
+> s′,w ′
+
+(−Z(s′, w ′)) + γG, 
+
+24 and 
+
+X′ := g(s, w, s ′, w ′) − λρ 1 
+
+> s′,w ′
+
+(−Z′(s′, w ′)) + γG ′.
+
+Then X ∼ (T πρ Z)( s, w ) and X′ ∼ (T πρ Z′)( s, w ). The reward term cancels. Conditional on (s′, w ′), Minkowski’s inequality gives 
+
+ E|X − X′|p | s′, w ′ 1/p ≤ λ ρ1 
+
+> s′,w ′
+
+(−Z(s′, w ′)) − ρ1 
+
+> s′,w ′
+
+(−Z′(s′, w ′)) 
+
++ γ  E|G − G′|p | s′, w ′ 1/p .
+
+By the W1-Lipschitz property of ρ1, the invariance of Wasserstein distance under x 7 → − x, and 
+
+W1 ≤ Wp,
+
+ρ1 
+
+> s′,w ′
+
+(−Z(s′, w ′)) − ρ1 
+
+> s′,w ′
+
+(−Z′(s′, w ′)) ≤ LρWp(Z(s′, w ′), Z ′(s′, w ′)) .
+
+The optimal coupling gives 
+
+ E[|G − G′|p | s′, w ′]1/p = Wp(Z(s′, w ′), Z ′(s′, w ′)) .
+
+Hence  E[|X − X′|p | s′, w ′]1/p ≤ (λL ρ + γ)Wp(Z(s′, w ′), Z ′(s′, w ′)) .
+
+Taking expectations over ( s′, w ′), then the p-th root, yields 
+
+Wp
+
+ (T πρ Z)( s, w ), (T πρ Z′)( s, w ) ≤ (λL ρ + γ)W p(Z, Z ′).
+
+Taking the supremum over ( s, w ) gives the claimed contraction. The Banach fixed-point theorem on the complete metric space ( Zp, W p) gives existence, uniqueness, and convergence of iterates. 
+
+Corollary 9.9 (Risk-neutral limit) . At λ = 0 , Theorem 9.8 reduces to Theorem 9.2, the stan-dard distributional Bellman γ-contraction. For λ > 0, the risk shift increases the contraction modulus from γ to γ + λL ρ. The recursion remains contractive precisely when the risk-aversion weight is small enough that γ + λL ρ < 1.Remark 9.10 (Operational Lρ for canonical one-step risk measures) . The contraction condition 
+
+γ +λL ρ < 1 is mild or restrictive depending on the W1-Lipschitz modulus of the chosen one-step risk functional. 
+
+• CVaR. The dual representation of CVaR α gives LCVaR α = 1 /α . At α = 0 .05, Lρ = 20, so with γ = 0 .95 the contraction condition requires λ < (1 − γ)/L ρ = 0 .0025. Thus unscaled CVaR can be used, but the risk-aversion weight must be correspondingly small. 
+
+• Entropic risk. For 
+
+ρη(L) = η log E[eL/η ],
+
+global W1-Lipschitzness is not automatic on unbounded supports. On a bounded interval [a, b ], the elementary bound 
+
+|ρη(μ) − ρη(ν)| ≤ exp 
+
+ b − aη
+
+
+
+W1(μ, ν )shows that a finite W1-Lipschitz constant exists, but it depends on the support diameter and on η, and it need not be smaller than one. Entropic risk is one-Lipschitz in stronger metrics such as W∞, not uniformly one-Lipschitz in W1.25 • Scalar Wasserstein-DRO risk. For the scalar identity-loss functional 
+
+ρε(μ) := sup 
+
+> ν:W1(ν,μ )≤ε
+
+Eν [X],
+
+one has ρε(μ) = Eμ[X]+ ε, hence Lρ = 1. For nonlinear losses, the corresponding Lipschitz modulus is inherited from the loss. Thus Theorem 9.8 is most useful when the one-step risk functional has a controlled W1-modulus or when the risk-aversion parameter λ is scaled to absorb that modulus. The natural headline application is therefore the scalar Wasserstein-DRO risk functional, for which Lρ = 1 and the contraction condition γ + λL ρ < 1 holds for any λ < 1 − γ without rescaling; the unscaled-CVaR case ( Lρ = 1 /α ) is the restrictive extreme that forces a small λ, not the intended use. 
+
+Proposition 9.11 (CVaR–Bellman incoherence in the static formulation) . When the one-period reward R is random and jointly distributed with the continuation return Z(s′, w ′), static CVaR does not decompose recursively: 
+
+CVaR α(R + γZ (s′, w ′)) ̸ = R + γ CVaR α(Z(s′, w ′)) 
+
+in general. Equality holds only in special cases, for example when R is deterministic conditional on the current state-action pair (so the translation invariance of CVaR applies). The static formulation of Definition 9.4 therefore does not admit a Bellman recursion with ρ = CVaR α;the dynamic formulation of Definition 9.6, which nests ρ1 
+
+> s′,w ′
+
+= CVaR α at each step, does, by Theorem 9.8. Remark 9.12 (Dynamic-CVaR and Markov risk measures) . The time-inconsistency of static CVaR is formalized in a substantial literature on Markov risk measures and time-consistent dynamic programming. Ruszczy´ nski (2010) introduces nested Markov risk measures. B¨ auerle and Ott (2011) show that the static CVaR τ objective in an MDP can be reduced to an ordinary MDP with an extended state space. Pflug and Pichler (2014) provide a book-length treatment. Theorem 9.8 above is the explicit contraction-based version of these nesting constructions in the distributional-return setting. 
+
+# 10 Synthesis: domination and second-order conservatism 
+
+Bayesian DPO and Wasserstein DRO are often presented as different philosophies. We show they are tightly connected via a domination bound (Theorem 10.1) and a calculation in a tractable special case (Proposition 10.11) that quantifies how loose the first-order bound can be. The label domination (rather than duality) is intentional: Theorem 10.1 bounds Bayesian uncertainty by Wasserstein DRO from above, but the two are not isomorphic in general. 
+
+10.1 Domination 
+
+Theorem 10.1 (Bayesian–DRO domination: model-level and loss-level forms) . Let Rpred  
+
+> n
+
+:= R 
+
+> Θ
+
+Rθ dP n(θ) and ˆθ := EPn [θ]. Let D ⊆ Θ be a measurable set with ˆθ ∈ D, and suppose that the model map θ 7 → Rθ is L-Lipschitz in W1 on D:
+
+W1(Rθ, R θ′ ) ≤ L∥θ − θ′∥, θ, θ ′ ∈ D. (29) 
+
+Define the model-level tail term τn(D) := R 
+
+> Dc
+
+W1(Rθ, R ˆθ) dP n(θ), allowing τn(D) = + ∞.
+
+(Model-level form.) If τn(D) < ∞, then 
+
+W1(Rpred  
+
+> n
+
+, R ˆθ) ≤ LEPn [∥θ − ˆθ∥1D(θ)] + τn(D). (30) 26 Consequently, defining εWn (D) := LEPn [∥θ − ˆθ∥1D(θ)] + τn(D), Rpred  
+
+> n
+
+∈ BW1 (Rˆθ, ε Wn (D)) , and for every loss ℓ(w, ·) that is Lipschitz in r with constant Lip r(ℓ), |ERpred  
+
+> n
+
+[ℓ(w, r )] −ERˆθ [ℓ(w, r )] | ≤ 
+
+Lip r(ℓ)εWn (D).
+
+(Loss-level form.) If the loss instead satisfies the uniform bounded-expectation condition 
+
+Bℓ := sup 
+
+> w∈W ,θ ∈Θ
+
+|ERθ [ℓ(w, r )] | < ∞, (31) 
+
+then 
+
+|ERpred  
+
+> n
+
+[ℓ(w, r )] − ERˆθ [ℓ(w, r )] | ≤ Lip r(ℓ)LEPn [∥θ − ˆθ∥1D(θ)] + 2 BℓPn(Dc). (32) 
+
+Under Assumption 4.7, any sequence Dn ↑ Θ with Pn(Dcn) = o(n−1/2) and Ln bounded yields, in either form, an effective radius of order O(n−1/2).Proof. By convexity of W1 under mixtures and Kantorovich–Rubinstein, W1(R Rθ dP n, R ˆθ) ≤R W1(Rθ, R ˆθ) dP n. Splitting over D and Dc and applying the local Lipschitz hypothesis gives (30). For the loss-level version, write ∆ ℓ(w) := |ERpred  
+
+> n
+
+[ℓ] − ERˆθ [ℓ]| ≤ R 
+
+> D
+
+|ERθ [ℓ] − ERˆθ [ℓ]|dP n +
+
+R 
+
+> Dc
+
+|ERθ [ℓ] − ERˆθ [ℓ]|dP n. The first integral is bounded by the local Lipschitz argument; the second by 2 BℓPn(Dc). 
+
+Remark 10.2 (Why the local form is the operative one) . The model map θ 7 → Rθ is rarely globally Lipschitz on the full parameter space Θ. The Gaussian–NIW case of Proposition 10.29 is typical: the local Lipschitz constant Lloc = max(1 , (2 √δ)−1) blows up as the lower bound δ
+
+on λmin (Σ) approaches zero, so a global Lipschitz constant does not exist. 
+
+Corollary 10.3 (Specialization to Gaussian–NIW; bounded or truncated losses) . Let R(μ, Σ) =
+
+N (μ, Σ) and let Pn be the NIW posterior with posterior mean ˆθn = (ˆ μn, ˆΣn). Assume Σ⋆ := plim n→∞ ˆΣn ≻ 0. Suppose either that the loss is bounded in the sense of (31) , or that the loss is replaced by a truncation sequence. Take δn = 12 λmin ( ˆΣn), ∆n = 2 λmax ( ˆΣn), Dn =
+
+{(μ, Σ) : δnI ⪯ Σ ⪯ ∆nI}. Then the local Lipschitz constant on Dn is Ln = max(1 , (2 √δn)−1),converging in probability to a finite limit. Standard NIW posterior concentration gives Pn(Dcn) = 
+
+O(e−cn ) for some c > 0, and the corresponding loss-level radius is εn = O(Lnn−1/2).Remark 10.4 (Explicit dimension dependence) . Corollary 10.3 states Pn(Dcn) = O(e−cn ) with the constant c > 0 depending on Wishart concentration. For fixed K, the bound is uniform; for K = Kn growing with n, the standard random-matrix tail (Wainwright, 2019, Theorem 6.1) gives Pr  λmin (Σ) < 12 λmin (Σ ⋆) ≤ 2 exp( −c(Kn, n ) · n) , c(Kn, n ) ≍ (1 − pKn/n )2+,
+
+which requires Kn/n → 0 for the local-Lipschitz domain Dn to retain exponential tail mass. In the high-dimensional regime Kn/n → κ ∈ (0 , 1), the local-Lipschitz constant Ln does not stabilize and the Bayesian–DRO radius εn = Ln · EPn ∥θ − ˆθ∥ inherits a Kn-dependent inflation. This is the analytic shadow of the empirical observation in Section 11.1 that the K = 25, n = 60 regime is dominated by covariance-estimation noise. 
+
+10.2 Posterior credible sets induce Wasserstein ambiguity sets 
+
+Theorem 10.5 (Posterior credible radius, finite-sample form) . Let Dn ⊆ Θ be a measurable Lipschitz domain on which the model map satisfies W1(Rθ, R ˆθ) ≤ L∥θ − ˆθ∥ for all θ ∈ Dn,with ˆθ ∈ Dn and Pn(Dcn) ≤ βn for some βn ∈ [0 , 1) . For δ ∈ (0 , 1) let q1−δ be the posterior 
+
+(1 − δ)-quantile of ∥θ − ˆθ∥, and define the credible radius 
+
+εn,δ = L · q1−δ. (33) 
+
+Then 
+
+Pn
+
+ Rθ ∈ BW1 (Rˆθ, ε n,δ ) ≥ 1 − δ − βn.
+
+27 Proof. On the event E := Dn ∩ {∥ θ − ˆθ∥ ≤ q1−δ}, the Lipschitz hypothesis on Dn gives 
+
+W1(Rθ, R ˆθ) ≤ L · q1−δ = εn,δ , so Rθ ∈ BW1 (Rˆθ, ε n,δ ) on E. The union bound gives Pn(E) ≥
+
+1 − δ − βn.
+
+Corollary 10.6 (Deterministic-inclusion form) . Under the hypotheses of Theorem 10.5, if in addition Pn({∥ θ − ˆθ∥ ≤ q1−δ}\ Dn) = 0 (so βn may be taken to be 0 for the displayed conclusion), then Pn(Rθ ∈ BW1 (Rˆθ, ε n,δ )) ≥ 1 − δ.Remark 10.7 (What the credible radius certifies, and what it does not) . The credible radius (33) is O(n−1/2) under Assumption 4.7, whereas the distribution-free coverage radius behind Theorem 6.9 scales as ( c1 log( c2/δ )/n )1/ max( K, 2) , which at K = 25 is effectively O(1) for any realistic n. The two radii are therefore not comparable in magnitude, and the credible-radius rule should be read as a posterior calibration of the ambiguity ball—it matches validation tuning without spending validation data— not as a finite-sample distributional-robustness certificate in the sense of Theorem 6.9. Worst-case coverage in the Mohajerin Esfahani–Kuhn sense would require the far larger Fournier–Guillin radius; the operational value documented in Section 11 is calibration-without-validation and turnover, not coverage. 
+
+Remark 10.8 (Discharging βn in Gaussian–NIW) . The credible ball {∥ θ − ˆθ∥ ≤ q1−δ} is rarely contained in any fixed Lipschitz domain with full posterior probability, because λmin ( ˆΣn) can be small in finite samples even when λmin (Σ ⋆) > 0. Theorem 10.5 handles this by retaining a probabilistic correction βn. For Gaussian–NIW, βn = O(e−cn ) for fixed K, so the correc-tion is exponentially small; for K = Kn growing with n, βn depends on Kn/n explicitly via Remark 10.4. 
+
+Proposition 10.9 (Predictive mixing generally differs from plug-in) . Let Rpred = R 
+
+> Θ
+
+Rθ dP (θ)
+
+and ˆθ = R 
+
+> Θ
+
+θ dP (θ). In general, Rpred ̸ = Rˆθ, and Bayesian predictive optimization and plug-in optimization are generally distinct. 
+
+Example 10.10 (Gaussian location model) . For Rμ = N (μ, Σ) with μ ∼ N (ˆ μ, Λ), Rpred =
+
+N (ˆ μ, Σ + Λ) whereas Rˆμ = N (ˆ μ, Σ). 
+
+10.3 Gaussian-isotropic case: posterior mixing is second order 
+
+Proposition 10.11 (Gaussian-isotropic posterior mixing is second order) . Let Rμ =
+
+N (μ, σ 2IK ) with known σ > 0, and suppose the posterior on μ is Pn = N (ˆ μ, Λn) with 
+
+Λn ≻ 0. Then Rpred  
+
+> n
+
+= N (ˆ μ, σ 2IK + Λ n) and 
+
+W1(Rpred  
+
+> n
+
+, R ˆμ) ≤ W2(Rpred  
+
+> n
+
+, R ˆμ) ≤ ∥Λn∥F
+
+2σ , (34) 
+
+W1(Rpred  
+
+> n
+
+, R ˆμ) ≥ p2/π ·
+
+p σ2 + λmax (Λ n) − σ
+
+
+
+. (35) 
+
+In particular, when Λn = O(n−1)IK and σ is fixed, W1(Rpred  
+
+> n
+
+, R ˆμ) = O(n−1), whereas EPn ∥μ −
+
+ˆμ∥ = O(n−1/2). The first-order Bayesian–DRO radius is conservative by one order in this symmetric Gaussian location model. Proof. Gaussian convolution gives the predictive identity. Both measures are Gaussian with the same mean ˆ μ, so the Bures–Wasserstein formula yields W 22 = PKi=1 (√σ2 + λi − σ)2. The inequality √σ2 + λ − σ = λ/ (√σ2 + λ + σ) ≤ λ/ (2 σ) gives (34). For the lower bound, let 
+
+v be a unit top eigenvector of Λ n and consider the 1-Lipschitz projection ϕ(x) = v⊤(x − ˆμ). Wasserstein distance contracts under 1-Lipschitz maps in the forward direction, hence 
+
+W1(Rpred  
+
+> n
+
+, R ˆμ) ≥ W1(ϕ#Rpred  
+
+> n
+
+, ϕ #Rˆμ).
+
+The two projected laws are ϕ#Rpred  
+
+> n
+
+= N (0 , σ 2 + λmax (Λ n)) and ϕ#Rˆμ = N (0 , σ 2). In one dimension, the monotone optimal coupling gives W1(N (0 , a 2), N (0 , b 2)) = |a − b|E|Z| = |a −
+
+b|p2/π with Z ∼ N (0 , 1). Substituting a = pσ2 + λmax (Λ n) and b = σ gives (35). 28 Remark 10.12 (Why first-order bounds overshoot) . For any 1-Lipschitz f : RK → R in the Gaussian-mean model, the function μ 7 → ERμ [f ] = EZ [f (μ + σZ )] is convolution-smoothed and infinitely differentiable. Its first-order Taylor expansion around ˆ μ gives a linear-in-( μ − ˆμ)contribution that integrates to zero against the centered Pn. The leading term is therefore second-order, of size O(EPn ∥μ − ˆμ∥2) = O(tr Λ n), matching ∥Λn∥F up to dimensional constants. The first-order Lipschitz upper bound misses this cancellation. 
+
+Proposition 10.13 (Second-order Bayes-DRO radius in the Gaussian-isotropic model) . Under the hypotheses of Proposition 10.11, define the second-order Bayes-DRO radius 
+
+ε(2)  
+
+> n
+
+:= ∥Λn∥F
+
+2σ . (36) 
+
+Then: (i) Rpred  
+
+> n
+
+∈ BW1 (Rˆμ, ε (2)  
+
+> n
+
+); (ii) for every 1-Lipschitz loss ℓ, |ERpred  
+
+> n
+
+[ℓ] − ERˆμ [ℓ]| ≤ ε(2)  
+
+> n
+
+;(iii) if Λn = O(n−1)IK and σ > 0 is fixed, then ε(2)  
+
+> n
+
+= O(n−1), compared with O(n−1/2) for the first-order radius; (iv) the second-order radius is fully data-driven. 
+
+10.4 When is the first-order Bayesian–DRO bound tight? A taxonomy 
+
+Example 10.14 (Deterministic affine law: first-order tight) . Let Rθ = δa+bθ . Then 
+
+W1(Rpred  
+
+> n
+
+, R ˆθ) = EPn ∥b(θ − ˆθ)∥, achieved by f (x) = ∥x − (a + bˆθ)∥ in the KR dual. The first-order radius is order-sharp. 
+
+Example 10.15 (Gaussian-mean location: second-order conservative) . By Proposition 10.11, the actual W1 gap is O(n−1) while the first-order radius is O(n−1/2). 
+
+Example 10.16 (Gaussian-scale: centered interior scale is smooth) . For Rσ = N (0 , σ 2IK ) with 
+
+σ random, when the posterior is concentrated away from σ = 0, the actual predictive-to-plug-in gap is second-order. 
+
+Example 10.17 (Kinked or noncentered models: first-order behavior reappears) . Let θ have posterior mean 0 and variance O(n−1), and set Rθ = δ|θ|e1 . Then W1(Rpred  
+
+> n
+
+, R ˆθ) = EPn |θ| =
+
+O(n−1/2), order-sharp despite posterior centering. 
+
+Proposition 10.18 (First-order tightness for affine-deterministic and locally non-smooth mod-els) . Assume one of the following two model structures. 
+
+(i) Deterministic affine. Rθ = δa+Bθ with a ∈ RK and B ∈ RK×dθ deterministic. Let 
+
+ˆθ = EPn θ. If the smallest singular value of B restricted to the linear span of supp( Pn)−{ ˆθ}
+
+is bounded below by σmin (B) > 0, then 
+
+W1(Rpred  
+
+> n
+
+, R ˆθ) ≥ σmin (B) · EPn ∥θ − ˆθ∥.
+
+(ii) Locally non-smooth model map. Suppose ˆθ = EPn θ and there exist a 1-Lipschitz test 
+
+f : RK → R, a direction v ∈ Rdθ with ∥v∥ = 1 , and constants c+̸ = c− such that, uniformly on a posterior-typical neighbourhood Un := {θ : ∥θ − ˆθ∥ ≤ rn},
+
+hf (θ) − hf (ˆθ) = c+
+
+ v⊤(θ − ˆθ) 
+
+> +
+
+− c−
+
+ v⊤(θ − ˆθ) 
+
+> −
+
++ r(θ), θ ∈ Un,
+
+with remainder sup θ∈Un |r(θ)|/∥θ − ˆθ∥ = o(1) and posterior-tail control Pn(U cn) ·
+
+sup θ∈U cn |hf (θ) − hf (ˆθ)| = o EPn |v⊤(θ − ˆθ)|. The uniformity over the full neigh-bourhood Un (rather than only along the line ˆθ + tv ) ensures the orthogonal component 
+
+θ⊥ does not break the expansion when θ ∈ Un has v⊤(θ − ˆθ)̸ = 0 but θ⊥̸ = 0 . Then 
+
+W1(Rpred  
+
+> n
+
+, R ˆθ) ≥ 12 |c+ − c−| · EPn |v⊤(θ − ˆθ)| − o(EPn |v⊤(θ − ˆθ)|).
+
+29 Consequently, in either class, the first-order Bayesian–DRO radius εWn of Theorem 10.1 is order-sharp: there exist constants 0 < c ≤ L < ∞ such that c · EPn ∥θ − ˆθ∥ ≤ W1(Rpred  
+
+> n
+
+, R ˆθ) ≤
+
+L · EPn ∥θ − ˆθ∥, and the upper bound of Theorem 10.1 cannot be improved by more than a constant factor. Proof. Case (i). The test function f (x) := ∥x − a − B ˆθ∥ is 1-Lipschitz. Under Rθ = δa+Bθ ,
+
+R f dR θ = ∥B(θ − ˆθ)∥; R f dR ˆθ = 0 and R f dR pred  
+
+> n
+
+= EPn ∥B(θ − ˆθ)∥ ≥ σmin (B) · EPn ∥θ − ˆθ∥ by the singular-value bound. Kantorovich–Rubinstein gives the claim. 
+
+Case (ii). Decompose θ − ˆθ = ( v⊤(θ − ˆθ)) v + θ⊥ with θ⊥ ⊥ v. On the posterior-typical neighbourhood, the directional expansion gives hf (θ)−hf (ˆθ) = c+(v⊤(θ− ˆθ)) + −c−(v⊤(θ− ˆθ)) − +
+
+o(|v⊤(θ − ˆθ)|) uniformly. Using EPn [v⊤(θ− ˆθ)] = 0 and the identity E[( X)+] = E[( X)−] = 12 E|X|
+
+for centered X,
+
+EPn [hf (θ) − hf (ˆθ)] = 12 (c+ − c−) · EPn |v⊤(θ − ˆθ)| + o(EPn |v⊤(θ − ˆθ)|).
+
+Replacing f by −f if c+ < c − and applying KR yields the claim. 
+
+Remark 10.19 (Order-sharpness in the nonsmooth taxonomy) . Proposition 10.18 substantiates the heuristic statements of Examples 10.14 and 10.17 with a quantitative lower bound. Com-bined with Proposition 10.11 (upper bound O(n−1) in the centered Gaussian-isotropic case) and the first-order upper bound of Theorem 10.1 ( O(n−1/2)), the picture is: smooth centered 
+
+models permit a second-order radius; nonsmooth or noncentered models do not, and the first-order radius is then within a model-dependent constant factor of the true Wasserstein gap. Theorem 10.20 below gives a sufficient modulus-of-smoothness condition for intermediate rates parameterized by ω.
+
+Theorem 10.20 (Second-order Bayes–DRO bound under a uniform modulus of smoothness) .
+
+Let Rθ be a parametric model with θ ∈ Θ ⊆ Rdθ and let Pn be a posterior with ˆθ = EPn [θ]. Let 
+
+F1 denote the class of 1-Lipschitz f : RK → R and set hf (θ) := R f dR θ. Assume: 
+
+(H1) (Local linearization with bounded coefficient.) There exists a posterior-typical neighbour-hood Nn ⊆ Θ with ˆθ ∈ Nn and, for each f ∈ F 1, a vector Gf ∈ Rdθ such that 
+
+hf (θ) − hf (ˆθ) = ⟨Gf , θ − ˆθ⟩ + ρf (θ), θ ∈ Nn,
+
+with sup f ∈F 1 ∥Gf ∥ ≤ G < ∞. The constant G is the local Lipschitz constant of θ 7 → Rθ
+
+at ˆθ in W1.
+
+(H2) (Uniform modulus.) There exists a non-decreasing ω : [0 , ∞) → [0 , ∞) with ω(0) = 0 such that sup f ∈F 1 |ρf (θ)| ≤ ω(∥θ − ˆθ∥) for all θ ∈ Nn.
+
+(H3) (Tail negligibility via integrable envelope.) There exists a measurable Φ : Θ → [0 , ∞) with 
+
+sup f ∈F 1 |hf (θ) − hf (ˆθ)| ≤ Φ( θ) for all θ ∈ Θ, and 
+
+G · EPn
+
+h
+
+∥θ − ˆθ∥ 1N cn
+
+i
+
++ EPn
+
+Φ( θ) 1N cn
+
+ = o
+
+
+
+EPn ω(∥θ − ˆθ∥)
+
+
+
+.
+
+Then 
+
+W1(Rpred  
+
+> n
+
+, R ˆθ) ≤ EPn
+
+h
+
+ω(∥θ − ˆθ∥)
+
+i
+
++ o
+
+
+
+EPn ω(∥θ − ˆθ∥)
+
+
+
+.
+
+Remark 10.21 (On the envelope Φ) . (H3) is the appropriate replacement for a deterministic “di-ameter of supports” bound, which would fail for Gaussian or Student-t models with unbounded support. In the Gaussian–NIW case, one may take Φ( θ) = G · ∥ θ − ˆθ∥ + W1(Rθ, R ˆθ); both terms have finite posterior moments and exponentially small tails by posterior concentration, so EPn [Φ( θ) 1N cn ] is O(e−cn ) when Nn is taken as a Gaussian credible ball of radius O(n−1/2+ δ). 30 Proof. By Kantorovich–Rubinstein duality, W1(Rpred  
+
+> n
+
+, R ˆθ) = sup f ∈F 1 EPn [hf (θ) − hf (ˆθ)]. Fix 
+
+f ∈ F 1 and split the expectation: 
+
+EPn [hf (θ) − hf (ˆθ)] = EPn
+
+h
+
+⟨Gf , θ − ˆθ⟩1Nn
+
+i| {z } 
+
+> =: T1
+
++ EPn [ρf (θ)1Nn ]
+
+| {z } 
+
+> =: T2
+
++ EPn [( hf (θ) − hf (ˆθ)) 1N cn ]
+
+| {z } 
+
+> =: T3
+
+.
+
+For T1, write EPn [( θ − ˆθ)1Nn ] = −EPn [( θ − ˆθ)1N cn ] using EPn [θ] = ˆθ. Cauchy–Schwarz with (H1) gives |T1| ≤ G · EPn [∥θ − ˆθ∥1N cn ], which is o(EPn ω) by (H3). For T2, (H2) gives |T2| ≤ 
+
+EPn [ω(∥θ − ˆθ∥)1Nn ] ≤ EPn ω. For T3, the envelope in (H3) gives |T3| ≤ EPn [Φ( θ)1N cn ] = o(EPn ω). Taking the supremum over f and absorbing the two o(EPn ω) terms yields the claim. 
+
+Corollary 10.22 (Polynomial moduli: explicit rates) . If ω(t) = M · t1+ α for some α ∈ [0 , 1] 
+
+and the posterior has EPn ∥θ − ˆθ∥1+ α = O(n−(1+ α)/2) (which holds under standard posterior concentration with covariance Λn = O(n−1)), then 
+
+W1(Rpred  
+
+> n
+
+, R ˆθ) = O
+
+
+
+n−(1+ α)/2
+
+.
+
+The endpoints α = 0 and α = 1 recover the first-order rate O(n−1/2) of Theorem 10.1 and the second-order rate O(n−1) of Proposition 10.11 respectively. The intermediate case α ∈ (0 , 1) 
+
+corresponds to α-H¨ older differentiable model maps and yields the interpolated rate n−(1+ α)/2.
+
+Example 10.23 (The taxonomy through the modulus) . Three model classes illustrate the corollary. 
+
+• Deterministic-affine (Rθ = δa+Bθ ): the map θ 7 → Rθ is Lipschitz in W1, but for general 
+
+f ∈ F 1 the composed function hf (θ) = f (a + Bθ ) is not affine in θ, and the KR-dual witnesses attaining the gap are typically nonsmooth at ˆθ (e.g. the distance function f (x) = 
+
+∥x − a − B ˆθ∥ gives hf (θ) = ∥B(θ − ˆθ)∥, which is kinked at ˆθ). Hence the deterministic-affine case belongs to the first-order, nonsmooth-cancellation regime, not the second-order smooth-cancellation regime. The sharp lower bound is then Proposition 10.18(i): W1(Rpred  
+
+> n
+
+, R ˆθ) ≥
+
+σmin (B) · EPn ∥θ − ˆθ∥. The modulus is ω(t) = c · t (α = 0), and Corollary 10.22 reproduces the first-order rate O(n−1/2). 
+
+• Gaussian-mean location (Rθ = N (θ, Σ)): the characteristic function gives hf (θ) = ( f ∗ φΣ)( θ)with φΣ the centered Gaussian density, hence ∇2hf exists and is uniformly bounded for 
+
+f ∈ F 1. The Taylor remainder gives ω(t) = 12 ∥∇ 2hf ∥∞ · t2, i.e. α = 1, and Corollary 10.22 recovers O(n−1). 
+
+• Kinked (Example 10.17, Rθ = δ|θ|e1 ): hf is non-differentiable at ˆθ = 0; the linearization (H1) fails and the modulus is ω(t) = c · t with c > 0, i.e. α = 0, yielding O(n−1/2). This is the saturating regime of Proposition 10.18(ii). 
+
+Remark 10.24 (How to verify the modulus in practice) . For absolutely continuous models with smooth densities, ∇khf is controlled by Sobolev norms of the score ∇θ log p(·; θ); α = 1 is the generic case under C1,1 regularity of θ 7 → p(·; θ). For exponential families with bounded score derivatives, α = 1 holds uniformly on compact parameter sets. For models with discontinuities in the support (deterministic location, piecewise definitions) the modulus is ω(t) = O(t) at parameter values on the kink, and ω(t) = O(t2) elsewhere. 
+
+10.5 Conditional two-sided Bayes–Wasserstein rate via boundary H¨ older reg-ularity 
+
+Theorem 10.20 gives the upper-bound side of an intermediate-rate result; Proposition 10.18 gives matching lower bounds in two structural classes. We now state the corresponding conditional 31 two-sided rate theorem. The word conditional is important: the exponent α⋆(bθn) is an invariant of the model map at the realized posterior center, but a matching lower rate also requires posterior moment control, tail negligibility, and an explicit lower-witness condition. Thus the theorem should be read as a sharp rate result under verifiable regularity and witness hypotheses, not as an unconditional statement that α⋆ alone determines the rate. 
+
+Definition 10.25 (Boundary H¨ older exponent of the model map) . Let Rθ be a parametric family, F1 the class of 1-Lipschitz f : RK → R, and hf (θ) := R f dR θ. For ˆθ ∈ Θ, define α⋆(ˆθ)to be the supremum over α ∈ [0 , 1] such that there exist constants C, r > 0 with sup  
+
+> f∈F 1
+
+hf (θ) − hf (ˆθ) − ⟨∇ θhf (ˆθ), θ − ˆθ⟩
+
+≤ C∥θ − ˆθ∥1+ α for all θ with ∥θ − ˆθ∥ ≤ r. 
+
+If there exists f ∈ F 1 such that hf fails to admit a Gˆ ateaux derivative at ˆθ along some direction 
+
+v ∈ Rdθ with v⊤Cov Pn (θ) v > 0, we set α⋆(ˆθ) := 0 and replace the expansion above by the purely first-order bound sup f ∈F 1 |hf (θ) − hf (ˆθ)| ≤ C∥θ − ˆθ∥.The exponent α⋆(ˆθ) is an intrinsic invariant of the model: it measures how smoothly pertur-bations in θ are transported to perturbations in Rθ when viewed through arbitrary Lipschitz test functions. The endpoints correspond to the two canonical regimes already identified: α⋆ = 0 for nonsmooth or discontinuous models (deterministic location, piecewise specification, kinked link), α⋆ = 1 for C1,1 models with bounded Hessian of hf uniformly in f ∈ F 1 (Gaussian-mean location, generic exponential families). 
+
+Conditioning convention. The center bθn = EPn [θ] is data-dependent, and α⋆(·) as defined in Definition 10.25 is generically jump-discontinuous at boundaries between smoothness classes (e.g. at the kink of Example 10.17). Theorem 10.26 is therefore stated conditionally on the realized posterior Pn and realized center bθn, with the operative definition of the rate exponent being 
+
+α⋆n := inf {α⋆(θ) : θ ∈ B(bθn, r n)},
+
+where B(bθn, r n) is a posterior-typical neighbourhood shrinking at rate rn = O(n−1/2). When the data-generating parameter θ⋆ sits in the interior of a smoothness class, α⋆n = α⋆(θ⋆) eventually with high probability and the rate takes its natural value α⋆(θ⋆). When θ⋆ sits at a jump of 
+
+α⋆(·), the infimum convention ensures the stated rate is the conservative one (lower exponent, slower convergence), which is the correct uniform statement. 
+
+Theorem 10.26 (Conditional two-sided Bayes–Wasserstein rate under boundary H¨ older regu-larity and lower witnesses) . Work conditionally on the realized posterior Pn and posterior center 
+
+bθn = EPn [θ]. Let 
+
+α⋆n := inf {α⋆(θ) : θ ∈ B(bθn, r n)} ∈ [0 , 1] 
+
+be the operative local exponent on a posterior-typical neighbourhood B(bθn, r n) with rn =
+
+O(n−1/2). Assume that the constants in Definition 10.25 hold uniformly on this neighbourhood with exponent α⋆n, and that the posterior satisfies 
+
+c−n−(1+ α⋆n)/2 ≤ EPn ∥θ − bθn∥1+ α⋆n ≤ c+n−(1+ α⋆n)/2
+
+for constants 0 < c − ≤ c+ < ∞, together with the tail-negligibility condition (H3) of Theo-rem 10.20 for ω(t) = Ct 1+ α⋆n . In the case α⋆n = 1 , assume additionally that 
+
+∥Λn∥F ≍ n−1, Λn := Cov Pn (θ).
+
+Suppose moreover that one of the following lower-witness conditions holds. 
+
+32 (Wα⋆n<1) Signed-moment witness when α⋆n ∈ [0 , 1). There exist f ⋆ ∈ F 1, a unit direction 
+
+v⋆ ∈ Rdθ , constants a+, a − ∈ R, and a posterior-typical neighbourhood Un = {θ : ∥θ − bθn∥ ≤ rn}
+
+such that, writing X := v⋆⊤(θ − bθn),
+
+hf ⋆ (θ) − hf ⋆ (bθn) − ⟨ Gf ⋆ , θ − bθn⟩ = a+(X+)1+ α⋆n − a−(X−)1+ α⋆n + r⋆(θ), θ ∈ Un, (37) 
+
+with sup θ∈Un |r⋆(θ)|/∥θ − bθn∥1+ α⋆n = o(1) , and the signed-moment lower bound 
+
+EPn
+
+h
+
+a+(X+)1+ α⋆n − a−(X−)1+ α⋆n
+
+i
+
+≥ cw · EPn ∥θ − bθn∥1+ α⋆n (38) 
+
+holds for some cw > 0 and all n sufficiently large. 
+
+(Wα⋆n=1 ) Hessian witness when α⋆n = 1. There exists f ⋆ ∈ F 1 such that hf ⋆ is twice differen-tiable at bθn with Hessian Hf ⋆ := ∇2hf ⋆ (bθn) satisfying ⟨Hf ⋆ , Λn⟩F ≥ cw · ∥ Λn∥F for some cw > 0
+
+and all n sufficiently large. Condition ( Wα⋆n<1) is the direct operational form of the lower bound: it asks not that a+ and 
+
+a− differ (which is insufficient for asymmetric posteriors), but that the signed (1 + α⋆n)-moment of the witness functional be of the same order as the absolute moment. For symmetric centered posteriors, (38) reduces to 12 (a+ − a−) · E|X|1+ α⋆n ≥ cwE∥θ − bθn∥1+ α⋆n , which holds whenever the posterior has positive variance in direction v⋆ and a+̸ = a− (this is the case in the kinked example of Example 10.17). For asymmetric posteriors, (38) is the natural one-line replacement and is satisfied by any witness whose nonsmooth-direction expansion is genuinely detected by the posterior on the right scale. Then there exist constants 0 < C − ≤ C+ < ∞, depending on the local regularity, posterior-moment, tail, and witness constants but not on n, such that 
+
+C−n−(1+ α⋆n)/2 ≤ W1(Rpred  
+
+> n
+
+, R bθn ) ≤ C+n−(1+ α⋆n)/2.
+
+In particular, 
+
+W1(Rpred  
+
+> n
+
+, R bθn ) = Θ 
+
+
+
+n−(1+ α⋆n)/2
+
+on the conditioning events described above. Proof. Upper bound. Apply Theorem 10.20 with ω(t) = C · t1+ α⋆n : hypothesis (H1) is the existence of ∇hf (or its Lipschitz analogue at α⋆n = 0); hypothesis (H2) is the definition of α⋆n;hypothesis (H3) is assumed. The conclusion gives 
+
+W1(Rpred  
+
+> n
+
+, R bθn ) ≤ C · EPn ∥θ − bθn∥1+ α⋆n
+
++ o EPn ∥θ − bθn∥1+ α⋆n
+
+
+
+≤ (Cc + + o(1)) · n−(1+ α⋆n)/2,
+
+which is the upper bound with C+ := 2 Cc + for n large. 
+
+Lower bound, case α⋆n ∈ [0 , 1) . Use f ⋆ from condition (W α⋆n<1) as a test function in Kantorovich–Rubinstein duality, replacing f ⋆ by −f ⋆ if necessary so that the right-hand side below is non-negative (KR duality is symmetric in this sign choice and −f ⋆ ∈ F 1 since −1 is 1-Lipschitz): 
+
+W1(Rpred  
+
+> n
+
+, R bθn ) ≥ EPn
+
+h
+
+hf ⋆ (θ) − hf ⋆ (bθn)
+
+i
+
+.
+
+By bθn = EPn θ the linear term vanishes, so expansion (37) on Un gives, with X := v⋆⊤(θ − bθn), 
+
+EPn
+
+hf ⋆ (θ) − hf ⋆ (bθn) ≥ EPn
+
+a+(X+)1+ α⋆n − a−(X−)1+ α⋆n
+
+
+
+− | r⋆
+
+> tot
+
+|,
+
+33 where |r⋆
+
+> tot
+
+| = o(EPn ∥θ − bθn∥1+ α⋆n ) by the remainder hypothesis and the tail condition on U cn.The signed-moment witness (38) controls the leading term directly: 
+
+EPn
+
+a+(X+)1+ α⋆n − a−(X−)1+ α⋆n
+
+ ≥ cw · EPn ∥θ − bθn∥1+ α⋆n
+
+≥ cw · c− · n−(1+ α⋆n)/2.
+
+Combining and absorbing the o(·) remainder for n large gives W1(Rpred  
+
+> n
+
+, R bθn ) ≥ C− · n−(1+ α⋆n)/2
+
+with C− := 12 cwc−.
+
+Lower bound, case α⋆n = 1. Apply Kantorovich–Rubinstein with the f ⋆ of condi-tion (W α⋆n=1). A second-order Taylor expansion at bθn, valid because hf ⋆ is C1,1 in a neighbourhood by the α⋆n = 1 hypothesis, gives 
+
+W1(Rpred  
+
+> n
+
+, R bθn ) ≥ EPn
+
+hf ⋆ (θ) − hf ⋆ (bθn)
+
+= 12 EPn
+
+(θ − bθn)⊤Hf ⋆ (θ − bθn)
+
++ o EPn ∥θ − bθn∥2
+
+= 12 ⟨Hf ⋆ , Λn⟩F + o(∥Λn∥F ),
+
+using EPn [( θ − bθn)( θ − bθn)⊤] = Λ n and the Bernstein–von-Mises-type cancellation of the linear term. The non-degeneracy hypothesis ⟨Hf ⋆ , Λn⟩F ≥ cw∥Λn∥F requires a uniformly positive Frobenius pairing between the witness curvature and the posterior covariance. Since Λ n is positive semidefinite, a sufficient condition is that Hf ⋆ be positive semidefinite on the directions carrying posterior variance with strictly positive pairing; more generally, only the displayed positive pairing is required. If the pairing is negative, replace f ⋆ by −f ⋆. Together with 
+
+∥Λn∥F = Θ( n−1) (a consequence of the posterior-moment hypothesis at α⋆n = 1) this yields the matching lower bound W1(Rpred  
+
+> n
+
+, R bθn ) ≥ C−n−1 with C− := 14 cw · lim inf n n∥Λn∥F > 0. 
+
+Corollary 10.27 (Three canonical regimes) . Theorem 10.26 reproduces the existing results in three canonical classes: 
+
+• Deterministic-affine, α⋆ = 0: for Rθ = δa+Bθ , Definition 10.25 gives α⋆ = 0 because hf (θ) = 
+
+f (a + Bθ ) is at best Lipschitz in θ without uniform first-order differentiability over f ∈ F 1.The sharp rate is W1(Rpred  
+
+> n
+
+, R ˆθ) = Θ( n−1/2), matching Proposition 10.18(i). 
+
+• Locally non-smooth, α⋆ = 0: the witness construction in Proposition 10.18(ii) is exactly the 
+
+α⋆ = 0 instance of Theorem 10.26, with f ⋆ = f and v⋆ = v from the directional expansion there. 
+
+• Centered Gaussian location, α⋆ = 1: for Rθ = N (θ, Σ) , hf = f ∗ φΣ is in C∞ with ∇2hf =
+
+∇2(f ∗ φΣ) uniformly bounded by σ−2 over f ∈ F 1, so α⋆ = 1 . The non-degeneracy condition 
+
+⟨Hf ⋆ , Λn⟩F ≥ c′
+
+> 0
+
+∥Λn∥F is met by any f with non-vanishing second moment of the score. The sharp rate is Θ( n−1), matching Proposition 10.11. For intermediate H¨ older regularity C1,α in the model map (e.g., truncated-Lipschitz density per-turbations or fractional-smoothness link functions), α⋆ = α and the sharp rate is Θ( n−(1+ α)/2),completing the taxonomy. Remark 10.28 (Scope of the conditional sharp-rate theorem) . Theorem 10.26 is a conditional sharp-rate theorem, not an unconditional characterization of the Bayes–Wasserstein gap by 
+
+α⋆ alone. The exponent α⋆(bθn) controls the upper bound through the modulus argument of Theorem 10.20. The matching lower bound additionally requires: posterior moment scaling on the correct order, tail negligibility outside the local neighbourhood, and a lower-witness 34 condition ensuring that the posterior actually detects the least smooth direction of the model map. Under these combined hypotheses, 
+
+W1(Rpred  
+
+> n
+
+, R bθn ) = Θ 
+
+
+
+n−(1+ α⋆)/2
+
+.
+
+The first-order radius of Theorem 10.1 is therefore order-sharp exactly in the α⋆ = 0 regime and conservative by a factor of order n(1 −α⋆)/2 when α⋆ > 0. In particular, the α⋆ = 1 Gaussian-location case explains the √n-overshoot documented in the numerical experiment. A theorem that removes the lower-witness hypothesis and derives the lower rate from α⋆ alone remains open. 
+
+10.6 Implications for practice 
+
+• Large n. When the posterior concentrates and the model map is locally Lipschitz, Bayesian predictive optimization and plug-in DRO become numerically close. 
+
+• Small n, nonsmooth, or noncentered models. Theorem 10.1 dominates Bayesian predictive risk by a Wasserstein ball centered at the plug-in law Rˆθ.
+
+• Symmetric location models. The actual Wasserstein gap is second-order; the smaller second-order radius ε(2)  
+
+> n
+
+= ∥Λn∥F /(2 σ) of Proposition 10.13 is then sufficient. 
+
+• Prior strength and DRO radius. Bayesian prior strength and DRO ambiguity radii are connected by calibration but not literally the same control parameter. 
+
+10.7 The Gaussian–NIW Lipschitz constant 
+
+Proposition 10.29 (Local Lipschitz constant in the Gaussian–NIW setting) . For the Gaussian model R(μ, Σ) = N (μ, Σ) , the Bures–Wasserstein formula (Gelbrich, 1990) gives 
+
+W 22 (N (μ, Σ) , N (μ′, Σ′)) = ∥μ − μ′∥2 + tr Σ + tr Σ ′ − 2 tr((Σ 1/2Σ′Σ1/2)1/2). (39) 
+
+Restricted to the domain Dδ := {(μ, Σ) : δI ⪯ Σ ⪯ ∆I},
+
+W1(N (μ, Σ) , N (μ′, Σ′)) ≤ ∥ μ − μ′∥ + 12√δ ∥Σ − Σ′∥F . (40) 
+
+The parameter-to-return map is locally Lipschitz with constant Lloc = max(1 , (2 √δ)−1).Proof. The Bures bound on the trace term gives tr Σ + tr Σ ′ − 2 tr((Σ 1/2Σ′Σ1/2)1/2) ≤ ∥ Σ1/2 −
+
+Σ′1/2∥2 
+
+> F
+
+(Bhatia et al., 2019, Proposition 1). The map Σ 7 → Σ1/2 is Fr´ echet differentiable on 
+
+{Σ ⪰ δI } with ∥DΣ1/2∥op ≤ (2 √δ)−1. By convexity of Dδ, the mean-value theorem gives 
+
+∥Σ1/2 − Σ′1/2∥F ≤ (2 √δ)−1∥Σ − Σ′∥F . Combined with W1 ≤ W2 yields the claim. 
+
+# 11 Numerical illustrations 
+
+This section reports three experiments aligned with the theory. Experiment 1 (Section 11.2) ver-ifies the Bayes–Wasserstein-DRO domination of Theorem 10.1 on a controlled Gaussian DGP and empirically confirms the second-order conservatism predicted by Proposition 10.11. Ex-periment 2 (Section 11.3) characterizes Wasserstein-DRO behavior across radii. Experiment 3 
+
+(Section 11.4) confirms the γ-contraction of the distributional Bellman operator (Theorem 9.2). All experiments use synthetic DGPs designed to be diagnostic of the theoretical predictions, and Experiment 5 (Section 11.6) tests the central operational claim—calibration without validation— affirmatively against an oracle radius; the empirical equity backtest in Section 11.1 is the only data-driven illustration and is presented as a sanity check rather than a production claim. 35 11.1 Empirical equity backtest at K = 25 , n = 60 
+
+Setup. Monthly returns on K = 25 assets selected from the present-day DJIA universe, 
+
+T = 348 months (Jan 1996–Dec 2024), estimation window n = 60 months, monthly rebalancing. Long-only fully invested simplex constraints. Posterior is Gaussian–NIW with weakly informa-tive prior; Wasserstein DRO radii tuned by held-out validation on the most recent 24 months of the estimation window. The Ledoit–Wolf baseline uses the constant-correlation shrinkage target of Ledoit and Wolf (2004), with shrinkage intensity estimated by their closed-form plug-in (the K=25 results are within ≤ 0.005 Sharpe of the single-factor target of Ledoit and Wolf (2003), so the choice of target does not drive the ranking at this dimension). The universe here is selected on full-sample data availability rather than from point-in-time membership, which is the source of the survivorship caveat discussed below. A point-in-time replacement—at each rebalance the index composition effective on that date, intersected with names having a complete trailing n-month history, so that newly added constituents are unavail-able until they season—is implemented in the companion code ( pit backtest.py ) against the membership schedule of Appendix A. Regenerating Tables 5–7 on that point-in-time universe is the headline empirical task of the companion study (Section 13); the numbers reported here are the survivorship-affected baseline, and the ranking—not the level—is the object we compare. Costs are not internalized in the rolling optimization; the net-of-cost calculation in Table 6 applies an end-of-period adjustment based on realized monthly turnover. Let w+ 
+
+> t
+
+denote the target post-trade portfolio at the beginning of month t, and let w− 
+
+> t
+
+denote the pre-trade portfolio after passive return drift: 
+
+w− 
+
+> t,i
+
+= w+
+
+> t−1,i
+
+(1 + rt,i )1 + PKj=1 w+ 
+
+> t−1,j
+
+rt,j 
+
+.
+
+Monthly turnover is measured as 
+
+τt = ∥w+ 
+
+> t
+
+− w− 
+
+> t
+
+∥1.
+
+This convention applies to every strategy, including equal-weight 1 /N . Thus a monthly re-balanced equal-weight portfolio generally has positive drift-induced turnover; a zero-turnover 1/N benchmark would instead be a buy-and-hold equal-initial-weight portfolio, not the monthly rebalanced benchmark used here. Table 5: Out-of-sample annualized performance, K = 25, n = 60, T = 348 months. Mean and Vol are annualized; Sharpe uses raw mean with RF = 0; CVaR is reported at 5%; MDD denotes maximum drawdown; Turnover is mean monthly realized ℓ1 turnover after passive drift and before rebalancing. “1/N” denotes the monthly rebalanced equal-weight portfolio, so its turnover is the realized drift-rebalancing turnover and is generally nonzero. “B-L (no views)” denotes Black–Litterman with uninformative views. “LW” denotes Ledoit–Wolf shrunk plug-in mean–variance. “B-DRO (cred)” denotes Bayesian-credible-radius DRO of Theorem 10.5. “W1-DRO (val)” denotes validation-tuned W1-DRO. “WCVaR-DRO (val)” denotes validation-tuned worst-case CVaR DRO.                                                       
+
+> Method Mean Vol Sharpe CVaR 0.05 MDD Turnover 1/N 0.116 0.152 0.760 0.099 0.426 0.044 Plug-in MV 0.122 0.192 0.639 0.131 0.582 0.764 Plug-in MV + Ledoit–Wolf 0.118 0.158 0.745 0.106 0.461 0.295 B-L (no views) 0.115 0.151 0.763 0.098 0.422 0.036 Bayes pred. 0.121 0.190 0.635 0.130 0.578 0.776
+> W1-DRO (val) 0.120 0.184 0.652 0.126 0.564 0.768 B-DRO (cred) 0.111 0.165 0.672 0.113 0.527 0.381 WCVaR-DRO (val) 0.105 0.153 0.687 0.108 0.473 0.861
+
+36 What the table says, and what it does not. The live-equity exercise is an implementation and calibration sanity check rather than evidence of unconditional empirical dominance. B-DRO attains a gross Sharpe of 0 .672 compared with 0 .652 for validation-tuned W1-DRO; the paired bootstrap Sharpe difference is 0 .019 with 95% CI = [ −0.086 , +0 .131], p = 0 .718. The two methods are statistically indistinguishable in Sharpe on this universe. The main empirical takeaway is operational equivalence: the Bayesian credible-radius rule achieves performance comparable to validation-tuned Wasserstein DRO while using posterior uncertainty rather than a held-out validation window to select the radius. The experiment does not establish that B-DRO dominates validation tuning in expectation, nor does it establish superiority over simple deterministic baselines: 1/N , no-view Black–Litterman, and Ledoit–Wolf-shrunk plug-in MV all attain higher gross Sharpe at this ( K, n ) = (25 , 60) ratio, and the same ranking survives net of 5 and 20 bp transaction costs (Table 6). B-DRO does, however, exhibit lower turnover (0 .381 vs 0 .768 for validation-tuned DRO) and lower tail risk (CVaR 0.05 = 0 .113 vs 0 .126), and the turnover-driven Sharpe advantage over W1-DRO grows monotonically in transaction-cost intensity. Two structural caveats on the universe and the costing model should be kept in view when reading these numbers. First , the 25-asset universe is selected on full-sample data availability rather than from point-in-time DJIA membership; the resulting survivorship bias (Brown et al., 1992) inflates the level of out-of-sample Sharpe across all methods by an amount that is sample-and universe-specific. The comparison between methods is less affected because the bias is largely common-factor, but the level claims should be discounted. Second , the constant-cost model ( c ∈ { 5, 20 } bp per unit turnover) understates the cost faced by a small-volume trader and overstates the cost faced by an institutional one; the operational ranking is invariant to the choice of c ∈ [5 , 50] bp on this universe, but extrapolation outside that range is not warranted. 
+
+Comparison with Ledoit–Wolf shrinkage. Ledoit–Wolf-shrunk plug-in MV (Ledoit and Wolf, 2003, 2004) (Sharpe = 0 .745, CVaR 0.05 = 0 .106, turnover 0 .295, MDD 0 .461) is the strongest optimized mean–variance covariance-shrinkage baseline in Table 5. It outperforms the listed distributionally-aware methods in Sharpe and also has lower turnover and draw-down than B-DRO in this low-dimensional DJIA experiment. Equal weight and no-view Black– Litterman remain even stronger simple baselines in Sharpe, consistent with the broader evi-dence of DeMiguel et al. (2009) that the 1 /N portfolio is hard to beat out-of-sample. The live-equity exercise should therefore be read as a calibration and turnover diagnostic, not as evidence that DPO methods outperform shrinkage or equal-weighting on all four reported met-rics (Sharpe, CVaR 0.05 , MDD, turnover) at ( K, n ) = (25 , 60). The complementary direction— Bayesian-credible-radius DRO computed on a Ledoit–Wolf-shrunk plug-in center—combines the calibration-free radius rule of Theorem 10.5 with the dimensional regularization of explicit shrinkage; this specification is untested in the present paper and is left to the empirical com-panion paper noted in Section 12. 
+
+Hybrid shrinkage–DRO baseline. A natural missing baseline is Bayesian credible-radius DRO computed around a Ledoit–Wolf-shrunk plug-in center. This hybrid combines the dimen-sional stabilization of covariance shrinkage with the calibration-free ambiguity radius of Theo-rem 10.5. The present experiment does not test this specification, so the comparison should not be read as evidence against shrinkage-aware DPO. Rather, Table 5 indicates that the empirical question is not “DPO versus shrinkage” but whether shrinkage and credible-radius robustness are complementary at larger K/n . This hybrid is therefore the main empirical baseline for the companion point-in-time CRSP/Compustat study. 37 Table 6: Out-of-sample annualized Sharpe ratios net of proportional transaction costs at 5 and 20 basis points per unit turnover. Cost-adjusted annual return is bμnet = bμgross − 12 c τ , where 
+
+c is the per-unit transaction-cost rate and τ is mean monthly realized ℓ1 turnover computed after passive drift. Under monthly rebalancing, the 1 /N row must include its drift-rebalancing turnover. Sharpe ratios are reported to three significant figures; for the 1 /N row the gross-to-5 bp change ( τ = 0 .044 gives annualized cost 0 .000264, equivalent to a Sharpe reduction of 
+
+≈ 0.002) is below this reporting precision. 
+
+Method Gross Sharpe Net Sharpe (5 bp) Net Sharpe (20 bp) 1/N 0.760 0.760 0.756 Plug-in MV 0.639 0.612 0.540 Plug-in MV + Ledoit–Wolf 0.745 0.736 0.702 B-L (no views) 0.763 0.760 0.756 Bayes pred. 0.635 0.612 0.539 
+
+W1-DRO (val) 0.652 0.627 0.552 B-DRO (cred) 0.672 0.659 0.617 WCVaR-DRO (val) 0.687 0.653 0.551 1/N 
+
+> Plug-in MV
+> Plug-in MV + LW
+> B-L (no views)
+> Bayes pred.
+> W1-DRO (val)
+> B-DRO (cred)
+> WCVaR-DRO (val)
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> 0.8
+> Annualized Sharpe
+> Gross vs net-of-cost Sharpe (DJIA, K=25, n=60)
+> gross
+> net 5 bp
+> net 20 bp
+
+Figure 1: Gross vs net-of-cost annualized Sharpe ratios at 5 and 20 bp per unit turnover. Equal-weight 1 /N and no-view Black–Litterman are essentially cost-invariant; Ledoit–Wolf-shrunk plug-in MV attains higher net Sharpe than every distributional method at both cost levels; the B-DRO advantage over W1-DRO widens with cost intensity. Generated by the companion notebook, Section 4. The net-of-cost picture sharpens the gross-Sharpe ranking. The B-DRO vs W1-DRO Sharpe gap, 0 .020 gross, widens to 0 .032 net at 5 bp and 0 .065 net at 20 bp: cost-aware investors should prefer the credible-radius rule on operational grounds even though the gross-Sharpe difference is within bootstrap noise. The dominance of 1 /N and no-view B-L is essentially cost-free (turnover near zero) and survives at every cost level; at 20 bp, equal weighting and no-view B-L beat every distributional method by at least 0 .14 in Sharpe. Ledoit–Wolf-shrunk plug-in MV remains a strong deterministic competitor at both cost levels. 38 Table 7: Pairwise out-of-sample Sharpe-ratio differences across methods, with 95% stationary-block-bootstrap intervals (Politis and Romano, 1994) (1000 resamples, block length ⌈T 1/3⌉ = 7, the standard rate-optimal choice for α-mixing series Hall et al., 1995; Patton et al., 2009). Entries are SR(row) − SR(col). None of the listed differences is statistically significant at the 5% level; the paired widths are an order of magnitude tighter than the marginal Sharpe intervals in Table 5.                              
+
+> B-L LW B-DRO W1-DRO 1/N −0.003 [ −0.030 ,0.022] 0.015 [ −0.041 ,0.069] 0.088 [ −0.052 ,0.220] 0.108 [ −0.038 ,0.245] B-L —0.018 [ −0.029 ,0.063] 0.091 [ −0.043 ,0.221] 0.111 [ −0.029 ,0.245] LW ——0.073 [ −0.063 ,0.198] 0.093 [ −0.050 ,0.226] B-DRO ———0.019 [ −0.086 ,0.131]
+
+The paired intervals are roughly 0 .2–0 .3 wide, compared with the marginal-Sharpe intervals of width ∼ 0.8 in Table 5. Even the paired comparison is too imprecise to discriminate the methods at T = 348 months; at this sample size, only Sharpe differences of order 0 .1–0 .15 are detectable at the 5% level. The ranking is therefore the right object to compare, not the absolute Sharpe; Tables 5 and 6 preserve the same ranking across cost levels, which is the strongest claim the data support. 
+
+Bootstrap CIs net of cost — failure to reject. The paired stationary-block bootstrap applied to a real DJIA series with the true historical turnover paths is the appropriate object; we do not have point-in-time CRSP/Compustat coverage to compute it here. As a surrogate, we ran the same procedure on a K = 25, T = 348 panel calibrated to comparable cross-sectional volatility and factor structure (full implementation in code/bootstrap net of cost.py ), ob-taining a paired 95% half-width of approximately 0 .06 for the B-DRO vs W1-DRO Sharpe difference at every cost level. The cost adjustment is a deterministic linear functional of the observed turnover series, so the bootstrap variance is essentially unchanged from gross to 5 bp to 20 bp. Combined with the observed point-estimate widening from 0 .020 (gross) to 0 .032 (5 bp) to 0 .065 (20 bp) in Table 6, the operational reading is: the paired-bootstrap procedure on this surrogate fails to reject the null hypothesis that the B-DRO and W1-DRO net-of-cost Sharpes are equal at the 5% level, including at 20 bp where the point estimate approaches but does not cross the conventional threshold . The widening of the point estimate with cost intensity is genuine and is the operational claim that survives; the statistical claim of separation does not, and would require either a longer sample, a higher cost regime, or a point-in-time replacement of this surrogate. The empirical companion paper noted in Section 12 is the appropriate venue for the point-in-time test. 
+
+11.2 Experiment 1: Bayes–DRO convergence and second-order conservatism 
+
+DGP. K = 10 assets with iid monthly returns from a centered Gaussian–isotropic DGP, 
+
+μ⋆i = 0 .06 /12, σ⋆ = 0 .16 /√12. Gaussian–NIW prior with μ0 = 0, λ0 = 1, Ψ 0 = 0 .01 IK ,
+
+ν0 = K + 2. 
+
+Estimands. For each n ∈ { 12 , 36 , 60 , 120 } and M = 200 Monte Carlo replicates: the first-order credible radius εn = L · EPn ∥μ − ˆμn∥ from Theorem 10.1; the true gap W2(Rpred  
+
+> n
+
+, R ˆμn )computed in closed form via the Bures distance between the Gaussian approximation of the multivariate-t predictive and the plug-in Gaussian (both centered at ˆ μn); a sample-based sliced-
+
+W1 cross-check from Nsamp = 1500 predictive and plug-in draws with Nproj = 400 random projections; and the second-order radius ε(2)  
+
+> n
+
+= ∥Λn∥F /(2ˆ σ) from Proposition 10.11. We report the closed-form W2 rather than empirical W1 because the plug-in empirical W1 estimator in 
+
+K = 10 dimensions has an N −1/K  
+
+> samp
+
+bias rate (Fournier and Guillin, 2015) that yields a noise 39 floor of order 10 −1 at Nsamp = 10 4 and dominates the O(1 /n ) signal. The sliced W1 cross-check uses a different estimator with substantially lower variance per draw, but in the present regime its variance plus the small t-vs-Gaussian bias still flatten the empirical curve well above the ana-lytical signal; we report it only to make the inadequacy of sample-based Wasserstein estimation in this signal-to-noise regime concrete (Table 8). The code is in code/experiment1 w1 mc.py .Table 8: Convergence of Bayesian DPO and Wasserstein DRO with empirical verification of second-order conservatism. Mean over M = 200 replicates; standard errors in paren-theses, computed by the script code/experiment1 w1 mc.py . Column 2: first-order radius 
+
+εn = L · EPn ∥μ − ˆμn∥. Column 3: closed-form Bures–Wasserstein W2 between the Gaussian approximation of the multivariate-t predictive and the plug-in Gaussian, both centered at ˆ μn.Column 4: second-order radius ε(2)  
+
+> n
+
+= ∥Λn∥F /(2ˆ σ). Column 5: sliced W1 cross-check from 
+
+Nsamp = 1500 Monte Carlo samples with Nproj = 400 projections. Sliced W1 has substantially better dimension dependence than the plug-in empirical W1 (whose N −1/K bias rate in K = 10 gives a noise floor of order 10 −1 at any practical Nsamp ); in this regime the residual SW 1 floor at the 10 −3 level reflects per-projection variance plus a small bias from the multivariate-t vs. Gaussian gap, both of which exceed the analytical O(1 /n ) signal. The rank order is nevertheless preserved across n. Column 6: ratio εn/W 2, growing like √n as predicted by Proposition 10.11.                               
+
+> nFirst-order εnW2(analytic) Second-order ε(2)
+> nSliced W1(MC) εn/W 2
+> 12 0.04470 (0 .00016) 0.00608 (2 ×10 −5)0.00752 (4 ×10 −5)0.00482 (0 .00008) 7.35 36 0.02488 (0 .00006) 0.00203 (5 ×10 −6)0.00227 (7 ×10 −6)0.00340 (0 .00005) 12 .25 60 0.01905 (0 .00004) 0.00122 (2 ×10 −6)0.00131 (3 ×10 −6)0.00320 (0 .00004) 15 .68 120 0.01340 (0 .00002) 0.00061 (8 ×10 −7)0.00063 (1 ×10 −6)0.00312 (0 .00003) 22 .05
+
+Interpretation. The fitted decay rate of εn across the four grid points is log( εn) regressed on log n, slope −0.524, consistent with the n−1/2 prediction of Theorem 10.1. The fitted decay rate of the analytical W2 gap is −1.001, indistinguishable from the n−1 prediction of Proposition 10.11. The second-order radius ε(2)  
+
+> n
+
+tracks W2 to within a small constant factor (ε(2)  
+
+> n
+
+/W 2 ∈ [1 .04 , 1.24] across the grid), confirming that it is the rate-correct Bayesian-calibrated radius in centered symmetric models. In the isotropic Gaussian setting, the analytic Bures W2
+
+and the one-dimensional KR-dual W1 lower bound of (35) have the same n−1 order, so the 
+
+W2 column verifies the n−1 rate of W1(Rpred  
+
+> n
+
+, R ˆμn ) even though it is not its exact value; the 
+
+W2 ≥ W1 inequality of (34) closes the loop. The ratio εn/W 2 grows as √n exactly as predicted: at n = 120 the first-order radius overshoots the true Wasserstein gap by a factor of roughly 22. The sample-based sliced W1 flattens out near 0 .003 for n ≥ 36 (fitted slope −0.195); this is not the plug-in empirical W1 rate N −1/K but rather the combined effect of per-projection variance and the residual multivariate-t-vs-Gaussian bias, both of which exceed the O(1 /n ) analytical signal at Nsamp = 1500. A back-of-envelope quantifies the bias term: for tν versus N (0 , 1) at large ν, the KL divergence is KL( tν ∥N ) ∼ 3/(4 ν2), hence the projected W1 on a unit-scale axis is of order pKL /2 ∼ p3/8 ν−1 (Pinsker). At νn = ν0 + n ∈ [14 , 122] across our grid and predictive scale ˆ σ ≈ 0.046, this gives a t-vs-Gaussian sliced-W1 bias of ˆ σp3/8 ν−1 
+
+> n
+
+, which is ≈ 2 × 10 −3 at n = 12 and ≈ 2.3 × 10 −4 at n = 120. The remaining ≈ 10 −3 at large n is per-projection Monte Carlo variance ( N −1/2samp at Nsamp = 1500 gives ≈ 2.6 × 10 −2 per projection, reduced to ≈ 1.3 × 10 −3 after averaging over Nproj = 400 projections). The combined floor of order 10 −3 matches the observed plateau and exceeds the analytical O(1 /n ) signal at this 
+
+n. Either way, sample-based Wasserstein estimation is unreliable for the small signal at these sample sizes, and the analytical Bures route is the only quantitatively trustworthy column. 40 10 2                
+
+> sample size n
+> 10 3
+> 10 2
+> Wasserstein quantity
+> Experiment 1 --- Bayes-DRO radius convergence ( K= 10, M= 200)
+> n(first-order radius)
+> Bures W2gap (proxy for W1rate)
+> (2)
+> n(second-order radius)
+> n1/2 reference
+> n1reference
+
+Figure 2: Experiment 1. Log-log convergence of the first-order Bayes–DRO radius εn, the analytic Bures W2 gap, and the second-order radius ε(2)  
+
+> n
+
+, with reference slopes n−1/2 and n−1.The fitted log–log slopes from Table 8 are approximately −0.52 for the first-order radius, −1.00 for the analytic W2 gap, and −1.08 for the second-order radius, consistent with the n−1/2
+
+and n−1 predictions and confirming the √n overshoot of Proposition 10.11. Generated by the companion notebook, Section 1. 
+
+11.3 Experiment 2: Wasserstein-DRO sensitivity 
+
+We compute the Wasserstein–CVaR DRO portfolio (Theorem 6.6, in the conic form of Propo-sition 6.8) on the same Gaussian DGP at K = 10, n = 60, α = 0 .05, across a grid of radii 
+
+ε ∈ { 0, 10 −4, 5×10 −4, 10 −3, 5×10 −3, 10 −2, 5×10 −2}. For each ε, we solve the conic program of Proposition 6.8 on a fresh in-sample window, evaluate the optimal portfolio’s CVaR 0.05 out-of-sample on N = 10 ,000 fresh draws from the DGP, and record the ℓ2 drift of the DRO-optimal weights from the empirical plug-in w⋆(ε = 0). The averages across M = 50 replications are summarized in Table 9 and Figure 3. Table 9: Experiment 2: out-of-sample CVaR 0.05 and weight drift of the Wasserstein-CVaR DRO portfolio as a function of the radius ε. Means over M = 50 replications; standard errors in parentheses. Generated by code/experiment2 dro sensitivity.py .
+
+ε OOS CVaR 0.05 ∥wDRO − wplug ∥2
+
+0 0.03211 (0 .0006) 0.0000 10 −4 0.03365 (0 .0006) 0.0158 (0 .001) 5×10 −4 0.03164 (0 .0006) 0.0390 (0 .002) 10 −3 0.03071 (0 .0006) 0.0725 (0 .003) 5×10 −3 0.02735 (0 .0005) 0.1476 (0 .005) 10 −2 0.02579 (0 .0005) 0.1914 (0 .007) 5×10 −2 0.02467 (0 .0005) 0.2253 (0 .008) 
+
+41 10 6 10 5 10 4 10 3 10 2         
+
+> 0.025
+> 0.026
+> 0.027
+> 0.028
+> 0.029
+> 0.030
+> 0.031
+> 0.032
+> 0.033
+> OOS CVaR 0.05
+> Out-of-sample tail risk
+> 10 610 510 410 310 2
+> 0.00
+> 0.05
+> 0.10
+> 0.15
+> 0.20
+> wDRO  wplug  2
+> Weight drift from plug-in
+
+Figure 3: Experiment 2. Left: out-of-sample CVaR 0.05 as a function of the Wasserstein radius 
+
+ε (log scale). Right: ℓ2 drift of the DRO-optimal weights from the plug-in. Both quantities respond monotonically to ε in the expected direction: increasing ε reduces tail risk and pushes the weights farther from the plug-in. Generated by the companion notebook, Section 2. OOS CVaR 0.05 decreases monotonically as ε grows from 5 × 10 −4 to 5 × 10 −2 (from 0 .0316 to 0.0247, a 22% reduction in tail risk), while the weight drift saturates near ∥wDRO −wplug ∥2 ≈ 0.23 as ε becomes large enough to dominate the empirical-loss term. The very small ε = 10 −4 point is noisier than its neighbours because the SCS solver is at the edge of its tolerance there; this is a numerical artifact of the implementation, not a sign-reversal in the underlying trade-off. The qualitative shape verifies the bias–variance interpretation of the dual-norm regularization in Proposition 6.8. 
+
+11.4 Experiment 3: distributional Bellman contraction 
+
+We simulate a 3-state, 3-action portfolio MDP with γ = 0 .95 and Rmax = 1. Two distinct initial return distributions Z(0) , Z ′(0) are evolved under the same policy and the supremal W1
+
+distance W 1(Z(k), Z ′(k)) is computed at each iteration. The empirical contraction rate (median per-iteration ratio over k = 50 iterations after a 5-iteration burn-in, averaged over Nreps = 500 random pairs of initial return-distribution functions) is ˆ ρ = 0 .9487 with mean 0 .9420 and interquartile range [0 .9359 , 0.9500], in line with the inequality ˆ ρ ≤ γ = 0 .95 of Theorem 9.2. The exponential decay confirms the contraction visually; the parametric-quantile parameterization (QR-DQN) and the C51 grid parameterization yield indistinguishable empirical rates. 42 0.90 0.91 0.92 0.93 0.94 0.95   
+
+> empirical contraction rate
+> 0
+> 50
+> 100
+> 150
+> 200
+> 250
+> frequency
+> Experiment 3 distributional Bellman contraction
+> theory = 0.95
+> empirical mean = 0.9420
+
+Figure 4: Experiment 3. Distribution of the empirical per-iteration contraction rate ˆ ρ over 
+
+Nreps = 500 random pairs of initial return distributions. The red dashed line marks the theoret-ical rate γ = 0 .95; the empirical mean (black dotted) is 0 .9420. Generated by the companion notebook, Section 3. 
+
+11.5 Experiment 4: High-dimensional sensitivity, calibrated K = 50 DGP 
+
+To test whether the operational claim of Section 11.1 survives at lower n/K ratios, we calibrate a three-factor (market, size, value) DGP to typical US-equity unconditional moments and rerun all eight methods at K = 50, n = 60, T = 348 months. The DGP has no survivorship bias by construction; it is not a replacement for a real point-in-time empirical study, but it shifts the 
+
+K/n ratio from 0 .42 (DJIA) to 0 .83 in a controlled environment that preserves realistic factor-noise structure. Calibration: annual market premium 7 .5% with vol 16%, SMB 2%/10 .5%, HML 3%/11%, with factor correlations ρ(M, SMB) = 0 .18, ρ(M, HML) = −0.12, ρ(SMB , HML) = 0.20; stock loadings βm ∼ N (1 .0, 0.28) clipped to [0 .35 , 1.75], βSMB and βHML centered with sd 0.42 and 0 .38; idiosyncratic vol 24% annual with cross-section sd 7%; a sparse alpha component on K/ 8 randomly chosen names with mean 2 .5% annual and sd 1 .2%; and a common t6 shock with annualized scale 1 .5% to ensure the sample-covariance estimator faces realistically heavy joint tails. Code: code/experiment highdim.py .Table 10: Calibrated K = 50 sensitivity, n = 60 rolling window, T = 348 months, γ = 5. Same eight methods as Table 5. Annualized statistics; turnover is monthly L1 drift-adjusted turnover under the convention of Section 11.1. Bold entries mark the best value among the three distributional robust methods ( W1-DRO, B-DRO, WCVaR-DRO), not among the naive baselines. Calibrated factor DGP with seed 20260524 + 50.                                                       
+
+> Method Sharpe CVaR 0.05 MDD Turnover Sharpe (5 bp) Sharpe (20 bp) 1/N 0.497 0.329 0.379 0.058 0.495 0.489 Plug-in MV 0.275 0.446 0.494 0.293 0.267 0.242 Plug-in MV + LW 0.277 0.454 0.499 0.278 0.269 0.246 B-L (no views) 0.497 0.329 0.379 0.058 0.495 0.489 Bayes pred. 0.280 0.451 0.496 0.277 0.272 0.249
+> W1-DRO (val) 0.331 0.397 0.399 0.248 0.323 0.299 B-DRO (cred) 0.341 0.392 0.420 0.207 0.334 0.314
+> WCVaR-DRO (val) 0.314 0.395 0.378 0.264 0.306 0.280
+
+Interpretation. Three findings are robust enough to report, but the table should still be read as a calibrated sensitivity rather than an empirical ranking theorem. First , the naive baselines 1/N and no-view Black–Litterman remain very hard to beat on Sharpe at K/n = 0 .83 (both 43 0.497), and their CVaR 0.05 is better than the best distributional robust method (0 .329 versus 0.392 for B-DRO). This preserves the central caution from the DJIA experiment: the paper does not claim dominance over naive benchmarks. Second , plug-in mean–variance, Ledoit– Wolf-shrunk plug-in MV, and Bayes-predictive MV all degrade sharply in this factor-rich high-
+
+K/n design, with Sharpe around 0 .28 and maximum drawdowns near 0 .50. In this seeded DGP, shrinkage alone does not rescue the optimized mean–variance rule. Third , within the distributional robust family, B-DRO (cred) is the strongest method in this rerun, leading on Sharpe (0 .341 versus 0 .331 for W1-DRO and 0 .314 for WCVaR-DRO), CVaR 0.05 , turnover (0 .207, well below the other robust variants), and net-of-cost Sharpe at both cost levels; WCVaR-DRO leads only on maximum drawdown (0 .378). The conclusion is therefore not “WCVaR always wins”; it is that posterior-calibrated and tail-aware robust methods are less fragile than plug-in MV in this high-K/n synthetic stress test, while the exact ordering among robust variants is implementation-, solver-, and DGP-sensitive. This ranking is consistent with the calibration mechanism suggested by Theorem 10.1 and Proposition 10.11, but it is not a formal prediction of those results: the theory characterizes radius behavior and first- versus second-order Wasserstein conservatism, not realized Sharpe rankings. 
+
+Scope of this experiment. This is a calibrated sensitivity and not a substitute for a point-in-time high-dimensional empirical study. The calibrated DGP has no survivorship bias and no regime shifts; live data has both. The fact that plug-in MV collapses here while it occupies an intermediate position in Table 5 is itself informative: the qualitative behavior of plug-in MV depends sharply on K/n . The robust variants appear less fragile in this seeded DGP, but their internal ranking is not stable enough to support a universal ordering claim. A true point-in-time empirical replacement requires institutional CRSP or Compustat access; the companion notebook DPO Aplus companion.ipynb provides a documented data-loading hook for users with such access. 
+
+11.6 Experiment 5: calibration without validation 
+
+The experiments above characterise radius behaviour ; this one tests the paper’s central opera-tional claim directly . The claim is that the Bayesian credible radius of Theorem 10.5 selects a Wasserstein-DRO radius as good as a validation-tuned one without consuming a held-out vali-dation window . This is a statistical property of the radius rule, and is therefore decidable on controlled DGPs where the optimal radius is computable. For each replicate we draw an in-sample window of n = 60 months from the calibrated three-factor DGP of Section 11.5 at K ∈ { 10 , 25 , 50 } and compute three radii for the linear-loss 
+
+W1-DRO portfolio (Corollary 6.5): the oracle radius minimising true out-of-sample CVaR 0.05 on a fresh N = 40 ,000-month sample; the validation-tuned radius, selected on a 24-month held-out window and refit on the full window (spending 24 months of data); and the credible radius of Theorem 10.5, which spends none. We then evaluate each rule’s true out-of-sample tail risk and Sharpe on the fresh sample. Means over M = 100 replicates, paired stationary bootstrap on the regret difference, seed 20260524 + 5; code code/experiment5 calibration.py .44 Table 11: Experiment 5: out-of-sample CVaR 0.05 regret versus the oracle radius (basis points) and out-of-sample Sharpe for the validation-tuned and credible-radius rules, calibrated factor DGP. Top block: across dimension at n = 60. Bottom block: across sample size at K = 25. Means over M = 100 replicates; the regret difference (credible − validation) carries a paired 95% bootstrap interval. The credible rule spends no validation data. 
+
+K Regret val. (bp) Regret cred. (bp) Diff. (bp), 95% CI SR oracle SR val. / cred. 10 125 .8 2.9 −122 .9 [ −151 .8, −97 .4] 0.426 0.392 / 0 .430 25 109 .4 6.5 −102 .9 [ −126 .3, −82 .0] 0.459 0.417 / 0 .465 50 128 .6 6.6 −122 .1 [ −158 .8, −89 .9] 0.469 0.413 / 0 .474 
+
+Robustness across sample size, K = 25 :
+
+n=36 130 .1 2.1 −128 .0 [ −150 .7, −106 .8] 0.461 0.409 / 0 .463 
+
+n=60 109 .4 6.5 −102 .9 [ −126 .3, −82 .0] 0.459 0.417 / 0 .465 
+
+n=120 83 .6 4.3 −79 .3 [ −102 .9, −60 .3] 0.460 0.424 / 0 .463 K=10 K=25 K=50           
+
+> 0
+> 20
+> 40
+> 60
+> 80
+> 100
+> 120
+> OOS CVaR 0.05  regret vs oracle (bp)
+> (a) Radius-selection regret
+> validation-tuned
+> credible (no val.)
+> K=10 K=25 K=50
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> OOS Sharpe
+> (b) Out-of-sample Sharpe
+> oracle
+> validation-tuned
+> credible (no val.)
+> 0.0 0.5 1.0 1.5 2.0 2.5 3.0 3.5
+> oracle radius
+> 0.0
+> 0.5
+> 1.0
+> 1.5
+> 2.0
+> 2.5
+> 3.0
+> 3.5
+> credible radius
+> (c) Calibration tracking (K=25)
+> Spearman = 0.59
+
+Figure 5: Experiment 5. (a) Out-of-sample CVaR 0.05 regret versus the oracle radius for the validation-tuned rule (orange) and the credible-radius rule (blue), by dimension. (b) Out-of-sample Sharpe, oracle level marked. (c) Calibration tracking at K = 25: the credible radius plotted against the per-replicate oracle radius, with the 45 ◦ line; the credible rule is small when the oracle is small and large when it is large (Spearman ρ = 0 .59–0 .82 across cells), establishing genuine calibration rather than a constant shrinkage offset. Generated by 
+
+code/experiment5 calibration.py .The result is affirmative and uniform across both dimension and sample size. The credible radius is within 2–7 bp of the oracle out-of-sample tail risk and matches the oracle Sharpe, whereas validation tuning on a 24-month window forfeits 84–130 bp of CVaR 0.05 and 0 .04–0 .05 of Sharpe; the paired regret difference is significantly negative in every cell. As n grows the validation penalty shrinks (from 130 bp at n = 36 to 84 bp at n = 120, since a fixed 24-month window is a smaller and less noisy fraction of the estimate), but the credible rule remains strictly ahead throughout. Critically, the credible radius tracks the oracle radius across replicates (Spearman ρ = 0 .59–0 .82, panel (c)): it is small precisely when the oracle wants a small radius and large when it wants a large one. This rules out the alternative explanation that the credible rule merely applies a constant over-shrinkage that happens to help in a noisy regime—it is genuine data-driven calibration, exactly as Theorem 10.5 predicts, with the posterior using the full sample where validation discards 24 months. This strengthens the operational claim from “statistically indistinguishable from validation tuning” to “near-oracle, calibrated to the oracle radius, and strictly better than validation tuning, without spending validation data.” The qualification of Section 11.1 still stands: this is a statement about radius selection , not about beating naive benchmarks on raw return; on raw Sharpe the naive baselines remain strong. 45 12 Limitations and open problems 
+
+Scope and ambition. The framework is single-period or per-step. Genuinely multi-period DPO with time-coherent risk and posterior updating—requiring nested risk measures and dy-namic conjugacy—is not developed here; see Ruszczy´ nski (2010) and Pflug and Pichler (2014) for the relevant technology. The numerical illustrations are diagnostic and intentionally low-dimensional; large-scale empirical performance, transaction-cost robustness, and out-of-sample universality remain open. 
+
+Empirical scope. The numerical experiments serve as proofs of concept. A production-grade empirical study would extend the DJIA experiment to higher K (S&P 500 or Russell 1000), include transaction costs internalized in the rolling backtest, evaluate sensitivity to estimation-window length, and test across multiple market regimes. We expect that the relative ranking of methods will change with K/n : the calibration advantage of the Bayesian credible-radius rule should grow with K (where validation data is more expensive), while the absolute advantage over shrinkage baselines should shrink in high-K regimes where dimension reduction dominates ambiguity modelling. 
+
+Survivorship and universe selection. The empirical universe is selected on full-sample data availability rather than from point-in-time DJIA membership, and the resulting survivor-ship bias inflates the absolute level of out-of-sample Sharpe by an unquantified amount. The bias is largely common-factor, so the ranking between methods (Tables 5 and 6) is more trust-worthy than the level. A point-in-time empirical study would use either CRSP with delistings handled by total-return-to-date, or Compustat with explicit calendar-time membership snap-shots; we do not undertake this here. The empirical companion paper noted in Section 13 is the appropriate venue for such a study. 
+
+Operational claim, narrowed. The operational claim of this paper is therefore precise: a Bayesian credible-radius calibration of Wasserstein DRO selects a radius that is near-oracle and strictly better than a validation-tuned radius—in out-of-sample tail risk and Sharpe—while spending no validation data (Experiment 5, Table 11), and it reduces turnover relative to validation tuning in a way that translates monotonically into a net-of-cost Sharpe advantage as transaction costs rise. The paper does not claim that any distributional method dominates equal weighting, no-view Black–Litterman, or Ledoit–Wolf-shrunk plug-in MV on raw Sharpe; the affirmative claim is about radius selection, not about beating naive benchmarks on return. 
+
+Computational scaling. Wasserstein-CVaR programs scale as LPs with O(n) scenario con-straints in the canonical linear-loss case. SOC reformulations for ℓ2-norm ground metrics add one cone per asset. Scenario complexity for chance-constrained problems grows as O(( K +log(1 /δ )) /ε ) per Theorem 7.4, manageable for K ≤ 500 on commodity solvers. 
+
+Theoretical gaps. Several theoretical questions remain open. First , the action-coupled re-ward extension of Theorem 9.2 preserves the standard γ-contraction; a genuinely new con-traction phenomenon attributable to turnover frictions would require either state augmenta-tion or a state-dependent Lipschitz constant on g. Second , the high-dimensional asymptotics (Kn/n → κ ∈ (0 , 1)) of the Bayesian–DRO radius are not developed; this regime is the natural empirical target for the companion CRSP study. Third , the sharp two-sided rate of Theo-rem 10.26 is stated for parametric models with a Euclidean parameter space; the extension to non-parametric or high-dimensional ( dθ = dθ,n growing with n) settings and its interaction with prior choice are open. 46 The intermediate-regime question noted in earlier versions of this work—whether the gap be-tween first- and second-order Bayesian–DRO conservatism admits a unified rate—is addressed by Theorem 10.26, which gives the sharp two-sided rate Θ( n−(1+ α⋆)/2) parameterized by the boundary H¨ older exponent α⋆(ˆθ) of the model map, under posterior-moment, tail-negligibility, and lower-witness hypotheses. A characterization purely in terms of α⋆ (i.e., without the auxil-iary lower-witness hypothesis) and an extension to non-parametric models remain open. 
+
+# 13 Conclusion 
+
+We have presented distributional portfolio optimization as a unified framework where Bayesian, robust, chance-constrained, stochastic, and reinforcement-learning portfolio methods are orga-nized by their position in the triple ( W, R, P ) of weight, return, and parameter distributions and, more fundamentally, by the joint coupling Γ θ(dw, dr ) from which the triple is derived. The framework yields measure-theoretic foundations, a rigorous treatment of Bayesian DPO with utility-tilted posteriors and concentration limits, dual representations for coherent and spectral risk, finite-sample DRO guarantees including the explicit specialization of Mohajerin Esfahani and Kuhn (2018) Cor. 5.1 to the canonical portfolio CVaR problem, chance-constrained con-vex inner approximations with quantitative tightness control, stochastic-allocation classes with a static no-randomization theorem, and a contraction theorem for the distributional Bellman operator in a portfolio MDP with action-coupled rewards. The synthesis section quantifies how Bayesian credible balls dominate distributional uncertainty in the Wasserstein metric, provides a fully data-driven second-order Bayes–DRO radius in the centered Gaussian case, proves first-order tightness for affine-deterministic and locally non-smooth model classes, and establishes a conditional two-sided Bayes–Wasserstein rate theorem under boundary H¨ older regularity, posterior-moment control, tail negligibility, and explicit lower-witness hypotheses. The result is a single analytical-and-computational vocabulary in which heterogeneous portfolio methodologies can be compared on equal footing. Table 12: Main theoretical results, organized by mathematical role.                                           
+
+> Result Role Section Thm. 3.6 Joint continuity of induced outcome law §3Prop. 3.4 Ex-ante outcome-law sufficiency §3Thm. 3.7 Static-DPO existence §3Thm. 4.5 Tilted-portfolio existence and limits §4Thm. 6.6 Wass-CVaR specialization of MEK Cor. 5.1 §6Prop. 6.8 Explicit Wass-CVaR conic program §6Thm. 8.1 Static no-randomization §8Prop. 8.10 Bayesian HRP →HRP/RA-HRP §8Thm. 9.2 Distributional Bellman contraction §9Thm. 9.8 Risk-shifted distributional Bellman contraction §9Thm. 10.1 Bayes–DRO domination §10 Thm. 10.5 Posterior credible radius (finite-sample form) §10 Prop. 10.11 Second-order conservatism in symmetric case §10 Prop. 10.13 Second-order Bayes–DRO radius §10 Prop. 10.18 First-order tightness for nonsmooth models §10 Thm. 10.20 Modulus-of-smoothness interpolation §10 Cor. 10.22 Polynomial moduli: explicit rates §10 Thm. 10.26 Conditional two-sided Bayes–Wasserstein rate §10 Prop. 10.29 Gaussian–NIW local Lipschitz constant §10
+
+Open directions. Several extensions remain natural. Multi-period DPO requires a fully time-coherent risk measure and a dynamic prior update; the distributional Bellman recursion of Section 9 is the building block but the joint integration of risk-sensitive control and posterior 47 updating remains undeveloped. Hybrid shrinkage-DRO – Bayesian credible-radius DRO com-puted on a Ledoit–Wolf-shrunk plug-in center, or equivalently a shrinkage-anchored Wasserstein ball – is the natural successor to the present design at high K/n . Continuous-time DPO under stochastic-volatility or jump-diffusion model classes would connect the framework to stochas-tic optimal control. Empirical companion : a point-in-time CRSP/Compustat empirical study at K ∈ [100 , 1000] with internalized transaction costs, multiple market regimes, and hybrid shrinkage-DRO configurations is the appropriate next step on the empirical side. 
+
+# A Point-in-time DJIA membership schedule 
+
+The point-in-time backtest of the companion code ( pit backtest.py , referenced in Section 11.1) uses the reconstitution record below: at each rebalance the investable universe is the index com-position effective on or before that date, intersected with names having a complete trailing 
+
+n = 60-month return history. Table 13 lists the constituent changes; the full 30-name composi-tion at each effective date is stored in the MEMBERSHIP object of the companion code and should be verified against an authoritative point-in-time source (S&P DJI press releases or CRSP index files) before any production use. Table 13: Point-in-time DJIA reconstitution record used by the companion point-in-time back-test. Each row is a constituent change effective on the stated date; the index holds exactly 30 names throughout.                         
+
+> Effective date Added Removed 2009-06-08 CSCO, TRV C, GM 2012-09-24 UNH KFT 2013-09-23 GS, NKE, V BAC, HPQ, AA 2015-03-19 AAPL T2017-09-01 DWDP DD 2018-06-26 WBA GE 2019-04-02 DOW DWDP 2020-04-06 RTX UTX 2020-08-31 AMGN, HON, CRM XOM, PFE, RTX 2024-02-26 AMZN WBA 2024-11-08 NVDA, SHW INTC, DOW
+
+# References 
+
+Carlo Acerbi. Spectral measures of risk: A coherent representation of subjective risk aversion. 
+
+Journal of Banking and Finance , 26(7):1505–1518, 2002. Amir Ahmadi-Javid. Entropic value-at-risk: A new coherent risk measure. Journal of Opti-mization Theory and Applications , 155(3):1105–1123, 2012. Luigi Ambrosio, Nicola Gigli, and Giuseppe Savar´ e. Gradient Flows in Metric Spaces and in the Space of Probability Measures . Lectures in Mathematics ETH Z¨ urich. Birkh¨ auser, 2nd edition, 2008. Philippe Artzner, Freddy Delbaen, Jean-Marc Eber, and David Heath. Coherent measures of risk. Mathematical Finance , 9(3):203–228, 1999. Doron Avramov and Guofu Zhou. Bayesian portfolio analysis. Annual Review of Financial Economics , 2:25–47, 2010. 48 Nicole B¨ auerle and Jonathan Ott. Markov decision processes with average-value-at-risk criteria. 
+
+Mathematical Methods of Operations Research , 74(3):361–379, 2011. Marc G. Bellemare, Will Dabney, and R´ emi Munos. A distributional perspective on reinforce-ment learning. In Proceedings of the 34th International Conference on Machine Learning (ICML) , 2017. Aharon Ben-Tal, Dick Den Hertog, Anja De Waegenaere, Bertrand Melenberg, and Gijs Rennen. Robust solutions of optimization problems affected by uncertain probabilities. Management Science , 59(2):341–357, 2013. Jerome Benveniste, Petter N. Kolm, and Gordon Ritter. Untangling universality and dispelling myths in mean–variance optimization. The Journal of Portfolio Management , 50(8):90–116, 2024. Rajendra Bhatia, Tanvi Jain, and Yongdo Lim. On the bures–wasserstein distance between positive definite matrices. Expositiones Mathematicae , 37(2):165–191, 2019. Patrick Billingsley. Probability and Measure . Wiley, anniversary edition, 2012. Fischer Black and Robert Litterman. Global portfolio optimization. Financial Analysts Journal ,48(5):28–43, 1992. V. I. Bogachev. Measure Theory . Springer, 2007. Stephen J. Brown, William Goetzmann, Roger G. Ibbotson, and Stephen A. Ross. Survivorship bias in performance studies. Review of Financial Studies , 5(4):553–580, 1992. Patrick Burns. Random portfolios for evaluating trading strategies. Technical report, Burns Statistics, 2007. Giuseppe Calafiore and Marco C. Campi. Uncertain convex programs: Randomized solutions and confidence levels. Mathematical Programming , 102(1):25–46, 2005. Marco C. Campi and Simone Garatti. The exact feasibility of randomized solutions of uncertain convex programs. SIAM Journal on Optimization , 19(3):1211–1230, 2008. Abraham Charnes and William W. Cooper. Chance-constrained programming. Management Science , 6(1):73–79, 1959. Alexander S. Cherny. Weighted v@r and its properties. Finance and Stochastics , 10(3):367–393, 2006. Will Dabney, Georg Ostrovski, David Silver, and R´ emi Munos. Implicit quantile networks for distributional reinforcement learning. In Proceedings of the 35th International Conference on Machine Learning (ICML) , 2018a. Will Dabney, Mark Rowland, Marc G. Bellemare, and R´ emi Munos. Distributional reinforce-ment learning with quantile regression. In AAAI Conference on Artificial Intelligence , 2018b. Erick Delage and Yinyu Ye. Distributionally robust optimization under moment uncertainty with application to data-driven problems. Operations Research , 58(3):595–612, 2010. Victor DeMiguel, Lorenzo Garlappi, and Raman Uppal. Optimal versus naive diversification: How inefficient is the 1/n portfolio strategy? Review of Financial Studies , 22(5):1915–1953, 2009. 49 Hans F¨ ollmer and Alexander Schied. Stochastic Finance: An Introduction in Discrete Time .De Gruyter, 3 edition, 2011. Nicolas Fournier and Arnaud Guillin. On the rate of convergence in Wasserstein distance of the empirical measure. Probability Theory and Related Fields , 162(3-4):707–738, 2015. Matthias Gelbrich. On a formula for the L2 Wasserstein metric between measures on Euclidean and Hilbert spaces. Mathematische Nachrichten , 147(1):185–203, 1990. Peter Hall, Joel L. Horowitz, and Bing-Yi Jing. On blocking rules for the bootstrap with dependent data. Biometrika , 82(3):561–574, 1995. Philippe Jorion. Bayes–stein estimation for portfolio analysis. Journal of Financial and Quan-titative Analysis , 21(3):279–292, 1986. Joseph B. Kadane. Prime time for Bayes. Controlled Clinical Trials , 16(5):313–318, 1995. B. J. K. Kleijn and A. W. van der Vaart. The Bernstein–von-Mises theorem under misspecifi-cation. Electronic Journal of Statistics , 6:354–381, 2012. Shigeo Kusuoka. On law-invariant coherent risk measures. Advances in Mathematical Economics ,3:83–95, 2001. Olivier Ledoit and Michael Wolf. Improved estimation of the covariance matrix of stock returns with an application to portfolio selection. Journal of Empirical Finance , 10(5):603–621, 2003. Olivier Ledoit and Michael Wolf. A well-conditioned estimator for large-dimensional covariance matrices. Journal of Multivariate Analysis , 88(2):365–411, 2004. Marcos L´ opez de Prado. Building diversified portfolios that outperform out of sample. Journal of Portfolio Management , 42(4):59–69, 2016. Harry Markowitz. Portfolio selection. Journal of Finance , 7(1):77–91, 1952. Richard O. Michaud. Efficient Asset Management . Harvard Business School Press, 1998. Peyman Mohajerin Esfahani and Daniel Kuhn. Data-driven distributionally robust optimization using the Wasserstein metric: Performance guarantees and tractable reformulations. Mathe-matical Programming , 171(1-2):115–166, 2018. Miquel Noguer i Alonso. Return-adjusted hierarchical risk parity and Schur portfolios: Acomprehensive theoretical and empirical study, July 2025. Available at SSRN: https:// ssrn.com/abstract=5370624 .Miquel Noguer i Alonso. Reinforcement learning portfolio optimization (RLPO): From Markowitz to risk-sensitive control, March 2026. Available at SSRN: https://ssrn.com/ abstract=6447220 .Andrew Patton, Dimitris N. Politis, and Halbert White. Correction to “automatic block-length selection for the dependent bootstrap” by d. politis and h. white. Econometric Reviews , 28 (4):372–375, 2009. Georg Ch. Pflug and Alois Pichler. Multistage Stochastic Optimization . Springer Series in Operations Research and Financial Engineering. Springer International Publishing, Cham, 2014. Dimitris N. Politis and Joseph P. Romano. The stationary bootstrap. Journal of the American Statistical Association , 89(428):1303–1313, 1994. 50 Nicholas G. Polson and Bernard T. Tew. Bayesian portfolio selection: An empirical analysis of the S&P 500 index 1970–1996. Journal of Business and Economic Statistics , 18(2):164–173, 2000. Andr´ as Pr´ ekopa. Stochastic Programming . Kluwer Academic Publishers, 1995. R. Tyrrell Rockafellar and Stanislav Uryasev. Optimization of conditional value-at-risk. Journal of Risk , 2(3):21–41, 2000. Andrzej Ruszczy´ nski. Risk-averse dynamic programming for Markov decision processes. Math-ematical Programming , 125(2):235–261, 2010. A. W. van der Vaart. Asymptotic Statistics . Cambridge Series in Statistical and Probabilistic Mathematics. Cambridge University Press, 2000. C´ edric Villani. Optimal Transport: Old and New . Springer, 2009. Martin J. Wainwright. High-Dimensional Statistics: A Non-Asymptotic Viewpoint . Cambridge Series in Statistical and Probabilistic Mathematics. Cambridge University Press, Cambridge, 2019. Shaun S. Wang. A class of distortion operators for pricing financial and insurance risks. Journal of Risk and Insurance , 67(1):15–36, 2000. 51

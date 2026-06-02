@@ -1,0 +1,987 @@
+Title: Higher-Order Efficient Estimators: A Review and Simulation-Based Benchmark Study
+
+URL Source: https://arxiv.org/pdf/2606.01674v1
+
+Published Time: Tue, 02 Jun 2026 02:37:24 GMT
+
+Number of Pages: 22
+
+Markdown Content:
+# Higher-Order Efficient Estimators: A Review and Simulation-Based Benchmark Study 
+
+Zeyi Wang and Mark J. van der Laan June 2, 2026 
+
+Abstract 
+
+Higher-order efficient estimators extend standard first-order semiparametric estimators by replacing second-order residuals with third- or higher-order terms, potentially enabling asymp-totic efficiency under slower nuisance function convergence rates and improving finite-sample performance. Existing methods achieve higher-order expansions through structurally different approximation strategies, including basis truncation, kernel smoothing, and highly adaptive lasso (HAL) representations, making direct theoretical and practical comparison difficult. In this manuscript, we provide a focused review and a simulation-based empirical benchmark for second-order efficient estimators, using treatment-specific mean estimation as a canonical causal inference and missing data problem. We compare how higher-order influence function (HOIF) estimators, kernel-based higher-order targeted minimum loss-based estimator (HOTMLE), and HAL-based HOTMLE construct higher-order expansions and the approximation or regulariza-tion burdens they introduce. The asymptotic and numerical study evaluates first-order and empirical second-order estimators under controlled nuisance errors with constant or increas-ing sectional variation complexity. Results show that higher-order debiasing can substantially reduce first-order estimation bias; however, gains depend strongly on stability of the approxi-mation or regularization required for higher-order correction. Empirical HAL-based HOTMLE shows relatively stable performance, while empirical HOIF remains sensitive to basis truncation and tuning choices. Overall, this manuscript clarifies when higher-order asymptotic improve-ments are attained in theory, when they may be practically visible, and when implementation instability may offset theoretical advantages. 
+
+Keywords: higher-order influence functions; higher-order efficient estimation; semiparametric ef-ficiency; doubly robust estimation; highly adaptive lasso. 
+
+# 1 Introduction 
+
+Targeted learning (van der Laan and Rubin, 2006; van der Laan and Rose, 2011, 2018) is built around the core idea that flexible estimation of nuisance features of the data-generating distri-bution can be combined with semiparametric efficiency theory to produce estimators that are targeted for scientifically interpretable parameters. The two-step procedure separates potentially high-dimensional nuisance feature estimates from estimation of a low-dimensional target of infer-ence. An initial nuisance estimate is updated along a parametric submodel whose score is deter-mined by the efficient influence curve (EIC) of the target parameter. This targeting step is typically low-dimensional and likelihood-based, designed to solve the EIC equation, thereby controlling first-order bias for the target parameter while preserving structural constraints of the statistical model. The resulting targeted minimum loss-based estimator (TMLE) is a plug-in estimator, a property 1
+
+> arXiv:2606.01674v1 [stat.ME] 1 Jun 2026
+
+that can improve finite-sample stability and interpretability by respecting known bounds and model constraints. In causal inference and missing data problems, TMLEs have been widely used because they allow nuisance estimates to be estimated using flexible machine learning algorithms while retaining the large-sample guarantees of semiparametric efficient estimation (van der Laan et al., 2007; van der Laan, 2017). They are closely related to other first-order efficient estimators, such as one-step estimators (Bickel et al., 1997) and augmented inverse probability weighted estimators (Robins and Rotnitzky, 1992), but differ in the plug-in construction and the use of targeted updates. These procedures are (first-order) asymptotically efficient (van der Vaart, 1998) in the sense that their asymptotic behavior is characterized by the EIC evaluated at the true distribution, through 
+
+ψn − ψ0 = ( Pn − P0)D∗(P0) + Rn + oP (n−1/2), (1.1) which is typically achieved under regularity conditions involving Donsker type conditions or cross-fitting and a mild consistency condition with no rate requirement (e.g. Section 2.2). Here, Pn is the empirical distribution, P0 is the true distribution, D∗ is the EIC, and Rn is a residual term, which in many doubly robust problems is second-order and bounded by a product of nuisance estimation errors in L2(P0)-norms. Asymptotic linearity and efficiency follow when Rn = oP (n−1/2). For example, in treatment-specific mean (TSM) estimation, or equivalently mean estimation under missing at random, the relevant nuisance functions are the outcome regression and the treatment or missingness propensity. If these nuisance components are estimated at comparable rates in 
+
+L2(P0) norm, then an oP (n−1/4) rate for each suffices for a diminishing residual on the root-n-scale. This second-order, product-rate residual structure is one of the main reasons first-order efficient estimators can successfully leverage flexible, data-adaptive nuisance estimation for improved bias control and valid root-n inference. The practicality of first-order efficient estimators has been substantially expanded by ensemble learning, cross-fitting, and highly adaptive regression. Super learner (van der Laan et al., 2007; Polley et al., 2025) and related ensemble implementations (Coyle et al., 2023; Wang et al., 2025) provide a principled way to combine multiple candidate algorithms and asymptotically achieve oracle risk performance relative to the candidate library under standard conditions. Cross-fitting weakens Donsker-type regularity conditions required for empirical process control. Highly adaptive lasso (HAL) (van der Laan, 2015; Benkeser and van der Laan, 2016; van der Laan, 2017; Bibaut and van der Laan, 2019) guarantees nonparametric convergence rates approximately OP (n−1/3) (in 
+
+L2(P0)-norm, ignoring log n factors) for c` adl` ag functions with bounded sectional variation norms. Therefore, first-order TMLE based on sufficiently flexible nuisance estimators, such as TMLE with initial estimates via super learners including HAL as a candidate algorithm (HAL-TMLE), generally achieves asymptotic efficiency in a broad range of causal and missing data problems, provided standard regularity and c` adl` ag nuisance functions with bounded sectional variation (van der Laan, 2017). Nevertheless, first-order theory has key limitations. The product rate may fail, or may be only weakly satisfied in finite samples, when nuisance functions have high-frequency structure, complex interactions, or variation norms that grow with the sample size. Even when methods such as HAL-TMLE attain favorable asymptotic rates under conditions, finite-sample performance can still be affected by large variation constants or computational constraints. In these cases, first-order debiasing may leave a non-negligible residual asymptotically or at realistic sample sizes. Higher-order estimation (HOE) was developed to address this limitation. The core idea is to move beyond first-order correction and construct estimators whose residual behaves like a third-or higher-order term. In favorable scenarios, such second- or higher-order correction can relaxe 2nuisance rate requirements, recover root-n behavior under slower nuisance convergence, or improve finite-sample bias. However, in general, (first-order) pathwise differentiability alone does not pro-duce higher-order expansion even in canonical problems such as TSM estimation. Higher-order debiasing typically introduces new approximation or regularization errors and potentially nested bias-variance trade-offs. Thus, it is crucial to analyze not only when HOE improves asymptotic rates, but also when it yields stable empirical gains in finite samples. The main methodological families for higher-order estimation differ mainly in how they achieve higher-order expansions despite the lack of certain desired differentiability conditions. HOIF esti-mators (Robins et al., 2008) circumvent a desired higher-order pathwise differentiability by utiliz-ing higher-order U-statistic corrections after projection onto finite-dimensional bases motivated by H¨ older spaces. Empirical HOIF estimators (Liu et al., 2026) replace challenging covariate density estimation with empirical Gram matrices. Kernel-based higher-order TMLE (Carone et al., 2017) uses kernel smoothing to obtain approximate higher-order differentiability. HAL-based higher-order TMLE (van der Laan et al., 2021) constructs data-adaptive, (first-order) pathwise-differentiable debiasing targets which also result in higher-order residuals. These methods aim for the similar ambition of higher-order residual behavior, but they rely on different structural assumptions and introduce distinct regularization burdens. A central difficulty is that higher-order debiasing is not free. The approximation used to enable higher-order expansions typically introduces new bias-variance trade-offs. For empirical HOIF esti-mators, one must choose a basis system, as well as a truncation dimension large enough to control projection bias but small enough to avoid destabilizing the U-statistic and the empirical Gram ma-trix inverses. Kernel-based higher-order TMLE replaces basis truncation with bandwidth selection, shifting additional regularization to smoothing bias and variance. HAL-based methods are based on milder differentiability conditions by exploiting HAL representation, but their performance still requires stability of sequential targeting steps and balance of representation error and estimation error. Thus, higher-order estimation changes the bias-variance problem; it does not eliminate it. This paper is motivated by the difficulty of directly comparing higher-order estimators and translating higher-order asymptotic results into practical guidance. The theory identifies general regimes where higher-order corrections should improve residual behavior, but it is often unclear how those regimes are related in practice, which regularization choices are required, and whether the predicted gains are visible at realistic sample sizes. We address these questions through a conceptual review of existing higher-order asymptotic results and a simulation-based empirical benchmark study. The review emphasizes the structure of higher-order expansions, the regularization burden induced by each estimator class, and nuisance settings in which asymptotic improvements are anticipated. The numerical study then evalu-ates whether these anticipated improvements are visible in finite samples under controlled data-generating processes designed to stress test different aspects of nuisance estimation and higher-order approximation. Our benchmark focuses on treatment-specific mean estimation, equivalently mean estimation under missing at random. This target is simple enough to allow transparent comparisons, but rich enough to illustrate main phenomena that motivate higher-order estimation. We compare first-order estimators with empirical higher-order procedures, emphasizing methods that avoid explicit covariate density estimation and require only moderate tuning, with the goal of preserving stabil-ity in practical implementation. The simulation design separates two often conflated challenges: the nuisance convergence rate and the difficulty of higher-order approximation. In particular, the benchmark includes variation controlled settings, where sectional variation is small, large, or in-creasing with sample sizes, and derivative-variation-controlled settings where oscillation complexity increases slower or faster. 3The contributions of the paper are three-fold. First, we provide a compact synthesis of higher-order estimation results most relevant for applied targeted learning, emphasizing practical and finite-sample implications. Second, we propose a benchmark framework that links simulation set-tings to different mechanisms where higher-order estimators are expected to succeed or fail, includ-ing nuisance convergence, regularization bias control, and numerical stability. Third, we report empirical evidence on when higher-order corrections appear useful or unstable, and identify imple-mentation choices that appear important for practical use. Overall, this paper studies whether the asymptotic possibilities survive the approximation and regularization required for implementation. The remainder of the paper is organized as follows. Section 2 introduces the treatment-specific mean problem and first-order efficiency concepts. Section 3 reviews empirical higher-order estima-tors with emphasis on their regularization burdens and asymptotic implications. Section 4 presents the benchmark framework, including the five nuisance complexity settings and evaluation metrics. Section 5 reports simulation results. Section 6 discusses practical lessons, limitations, and open problems for higher-order targeted learning. 
+
+# 2 Background and Preliminaries 
+
+2.1 Notations for Treatment-Specific Mean (TSM) Example 
+
+Observed data is O = ( X, A, Y ), where X is the d-dimensional baseline covariates, A is the binary treatment (1 for treated), and Y is the outcome. Under standard causal assumptions (consis-tency, conditional ignorability, positivity), outcome regression b(x) = E[Y |A = 1 , X = x] identifies 
+
+E[Y (1) |X = x], where Y (1) is the counterfactual outcome under A = 1. The target of inference is then ψ = E[b(X)], the treatment-specific mean (TSM). 
+
+b(x) = E[Y |A = 1 , X = x]
+
+g(x) = P (A = 1 |X = x),fX (x) = dF X
+
+dμ (x)
+
+ψ = E[b(X)] .
+
+Components p = ( b, g, f X ) for outcome regression, propensity, and covariate density factorize the full data distribution P ∈ M for binary outcomes, or the information of P relevant to ψ for continuous outcomes. With empirical higher-order estimators, the covariate density fX is estimated by the empirical measure, Pn, that puts equal weights to IID observations. 
+
+2.2 First-Order Efficient Estimators for TSM 
+
+The TSM parameter ψ = Ψ( P ) is pathwise differentiable with efficient influence curve (EIC) 
+
+D∗(P ) = Ag(X) (Y − b(X)) + b(X) − Ψ( P ). In standard first-order estimation, fX is estimated with empirical distribution Pn, and the resulting estimator depends on P only through outcome regression b. With a slight abuse of notation, we write Ψ( P ) = Ψ( b). For the true parameter value 
+
+ψ0 = Ψ( b0) at P0, the second-order residual is R(P, P 0) ≡ Ψ( P )−Ψ( P0)+ P0D∗(P ) = P0 (g−g0)( b−b0) 
+
+> g
+
+,which yields an exact expansion Ψ( P ) − Ψ( P0) = −P0D∗(P ) + R(P, P 0) (2.1) = ( Pn − P0)D∗(P ) − PnD∗(P ) + R(P, P 0). (2.2) 4For an estimator P of P0 based on n i.i.d. observations, under regularity conditions that D∗(P )falls into a P0-Donsker class with probability tending to 1, || D∗(P ) − D∗(P0)|| L2(P0) = oP (1), 
+
+PnD∗(P ) = oP (n−1/2), it achieves (Pn − P0)( D∗(P ) − D∗(P0)) = oP (n−1/2)and thereby the desired expansion (1.1) with Rn = R(P, P 0), which is bounded by || g−g0|| L2(P0)|| b−
+
+b0|| L2(P0) under positivity. Therefore, asymptotic linearity and efficiency of first-order estimators depend mainly on a product nuisance rate of n−1/2. This is satisfied, for example, with HAL-based estimation for c` adl` ag , variation bounded functions, but still motivates third- or higher-order product nuisance rates for finite-sample performance, unbounded variation, and computational challenges. 
+
+Remark 1. The Donsker class condition may be replaced by cross-fitting b, g using oracle inequal-ity. First-order TMLE achieves PnD∗(P ∗) = oP (n−1/2) at the targeted update P ∗ = P (1)  
+
+> n
+
+(P ) = 
+
+P (1) (P, ϵ ∗) by solving an MLE ϵ∗ = arg max ϵ Pn log p(1) (P, ϵ ) along the least favorable paramet-ric submodel P (1) (P, ϵ ) with score ddϵ |ϵ=0 log p(1) (P, ϵ ) = Ag(X) (Y − b(X)). In TSM with binary or bounded continuous outcomes, it is typically chosen as b(1) (b, ϵ ) = expit {logit b + ϵ Ag } where H = Ag
+
+is the clever covariate in the targeting step logistic regression. The update P ∗ preserves the nui-sance rate in (2.2) through the local parametric MLE ϵ∗ under positivity so that || b∗ − b0|| L2(P0) =
+
+OP (|| b − b0|| L2(P0)). PnD∗(P ∗) = oP (n−1/2) is not required for one-step estimator (the AIPW esti-mator in TSM) ψ∗ = Ψ( P )+ PnD∗(P ), which alters (2.1) directly. || D∗(P )−D∗(P0)|| L2(P0) = oP (1) is generally a weaker condition than || g − g0|| L2(P0)|| b − b0||| L2(P0) = oP (n−1/2). 
+
+# 3 Review of Empirical Higher-Order Efficient Estimators 
+
+3.1 Higher-Order Efficiency 
+
+Second-order efficient estimators typically reach an expansion of the following form under additional differentiability conditions: 
+
+ψn − ψ0 = ( Pn − P0)D(1) (P0) + S(2)  
+
+> n
+
++ En + Rn + oP (n−1/2), (3.1) where D(1) represents the first-order EIC, S(2)  
+
+> n
+
+denotes a second-order debiasing term, often a U-statistic or higher-order empirical process term, En is an additional approximation or representation error, and Rn is typically bounded by third-order products of nuisance estimation errors. For asymp-totic linearity, S(2)  
+
+> n
+
+= oP (n−1/2) is needed, but the required conditions may be more challenging if (3.1) relies on more demanding differentiability conditions. Overall, compared with the first-order expansion (1.1), the second-order residual is replaced by a higher-order residual, which may allow semiparametric efficiency under slower nuisance convergence rates, provided proper control of the induced approximation error En. For concrete and traceable comparisons, this manuscript primarily focuses on second-order estimators, although higher-order generalizations are possible. However, the existence of expansion (3.1) is non-trivial in causal inference and missing data problems. In such settings, the original target parameter typically fails to reach the required differ-entiability, and practical higher-order estimation often relies on an approximated representation, which induces the additional error En that does not appear in the first-order expansion (1.1). This distinction leads to a crucial yet delicate bias-variance trade-off. The third-order residual control is dominant only after reducing the smoothing, truncation, or approximation error En. For 5example, reducing smoothing decreases En and improves the approximation, but at the same time may approach practical near-violation of the required pathwise-differentiability. As a result, S2 
+
+> n
+
+may explode in finite samples even when asymptotic linearity formally holds. Thus, it is important to evaluate how the higher-order expansion (3.1) is constructed and how demanding the approximate differentiability conditions are in practice. In the rest of this section, we review two classes of higher-order constructions that face distinct differentiability challenges. 
+
+3.2 Constructions Based on Second-Order Canonical Gradient 
+
+When second-order pathwise differentiability holds, the exact expansion (2.1) can be refined by approximating the second-order residual through a second-order canonical gradient: Ψ( P ) − Ψ( P0) = −P0D(1) (P ) − 12 P 20 D(2) (P ) + Rn
+
+= ( Pn − P0)D(1) (P ) + 12 (P 2 
+
+> n
+
+− P 20 )D(2) (P ) − PnD(1) (P ) − 12 P 2 
+
+> n
+
+D(2) (P ) + Rn,
+
+where − 12 P 20 D(2) (P ) approximates the second-order remainder up to a third-order error using the second-order canonical gradient, D(2) (P ). Here, we adopt the notation P 20 h = RR h(o1, o 2)dP 0(o1)dP 0(o2)for expectation of bivariate maps over two independent draws, and P 2 
+
+> n
+
+h results in the V-statistic. This expansion motivates a class of second- or higher-order efficient estimators, designed as one-step estimators or TMLEs, that essentially depend on the existence of higher-order canonical gradients. Additional Donsker type conditions are required for higher-order inference utilizing both first- and second-order canonical gradients, but are not required for attaining asymptotic linearity. Unfortunately, second-order pathwise differentiability may not hold even for canonical target parameters such as TSM. Given Ψ( P ) = E[b(X)] = R b(x)fX (x)dx where b(x) = E[ δ(X−x)  
+
+> fX(X)
+
+b(X)] = 
+
+E[ δ(X−x)  
+
+> fX(X)
+> Ag(X)
+
+Y ] and fX (x) = E[δ(X − x)fX (X)], we derive the formal second-order canonical gradient with independent copies O1, O 2
+
+D(2) (P )( O1, O 2) = 2A1
+
+g(X1) {Y1 − b(X1)} δ(X1 − X2)
+
+fX (X1)
+
+
+
+1 − A2
+
+g(X2)
+
+
+
+,
+
+which involves Dirac’s delta and is not square-integrable for continuous X. As a result, the TSM parameter is not genuinely second-order pathwise differentiable. To solve this non-differentiability issue, the following methods adopt two different approxi-mations: the HOIF-based method approximates δ(X1−X2)  
+
+> fX(X1)g(X1)
+
+≈ ¯zk(X1)⊤Ω−1 ¯zk(X2) with a finite-dimensional projection, whereas the kernel-based HOTMLE applies kernel-smoothing for δ(X1 −
+
+X2). Such truncation or smoothing produces an approximated version of the second-order residual, which can then be estimated with a third-order error, leading to a combined error of En + Rn due to approximation (truncation or smoothing) and estimation. Although not analyzed in these publications, they also correspond to estimating truncated or smoothed auxiliary parameters Ψ¯zk (P ) = E[b¯zk (X)] , Ψh(P ) = E[bh(X)] ,
+
+where 
+
+b¯zk (x) = E[¯ zk(X)⊤Ω−1 ¯zk(x)AY ]and 
+
+bh(x) = E[ Kh(X − x)
+
+fX (X) b(X)] 6are dependent on the choice of basis ¯ zk and the kernel Kh. In addition, since E(AY |X) = g(X)b(X), we have b¯z (x) = ¯ zk(x)⊤Ω−1E[g(X)¯ zk(X)b(X)] = Π (g)¯zk b(x); that is, b¯zk is the orthogonal projection of b onto span {¯zk} in the weighted Hilbert space L2(gf X ), where the projection is defined under the inner product ⟨u, s ⟩g = E[g(X)u(X)s(X)] with the Gram matrix Ω = E[g(X)¯ zk(X)¯ zk(X)⊤]. Equivalently, 
+
+b¯zk = arg min   
+
+> s∈span {¯zk}
+
+E[g(X){b(X) − s(X)}2],
+
+so that b¯zk can be viewed as the weighted least-square regression of b(X) onto ¯ zk(X) with weights 
+
+g(X). Both approaches result in a third-order remainder Rn that involves nuisance errors for b, g, f X
+
+and an approximation error En due to truncation or smoothing. We review the detailed construc-tions below. 
+
+3.2.1 HOIF 
+
+HOIF-based second-order estimator relies on the following second-order U-statistic for additional debiasing: 
+
+S(2)  
+
+> n
+
+= 1
+
+n(n − 1) 
+
+X 
+
+> i1̸=i2
+
+−Ai1 (Yi1 − b(Xi1 ))¯ zk(Xi1 )⊤Ω−1 ¯zk(Xi2 )(1 − Ai2
+
+g(Xi2 ) ), (3.2) where ¯ zk(x) = ( z1(x), . . . , z k(x)) T is a chosen basis system with k dimensions, and Ω = P0[A¯zk(X)¯ zk(X)T ]is the Gram matrix. (3.2) is a standard U-statistic correction based on estimating the first-order estimator’s cross-product residual, R(P, P 0) = R (b(x) − b0(x))( 1 
+
+> g(x)
+
+− 1 
+
+> g0(x)
+
+)g0(x)fX0(x)dx = ⟨b(x) −
+
+b0(x), 1 
+
+> g(x)
+
+− 1 
+
+> g0(x)
+
+⟩g0 ≈
+
+D
+
+Π(g)¯zk (b(x) − b0(x)) , Π(g)¯zk ( 1 
+
+> g(x)
+
+− 1 
+
+> g0(x)
+
+)
+
+E
+
+> g0
+
+= E0[g0(b − b0)¯ zk]⊤Ω−1E0[g0( 1 
+
+> g
+
+− 
+
+> 1
+> g0
+
+)¯ zk] after projecting the nuisance-error functions b − b0 and 1 
+
+> g
+
+− 1 
+
+> g0
+
+onto the functional space spanned by ¯ zk(x). Therefore, the error of estimating the second-order residual is decomposed into the truncation bias En due to projections and the third-order error Rn of estimating the pro-jected version with the U-statistic. This results in a second-order HOIF estimator of the form 
+
+ψn = Ψ( P ) + PnD(1) (P ) + S(2)  
+
+> n
+
+.Formally, the second-order U-statistic involves a Dirac delta δ(x1 − x2) satisfying R δ(x1 −
+
+x2)f (x2)dx 2 = f (x1). For discrete covariates with finite support, this is square-integrable and requires no projection approximation so that the truncation error En vanishes. For continu-ous covariates, it is not square-integrable and does not yield a valid U-statistic. This motivates ¯zk(Xi1 )⊤Ω−1 ¯zk(Xi2 ), which gives a square-integrable approximation to the formal kernel, and it makes the projected version of the second-order residual estimable by a U-statistic. The rest of the U-statistic construction is standard: it uses two distinct observations to estimate a cross-product of two (projected) nuisance errors. If the basis is orthonormal in L2(g0fX0), then Ω = Ik; otherwise, the correction Ω −10 must be estimated in practice. To complete the estimator construction, it still requires specifying the basis system and estimat-ing the Gram matrix. The original, density-based version uses a nonparametric density estimate ˆfX ; however, reliable density estimate can be challenging in practice. The empirical version uses the empirical covariance ˆΩ = Pn[A¯zk(X)¯ zk(X)T ]; in this case, it requires a slowly increasing k that avoids exploding the inverse but still controls the truncation bias En. Although different bases may yield the same minimax rate, finite-sample performance can differ substantially depending on the actual data-generating process and the stability of ˆΩ−1.7As the oracle U-statistic removes the projected component of the first-order estimator’s resid-ual, the leftover error consists of two components. The “truncation bias” arises from the basis approximation that enables the U-statistic construction, 
+
+En =
+
+Z
+
+{I − Π(g) 
+
+> k
+
+}(b − b0)( x){I − Π(g) 
+
+> k
+
+}(1 /g − 1/g 0)( x)g0(x)fX0(x) dx 
+
+= OP (||{ I − Π(g) 
+
+> k
+
+}(b − b0)|| L2(g0fX0)||{ I − Π(g) 
+
+> k
+
+}(1 /g − 1/g 0)|| L2(g0fX0))where Π (g) 
+
+> k
+
+denotes the L2(g0fX0) projection onto the span of ¯ zk. The “estimation bias” arises from estimating Ω and leads to a third-order term. With original HOIF estimators, 
+
+Rn = OP
+
+ ∥b − b0∥L2(P0)∥g − g0∥L2(P0)∥fX − fX0∥L2(P0)
+
+ ,
+
+or with empirical HOIF estimators, 
+
+Rn = OP
+
+
+
+∥b − b0∥L2(P0)∥g − g0∥L2(P0)∥ ˆΩ − Ω0∥op 
+
+
+
+.
+
+Under H¨ older smoothness assumptions with coefficients βb, β g, β f for b, g, f X and bases satisfying Jackson approximation properties (e.g. wavelets, splines, Fourier), typically we have 
+
+En = OP
+
+
+
+k−(βb+βg )/d 
+
+.
+
+Furthermore, for original, density-based HOIF, 
+
+Rn = OP (n− βb       
+
+> 2βb+d−βg
+> 2βg +d−βf
+> 2βf+d
+
+).
+
+For empirical HOIF, 
+
+Rn = OP (n− βb   
+
+> 2βb+d−βg
+> 2βg +d
+
+pk/n ).
+
+In addition, the U-statistic behavior will be dependent on the extent of truncation through 
+
+S(2)  
+
+> n
+
+= OP (
+
+√kn ),
+
+and therefore asymptotic linearity requires k = o(n). The decomposition and the rate results highlight the central trade-off in HOIF methods: in-creasing k is necessary to reduce approximation bias and improve representation accuracy, but may simultaneously induce statistical and numerical instability. For empirical HOIF, this regularization trade-off is particularly delicate: increasing k may worsen both the U-statistic performance and the numerical stability of ˆΩ−1. In practice, large k may lead to practical near-violation of second-order pathwise-differentiability and result in non-negligible constant in finite samples. At the same time, larger k destabilizes inversion of the empirical Gram matrix; stable inversion at large k requires larger n and operator error ∥ ˆΩ − Ω∥op sufficiently small relative to the minimum eigenvalue of Ω. Existing asymptotic results suggest carefully controlled growth rates for k such as k ∼ n/ (log n)2,but finite-sample performance may remain highly sensitive to basis choice. In particular, some ba-sis systems may require larger approximation dimensions to achieve adequate representation bias reduction, while simultaneously yielding unstable empirical behavior at the available sample size. 83.2.2 Kernel-based HOTMLE 
+
+Kernel-based higher-order TMLE (HOTMLE) is motivated by the same challenge that leads to the finite-dimensional projection in HOIF: for continuous covariates, the formal second-order gradient involves a Dirac delta, and therefore does not define a square-integrable second-order influence function. Instead of replacing the delta with a projection kernel inspired by basis approximation, kernel-based HOTMLE replaces it with a smoothing kernel, K( x1−x2 
+
+> h
+
+) indexed by a bandwidth h.Such kernel smoothing also yields an approximate second-order canonical gradient. The debiasing is then implemented through targeting steps within the TMLE framework, instead of as one-step updates. For the counterfactual mean example, this defines the following approximated second-order efficient influence curve: 
+
+D(2)  
+
+> h
+
+(P )( o1, o 2) = H(2)  
+
+> h
+
+(P )( x1, a 1, x 2, a 2){y1 − b(x1)},
+
+with 
+
+H(2)  
+
+> h
+
+(P )( x1, a 1, x 2, a 2) = 2a1
+
+g(x1)fX (x1) Kh(x1 − x2)
+
+
+
+1 − a2
+
+g(x2)
+
+
+
+, Kh(u) = h−dK(u/h ).
+
+The targeting step is then augmented so that the final targeted update P ∗ solves both 
+
+PnD(1) (P ∗) = 0 , Pn ¯D(2) 
+
+> hn,n
+
+(P ∗ 
+
+> n
+
+) = 0 ,
+
+where ¯D(2) 
+
+> h,n
+
+(P )( o) = 1
+
+> n
+
+Pnj=1 D(2)  
+
+> h
+
+(P )( o, O j ), heuristically equivalent to solving P 2 
+
+> n
+
+D(2)  
+
+> hn
+
+(P ∗) = 0. The resulting estimator is subject to the expansion 3.1, where 
+
+S(2)  
+
+> n
+
+= 12 (P 2 
+
+> n
+
+− P 20 )D(2)  
+
+> hn
+
+(P ) = OP
+
+h−d/ 2
+
+> n
+
+n
+
+!
+
+Rn = OP 1 − fX0g0
+
+fX g L2(P0)
+
+g − g0
+
+g L2(P0)
+
+∥b − b0∥L2(P0)
+
+!
+
+,
+
+and the approximation error En due to smoothing is controlled as En = OP
+
+ hm0+1  
+
+> n
+
+∥b − b0∥L2(P0)
+
+
+
+when b0, g 0 are assumed m0-times continuously differentiable and K is 2 d-times differentiable. Asymptotic linearity requires selecting h−dn = o(n). Therefore, careful tuning is required for balancing the nuisance rates, assumed smoothness or-der, kernel choice, bandwidth, and precision of the kernel approximation. Since kernel HOTMLE replaces the HOIF basis-dimension trade-off with a bandwidth trade-off, its finite-sample perfor-mance likewise remains sensitive to precision of the density estimate fX through both approximation error En and residual Rn.
+
+3.3 Constructions Based on HAL and Fluctuation Parameters 
+
+Constructions so far are motivated by estimating and correcting the second-order residual term Rn
+
+in (1.1) with approximations of the non-existent formal second-order canonical gradient. A closely related but distinct motivation is to directly debias a first-order estimator. Since P0D∗(P0) = 0, one can consider minimizing 
+
+fn, 0(P ) = {Ψ( P ∗(P )) − Ψ( P0) − PnD∗(P0)}2,
+
+9where P ∗(P ) is the first-order TMLE update of an initial estimator P . Along a regular parametric submodel Pδ,h through P with score h, the pathwise derivative has the form 
+
+ddδ |δ=0 
+
+fn, 0(Pδ,h ) = C(P ) · ddδ |δ=0 
+
+Ψ( P ∗(Pδ,h )) ,
+
+for a constant C(P ) conditioning on the initial estimator. This motivates targeting the fluctuation parameter P 7 → Ψ( P ∗(P )) directly. For continuous covariates, this fluctuation parameter is generally (first-order) non-pathwise dif-ferentiable, because dP n/dP does not exist for continuous P . This first-order non-differentiability issue is less challenging than the lack of second-order pathwise differentiability of the original pa-rameter, since the differentiability condition demands only oP (n−1/2) precision (instead of oP (n−1)) for the approximation of pathwise derivatives along regular parametric submodels. It is also re-flected by the easier control of the debiasing term S2 
+
+> n
+
+as a standard empirical process under similar regularity conditions as first-order estimators. HAL-based HOTMLE addresses this non-differentiability issue by replacing the empirical Pn
+
+with a smooth surrogate ˜Pn from the highly adaptive lasso maximum likelihood estimator (HAL-MLE). The resulting fluctuation parameter becomes pathwise differentiable and admits a canonical gradient. Specifically, when an HAL-MLE ˜Pn satisfies d ˜Pn/dP ∈ L2(P ) and Ψ : M → Rk is path-wise differentiable, a data-adaptive, pathwise differentiable fluctuation parameter can be defined as Ψ(1)  
+
+> n
+
+: P 7 → Ψ( ˜P (1)  
+
+> n
+
+(P )) ,
+
+where ˜P (1)  
+
+> n
+
+(P ) is a first-order targeted update using the HAL-MLE risk defined by ˜Pn instead of the empirical risk by Pn. The canonical gradient is denoted by D(2)  
+
+> n
+
+. Joint targeting of Ψ( P0) and the auxiliary parameter Ψ (1)  
+
+> n
+
+(P0) yields HAL-based second-order TMLE. 
+
+Remark 2. The original HAL-based HOTMLE is defined differently through sequential HAL-based updates, Ψ( ˜P (1)  
+
+> n
+
+˜P (2)  
+
+> n
+
+(P )), where the updates ˜P (1)  
+
+> n
+
+, ˜P (2)  
+
+> n
+
+solve ˜PnD(1) ( ˜P (1)  
+
+> n
+
+(P )) = 0, ˜PnD(2)  
+
+> n
+
+( ˜P (2)  
+
+> n
+
+(P )) = 0. This version admits an expansion of the form Ψ( ˜P (1)  
+
+> n
+
+˜P (2)  
+
+> n
+
+(P )) − Ψ( P0) = ( Pn − P0)D(1) ˜P (1)    
+
+> n(P)
+
++ ( ˜Pn − P0)D(2)      
+
+> n, ˜P(2)
+> n(P)
+
++ En + Rn + oP (n−1/2).
+
+Under regularity conditions, asymptotic linearity can be attained with slower nuisance rates, as ( ˜Pn − P0)D(2)     
+
+> n, ˜P(2)
+> n(P0)
+
+can be absorbed to a third-order residual Rn, and the additional regular-ization bias En (due to the surrogate HAL-MLE) ( ˜Pn − Pn)D(1) ˜P (1)   
+
+> n(P0)
+
+can be controlled through undersmoothing. 
+
+Remark 3. Strictly speaking, only the definition of the fluctuation parameter Ψ (1)  
+
+> n
+
+and its EIC D(2) 
+
+> n
+
+depends on HAL-MLE, and the targeting steps can directly solve the empirical mean equations 
+
+PnD(1) (P (1)  
+
+> n
+
+(P )) ≈ 0, PnD(2)  
+
+> n
+
+(P (2)  
+
+> n
+
+(P )) ≈ 0. This empirical version, Ψ( P (1)  
+
+> n
+
+P (2)  
+
+> n
+
+(P )), leads to stan-dard empirical process terms up to a third-order residual Rn and a slightly different regularization bias En led by ( ˜Pn − Pn){D(1)    
+
+> P(1)
+> n(P0)
+
+− D(1)      
+
+> P(1)
+> nP(2)
+> n(P)
+
+}. This may provide extra cancellation in the HAL regularization bias and may improve finite-sample stability. Throughout this manuscript, we focus on this empirical implementation of second-order TMLE. This HAL-based second-order TMLE admits a higher-order expansion of the form (3.1) under regularity conditions of Section 2.2. Let P (1)  
+
+> n
+
+(P ), P (2)  
+
+> n
+
+(P ) be the first- and second-order TMLE 10 updates that solve PnD(1) (P (1)  
+
+> n
+
+(P )) = oP (n−1/2) and PnD(2)  
+
+> n
+
+(P (2)  
+
+> n
+
+(P )) = oP (n−1/2). Then, 
+
+S(2)  
+
+> n
+
+= ( Pn − P0)D(2)    
+
+> n,P (2)
+> n(P)
+
+En = OP
+
+
+
+( ˜Pn − Pn){D(1)    
+
+> P(1)
+> n(P0)
+
+− D(1)      
+
+> P(1)
+> nP(2)
+> n(P)
+
+} + ( ˜Pn − Pn){D(2)    
+
+> n,P (2)
+> n(P0)
+
+− D(2)    
+
+> n,P (2)
+> n(P)
+
+}
+
+
+
+Rn = OP
+
+
+
+∥p − p0∥3 
+
+> L2(P0)
+
++ ∥˜pn − p0∥3
+
+> L2(P0)
+
+
+
+.
+
+Under additional Donsker conditions or cross-fitting and mild consistency similar to Section 2.2, generally we have S(2)  
+
+> n
+
+= ( Pn − P0)D(2)  
+
+> n,P 0
+
++ oP (n−1/2) = oP (n−1/2), where ∥D(2)  
+
+> n,P 0
+
+∥L2(P0) involves first-order difference of ˜Pn, P n.In the TSM example, this construction avoids estimating the covariate density. Similar to first-order estimators, the marginal covariate distribution fX is set to the marginal empirical distribution in both ˜Pn and P . Let p = ( b, g ) be the estimated nuisance components. The residual satisfies 
+
+Rn = OP (∥g − g0∥∥ p − p0∥2 + ∥˜gn − g0∥∥ ˜pn − p0∥2).
+
+Under bounded sectional variation norm assumptions, or slowly increasing complexity that pre-serves ∥˜pn − p0∥ = oP (n−1/6), the residual is asymptotically third-order, represented by Rn =
+
+OP
+
+ ∥g − g0∥(∥g − g0∥2 + ∥b − b0∥2) in (3.1). The approximation error En, in addition to the third-order residual, arises from replacing the empirical distribution Pn by the HAL surrogate ˜Pn. Unlike the truncation bias in HOIF or the smoothing bias in kernel-based HOTMLE, this regularization bias is controlled by the amount of HAL regularization and may be reduced through undersmoothing, that is, by allowing larger sectional variation norms than the cross-validated choice and allowing ˜Pn closer to Pn. As a result, it replaces the challenging basis or bandwidth tuning with tuning of sectional variation bounds, which motivates clearly defined finite-sample criteria of increasing the complexity bounds till ( ˜Pn − Pn)D(1)   
+
+> P∗
+
+≈ 0 or ( ˜Pn − Pn)( D(1)     
+
+> P(1)
+> n(P)
+
+− D(1)      
+
+> P(1)
+> nP(2)
+> n(P)
+
+) ≈ 0. The leading term ( ˜Pn − Pn){D(1)    
+
+> P(1)
+> n(P0)
+
+− D(1)      
+
+> P(1)
+> nP(2)
+> n(P)
+
+} in the regularization bias En is intuitively controlled in undersmoothing as ˜Pn → Pn, and two upper bounds can be applied. First, we have 
+
+En = OP (∥˜pn − p0∥L2(P0)∥p − p0∥L2(P0))directly from the leading term. Second, assuming s ∈ { 0, 1, . . . }-th order differentiability and sectional variation norm of the s-th order derivative is bounded by K(n), 
+
+En = OP
+
+ ∥p − p0∥v∥˜pn − p0∥L2(P0)∥˜un, 0 − un∥L2(P0)
+
+
+
+where ˜ un, 0 is the projection of un = ˜ vn − ˜Pn ˜vn onto the span of J active basis in ˜ pn, with vn =
+
+D(1)    
+
+> P(1)
+> n(P0)
+
+− D(1)       
+
+> P(1)
+> nP(2)
+> n(P)
+
+and ˜ vn = vn 
+
+> ∥vn∥v
+
+. We have ∥˜un, 0 − un∥L2(P0) of order 1 /J and ∥˜pn − p0∥L2(P0)
+
+of order  (J/n )1/2 + (1 /J )s+1 K(n). When s ≥ 1 and p = ˜pn, we have ∥˜pn − p0∥v of order 
+
+ (J/n )1/2 + (1 /J )sK(n). Therefore, we can have negligible En = oP (n−1/2) with or without undersmoothing in various settings under bounded or slowly increasing sectional variation norms, as illustrated in Section 4.4. Overall, the required conditions for asymptotic linearity are structurally different from H¨ older -type smoothness or kernel-based conditions. The fact that none or minimal undersmoothing is required for En = oP (n−1/2) leads to a minimal risk for near-violation of pathwise differentiability 11 due to aggressively undersmoothing ˜Pn. Even under moderate undersmoothing, S2 
+
+> n
+
+remains stable, because undersmoothing only selects larger variation bounds and typically preserves consistency and convergence rates of HAL. This again reflects the less demanding nature of first-order dif-ferentiability conditions regarding fluctuation parameters. The third-order residual Rn is free of covariate density fX , and now involves nuisance estimation errors from both an initial estimator P
+
+and the HAL-MLE ˜Pn.
+
+3.4 Empirical Estimators and Empirical Evidence 
+
+Second-order estimators for TSM can be categorized by how they regularize the formal higher-order influence function and by whether covariate density estimation fX is required in addition to outcome and propensity regressions b, g . In practice, density estimation may be a bottleneck for scalability and introduce additional bias-variance trade-offs though bandwidth, basis, or smoothing hyperparameter selection. To clearly illustrate estimator performance under a stable, controlled benchmark framework, we focus on the empirical estimators that avoid explicit density estimation. This includes empirical HOIF using empirical Gram matrices and HAL-based HOTMLE solving empirical estimating equations, which are compared against standard first-order estimators. However, existing empirical evidence of these estimators are closely related to the underly-ing theoretical assumptions. For example, empirical analyses of HAL-based HOTMLE are con-ducted under bounded sectional variation settings, while HOIF analyses are typicallyevaluated under H¨ older -type smoothness conditions with basis satisfying classical approximation rates. As a result, the current empirical comparisons can be difficult to interpret across methods, analyzed under related but distinct data generating processes. For example, minimax analysis characterizes the worst-case optimal rate over a specified func-tion class, such as a H¨ older ball. But practical performance depends on the overlap between the true data-generating mechanism and the assumed function class. Realistic nuisance functions may have discontinuity, limited effective dimensions, or restricted oscillation patterns, which put them outside a nominal H¨ older class or within a strict submodel. Asymptotic minimax rates may then either overestimate or underestimate the nuisance rate in practice. Empirical evidence is lacking for many practically relevant settings, despite substantially available theoretical results. Several important questions therefore remain only partially understood empirically: 
+
+• When do higher-order estimators provide substantial finite-sample improvements over first-order estimators? 
+
+• When do higher-order estimators become unstable or provide only negligible gains? 
+
+• How sensitive are different estimators to particular approximation or regularization choices? 
+
+• To what extent do asymptotic results translate to practical finite-sample performance? A systematic empirical comparison across empirical higher-order estimators is needed for under-standing the practical advantage and limitation of higher-order methods over standard first-order estimation. 
+
+# 4 Benchmark Framework 
+
+4.1 Data Generating Process 
+
+Covariate density fX is not directly estimated by empirical second-order estimators and first-order estimators. We stress test the stability of these empirical estimators by adopting a rough density 12 function within a H¨ older class with coefficient 0 .1 and a complex covariance structure for a 4-dimensional covariate X ∈ [0 , 1] 4.Outcome and propensity score models b, g are designed similarly, where P (Y = 1 |A = 1 , X ) = 
+
+b(X) and P (A = 1 |X) = g(X) for binary Y, A . The truths b0, g 0 are designed with controlled smoothness and complexity on the logit scale in the following five settings. 1. Small constant variation. 2. Large constant variation. 3. Increasing variation. 4. Slowly increasing oscillation (derivative variation). 5. Fast increasing oscillation (derivative variation). Setting 1-3 are subsets of the Skorohod space D[0 , 1] 4 of c` adl` ag functions, with a finite (0-order) bounded sectional variation norm K or K(n) given any finite sample size n. We denote these function classes as BV0 or BV0( K) by the variation bound. Setting 3 allows K(n) → ∞ and converges to the full D[0 , 1] 4 as n → ∞ . H¨ older functions with coefficient 0 < α < 1, denoted by 
+
+Hα[0 , 1] 4, may have infinite variation and each constructs a different subset of D[0 , 1] 4: discontinuity is excluded by a H¨ older ball, infinite variation is excluded by BV0, and BV0 may contain functions satisfying H¨ older conditions up to 0 < α ≤ 1. Setting 4-5 require almost everywhere differentiability and their (weak) derivative spaces contain c` adl` ag functions while converging to D[0 , 1] 4. Except for allowing discontinuity, they construct subsets of the space of Lipschitz functions H1[0 , 1] 4 and therefore subsets of any H¨ older ball Hα[0 , 1] 4
+
+with 0 < α < 1. We denote these smoother function classes as BV1 or BV1( K(n)) with bounded first-order sectional variation norm K(n) on the (weak) first-order derivatives. These can construct special nonparametric subspaces of H¨ older balls where further rate improvements may be possible, and they may expand outside the H¨ older balls through up to countably many discontinuity points. We use harmonic functions with increasing frequency and amplitude in Settings 1-5 for com-plexity control and they are defined over five equidistant sections per coordinate. In addition, we let Setting 1-3 also involve a mixture from H1/4[0 , 1] 4 with finitely many wavelet basis functions, so that Setting 1-3 DGPs are within H1/4[0 , 1] 4 except for finitely many discontinuity points between sections. Settings 4-5 are within H1[0 , 1] 4 except for discontinuity points. For improved traceability, we simulate with no-interaction so that effectively d = 1 for Jackson-type minimax rates; however, the discontinuity may lead to Gibbs phenomenon and challenge the minimax rates. 
+
+4.2 Nuisance Rate Control 
+
+We control the nuisance error rate exactly to the order of n−1/6 such that second-order residual control is insufficient for root-n consistency and third-order residual control becomes necessary (ex-cept in the first-order competitors that use HAL instead as the initial estimators). Specifically, nuisance errors are controlled manually through ˆb = b0 + n−1/6en with bounded || en|| L2(P ), so that first-order estimates only result in a second-order residual of order n−1/3, not diminishing asymptotically. Exact nuisance error control is implemented to stress-test residual-term perfor-mance, since minimax-based nuisance rates may be misleading in finite simulations. When the actual DGP lies in a strict submodel of the assumed H¨ older ball, minimax rates over the full ball can be over-pessimistic; this can occur when generating close to infinitely many basis functions is computationally expensive in simulations (e.g. Settings 1-3) or in realistic scenarios with potential 13 rate improvements relative to the worst case (e.g. Settings 4-5). Minimax rates may also be over-optimistic when the H¨ older ball radius is poorly calibrated or when there exists discontinuity (e.g. Settings 1-5) so that the actual model expands outside the assumed class. 
+
+4.3 Estimators 
+
+We construct the following estimators using the initial estimation with controlled errors: first-order TMLE (1TMLE), empirical HAL-based second-order TMLE without or with additional under-smoothing (e2TMLE and u2TMLE), and empirical HOIF estimator (e2HOIF; see detailed basis construction in Section 4.4). Without further specification, these estimators share identical initial estimators, in order to illustrate the potential improvement of second-order estimators. Additionally, we compare the following first-order TMLE using HAL as the initial estimator: 0-order spline HAL as the initial (0HAL-1TMLE) in Setting 1-3 and 1-order spline HAL as the initial (1HAL-1TMLE) in Setting 4-5. These estimators are included as asymptotic state-of-the-art first-order competitors under each setting. 
+
+4.4 Asymptotic Rates Comparison 
+
+We summarize below the combined asymptotic rates of En +Rn in (3.1) for second-order estimators or Rn in (1.1) for first-order estimators in Setting 1-5. For 1TMLE, Rn is bounded by the second-order product of order n−1/3 consisting of the nuisance estimation errors for b, g of order n−1/6. Similarly, for 0HAL-1TMLE, Rn is bounded by the second-order product of 0HAL nuisance errors of order n−1/3 (up to log n factors, same below in the subsection), which yields n−2/3 with bounded sectional variation in Settings 1-2, and n−4/9 in Setting 3 with increasing variation bounds K(n) ∼ n1/9; 1HAL attains n−2/5 nuisance error rate under BV1, which yields 1HAL-1TMLE residuals of order n−1/2 or n−1/3 under BV1( K(n)) with 
+
+K(n) ≍ n3/20 or K(n) ≍ n7/30 in Settings 4-5. e2HOIF controls Rn to the order of n−5/6+ s/ 2 with n−1/6 nuisance rates and k ≍ ns many Fourier basis functions, and leaves En of order n−s/ 2 or n−2s for β = 1 /4 in Settings 1-3 or β = 1 in Settings 4-5 ignoring impact of discontinuity. The optimal combined rates for En + Rn are up to 
+
+n−5/12 or n−2/3 for Settings 1-3 or 4-5, attained at k ≍ n5/6/(log n)2 or n1/3/(log n)2, respectively. However, finite-sample implementation can be challenging, since n5/6/(log n)2 ranges from 3 to 46, 
+
+n1/3/(log n)2 from 0.21 to 0.29, for n ∈ [200 , 25600], and there is no easy-to-follow tuning guidance. As an attempt to test the performance, we additively included 16 Fourier basis per coordinate and the intercept, which led to 65 ×65 Fourier Gram matrices which typically still admit stable inversion. We hypothesized that k = 65 < (25 , 600) 1/2 may be sufficiently large for the approximation error up to discontinuity while not significantly deteriorating the residual order n−5/6+ s/ 2.Both e2TMLE and u2TMLE control Rn = oP (n−1/2) through products of nuisance estimation errors and the regularization bias En may be of different orders. In Settings 1-3 with finite variation bound K or slowly increasing K(n) ≍ n1/9, 0HAL activates J ≍ n1/3 basis, ∥p − p0∥v is of order n−1/6, and therefore Rn dominates with or without undersmoothing. In Settings 4-5 under BV1( K(n)) and increasing K(n), 1HAL activates J ≍ n1/5 basis, ∥˜pn − p0∥L2(P0) deteriorates linearly in K(n)n−2/5, so we have En at least of order n−8/15 and thereby Rn remains the dominant term before undersmoothing. 14 Estimator Setting 1–2 Setting 3 
+
+1TMLE OP (n−1/3) OP (n−1/3)e2TMLE OP (n−1/2) OP (n−1/2)u2TMLE OP (n−1/2) OP (n−1/2)e2HOIF OP (n−5/12 ) OP (n−5/12 )0HAL-1TMLE OP (n−2/3) OP (n−4/9)Table 1: Settings 1-2 correspond to BV0 with small or large constant variations, while Setting 3 corresponds to BV0( K(n)) with increasing variation K(n) ≍ n1/9. Nuisance rates are controlled to 
+
+n−1/6 except for 0HAL-1TMLE with HAL initial estimation. Rates are stated up to log n factors for the combined error En + Rn of second-order estimators in (3.1) or for the second-order residual 
+
+Rn of first-order estimators in (1.1). 
+
+Estimator Setting 4 Setting 5 
+
+1TMLE OP (n−1/3) OP (n−1/3)e2TMLE OP (n−1/2) OP (n−1/2)u2TMLE OP (n−1/2) OP (n−1/2)e2HOIF OP (n−2/3) OP (n−2/3)1HAL-1TMLE OP (n−1/2) OP (n−1/3)Table 2: Settings 4-5 correspond to BV1( K(n)) with increasing variation; K(n) ≍ n3/20 in Setting 4 and K(n) ≍ n7/30 in Setting 5. Nuisance rates are controlled to n−1/6 except for 1HAL-1TMLE with first-order spline HAL as initial estimation. Rates are stated up to log n factors for the combined error En + Rn of second-order estimators in (3.1) or for the second-order residual Rn of first-order estimators in (1.1). 
+
+# 5 Simulation Results 
+
+Across all settings (Figure 1 and 2), the HAL-based second-order TMLE estimators achieve sub-stantial and stable bias reduction relative to the corresponding first-order TMLE with the same initial nuisance estimators. Both e2TMLE and u2TMLE exhibit comparable root-n-scaled bias performance, without or with undersmoothing, despite relying on nuisance convergence rates as slow as n−1/6. These results provide empirical evidence for the theoretical higher-order residual performance in finite samples. In Setting 3 with increasing sectional variation norm at rate K(n) ≍ n1/9, 1TMLE using either HAL or slowly converging n−1/6-rate nuisance estimators shows persistent root-n-scaled bias, whereas 2TMLE remains relatively stable as n increases (Figure 1). This performance is consistent with the asymptotic comparison in Table 1 and Section 4.4. Similarly, in Settings 4-5 with increasing oscillation through increasing sectional variation norm of first-order derivatives, 2TMLE maintains stable finite-sample bias control and outperforms the state-of-the-art first-order 1HAL-1TMLE competitors (Figure 2). In Setting 1-2 with bounded sectional variation, 0HAL-1TMLE achieves faster theoretical rate of order n−2/3; however, 2TMLE exhibits superior finite-sample performance up to n = 25 , 600, particularly in Setting 2 with larger sectional variation constants (Figure 1). This suggests that higher-order residual control may dominate the finite-sample performance over a substantial range of practically relevant sample sizes. Thus, even when asymptotic rate improvement is not expected, finite-sample gains may still occur in practice through flexible nuisance estimators and stable third-order residual control. 15 Setting 1 Setting 2 Setting 3                 
+
+> 200 400 800 1600 3200 6400 1280025600 200 400 800 1600 3200 6400 1280025600 200 400 800 1600 3200 6400 1280025600 0.0 0.2 0.4 0.6 0.8 0.0 0.5 1.0 1.5 2.0 2.5 0.00 0.25 0.50 0.75 Sample size n bias 1TMLE e2TMLE r2TMLE e2HOIF HAL plug-in HAL-1TMLE
+
+Figure 1: Root-n scaled bias for BV0 settings. Settings 1-2: bounded sectional variation with small and large constant variation; Setting 3: increasing sectional variation K(n) ≍ n1/9. Nuisance rates are controlled to n−1/6 except for 0HAL-1TMLE which uses standard (0-order) HAL initial estimation. Although undersmoothing theoretically reduces the regularization bias term En, the empirical 2TMLE already achieves sufficient control in Settings 1-5, both asymptotically and in finite samples. Therefore, the practical gain from undersmoothing is relatively limited in these scenarios. This demonstrates that the empirical 2TMLE without further undersmoothing may already achieve sufficient regularization bias control in a broad range of nonparametric settings. The empirical performance of e2HOIF is substantially less stable. Despite the asymptotic analysis, the finite-sample implementation exhibits dedicate bias-variance trade-off, even when Gram matrix inversion remains numerically stable. The performance may be additionally affected by the discontinuity points that are particularly challenging for global Fourier representations. The theoretical rates such as k ≍ n5/6/(log n)2 are difficult to implement in practice at moderate sample sizes. Practical tuning must simultaneously balance approximation error, prediction performance, and numerical stability of Gram matrix inversion. These preliminary findings suggest that e2HOIF may require substantially more careful basis selection and optimal-rate-aware tuning than the corresponding HAL-based second-order TMLE estimators. 
+
+# 6 Discussion 
+
+In this manuscript, we investigate higher-order estimation constructed based on formal second-order canonical gradients or HAL-based fluctuation parameters. These estimators achieve higher-order residual performance provided proper approximation error control, under related but different non-parametric settings. In addition, we note that all these estimators can be considered estimators of 16 Setting 4 Setting 5                     
+
+> 200 400 800 1600 3200 6400 12800 25600 200 400 800 1600 3200 6400 12800 25600 0.0 0.2 0.4 0.6 0.0 0.2 0.4 0.6 Sample size n bias 1TMLE e2TMLE r2TMLE e2HOIF HAL plug-in HAL-1TMLE
+
+Figure 2: Root-n scaled bias for BV1 settings. Settings 4-5: increasing first-order sectional vari-ation with derivative variation K(n) ≍ n3/20 and K(n) ≍ n7/30 , respectively. Nuisance rates are controlled to n−1/6 except for 1HAL-1TMLE which uses first-order spline HAL as initial estimation. approximate parameters, defined by basis projection, kernel smoothing, or HAL-based fluctuation. Under realistic nonparametric settings motivated by complexity and oscillation control through sectional variation, we provide numerical results that empirical second-order estimation can provide meaningful gains not only asymptotically but also in practically relevant finite-sample scenarios. When nuisance estimators converge slowly, the HAL-based second-order TMLE exhibits stable finite-sample improvement over first-order estimators, even under increasing variation and increas-ing oscillation that deteriorate typical HAL rates. This provides empirical evidence of reliable higher-order residual control and relatively robust performance under different tuning choices. In practice, second-order TMLE may be particularly attractive when flexible nuisance estimators con-verge slowly, or when large or increasing complexity constants leave persistent finite-sample bias by first-order estimation. Our analysis highlights a key conceptual distinction between different higher-order construc-tions. One challenge arises from lack of second-order pathwise differentiability, which itself requires approximation precision of order oP (n−1) along regular parametric paths. Approximately achiev-ing such precision in large nonparametric models may still be difficult; this partially explains the challenges of HOIF-based estimators in finite samples, despite potentially greater asymptotic gains under corresponding regularity conditions. A different challenge arises from lack of first-order pathwise differentiability of an auxiliary fluctuation parameter, where only oP (n−1/2) precision is required. Although both constructions lead to additional approximation errors, the resulting prac-17 tical finite-sample performance may differ substantially. In particular, HAL-based second-order construction addressing the latter difficulty may remain considerably more stable in finite samples while achieving weaker asymptotic guarantees under certain settings. The results also empha-size that asymptotic optimality alone may provide insufficient guidance in realistic finite-sample scenarios for higher-order estimators. An important aspect underlying this stability is the score-equation-solving property of HAL-based estimation. HAL solves increasingly rich collections of empirical score equations as the number of active basis grows. This property explains the regularization term control already achieved in empirical 2TMLE, as well as the potential rate improvement through undersmoothing. In the meantime, explicit second-order targeting separates approximation from nuisance estimates, avoiding potentially unnecessary variance inflation in aggressive undersmoothing. Compared with plug-in estimation solely based on HAL nuisance estimators, the numerical results highlight that explicitly separating nuisance estimation from higher-order construction can provide practical finite-sample advantages, even when asymptotic improvements are not expected, whereas asymptotic rate improvement appears possible with increasing oscillation such as Setting 5. The plug-in property of TMLE may be particularly valuable in higher-order estimation. While plug-in estimation is considered a desirable but usually secondary property in first-order semi-parametric estimation, it becomes substantially more important when more aggressive debiasing introduces dedicate bias-variance trade-off. By respecting global parameter constraints throughout the first- and second-order targeted updates, the substitution structure of TMLE may partially explain the observed relatively robust finite-sample performance. Several limitations and open challenges remain. This work does not systematically investigate positivity challenges that may further affect stability of second-order estimation through increas-ing instability in clever covariates and canonical gradients. This is particularly important because higher-order covariates can involve more inverse weighting than first-order influence curves, and finite-sample stability is necessary for visible asymptotic gains. Understanding behavior and possi-ble remedies under practical positivity violations warrants an important direction of future work. Dimensionality presents practical or theoretical challenges for HAL-based or HOIF-based con-structions. Randomized and data-adaptive basis generation may provide favorable computational advantage while largely preserving approximation properties. How different basis growth strategies interact with residual and approximation error controls remains unexplored with the present work. Computational scalability for higher-order estimators remains an important open challenge under high-dimension input with deep interactions. The results suggest that classical H¨ older conditions and Jackson-type minimax rates may not fully utilize realistic complexity assumptions. They may also be affected by discontinuities or other local irregularities, where some basis systems are more sensitive than others. These observations suggest that basis selection remains a practical challenge despite identical minimax rates under ideal conditions, in addition to other critical aspects of bias-variance tuning. One possible direction is combining Lepski’s method with cross-validation based tuning and basis selection, with respect to a sequence of fluctuation parameters with decreasing oracle bias. Such procedures would still require simultaneous optimization of approximation precision and Gram matrix stability, which remains challenging. Lastly, the basis representation underlying both empirical second-order HOIF and HAL-based second-order TMLE suggests higher-than-second-order potential that is not fully investigated in this manuscript. Basis representations of fluctuation parameters may substantially simplify the derivation of subsequent canonical gradients, enabling the possibility of partially automated higher-order estimation for maximal asymptotic and finite-sample gains. Such computational approaches may achieve significant practical impact beyond analytically tractable settings. 18 A Data Generating Process Details 
+
+We generate i.i.d. copies of O = ( X, A, Y ) with covariate X ∈ [0 , 1] 4, binary treatment A, and binary outcome Y .The covariates X are generated from a rough marginal density using D12/db6 Daubechies wavelet basis with H¨ older coefficient βf = 0 .1, with the same Baker-type dependence structure, following Liu et al. (2026). This is for better comparison across methods and to stress test empirical estimator performance. Specifically, 
+
+fX (t) ∝ 1 + exp 
+
+
+
+12
+
+X
+
+> j∈J
+
+X
+
+> ℓ
+
+2−j(βf +1 /2) ωjℓ (t)
+
+, 0 ≤ t ≤ 1.
+
+Here, ωjℓ denotes the D12/db6 Daubechies wavelet at resolution j and location ℓ. In the implemen-tation we set J = 0 , 3 and the density is normalized numerically. waveslim R package (Whitcher and Whitcher, 2020) is used for wavelet evaluations. For Baker-type dependence construction, a pair of independent covariate vectors are generated, and randomly selected coordinate-wise maxima or minima are used as the observation. True outcome regression b0(x) = E[Y |A = 1 , X = x] and propensity score g0(x) = P (A =1|X = x) are generated with logits ηb, η g. We scale probability values to [0 .25 , 0.75] to ensure positivity. 
+
+b0(x) = 0 .25 + 0 .50 · expit {ηb(x)},g0(x) = 0 .25 + 0 .50 · expit {ηg(x)}.
+
+A.1 Settings 1-3 
+
+In Setting 1-3, we set 
+
+ηb(x) = 
+
+> 4
+
+X
+
+> j=1
+
+{cb(xj ; a, κ ) + 0 .1ζbj h0.25 (xj )} ,ηg(x) = 
+
+> 4
+
+X
+
+> j=1
+
+{cg(xj ; a, κ ) + 0 .1ζgj h0.25 (xj )} .
+
+The mixture component (with wavelets and H¨ older coefficient 0.25, weighted by 0.1) use the design of Appendix E in Liu et al. (2026) with coefficients 
+
+ζb = ( −0.2819 , 0.4876 , −0.1515 , −0.1190) ,ζg = (0 .09789 , 0.08800 , −0.4823 , 0.4588) .
+
+In addition, cb, c g are c` adl` ag functions piecewise smooth on five sections. We set 
+
+cb(t; a, κ ) = αr + a · sr(t; κ),cg(t; a, κ ) = δr + a · ur(t; κ),
+
+19 for t ∈ Ir, I r = [0 .2( r − 1) , 0.2r), r = 1 , . . . , 5. For outcome regression, 
+
+r αr sr(t; κ)1 −0.05 0.50 sin {2κπ (t + 1 .0) + 0 .2} + 0 .20 cos {3κπ (t + 1 .0) − 0.1}
+
+2 0.30 0.55 sin {3κπ (t + 0 .6) + 0 .3} − 0.22 cos {2κπ (t + 0 .6) + 0 .4}
+
+3 0.55 0.60 sin {2κπt + 0 .15 } − 0.28 cos {4κπt − 0.2}
+
+4 0.25 0.50 sin {3κπ (t − 0.2) + 0 .5} + 0 .18 cos {2κπ (t − 0.2) + 0 .3}
+
+5 −0.10 0.40 sin {2κπ (t − 0.6) + 0 .4} − 0.15 cos {3κπ (t − 0.6) − 0.2}
+
+Similarly, for propensity scores, 
+
+r δr ur(t; κ)1 −0.90 0.35 sin {2κπ (t + 1 .0) } − 0.20 cos {3κπ (t + 1 .0) }
+
+2 −0.55 0.45 sin {3κπ (t + 0 .6) } + 0 .18 cos {2κπ (t + 0 .6) }
+
+3 −0.25 0.55 sin {2κπt } − 0.22 cos {4κπt }
+
+4 −0.45 0.40 sin {3κπ (t − 0.2) } − 0.20 cos {2κπ (t − 0.2) }
+
+5 −0.75 0.30 sin {2κπ (t − 0.6) } + 0 .15 cos {3κπ (t − 0.6) }
+
+The amplitude parameter a and frequency parameter κ are set as (a, κ ) = 
+
+
+
+(1 , 3) , Setting 1 ,
+
+(3 , 10) , Setting 2 ,
+
+(1 , 10( n 
+
+> 200
+
+)2/9), Setting 3 .
+
+A.2 Settings 4-5 
+
+Settings 4-5 use the integrated version of the sectional functions above to control the variation of the first-order derivatives. The derivative sectional variation norms increase at rate n3/20 or n7/30 .Specifically, 
+
+Cb(t; a, κ ) = 
+
+Z t
+
+> 0
+
+cb(u; a, κ ), du, ηb(x) = ηg(x) = 
+
+> 4
+
+X
+
+> j=1
+
+Cb(xj ; a, κ ) + I(x1 > 0.5) + sin( πx 2).
+
+The amplitude parameter a and frequency parameter κ are set as (a, κ ) = 
+
+
+
+100   n
+
+> 200
+
+3/40 , 5   n
+
+> 200
+
+3/40 
+
+, Setting 4 ,
+
+
+
+100   n
+
+> 200
+
+7/60 , 5   n
+
+> 200
+
+7/60 
+
+, Setting 5 .
+
+20 References 
+
+D. Benkeser and M.J. van der Laan. The highly adaptive lasso estimator. Proceedings of the IEEE Conference on Data Science and Advanced Analytics , 2016. To appear. A. Bibaut and M.J. van der Laan. Fast rates for empirical risk minimization over cadlag functions with bounded sectional variation norm. Technical report, Division of Biostatistics, University of California, Berkeley, 2019. P.J. Bickel, C.A.J. Klaassen, Y. Ritov, and J.A. Wellner. Efficient and adaptive estimation for semiparametric models . Springer, 1997. M. Carone, I. Diaz, and M.J. van der Laan. Higher order targeted loss-based estimation. In M.J. van der Laan and S. Rose, Targeted Learning in Data Science:Causal Inference for complex longitudinal studies , chapter 26, page Tbt. Springer, New York, 2017. Jeremy Coyle, Nima Hejazi, Ivana Malenica, Rachael Phillips, and Oleg Sofrygin. sl3: Pipelines for Machine Learning and Super Learning , 2023. URL https://github.com/tlverse/sl3 . R package version 1.4.5. Lin Liu, Rajarshi Mukherjee, Whitney K. Newey, and James M. Robins. Semi-parametric efficient empirical higher order influence function estimators, 2026. URL 
+
+https://arxiv.org/abs/1705.07577 .Eric Polley, Erin LeDell, Chris Kennedy, and Mark van der Laan. SuperLearner: Super Learner Prediction , 2025. URL https://github.com/ecpolley/superlearner . R package version 2.0-40. James M. Robins and Andrea Rotnitzky. Recovery of information and ad-justment for dependent censoring using surrogate markers. 1992. URL 
+
+https://api.semanticscholar.org/CorpusID:115555208 .J.M. Robins, L. Li, E. Tchetgen Tchetgen, and A.W. van der Vaart. Higher order influence functions and minimax estimation of nonlinear functionals. In Probability and Statistics: Essays in Honor of David A. Freedman , pages 335–421. Institute of Mathematical Statistics, 2008. Mark van der Laan, Zeyi Wang, and Lars van der Laan. Higher order targeted maximum likelihood estimation, 2021. URL https://arxiv.org/abs/2101.06290 .Mark J van der Laan, Eric C Polley, and Alan E Hubbard. Super learner. Statistical applications in genetics and molecular biology , 6(1), 2007. M.J. van der Laan. A generally efficient targeted minimum loss-based estimator. Technical Report 300, UC Berkeley, 2015. http://biostats.bepress.com/ucbbiostat/paper343. M.J. van der Laan. A generally efficient targeted minimum loss based estimator. International Journal of Biostatistics , pages 1106–1118, 2017. M.J. van der Laan and S. Rose. Targeted Learning: Causal Inference for Observational and Exper-imental Data . Springer, Berlin Heidelberg New York, 2011. M.J. van der Laan and S. Rose. Targeted Learning in Data Science: Causal Inference for Complex Longitudinal Studies . Springer, Berlin Heidelberg New York, 2018. 21 M.J. van der Laan and Daniel B. Rubin. Targeted maximum likelihood learning. Int J Biostat , 2 (1):Article 11, 2006. A. W. van der Vaart. Asymptotic Statistics . Cambridge Series in Statistical and Probabilistic Mathematics. Cambridge University Press, 1998. Zeyi Wang, Wenxin Zhang, Brian S Caffo, Martin Lindquist, and Mark van der Laan. Super ensem-ble learning using the highly-adaptive-lasso, 2025. URL https://arxiv.org/abs/2312.16953 .Brandon Whitcher and Maintainer Brandon Whitcher. Package ‘waveslim’, 2020. 22

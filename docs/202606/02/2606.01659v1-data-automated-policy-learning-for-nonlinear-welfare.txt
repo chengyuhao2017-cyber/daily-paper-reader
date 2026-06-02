@@ -1,0 +1,7517 @@
+Title: Data-Automated Policy Learning for Nonlinear Welfare
+
+URL Source: https://arxiv.org/pdf/2606.01659v1
+
+Published Time: Tue, 02 Jun 2026 02:02:14 GMT
+
+Number of Pages: 81
+
+Markdown Content:
+# Data-Automated Policy Learning for Nonlinear Welfare 
+
+## Chunrong Ai a* Zeqi Wu b† Zheng Zhang b‡  
+
+> a
+
+School of Management and Economics, The Chinese University of Hong Kong, Shenzhen  
+
+> b
+
+Institute of Statistics and Big Data, Renmin University of China 
+
+Abstract 
+
+This paper explores policy learning from observational data, focusing on a nonlinear welfare criterion in a binary treatment setting. The nonlinear criterion is inspired by scenarios where policymakers prioritize specific population segments. We model this criterion using a utility function that encompasses potential outcomes and intermediate parameters, with the latter capturing higher moments of the outcome distributions. When formulated in the context of observational data, both the intermediate param-eters and the welfare criterion depend on the propensity score, which we estimate using machine-learning techniques. To address bias in machine learning estimates, we introduce a novel reweighting-based debiasing approach that offers a promising alternative to traditional orthogonality-based methods. To tackle the complexities of infinite-dimensional policy spaces, we employ sieve approximations and K-fold cross-validation for model selection, thereby fully automating the policy-learning process. Despite these complexities, we demonstrate that both the welfare regret and the average welfare regret of our proposed policy learning method satisfy an oracle inequality, thereby providing theoretical guarantees on the performance of the estimated policy relative to the best possible policy. This finding extends the existing results from linear to nonlinear welfare criteria, from finite-dimensional to infinite-dimensional policy spaces, and from a known propensity score to a machine-learned one. 
+
+Keywords: Policy Learning; Oracle Inequality; Sieve Approximation; Machine Learning; Welfare Criterion 
+
+> *
+
+Email: chunrongai@cuhk.edu.cn .
+
+> †
+
+Email: wuzeqi@ruc.edu.cn .
+
+> ‡
+
+Email: zhengzhang@ruc.edu.cn .
+
+1
+
+> arXiv:2606.01659v1 [econ.EM] 1 Jun 2026
+
+# 1 Introduction 
+
+There is an increasing body of literature on policy learning. Most existing studies focus on a linear welfare criterion and a binary treatment setting. In this context, the binary variable T indicates program participation status: T = 1 if the individual participates and 
+
+T = 0 if not. The potential outcome associated with participation status t is represented as Y ∗(t) ∈ Y ⊂ R, and X ∈ X ⊂ Rd denotes individual characteristics. A policy 
+
+π : X → { 0, 1} decides whether to assign an individual with attributes X to the program. The potential outcome under the policy is given by: 
+
+Y ∗(π(X)) = π(X)Y ∗(1) + (1 − π(X)) Y ∗(0) .
+
+Policymakers specify a welfare criterion W (π) and a policy space Π∞, aiming to learn the optimal policy defined by 
+
+π∗ = arg max 
+
+> π∈Π∞
+
+W (π).
+
+A common choice for the welfare is the expectation of the potential outcome: 
+
+W (π) = E[Y ∗(π(X))] = E[π(X)Y ∗(1) + (1 − π(X)) Y ∗(0)] ,
+
+which is clearly linear with respect to the policy. A risk-averse policymaker might prefer to utilize the average utility of potential outcomes, represented as 
+
+W (π) = E[U (Y ∗(π(X)))] = E[π(X)U (Y ∗(1)) + (1 − π(X)) U (Y ∗(0))] .
+
+However, this extension is only superficial: redefining the potential outcome as U (Y ∗(t)) 
+
+demonstrates that the resulting welfare remains linear in policy. By contrast, many significant applications lead to welfare criteria that are genuinely nonlinear in policy. For instance, in income-inequality literature, policymakers aim to reduce disparities through targeted interventions, and the welfare criterion is often a measure of inequality, such as the Gini 2coefficient (Gastwirth, 1971, 1972): 
+
+W (π) = −2M −1 PMr=1 αrβ∗(π; αr)
+
+E[Y ∗(π(X))] + 1 , αr = rM + 1 ,
+
+where M is a finite positive integer and β∗(π; α) denotes the α-quantile of Y ∗(π(X)) .Since quantiles are nonlinear in relation to policy choices, the welfare criterion is likewise nonlinear. Nonlinearity also appears in alternative inequality measures, such as the relative standing of specific population segments: 
+
+W (π) = E [Y ∗(π(X)) | Y ∗(π(X)) ≤ β∗(π; 0 .5)] 
+
+E [Y ∗(π(X))] ,
+
+or the relative status of a defined subpopulation: 
+
+W (π) = E [Y ∗(π(X))1( gender = “female” )] 
+
+E [Y ∗(π(X))] ,
+
+and in the analysis of upper-tail (90/50) and lower-tail (50/10) ratios (Autor et al., 2008): 
+
+W (π) = −β∗(π; 0 .9) 
+
+β∗(π; 0 .5) and W (π) = −β∗(π; 0 .5) 
+
+β∗(π; 0 .1) .
+
+Nonlinear welfare criteria naturally arise in the fields of risk management and public health. In risk management, firms aim to control the risk of significant losses. Let the binary variable T ∈ { 0, 1} represent an investment decision, where T = 1 indicates a one-period investment in the asset and T = 0 indicates no investment. Let Y ∗(1) denote the corresponding one-period payoff (or return), while we set Y ∗(0) = 0 . Given characteristics 
+
+X (e.g., volatility, momentum, or fundamentals), an investment strategy π : X → { 0, 1}
+
+induces the realized payoff: 
+
+Y ∗(π(X)) = π(X)Y ∗(1) + (1 − π(X)) Y ∗(0) = π(X)Y ∗(1) .
+
+We denote L∗(π) = −Y ∗(π(X)) and let β∗(π; α) represent the α-quantile of L∗(π). The welfare criterion can be expressed as a measure of risk, such as Value-at-Risk (VaR), defined as W (π) = −β∗(π; α), or Conditional Value-at-Risk (CVaR), given by W (π) = 
+
+3−(1 −α)−1E[L∗(π) · 1( L∗(π) ≥ β∗(π; α))] (Rockafellar and Uryasev, 2000), or the spectral risk measure (e.g., Acerbi, 2002): 
+
+W (π) = −
+
+> M
+
+X
+
+> r=1
+
+ϕ(αr)β∗(π; αr), αr = rM + 1 ,
+
+with a weighting function ϕ(α) (see Dowd and Blake, 2006). All of these risk measures are nonlinear in relation to policy. In public health, policymakers aim to reduce the incidence of severe post-discharge uti-lization through targeted programs. For example, in the United States, Medicare’s Hospital Readmissions Reduction Program (HRRP) specifically targets 30-day unplanned readmis-sions by penalizing hospitals with higher-than-average readmission rates (Khera et al., 2018, Ryan et al., 2017, Zuckerman et al., 2016). Research shows that readmission-related utiliza-tion is highly right-skewed: a small fraction of patients accounts for a disproportionate share of readmissions and hospital use (Fouayzi and Ash, 2022, Manning et al., 2005). These distributional features motivate policymakers to prioritize the upper tail of the outcome distribution rather than focusing solely on the average. In this context, let T represent the intensity of post-discharge care for a patient, where T = 1 indicates enhanced transitional care (e.g., intensive monitoring and follow-up) and T = 0 signifies usual care. The variable 
+
+Y ∗(t) ≥ 0 reflects the readmission burden under treatment t, such as the total number of inpatient days due to unplanned readmissions within 30 days post-discharge, with lower values being more desirable. Given patient covariates X (e.g., age, gender, BMI, and comorbidity indices), a policy π : X → { 0, 1} assigns care intensity and determines the burden Y ∗(π(X)) . The welfare criterion being considered is a tail-sensitive measure of the expected burden among the worst-off (1 − α) fraction of patients: 
+
+W (π) = − 11 − α E[Y ∗(π(X)) · 1{Y ∗(π(X)) ≥ β∗(π; α)}] ,
+
+where β∗(π; α) denotes the α-quantile of Y ∗(π(X)) and is nonlinear in relation to the policy. All the aforementioned examples emphasize the need for a nonlinear welfare criterion that directly depends on the policy through potential outcomes and indirectly through intermediate parameters β∗(π) (such as the quantiles mentioned earlier). Specifically, we 4model this with: 
+
+W (π) = E [U (Y ∗(π(X)) , X, β∗(π))] , (1.1) where U (·, ·, ·) is a known utility function. The policy space can be complex and infinite-dimensional, making the optimal policy 
+
+π∗ challenging to compute. To overcome this issue, we leverage the sieve literature to approximate the policy space using a sequence of finite-dimensional sieve classes {Πℓ : ℓ =1, 2, . . . }. Within each class, we determine the best policy as 
+
+π∗ 
+
+> ℓ
+
+= arg max 
+
+> π∈Πℓ
+
+W (π).
+
+Since the welfare criterion is unknown, we estimate it from a training sample, say I, by 
+
+cWI (π) and find the best policy using: 
+
+bπℓ,I = arg max 
+
+> π∈Πℓ
+
+cWI (π).
+
+We then apply K-fold cross-validation to select the optimal policy approximation space 
+
+Πbℓ (see (2.2)) and subsequently estimate the optimal policy as bπ (see (2.3)). Despite these extensions, we establish the following oracle inequality for the average welfare regret: 
+
+E [W (π∗) − W (bπ)] 
+
+≤ inf 
+
+> ℓ=1 ,2,...
+
+
+
+W (π∗) − max 
+
+> π∈Πℓ
+
+W (π)
+
+| {z }
+
+> approximation error
+
++ max 
+
+> π∈Πℓ
+
+W (π) − E [W (bπℓ,I )] 
+
+| {z }
+
+> estimation error
+
++log ℓ
+
+√N
+
+
+
++
+
+r CN . (1.2) 
+
+Related Literature. Our work builds on the policy-learning literature initially developed by Manski (2004). A significant portion of this literature examines treatment choices under linear welfare criteria, in which an average or utilitarian objective defines the policy value. Early contributions to this field include studies by Bhattacharya and Dupas (2012), Hirano and Porter (2009), Qian and Murphy (2011), Stoye (2009, 2012), Tetenov (2012), Zhao et al. (2012), and more recent works by Athey and Wager (2021), Crippa (2025), Fang et al. (2025a,b), Kitagawa and Tetenov (2018), Liu et al. (2025), Luedtke and van der Laan (2016), 5Mbakop and Tabord-Meehan (2021). With the exception of Mbakop and Tabord-Meehan (2021), all these studies assume a finite-dimensional policy space (e.g., Π∞ = Π ℓ with ℓ
+
+fixed or allowed to grow with sample size), which allows them to avoid the complexities of policy-space approximation and data-driven model selection. They either assume a known propensity score or estimate it using machine-learning methods, then apply double debiasing to remove the machine-learning bias. In both cases, they ultimately establish an explicit upper bound on the welfare regret: 
+
+E [W (π∗) − W (bπℓ,I )] ≤ C
+
+rVC(Π ℓ)
+
+N , (1.3) where VC(Π ℓ) represents the Vapnik-Chervonenkis (VC) dimension of the policy class. In contrast, Mbakop and Tabord-Meehan (2021) addresses an infinite-dimensional policy space with a known propensity score, thus avoiding the need for debiasing. They present an upper bound on the average welfare regret that is similar to ours, though still under a linear welfare criterion. Our contribution extends this literature to encompass a nonlinear welfare criterion, a machine-learned propensity score, and an infinite-dimensional policy space. A smaller body of literature explores policy learning for nonlinear welfare criteria within a finite-dimensional policy class, where the dimension may increase with sample size (that is, Π∞ = Π ℓ, with ℓ allowed to grow with sample size). Notable examples include Wang et al. (2018) on quantile-optimal treatment regimes, Chen et al. (2025) addressing a quantile-based welfare criterion with an unmeasured confounder, Fan et al. (2025) focusing on a conditional value-at-risk criterion, Kitagawa and Tetenov (2021) discussing an equality-minded social welfare criterion, and Terschuur (2025) examining nonlinear welfare criteria defined through U-statistics. These studies assume a finite-dimensional policy space, treat the propensity score as either known or derived via machine learning, and employ double-debiasing techniques to mitigate machine-learning bias. Despite the nonlinearity, they manage to derive a similar, explicit upper bound on the average welfare regret, akin to the upper bound mentioned in equation (1.3). We aim to extend this existing literature to encompass infinite-dimensional policy spaces. To learn the optimal policy from observational data, it is essential to estimate both the intermediate parameters and the welfare criterion. Since both estimates rely on the unknown propensity score, we use machine-learning algorithms to estimate it. It is well recognized 6that machine-learned propensity scores introduce bias in both the intermediate parameter and the welfare-criterion estimates, which in turn affects the (average) welfare regret and slows its convergence rate. To correct for this machine-learning bias, existing literature applies double-debiasing procedures based on a Neyman orthogonality condition (see Athey and Wager (2021), Chernozhukov et al. (2018), Robins et al. (1994) for linear welfare criteria and Fan et al. (2025), Terschuur (2025) for nonlinear criteria). Our procedure includes an additional step, estimating the intermediate parameters, so we need to debias both these parameters and the welfare criterion estimates simultaneously. We propose a reweighting method inspired by covariate-balancing approaches (Ai et al., 2021, Chan et al., 2016, Imai and Ratkovic, 2014), adapted here for bias correction. Covariate-balancing methods have shown strong performance in finite samples, and we expect our debiasing procedure to exhibit similar effectiveness. To our knowledge, this reweighting-based debiasing technique is novel in the literature and serves as a valuable alternative to double debiasing based on Neyman orthogonality. The remainder of the paper is organized as follows. Section 2 presents a data-automated optimal policy learning procedure that employs a generic welfare estimate alongside K-fold cross-validation to identify the best policy subclass, while establishing an oracle inequality for both the average welfare regret and the welfare regret. Section 3 formally defines the model, expressing the unknown parameters and the welfare criterion in terms of the observed data, based on the assumptions of unconfoundedness and overlap. Section 4 introduces a machine-learning propensity-score estimator, along with a novel reweighting debiasing procedure for estimating the intermediate parameters and the welfare criterion. Section 5 verifies that the proposed estimator for the welfare criterion meets the high-level conditions outlined in Section 2. Section 6 applies the proposed methodology to data from the National Job Training Partnership Act (JTPA) Study. Finally, Section 7 summarizes the findings. All omitted proofs are included in the Appendix. 
+
+# 2 A Data-Automated Learning Procedure 
+
+We will outline a data-driven policy-learning procedure that relies on a generic welfare estimator and cross-validation. Let {(Yi, Xi, T i)}Ni=1 represent an independent and identi-cally distributed (i.i.d.) sample. Throughout the paper, we use I ⊂ { 1, 2, . . . , N } to index 7a generic training subsample and |I| to denote its sample size. Let cWI (π) be a generic estimator of W (π) calculated from the training subsample {(Yi, Xi, T i)}i∈I . We assume that cWI (π) is pointwise p|I|-consistent for W (π) and that its estimation error satisfies an exponential probability bound, as formalized in Assumption 2.1. 
+
+Assumption 2.1. For a fixed policy π ∈ Π∞, there exist finite constants C1, . . . , C 4 > 0,independent of δ, I, and π, such that the following inequality holds for all δ > 0 and 
+
+|I| > C 4:
+
+P cWI (π) − W (π) ≥ δ + C1
+
+p|I|
+
+!
+
+≤ C2 exp( −C3 |I| δ2).
+
+In applications, users must verify that their welfare estimators satisfy this high-level condition. We will present a welfare estimator and confirm that it indeed satisfies Assump-tion 2.1. With cWI (π) established, a natural policy learning strategy is to maximize it over Π∞.However, for an infinite-dimensional Π∞, such a strategy can be computationally intractable and prone to overfitting. Following the work of Mbakop and Tabord-Meehan (2021), we approximate Π∞ by a nested sequence of finite-dimensional policy subclasses Πℓ ⊂ Πℓ+1 ⊂· · · ⊂ Π∞.1 Within each subclass Πℓ, we estimate the best policy by 
+
+bπℓ,I := arg max 
+
+> π∈Πℓ
+
+cWI (π). (2.1) We determine the best subclass using a K-fold cross-validation (CV) procedure, as outlined in various studies (Hall (1983), Stone (1974), Lecu ´e and Mitchell (2012), and Gy ¨orfi et al. (2002)). Specifically, for a fixed integer K ≥ 2, we partition the index set {1, . . . , N }
+
+into K disjoint folds of equal size. For each pair (k, ℓ ), let Ik denote the kth fold and 
+
+I−k = {1, . . . , N } \ Ik its complement. We utilize the training subsample I−k to learn the welfare cWI−k (π) and the candidate policy bπℓ,I −k . The holdout sample Ik is then used to compute cWIk (π) and to evaluate the performance of the candidate policy on the holdout sample using cWIk (bπℓ,I −k ). The K-fold CV procedure selects the best subclass according to                   
+
+> 1Throughout the paper, we take this approximating sequence to satisfy VC(Π ℓ)<∞for every ℓ≥1and
+> W(π∗)−max π∈ΠℓW(π)→0as ℓ→ ∞ .
+
+8the formula: 
+
+bℓ = arg max 
+
+> ℓ=1 ,2,...
+
+(
+
+1
+
+K
+
+> K
+
+X
+
+> k=1
+
+cWIk (bπℓ,I −k ) − log ℓ
+
+√N
+
+)
+
+, (2.2) where the penalty term log ℓ/ √N helps to prevent the selection of very large policy classes. The identified policy is then defined as: 
+
+bπ := bπbℓ,I −bk
+
+, where bk := arg max 
+
+> 1≤k≤K
+
+cWIk (bπbℓ,I −k ). (2.3) The following theorem establishes the oracle inequality (1.2) with I = I−k for any k.
+
+Theorem 2.1. Assuming that the conditions outlined in Assumption 2.1 hold and that C > 0
+
+is a finite constant, the learned optimal policy bπ defined in (2.3) satisfies the oracle inequality (1.2) for sufficiently large N .
+
+Remark 2.1. The study by Mbakop and Tabord-Meehan (2021) utilized a single holdout sample to identify the best policy class, which introduces randomness due to relying on that single sample. The K-fold cross-validation (CV) procedure mitigates this randomness by averaging over multiple holdout samples. 
+
+Remark 2.2. The penalty term “ log ℓ/ √N ” in (2.2) serves as a regularizer that prevents the selection of very large policy classes (as noted in Mbakop and Tabord-Meehan (2021)). This term can be omitted when the number of candidate subclasses is finite and may even increase with N . For example, one might use the following equations: 
+
+bℓ := arg max 
+
+> ℓ=1 ,...,L N
+> K
+
+X
+
+> k=1
+
+cWIk (bπℓ,I −k ) and bk := arg max 
+
+> 1≤k≤K
+
+cWIk (bπbℓ,I −k )
+
+where LN ≥ 2 is a sequence of positive integers. In this scenario, the learned optimal policy 
+
+bπ fulfills the condition: 
+
+E [W (π∗) − W (bπ)] 
+
+≤ inf 
+
+> ℓ=1 ,...,L N
+
+(
+
+W (π∗) − max 
+
+> π∈Πℓ
+
+W (π)
+
+| {z }
+
+> approximation error
+
++ max 
+
+> π∈Πℓ
+
+W (π) − E W (bπℓ,I −1 )| {z }
+
+> estimation error
+
+)
+
++ C
+
+rlog LN
+
+N
+
+9for sufficiently large N ; the proof is given in Appendix D. The bound compares this policy with the best tradeoff among the first LN policy classes, but it may not necessarily be the best overall. 
+
+Remark 2.3. Once the best subclass Πbℓ has been selected, it is tempting to re-learn the policy using the full sample by maximizing cW{1,...,N }(π) over π ∈ Πbℓ. However, without additional stability-type conditions, as discussed in (Bousquet and Elisseeff, 2002), this learned policy may not satisfy the oracle inequality (1.2), because the policy selected from a subsample might not be the best after retraining on the full sample, as noted by (Lecu ´e and Mitchell, 2012, Example 2.8). The theorem generalizes the oracle inequality by providing a bound on the average welfare regret E[W (π∗) − W (bπ)] . In practice, policymakers can only access a single sample, and are more concerned with the realized welfare regret W (π∗) − W (bπ). We show that a similar oracle inequality holds with high probability. 
+
+Corollary 2.1. Suppose Assumption 2.1 holds. Let C, C ′, C 1, C 2 > 0 be finite constants. The learned policy bπ, defined in (2.3) satisfies the inequality: 
+
+W (π∗) − W (bπ)
+
+≤ inf 
+
+> ℓ=1 ,2,...
+
+
+
+W (π∗) − max 
+
+> π∈Πℓ
+
+W (π)
+
+| {z }
+
+> approximation error
+
++ max 
+
+> π∈Πℓ
+
+W (π) − 1
+
+K
+
+> K
+
+X
+
+> k=1
+
+W (bπℓ,I −k )
+
+| {z }
+
+> estimation error
+
++2 log ℓ
+
+√N
+
+
+
++
+
+rC + δN .
+
+This holds with a probability of at least 1 − C1 exp( −C2δ) for all δ > 0 and sufficiently large N .
+
+Corollary 2.1 establishes a probability oracle inequality. The constant “2” in front of 
+
+log ℓ/ √N arises from a union bound used to control the concentration of 1
+
+> K
+
+PKk=1 cWIk (bπℓ,I −k )
+
+around 1
+
+> K
+
+PKk=1 W (bπℓ,I −k ). This constant can be replaced with any value greater than 1,with corresponding adjustments to C, C 1, C 2.The oracle inequality provides insights into the quality of the learned policy only when both the approximation and estimation errors are minimal. We can quantify the estimation error under a strengthened Assumption 2.1. 10 Assumption 2.2. For the training sample I and a subclass of policies Π ⊂ Π∞ with VC dimension satisfying VC(Π) /|I| → 0, we can assume that: 
+
+P sup 
+
+> π∈Π
+
+cWI (π) − W (π) ≥ δ + C1
+
+s
+
+VC(Π) 
+
+|I|
+
+!
+
+≤ C2 exp( −C3 |I| δ2)
+
+holds for all δ > 0 and |I| > C 4, where C1, . . . , C 4 > 0 are finite constants independent of 
+
+δ, I, and Π.
+
+Assumption 2.2 imposes a uniform convergence rate on the welfare estimator. It allows the VC dimension of the policy class, Π, to increase with the sample size at a rate that is slower than the sample size itself: VC(Π) /|I| → 0. This rate condition aligns, up to logarithmic factors, with the minimax rate for policy learning under linear welfare criteria (Athey and Wager, 2021, Kitagawa and Tetenov, 2018). Under this strengthened assumption, we derive an upper bound on the estimation error. 
+
+Corollary 2.2. Suppose Assumption 2.2 holds. Then there exist finite constants C, C ′ > 0
+
+such that the learned policy bπ defined in (2.3) satisfies, for sufficiently large N ,
+
+E [W (π∗) − W (bπ)] 
+
+≤ inf 
+
+> ℓ=1 ,2,...
+
+
+
+W (π∗) − max 
+
+> π∈Πℓ
+
+W (π)
+
+| {z }
+
+> approximation error
+
++C′
+
+r KK − 1
+
+rVC(Π ℓ)
+
+N + log ℓ
+
+√N
+
+
+
++
+
+r CN .
+
+To quantify the approximation error, however, we need to gather information about the policy space and its approximation. For illustrative purposes, we will compute the approximation error for three common policy classes and their approximations. Throughout this process, we will maintain the following Lipschitz condition on W (π).
+
+Assumption 2.3. There exists a finite constant CW > 0 such that for any two policies 
+
+π1, π 2 ∈ Π∞, |W (π1) − W (π2)| ≤ CW P (π1(X)̸ = π2(X)) .
+
+Example 2.1 (Monotone policies) . In practice, shape restrictions on the policy class Π∞ cap-ture constraints implied by economic theory or fairness considerations. A canonical example of this is monotonicity. After normalizing the supports, let Xi = ( Xi1, X i2)⊤ ∈ [0 , 1] 2. The 11 monotone policy class is written as: Π∞ = {πf (x1, x 2) = 1 {x2 ≤ f (x1)} : f is non-increasing }.We approximate this infinite-dimensional class using the monotone piecewise-linear sieve 
+
+Πℓ. Its elements are threshold rules defined by non-increasing, continuous, piecewise-linear boundaries with knots on a 2ℓ-grid. Appendix B provides the formal definition, follow-ing the construction found in Mbakop and Tabord-Meehan (2021, Example 3.2). Under Assumption 2.3, if the conditional density of X1 given X2 is uniformly bounded, then 
+
+VC(Π ℓ) = O(2 ℓ) and the approximation error is W (π∗) − max π∈Πℓ W (π) = O(2 −ℓ) (see Proposition B.1). In the next two examples, the sieve classes need not be subsets of Π∞. When these classes are used in the oracle bound, Assumptions 2.1–2.3 are imposed on these sieve classes directly, so Theorem 2.1 continues to apply through the resulting approximation and estimation errors. 
+
+Example 2.2 (Decision Trees) . Decision trees are another popular class of binary-valued policies (e.g., Athey and Wager, 2021, Zhou et al., 2023). One example policy space is a treatment rule represented as a smooth threshold in a single covariate, conditional on the remaining covariates. Specifically, with X = ( X−d, X d) ∈ [0 , 1] d, the policy class is given by Π∞ = πf (x−d, x d) = 1 {xd ≤ f (x−d)} : f ∈ Cs([0 , 1] d−1), 0 ≤ f ≤ 1 .Here s ∈ N+, and Cs([0 , 1] d−1) denotes the class of functions with continuous partial derivatives up to order s. Let Πℓ be the class of binary decision trees of depth at most 
+
+ℓ. Each internal node selects a coordinate j ∈ { 1, . . . , d } and a threshold b ∈ R, routing observations according to whether xj < b , with each leaf assigned a label in {0, 1}. Under Assumption 2.3, if the conditional density of Xd given X−d is uniformly bounded, then 
+
+VC(Π ℓ) = O(2 ℓ(ℓ + log d)) and the approximation error is W (π∗) − max π∈Πℓ W (π) = 
+
+O 2−⌊ (ℓ−1) /(d−1) ⌋ (see Proposition B.2). 
+
+Example 2.3 (Deep Neural Networks) . Deep neural networks (DNNs) provide a flexi-ble framework for approximating complex decision boundaries. As in Example 2.2, we also consider the smooth decision-boundary policy class, with X = ( X−d, X d) ∈ [0 , 1] d,given by Π∞ = πf (x−d, x d) = 1 {xd ≤ f (x−d)} : f ∈ Cs([0 , 1] d−1), 0 ≤ f ≤ 1 . Let 
+
+FDNN ,ℓ denote the class of fully connected feedforward ReLU networks with width Hℓ
+
+and depth Dℓ, where these architectural parameters grow with ℓ. The sieve policy class 12 is Πℓ = {πg(x) = 1 {g(x) ≥ 0} : g ∈ F DNN ,ℓ }. Under Assumption 2.3, if the con-ditional density of Xd given X−d is uniformly bounded, then Proposition B.3 gives 
+
+VC(Π ℓ) = O{D 2 
+
+> ℓ
+
+H2 
+
+> ℓ
+
+log( DℓH2 
+
+> ℓ
+
+)}. The approximation error is W (π∗) − max π∈Πℓ W (π)= O{(Hℓ/ log Hℓ)−2s/ (d−1) (Dℓ/ log Dℓ)−2s/ (d−1) }.
+
+# 3 Model 
+
+We now formally establish the model for the welfare criterion. We define the intermediate parameters β∗(π) ∈ Rp as the minimizer of a sum of expected convex losses: 
+
+β∗(π) := arg min 
+
+> β=( β1,...,β p)⊤∈Rp
+> p
+
+X
+
+> j=1
+
+E [Lj (Y ∗(π(X)) − βj )] ,
+
+where p ≥ 1 is an integer and L1, . . . , Lp are known convex loss functions. Different selections of loss functions capture different distributional features. For example, when p =2, if we take L1(v) = v2/2, and L2(v) = v · (0 .5 − 1( v ≤ 0)) , the intermediate parameters correspond to the mean and the median: β∗(π) = ( E [Y ∗(π(X))] , median [Y ∗(π(X))]) ⊤.Similarly, with the check loss defined as L(v) = v · (α − 1( v ≤ 0)) , the intermediate parameter corresponds to the α-quantile. Both the intermediate parameters and the welfare criterion are expressed in terms of potential outcomes. To reframe them using the observed data (Y, X, T ), where Y = Y ∗(T )
+
+represents the observed outcome, we impose the Stable Unit Treatment Value Assumption (SUTVA) (Imbens and Rubin, 2015) and the following conditions regarding the data-generating process (Athey and Wager, 2021, Kitagawa and Tetenov, 2018, Mbakop and Tabord-Meehan, 2021). 
+
+Assumption 3.1 (Unconfoundedness and Overlap) . (i) (Unconfoundedness) Given the covariate X, program participation T is independent of the potential outcomes, meaning Y ∗(0) , Y ∗(1) ⊥ T | X.(ii) (Overlap) There exists a constant 0 < κ < 1/2 such that κ < e ∗(X) < 1 − κ almost surely, where e∗(X) := E [T | X] is the propensity score. 
+
+13 Under Assumption 3.1, we can express the following optimization problem: 
+
+β∗(π) = arg min 
+
+> β=( β1,...,β p)⊤∈Rp
+> p
+
+X
+
+> j=1
+
+E
+
+ π(X)Te∗(X) + (1 − π(X)) (1 − T )1 − e∗(X)
+
+
+
+Lj (Y − βj )
+
+
+
+. (3.1) Additionally, we define: 
+
+W (π) = E
+
+ π(X)Te∗(X) + (1 − π(X)) (1 − T )1 − e∗(X)
+
+
+
+U (Y, X, β∗(π)) 
+
+
+
+. (3.2) The propensity score e∗(X) is unknown and is defined by e∗(X) = E[T | X], which can be found by solving the following optimization problem: e∗(X) = arg min 
+
+> e(·)
+
+{E [( T − e(X)) 2]}.However, a sample least-squares estimator based on this characterization may produce fitted values close to 0 or 1. We therefore use the following equivalent population formulation, understood over functions satisfying 0 < e (X) < 1:
+
+e∗(X) = arg min 
+
+> 0<e (·)<1
+
+(
+
+E
+
+"
+
+T
+
+ 1
+
+e(X) − 1
+
+e∗(X)
+
+2
+
++ (1 − T )
+
+ 11 − e(X) − 11 − e∗(X)
+
+2#) 
+
+= arg min 
+
+> 0<e (·)<1
+
+
+
+E
+
+ Te(X)2 − 2
+
+e(X)
+
+
+
++ E
+
+ 1 − T
+
+(1 − e(X)) 2 − 21 − e(X)
+
+ 
+
+. (3.3) Compared with the least-squares characterization, this criterion measures errors on the inverse-propensity scale that enters the inverse-probability-weighted (IPW) terms. Its population excess risk is a weighted sum of squared errors of 1/e (X) and 1/{1 − e(X)},with the same minimizer e∗; in estimation, we minimize its sample analog over a bounded logistic DNN class to keep fitted propensity scores away from 0 and 1.
+
+# 4 Estimation of Welfare 
+
+We present an estimator for the welfare criterion based on a generic training sample I.Equations (3.1)–(3.3) suggest a three-step sequential estimation procedure. In the first step, we estimate the propensity score using a sample analog of (3.3). We then substitute this estimate into a sample analog of (3.1) to estimate the intermediate parameters. Finally, we use both estimates to compute the welfare criterion using a sample analog of (3.2). 14 To estimate the propensity score from the training sample I, we utilize a deep neural network, denoting the estimate as beI (·) (see (A.2)). From the existing literature, it follows that ∥beI − e∗∥P, 2 = OP
+
+
+
+|I|−se/(2 se+d) log 3 |I|
+
+
+
+(see the proof of Lemma E.1), where se
+
+indicates the smoothness of e∗(X) (see Assumption 5.1). It is well-documented that machine learning can induce bias, which then propagates to the welfare criterion through both direct bias in the IPW terms and indirect bias in estimates of intermediate parameters. Simply substituting e∗ with beI in the sample analog of equations (3.1)–(3.3) may introduce bias in the intermediate parameters and welfare estimates. This, in turn, leads to a violation of Assumption 2.1. To mitigate machine learning bias, we propose a weighted analog of equations (3.1)–(3.3): 
+
+bβI (π) = arg min 
+
+> β=( β1,...,β p)⊤∈Rp
+> p
+
+X
+
+> j=1
+
+1
+
+|I|
+
+X
+
+> i∈I
+
+bwI,i (π)
+
+nπ(Xi)Ti
+
+beI (Xi) + (1 − π(Xi))(1 − Ti)1 − beI (Xi)
+
+o
+
+Lj (Yi − βj ).
+
+(4.1) The welfare estimator is defined as: 
+
+cWI (π) = 1
+
+|I|
+
+X
+
+> i∈I
+
+bwI,i (π)
+
+nπ(Xi)Ti
+
+beI (Xi) + (1 − π(Xi))(1 − Ti)1 − beI (Xi)
+
+o
+
+U (Yi, Xi, bβI (π)) . (4.2) In this context, { bwI,i (π) : i ∈ I} represents the calibrated weights. We show in Appendix A that these weights must satisfy the following conditions: 
+
+1
+
+|I|
+
+X
+
+> i∈I
+
+(1 − π(Xi)) 
+
+ wi(1 − Ti)1 − beI (Xi) − 1
+
+
+
+μ∗
+
+> j0
+
+(Xi; β∗(π)) + 1
+
+|I|
+
+X
+
+> i∈I
+
+π(Xi)
+
+ wiTi
+
+beI (Xi) − 1
+
+
+
+μ∗
+
+> j1
+
+(Xi; β∗(π)) = 0 , j = 0 , 1, . . . , p. 
+
+(4.3) For t ∈ { 0, 1}, we define: μ∗
+
+> 0t
+
+(x; β) := EU (Y, X, β) | X = x, T = t and μ∗
+
+> jt
+
+(x; β) := 
+
+EL′ 
+
+> j
+
+(Y − βj ) | X = x, T = t for j = 1 , . . . , p , where L′ 
+
+> j
+
+is understood as specified in Assumption 5.2. In practice, β∗(π) and μ∗
+
+> jt
+
+(·; β) are replaced with the initial estimator 
+
+bβinit  
+
+> I
+
+(π) and the conditional mean estimators bμI,jt (·; bβinit  
+
+> I
+
+(π)) , respectively, as detailed in Appendix A. Notice that the weights satisfying the equations (4.3) are generally not unique. We apply 15 the entropy method to calibrate the weights as the solution to 
+
+( bwI,i (π) : i ∈ I) = arg min 
+
+> wi>0: i∈I
+
+X
+
+> i∈I
+
+(wi log wi − wi) subject to (wi : i ∈ I) satisfying (4 .3) .
+
+(4.4) In this context, the objective function D(w) = w log w − w measures the distance of w from 
+
+1, ensuring that the calibrated weights bwI,i (π), i ∈ I, are unique and always non-negative. 
+
+Remark 4.1. From a computational perspective, the equation (4.4) is a convex program with 
+
+p + 1 linear constraints, making it straightforward to compute. In particular, the problem can be solved efficiently through its dual formulation using standard convex-optimization solvers, as referenced in (Boyd and Vandenberghe, 2004). 
+
+# 5 Properties of the Empirical Welfare Criterion 
+
+Having constructed the welfare criterion estimator, we will now verify that it meets the high-level condition outlined in Section 2. We require the following conditions. 
+
+Assumption 5.1. Assume that X = [0 , 1] d. Let M > 1 be a finite constant. The true propensity score e∗(x) satisfies the following condition: 
+
+log e∗(x)1 − e∗(x) ∈ Cse  [0 , 1] d := 
+
+(
+
+f : max 
+
+> α∈Nd,∥α∥1≤se
+
+sup 
+
+> x∈[0 ,1] d
+
+|∂αf (x)| ≤ M
+
+)
+
+,
+
+where se > d/ 2 is an integer, ∥α∥1 := α1 + · · · + αd and ∂αf represents the partial derivative of f .
+
+Assumption 5.2 (Regularity assumptions on Lj ). For each j = 1 , . . . , p , let β∗ 
+
+> j
+
+(π) be the 
+
+jth component of β∗(π). Let c0 > 0 be a finite constant. The following conditions hold for any j = 1 , . . . , p .(i) Lj (v) is convex on R. There exists a non-decreasing function L′ 
+
+> j
+
+(v) : R → R
+
+such that ´ ba L′ 
+
+> j
+
+(v)dv = Lj (b) − L j (a) for any a, b ∈ R. We refer to L′ 
+
+> j
+
+(v) as the “derivative” of Lj (v).
+
+16 (ii) Define Qj (β; π) := E
+
+hn π(X)Te∗(X) + (1 −π(X))(1 −T )1−e∗(X)
+
+o
+
+Lj (Y − β)
+
+i
+
+. Let Q′′ and Q′′  
+
+> lip
+
+be two positive and finite constants. Qj (β; π) is twice differentiable with respect to β, and we denote its second-order derivative by Q′′  
+
+> j
+
+(β; π). It holds that Q′′  
+
+> j
+
+(β∗ 
+
+> j
+
+(π); π) ≥ Q′′ 
+
+uniformly over π ∈ Π∞ and Q′′  
+
+> j
+
+(β; π) − Q′′  
+
+> j
+
+(β∗ 
+
+> j
+
+(π); π) ≤ Q′′  
+
+> lip
+
+· β − β∗ 
+
+> j
+
+(π) for all 
+
+β satisfying β − β∗ 
+
+> j
+
+(π) ≤ c0 and all π ∈ Π∞.(iii) sup π∈Π∞ sup β:|β−β∗ 
+
+> j(π)
+
+|≤c0 L′ 
+
+> j
+
+(Y − β) ≤ M/ 4 almost surely, where 0 < M < ∞ is a constant that may depend on Q′′ and Q′′ 
+
+> lip
+
+.
+
+Assumption 5.3 (Regularity assumptions on U ). Denote Ψ( β; π) by E π(X)T /e ∗(X) + (1 − π(X))(1 − T )/(1 − e∗(X)) U (Y, X, β). The following conditions hold. (i) There exists a finite constant M > 0 such that the bound sup π∈Π∞ sup β:∥β−β∗(π)∥≤ c0
+
+|U (Y, X, β)| ≤ M/ 4 holds almost surely. (ii) The function class U := {(Y, X) 7 → U (Y, X, β) : ∥β − β∗(π)∥ ≤ c0, π ∈ Π∞}
+
+satisfies sup Q log N
+
+M 
+
+> 4
+
+ϵ, U, ∥·∥ Q, 2
+
+
+
+≤ ν log ( a/ϵ ) for all 0 < ϵ < 1, where a, ν > 0
+
+are finite constants, and sup Q is taken over all finitely discrete measures. (iii) Given any policy π ∈ Π∞, Ψ( β; π) is differentiable with respect to β, and we denote its gradient by ∇Ψ( β; π). There exists a finite constant Ψ′ ≥ 0 such that 
+
+∥∇ Ψ( β; π)∥ ≤ Ψ′ for all β satisfying ∥β − β∗(π)∥ ≤ c0 and all π ∈ Π∞.
+
+Assumption 5.4. Let sμ > d/ 2 be an integer. It holds that 
+
+X 7 → μ∗
+
+> jt
+
+(X; β) : ∥β − β∗(π)∥ ≤ c0, π ∈ Π∞, t ∈ { 0, 1}, j = 0 , . . . , p 
+
+⊂ Csμ  [0 , 1] d := 
+
+(
+
+f : max 
+
+> α∈Nd,∥α∥1≤sμ
+
+sup 
+
+> x∈[0 ,1] d
+
+|∂αf (x)| ≤ M
+
+)
+
+for some constant M > 0.
+
+Assumption 5.5. There exist finite constants Lμ > 0 and cξ > 0 such that the following conditions hold. (i) For any β1, β2 ∈ Rp, j = 0 , . . . , p , and t ∈ { 0, 1}: μ∗
+
+> jt
+
+(X; β1) − μ∗
+
+> jt
+
+(X; β2) P, 2 ≤
+
+Lμ ∥β1 − β2∥.
+
+17 (ii) For t ∈ { 0, 1}, define ξ∗ 
+
+> t
+
+(X; π) :=  μ∗
+
+> jt
+
+(X; β∗(π)) : j = 0 , . . . , p ⊤. Then 
+
+inf 
+
+> π∈Π∞
+
+λmin 
+
+n
+
+E(1 − π(X)) ξ∗
+
+> 0
+
+(X; π)ξ∗
+
+> 0
+
+(X; π)⊤ + π(X)ξ∗
+
+> 1
+
+(X; π)ξ∗
+
+> 1
+
+(X; π)⊤o
+
+≥ cξ.
+
+Assumption 5.6. The training sample size satisfies |I| → ∞ as N → ∞ . Throughout this assumption, beI , bβinit  
+
+> I
+
+(π), and bμI,jt , j = 0 , . . . , p and t ∈ { 0, 1}, refer to the estimators defined in the respective equations (A.2), (A.5), and (A.3)–(A.4). (i) Almost surely, |log {beI (X)/(1 − beI (X)) }| ≤ M , and |bμI,jt (X; β)| ≤ M uniformly over π ∈ Π∞, ∥β − β∗(π)∥ ≤ c0, j = 0 , . . . , p , and t = 0 , 1, where c0 is from Assumption 5.2. (ii) The DNN classes FDNN (He, De) and FDNN (Hμ, Dμ) defined in (A.1) and used in (A.3)–(A.4) are constructed as follows. The first uses HeDe ≍ | I|d/ (4 se+2 d) (log |I|)2,and the second uses HμDμ ≍ | I|d/ (4 sμ+2 d) (log |I|)2. In addition, their minimum diverges to infinity, and their logarithms are O(log |I|).
+
+Assumption 5.1 is a smoothness condition that is commonly recognized in the literature on deep neural network estimation (Farrell et al., 2021, Jiao et al., 2023, Schmidt-Hieber, 2020), as well as in the broader nonparametric-estimation literature (Chen, 2007). The conditions outlined in Assumption 5.2 are for estimating β∗(π), allowing for non-smooth objectives such as Lj (v) = v(0 .5 − 1( v ≤ 0)) . Similarly, the conditions in Assumption 5.3 are for estimating W (π) and are satisfied by many utility functions U . Both assumptions are well-established in the literature (van der Vaart, 1998, van der Vaart and Wellner, 1996). It is important to note that Assumptions 5.2 and 5.3 hold uniformly over π ∈ Π∞. The uniform condition is critical for Assumption 2.2, which requires uniform convergence of 
+
+cWI (π). If only Assumption 2.1 is necessary, a pointwise-in-π version of these conditions is sufficient. Assumption 5.4 is a smoothness condition on the conditional mean function 
+
+μ∗
+
+> jt
+
+(Xi; β), which is analogous to Assumption 5.1. Assumption 5.5 imposes Lipschitz continuity on μ∗
+
+> jt
+
+(Xi; β) in relation to β and includes a population non-singularity condition involving μ∗
+
+> jt
+
+(X; β∗(π)) , j = 0 , . . . , p and t ∈ { 0, 1}. The Lipschitz condition is satisfied by both Lj (v) = v(0 .5 − 1( v ≤ 0)) and Lj (v) = v2/2. The non-singularity condition eliminates linear redundancy among the functions μ∗
+
+> jt
+
+(X; β∗(π)) ; if this condition fails, 18 redundant functions can be removed before applying the calibration step. Assumption 5.6(i) imposes boundedness on the nuisance estimates, while Assumption 5.6(ii) restricts the width and depth of the deep neural networks. This latter requirement is familiar in the deep neural network estimation literature (see, e.g., Farrell et al., 2021, Jiao et al., 2023, Schmidt-Hieber, 2020). Under these sufficient conditions, we show that the proposed welfare criterion estimator meets the high-level assumptions outlined in Section 2. 
+
+Theorem 5.1. Suppose that Assumptions 3.1, 5.1, 5.2, 5.3, 5.4, 5.5, and 5.6 hold. Addition-ally, suppose that cWI (π) ≤ C almost surely for any π ∈ Π∞ and I ⊂ { 1, . . . , N }, where 
+
+C > 0 is a finite constant. Under these conditions, the debiased welfare criterion estimator 
+
+cWI (π), defined in (4.2), satisfies Assumptions 2.1 and 2.2. Furthermore, the welfare function 
+
+W (π), defined in (3.2), satisfies Assumption 2.3. 
+
+Combined with Theorem 2.1, Theorem 5.1 implies that the average welfare regret of the proposed policy-learning procedure adheres to the oracle inequality stated in (1.2); combined with Corollary 2.1, it also yields the corresponding high-probability welfare regret bound. 
+
+# 6 Empirical Application 
+
+To illustrate the practical value of the proposed policy learning procedure, we apply it to data from the National Job Training Partnership Act (JTPA) Study. This large-scale randomized controlled trial was commissioned by the U.S. Department of Labor to evaluate the effectiveness of publicly funded job-training programs. This dataset has become a benchmark in the policy evaluation and policy learning literature (Abadie et al., 2002, Ai et al., 2026, Crippa, 2025, Kitagawa and Tetenov, 2018, Liu et al., 2025, Mbakop and Tabord-Meehan, 2021). 2
+
+Our analysis uses a sample of N = 11 ,008 individuals. For each individual, we observe two baseline covariates: years of education ( X1) and pre-program earnings ( X2). The outcome of interest, Yi, is the total earnings over the 30-month period following random  
+
+> 2The sample we use is taken from the supplementary materials of Mbakop and Tabord-Meehan (2021), available at https://onlinelibrary.wiley.com/doi/10.3982/ECTA16437 .
+
+19 assignment. Let T ∈ { 0, 1} denote the randomized treatment assignment (the training offer), which means that the propensity score e∗(X) = P (T = 1 | X) is constant and equal to 2/3.While the true propensity score is known in this sample, we deliberately treat it as unknown to demonstrate the applicability of the method in situations where assignment probabilities are unavailable, partially observed, or require estimation. We focus on a specific class of monotone, interpretable allocation rules, guided by the principle that, all else being equal , individuals with lower socioeconomic status (such as less education or lower earnings) should be (weakly) prioritized for training. Let X1 and X2
+
+represent the supports of education and pre-program earnings, respectively. We define the policy space as: 
+
+Π∞ = {π : X1 × X 2 → { 0, 1} : π(x1, x 2) = 1( f (x1) ≥ x2) for some non-increasing f } .
+
+The policy π(x1, x 2) = 1 {x2 ≤ f (x1)} assigns an individual to training whenever their pre-program earnings fall below an education-specific cutoff f (x1). The restriction that f is non-increasing ensures that the cutoff is (weakly) higher for individuals with less education, making the earnings criterion more lenient for them. This rule is transparent: it can be represented as a treatment region in the (x1, x 2)-plane or, equivalently, as an estimated cutoff curve bf (x1).Previous studies (e.g., Mbakop and Tabord-Meehan, 2021) have optimized this class of rules using a linear welfare criterion that maximizes average outcomes E[Y ∗(π(X))] .However, such an objective neglects distributional concerns: a policy designed to maximize average income may inadvertently increase income disparities. To address this trade-off between efficiency (aggregate income) and equity (income dispersion), we adopt a nonlinear welfare criterion that penalizes outcome dispersion. Specifically, we aim to maximize the ratio of the mean outcome to its standard deviation, known as the inverse coefficient of variation: 
+
+WICV (π) = E [Y ∗(π(X))] 
+
+pVar ( Y ∗(π(X))) , (6.1) where Var ( Y ∗(π(X))) = E [Y ∗(π(X)) 2] − (E [Y ∗(π(X))]) 2. This objective is rooted in the axiomatic literature on inequality measurement (e.g., Atkinson, 1970), which emphasizes 20 that social welfare evaluations should balance efficiency (mean outcomes) against equity (distributional fairness). Maximizing WICV (π) is equivalent to minimizing the coefficient of variation, a scale-invariant measure of inequality that penalizes dispersion relative to the mean. To reformulate this objective within our framework, we express it using the auxiliary parameters β∗(π) and the utility function U (·) introduced in Section 3. Since earnings are non-negative in our sample and the policy mean is positive for the policies considered here, maximizing WICV (π) is equivalent to maximizing its square. Simple algebra shows that maximizing WICV (π)2 is equivalent to maximizing the negative ratio of the second moment to the squared first moment: 
+
+π∗ = arg max 
+
+> π∈Π∞
+
+
+
+− E [Y ∗(π(X)) 2](E [Y ∗(π(X))]) 2
+
+
+
+. (6.2) This problem fits directly into our general framework, with a single auxiliary parameter (p = 1 ). We define β∗ 
+
+> 1
+
+(π) to be the population mean of the potential outcome, corresponding to the quadratic loss L1(v) = v2/2:
+
+β∗ 
+
+> 1
+
+(π) := arg min 
+
+> β∈R
+
+E
+
+12 (Y ∗(π(X)) − β)2
+
+
+
+= E [Y ∗(π(X))] .
+
+The utility function is given by U (y, x, β 1) := −y2/β 21 . With a slight abuse of notation, we denote the welfare criterion as: 
+
+W (π) = E [U (Y ∗(π(X)) , X, β ∗ 
+
+> 1
+
+(π))] = − E[Y ∗(π(X)) 2](E[Y ∗(π(X))]) 2 .
+
+We learn the optimal policy π∗ from observational data by maximizing cWI (π) as defined in equation (4.2) over the sieve approximating sequence described in Example 2.1. We use a 5-fold cross-validation procedure (2.3) to select the best subclass. 3 To determine the best policy within each policy subclass, we employ the Strategic Monte Carlo Optimization (SMCO) algorithm as outlined in Chen et al. (2026). This algorithm demonstrates that, under suitable conditions, it converges to a local optimum from a single starting point and to  
+
+> 3Following Mbakop and Tabord-Meehan (2021), this application contains only five candidate subclasses,
+> Π1, . . . , Π5.
+
+21 a global optimum as the number of starting points increases. Consequently, we run SMCO from multiple starting points that are generated quasi-uniformly over a unit hypercube. This approach provides space-filling exploration of the parameter domain and enhances the robustness of the nonconvex search. 4
+
+The welfare estimate cWI (π) as described in equation (4.2) relies on several nuisance components, including the estimated propensity score beI (·) and the estimated conditional mean functions bμI,jt (·; β). We compute these estimates using deep neural networks, as detailed in Appendix A. The architecture of the network, including its depth and width, is determined through cross-validation on the same training sample used to train cWI (π).Figure 1 displays the best policies found in the simplest ( Π1) and the most complex ( Π5)subclasses of the approximating sequence. 7 8 9 10 11 12 13 14 15 16 17 18            
+
+> Years of Education
+> 0
+> 5,000
+> 10,000
+> 15,000
+> 20,000
+> 25,000
+> Pre-program Earnings
+> Treated
+> Untreated
+> Policy boundary 78910 11 12 13 14 15 16 17 18
+> Years of Education
+> 0
+> 5,000
+> 10,000
+> 15,000
+> 20,000
+> 25,000
+> Pre-program Earnings
+> Treated
+> Untreated
+> Policy boundary
+
+Figure 1: The best policy found in the simplest ( Π1) and most complicated ( Π5) classes. The x-axis represents years of education, while the y-axis indicates pre-program earnings. The red and green shaded areas represent individuals assigned to the treatment and control groups, respectively, under the estimated optimal policy. Left panel: best policy learned within Π1; right panel: best policy learned within Π5.Our 5-fold cross-validation procedure identifies Π1 as the best subclass, and we denote the learned optimal policy as bπNonlin . We compare bπNonlin with the benchmark policy 
+
+bπLin , which was derived from penalized welfare maximization under the linear criterion 
+
+E[Y ∗(π(X))] as discussed in Mbakop and Tabord-Meehan (2021). To evaluate each policy, 
+
+> 4
+
+Following the subclass construction in Mbakop and Tabord-Meehan (2021), the ℓth subclass can be indexed, after an appropriate reparametrization, by a vector θ = ( θ1, . . . , θ 2ℓ−1+1 ) lying in a simplex-type set: θj ≥ 0 and P2ℓ−1+1  
+
+> j=1
+
+θj ≤ 1. We construct an explicit mapping from the (2 ℓ−1 + 1) -dimensional unit hypercube onto this set and run SMCO over the hypercube, which lets us generate quasi-uniform starting points while enforcing the simplex constraint by construction. 
+
+22 we compute the mean and standard deviation of its associated potential outcomes based on the full sample, using a de-biased estimator as described in Section 4. For a given policy bπ,these estimators are defined as follows: 
+
+\Mean( bπ) = 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+bwi(bπ)
+
+ bπ(Xi)Ti
+
+be(Xi) + (1 − bπ(Xi))(1 − Ti)1 − be(Xi)
+
+
+
+Yi,
+
+and 
+
+cSD( bπ) = 
+
+vuut 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+bwi(bπ)
+
+ bπ(Xi)Ti
+
+be(Xi) + (1 − bπ(Xi))(1 − Ti)1 − be(Xi)
+
+
+
+Y 2 
+
+> i
+
+−
+
+\Mean( bπ)
+
+2
+
+,
+
+where be(X) is the DNN estimate of the propensity score using the full sample. The weights 
+
+bwi(bπ) are determined by the following optimization problem: 
+
+
+
+( bw1(bπ), . . . , bwN (bπ)) = arg min 
+
+> wi>0: i=1 ,...,N
+
+PNi=1 (wi log wi − wi) subject to 
+
+0 = 1
+
+> N
+
+PNi=1 (1 − bπ(Xi)) 
+
+nwi(1 −Ti)1−be(Xi) − 1
+
+o bE [Y | X = Xi, T = 0] + 1
+
+> N
+
+PNi=1 bπ(Xi)
+
+n wiTi 
+
+> be(Xi)
+
+− 1
+
+o bE [Y | X = Xi, T = 1] ,
+
+0 = 1
+
+> N
+
+PNi=1 (1 − bπ(Xi)) 
+
+nwi(1 −Ti)1−be(Xi) − 1
+
+o bE [Y 2 | X = Xi, T = 0] + 1
+
+> N
+
+PNi=1 bπ(Xi)
+
+n wiTi 
+
+> be(Xi)
+
+− 1
+
+o bE [Y 2 | X = Xi, T = 1] ,
+
+where bE[Y | X = x, T = t] and bE[Y 2 | X = x, T = t] are the DNN estimates of 
+
+E[Y | X = x, T = t] and E[Y 2 | X = x, T = t], respectively. The empirical results highlight the trade-off inherent in our method. The benchmark policy bπLin yields a mean outcome of 16 ,201 .57 , with a standard deviation of 16 ,763 .98 . In contrast, the policy bπNonlin , estimated under our nonlinear welfare criterion, yields a mean outcome of 16 ,132 .78 and a standard deviation of 16 ,617 .18 . Relative to the benchmark, 
+
+bπNonlin reduces the mean outcome by approximately 0.42% and the standard deviation by about 0.88% , reflecting our goal of achieving lower outcome dispersion under the nonlinear welfare criterion. 23 7 Conclusion 
+
+This paper presents a data-driven policy-learning procedure that utilizes observational data to address a nonlinear welfare criterion within an infinite-dimensional policy space. The proposed learning procedure expands the existing literature on policy learning by moving from a linear (utilitarian) welfare criterion to a nonlinear one, transitioning from finite-dimensional to infinite-dimensional policy spaces, and shifting focus from a known propensity score to an unknown one. Additionally, we introduce a novel reweighting-based debiasing method, providing a valuable alternative to the current double debiasing approach. We applied this procedure to the JTPA study, where we found a balance between efficiency and equity. However, a significant challenge remains in the computational aspect: determining the best policy bπℓ,I is fundamentally a nonconvex optimization problem. Due to the nonlinearity of the welfare criterion and the structure of the policy space, multiple local optima may arise. Future research should aim to develop more efficient optimization techniques, such as tighter convex relaxations or advanced heuristic search algorithms, to tackle these computational challenges. 
+
+# Appendix 
+
+The appendices include the following components: DNN estimators, weight calibration, calculations of approximation errors, and proofs of the main results. Throughout the appendix, we write “w.p.” as shorthand for “with probability.” 
+
+Notation . The notation used throughout this paper, and its appendices, is as follows. Let 
+
+N := {0, 1, 2, . . . } and N+ := {1, 2, . . . }. For a scalar a, ⌊a⌋ denotes the integer part of a.The indicator of an event A is denoted by 1( A) or 1{A}. For any set D, |D| denotes its cardinality. For a column vector x = ( x1, . . . , x d)⊤ ∈ Rd, the Euclidean norm is defined as ∥x∥ =(x⊤x)1/2. The notation x−d = ( x1, . . . , x d−1)⊤ separates the last coordinate from the remaining covariates. For a matrix A, ∥A∥ denotes the operator norm, which is the largest singular value. When A is symmetric and positive semidefinite, λmin (A) indicates its smallest eigenvalue, which is also its smallest singular value. For a multi-index α =(α1, . . . , α d) ∈ Nd, we define ∥α∥1 := α1 + · · · + αd and ∂αf as the partial derivative. 24 For an integer s ≥ 0 and a domain D, Cs(D) represents the class of functions that have continuous partial derivatives up to order s, equipped with the usual maximum sup-norm over those derivatives. Let (Ω , F, P ) be the underlying probability space, and let E denote the expectation under the probability measure P . For an integrable function f , we define P f := ´ f dP = E[f ].When there is no risk of confusion, we use Z to denote the observed data triple consisting of Y , X, and T . For a training set I ⊂ { 1, . . . , N }, let m = |I| represent the size of the training sample. We define the empirical measure based on the training sample as 
+
+Pmf := m−1 P 
+
+> i∈I
+
+f (Zi).For any random vector or matrix X, we define the norm ∥X∥P,q := ( ´ ∥X∥qdP )1/q for 
+
+q ≥ 1. For any function f : X ⊂ Rd → Rd′
+
+, we define ∥f ∥P,q := ∥f (X)∥P,q and ∥f ∥∞ := sup x∈X ∥f (x)∥. For two sequences of random vectors Xn and Yn, we say Xn = oP (∥Yn∥)
+
+if P (∥Xn∥/∥Yn∥ > ϵ ) → 0 for any ϵ > 0. Similarly, Xn = OP (∥Yn∥) means that for any ϵ > 0 there exists M < ∞ such that lim sup n→∞ P (∥Xn∥/∥Yn∥ ≥ M ) < ϵ . For two positive, non-random sequences an and bn, we write an ≲ bn if an ≤ Cb n for some finite constant C > 0 that is independent of n. We write an ≍ bn if both an ≲ bn and bn ≲ an
+
+hold. For a function class G and a norm ∥ · ∥ Q,q , where Q is a probability measure, the covering number N (ϵ, G, ∥ · ∥ Q,q ) is defined as the minimal cardinality of a finite set {g1, . . . , g Nϵ }
+
+such that sup g∈G inf 1≤i≤Nϵ ∥g − gi∥Q,q < ϵ . Whenever sup Q appears in entropy bounds, it refers to the supremum over finitely discrete probability measures. Following Chernozhukov et al. (2014), when a class has a bounded envelope, we say it is VC-type with index v if, for some constants A > 1 and C > 0, sup Q log N (Cϵ, G, ∥ · ∥ Q, 2) ≤ Cv log( A/ϵ ) for all 
+
+0 < ϵ < 1. For a policy class Π, VC(Π) denotes its Vapnik–Chervonenkis dimension. For a function class G and a function h, we define h ◦ G := {h ◦ g : g ∈ G} .25 A DNN estimators 
+
+This section presents DNN estimators for the propensity score and the conditional mean functions, as well as initial estimators of the intermediate parameters. Let 
+
+FDNN (H, D):= 
+
+n
+
+x ∈ Rd 7 → WDσ
+
+
+
+· · · σ
+
+
+
+W3σ
+
+
+
+W2σ
+
+
+
+W1σ(W0x + b0) + b1
+
+
+
++ b2
+
+
+
++ b3
+
+
+
++ · · · 
+
+
+
++ bD :
+
+Wl ∈ Rdl+1 ×dl , b l ∈ Rdl+1 , 0 ≤ l ≤ D , d 0 = d, d D+1 = 1 , max {d1, . . . , d D} ≤ H 
+
+o
+
+(A.1) denote a class of deep neural networks (DNNs) with depth D and width H. These net-works utilize fully connected feedforward architectures with the nonsmooth rectified linear unit (ReLU) activation function defined as σ(z) = max {z, 0}, which is applied to each component of z if z is a vector. To estimate the propensity score and ensure that the resulting estimates fall within the range (0 , 1) , we use a logistic transformation of the DNN class and estimate the propensity score function using a DNN and the subsample I as follows: 
+
+beI := arg min    
+
+> e∈logistic ◦{ f∈F DNN (He,De): ∥f∥∞≤M}
+
+X
+
+> i∈I
+
+ Ti
+
+e2(Xi) − 2
+
+e(Xi) + 1 − Ti
+
+(1 − e(Xi)) 2 − 21 − e(Xi)
+
+
+
+(A.2) where He and De represent the width and depth of the DNN, respectively, and logistic (x) = 1/{1 + exp( −x)}.We estimate the conditional mean functions μ∗
+
+> 0t
+
+(x; β) := E[U (Y, X, β) | X = x, T =
+
+t] and μ∗
+
+> jt
+
+(x; β) := E[L′ 
+
+> j
+
+(Y − βj ) | X = x, T = t], j = 1 , . . . , p , using DNNs as follows, where L′ 
+
+> j
+
+is understood in the context of Assumption 5.2: 
+
+bμI,jt (·; β) := arg min  
+
+> f∈F DNN (Hμ,Dμ)
+
+1
+
+|I|
+
+X
+
+> i∈I
+
+1( Ti = t)( L′ 
+
+> j
+
+(Yi − βj ) − f (Xi)) 2, 1 ≤ j ≤ p, (A.3) 
+
+bμI, 0t(·; β) := arg min  
+
+> f∈F DNN (Hμ,Dμ)
+
+1
+
+|I|
+
+X
+
+> i∈I
+
+1( Ti = t)( U (Yi, Xi, β) − f (Xi)) 2. (A.4) where Hμ and Dμ represent the width and depth of the DNN, respectively. Finally, we estimate the intermediate parameters, bβinit  
+
+> I
+
+(π), as follows: 
+
+bβinit  
+
+> I
+
+(π) = arg min 
+
+> β=( β1,...,β p)⊤∈Rp
+> p
+
+X
+
+> j=1
+
+1
+
+|I|
+
+X
+
+> i∈I
+
+nπ(Xi)Ti
+
+beI (Xi) + (1 − π(Xi))(1 − Ti)1 − beI (Xi)
+
+o
+
+Lj (Yi − βj ).
+
+(A.5) 26 A.1 Weights calibration 
+
+To obtain the calibrated weights as defined in (4.3), we perform a first-order Taylor expansion of cWI (π) − W (π) in bβI (π) around β∗(π):
+
+cWI (π) − W (π)= 1
+
+|I|
+
+X
+
+> i∈I
+
+bwI,i (π)
+
+(1 − π(Xi))(1 − Ti)1 − beI (Xi) + π(Xi)Ti
+
+beI (Xi)
+
+
+
+U (Yi, Xi, β∗(π)) − W (π)+ 1
+
+|I|
+
+X
+
+> i∈I
+
+bwI,i (π)
+
+(1 − π(Xi))(1 − Ti)1 − beI (Xi) + π(Xi)Ti
+
+beI (Xi)
+
+∂U (Yi, Xi, β∗(π)) 
+
+∂β
+
+bβI (π) − β∗(π)
+
++ o(∥bβI (π) − β∗(π)∥).
+
+We refer to the first two displayed summands as the first and second terms, respectively. The bias in machine learning propagates directly through the estimated propensity score in the first term, and indirectly through bβI (π) − β∗(π) in the second term. Decomposing the first term as A1 + A2, where 
+
+A1 := 1
+
+|I|
+
+X
+
+> i∈I
+
+bwI,i (π)
+
+(1 − π(Xi))(1 − Ti)1 − beI (Xi) + π(Xi)Ti
+
+beI (Xi)
+
+
+
+× U (Yi, Xi, β∗(π)) − μ∗ 
+
+> 0Ti
+
+(Xi; β∗(π)) ,A2 := 1
+
+|I|
+
+X
+
+> i∈I
+
+bwI,i (π)
+
+(1 − π(Xi))(1 − Ti)1 − beI (Xi) + π(Xi)Ti
+
+beI (Xi)
+
+
+
+× μ∗ 
+
+> 0Ti
+
+(Xi; β∗(π)) − W (π),
+
+we have by the definition of μ∗ 
+
+> 0t
+
+that E[U (Yi, Xi, β∗(π)) − μ∗ 
+
+> 0Ti
+
+(Xi; β∗(π)) | Ti, Xi] = 0 .Hence A1 = OP (|I|−1/2) by applying a central limit theorem. Now, we will rewrite the term 
+
+A2 as: 
+
+A2 = 1
+
+|I|
+
+X
+
+> i∈I
+
+
+
+(1 − π(Xi))  b wI,i (π)(1 − Ti)1 − beI (Xi) − 1 μ∗
+
+> 00
+
+(Xi; β∗(π)) + π(Xi) b wI,i (π)Ti
+
+beI (Xi) − 1 μ∗
+
+> 01
+
+(Xi; β∗(π)) 
+
+| {z }
+
+> := A21
+
++ 1
+
+|I|
+
+X
+
+> i∈I
+
+(1 − π(Xi)) μ∗
+
+> 00
+
+(Xi; β∗(π)) + π(Xi)μ∗
+
+> 01
+
+(Xi; β∗(π)) − W (π)
+
+| {z }
+
+> := A22
+
+.
+
+Once again, A22 = OP (|I|−1/2) follows from a central limit theorem, indicating that the term A21 represents the direct bias. To reduce this direct bias, we can adjust the weights to 27 ensure that the direct bias becomes zero: 
+
+0 = 1
+
+|I|
+
+X
+
+> i∈I
+
+
+
+(1 − π(Xi))  b wI,i (π)(1 − Ti)1 − beI (Xi) − 1 μ∗
+
+> 00
+
+(Xi; β∗(π)) + π(Xi) b wI,i (π)Ti
+
+beI (Xi) − 1 μ∗
+
+> 01
+
+(Xi; β∗(π)) 
+
+
+
+.
+
+By applying similar arguments to the first-order condition of (4.1), we can determine the weights needed to eliminate the indirect bias for each j = 1 , . . . , p :
+
+0 = 1
+
+|I|
+
+X
+
+> i∈I
+
+(1 − π(Xi))  b wI,i (π)(1 − Ti)1 − beI (Xi) − 1 μ∗
+
+> j0
+
+(Xi; β∗(π)) + 1
+
+|I|
+
+X
+
+> i∈I
+
+π(Xi) b wI,i (π)Ti
+
+beI (Xi) − 1 μ∗
+
+> j1
+
+(Xi; β∗(π)) .
+
+Both μ∗
+
+> jt
+
+(·; β) and β∗(π) are unknown, so we replace them with the initial estimator bβinit  
+
+> I
+
+(π)
+
+as defined in (A.5) and with the DNN estimators as defined in (A.3)–(A.4), and compute the calibrated weights from the minimization problem 
+
+( bwI,i (π) : i ∈ I) = arg min 
+
+> wi>0: i∈I
+
+X
+
+> i∈I
+
+(wi log wi − wi)
+
+s.t. 0 = 1
+
+|I|
+
+X
+
+> i∈I
+
+(1 − π(Xi))  wi(1 − Ti)1 − beI (Xi) − 1 bμI,j 0(Xi; bβinit  
+
+> I
+
+(π)) + 1
+
+|I|
+
+X
+
+> i∈I
+
+π(Xi) wiTi
+
+beI (Xi) − 1 bμI,j 1(Xi; bβinit  
+
+> I
+
+(π)) , j = 0 , 1, . . . , p. 
+
+# B Calculation of approximation errors 
+
+This section calculates the bounds on the approximation-error rates for example policy spaces, such as 2.1–2.3, under the high-level Assumption 2.3. Let d∆(π1, π 2) := P  π1(X)̸ = π2(X). It follows from Assumption 2.3 that inf π∈Πℓ |W (π∗)−
+
+W (π)| ≤ CW inf π∈Πℓ d∆(π∗, π ), where π∗ := arg max π∈Π∞ W (π). As a result, we obtain 
+
+W (π∗) − max 
+
+> π∈Πℓ
+
+W (π) ≤ inf 
+
+> π∈Πℓ
+
+|W (π∗) − W (π)| ≤ CW inf 
+
+> π∈Πℓ
+
+d∆(π, π ∗). (B.1) We study examples of monotone policies, decision trees, and neural networks from Section 2. In each example, we derive an explicit bound for inf π∈Πℓ d∆(π, π ∗) and then use (B.1) to determine the corresponding welfare approximation rate. We will start with the example of monotone policies. 28 B.1 Example 2.1: monotone policies 
+
+B.1.1 Monotone policy class and the sieve 
+
+In the case of monotone policies, it is convenient to normalize the supports such that 
+
+Xi = ( Xi1, X i2)⊤ ∈ [0 , 1] 2. Consider the monotone class defined as: 
+
+Π∞ = Π mon  
+
+> ∞
+
+= {πf (x1, x 2) = 1 {f (x1) ≥ x2} : f : [0 , 1] → [0 , 1] is non-increasing } .
+
+This class has an infinite VC dimension; see Devroye et al. (1996) and Mbakop and Tabord-Meehan (2021). The sieve used by Mbakop and Tabord-Meehan (2021, Example 3.2) is constructed from triangular basis functions. In their example, the sieve is defined as: G = {(x1, x 2) : 
+
+x2 ≥ f (x1), f increasing }. Using our notation, the same construction can be achieved by reversing the direction of monotonicity, which simply changes the sign of the linear inequality involving the coefficient vector. Fix an integer J ≥ 1. For j = 0 , . . . , J , define 
+
+ψJ,j (x) = 
+
+
+
+1 − | Jx − j| , x ∈ (j − 1) /J, (j + 1) /J  ∩ [0 , 1] ,
+
+0, otherwise .
+
+These are the standard “hat” or triangular basis functions. Define the coefficient vector 
+
+θJ = ( θJ, 0, . . . , θ J,J )⊤ and the first-difference matrix 
+
+DJ =
+
+
+
+−1 1 0 · · · 0 00 −1 1 · · · 0 0
+
+... ... ... . . . ... ...
+
+0 0 0 · · · −1 1
+
+ ∈ RJ×(J+1) .
+
+For our non-increasing class, the relevant coefficient restriction is DJ θJ ≤ 0, i.e., θJ, 0 ≥
+
+θJ, 1 ≥ · · · ≥ θJ,J .We define the piecewise-linear function class and the associated policy class as 
+
+Fmon  
+
+> J
+
+:= 
+
+(
+
+fθ(x1) := 
+
+> J
+
+X
+
+> j=0
+
+θJ,j ψJ,j (x1) : θJ ∈ [0 , 1] J+1 , D J θJ ≤ 0
+
+)
+
+,
+
+Πmon  
+
+> J
+
+:= {πθ(x1, x 2) = 1 {x2 ≤ fθ(x1)} : fθ ∈ F mon  
+
+> J
+
+} .
+
+For a sieve index ℓ, we define Jℓ := 2 ℓ and Πℓ := Π mon  
+
+> Jℓ
+
+. This refinement is similar to that discussed in the literature Mbakop and Tabord-Meehan (2021, Example 3.2), with an 29 inconsequential shift in the index. 
+
+Remark B.1. The basis {ψJ,j }Jj=0 interpolates the coefficient vector at the grid points: 
+
+fθ(j/J ) = θJ,j . On the interval [j/J, (j + 1) /J ], we have fθ(x) = θJ,j {1 − (Jx − j)} +
+
+θJ,j +1 (Jx − j), which shows that fθ is linear on that interval. Therefore, Fmon  
+
+> J
+
+consists precisely of continuous piecewise-linear functions with knots at j/J , where the values at the knots are non-increasing. 
+
+B.1.2 Approximation error rate 
+
+We will derive the approximation error rate in d∆(π, π ∗) and then convert it to a welfare approximation error rate using (B.1). 
+
+Assumption B.1 (Regularity for the monotone example) . The optimal policy, π∗, belongs to the set Πmon  
+
+> ∞
+
+, which implies that π∗(x1, x 2) = 1 {x2 ≤ f ∗(x1)} for some non-increasing 
+
+f ∗ : [0 , 1] → [0 , 1] . Additionally, for every x2 ∈ [0 , 1] , the conditional distribution of 
+
+X1 | X2 = x2 is absolutely continuous and has density bounded by AX < ∞.
+
+Proposition B.1 (Monotone-sieve approximation error rate and VC dimension) . Let Πℓ =Πmon 2ℓ , and suppose that Assumptions 2.3 and B.1 hold. For every ℓ ≥ 1, we have VC(Π ℓ) ≤
+
+2ℓ + 3 and W (π∗) − max π∈Πℓ W (π) ≤ CW AX 2−ℓ.Proof. To define the parameter J, we set J = Jℓ = 2 ℓ. By construction, every function 
+
+f ∈ F mon  
+
+> J
+
+can be expressed as: f (x1) = PJj=0 θj ψJ,j (x1), which indicates that Fmon  
+
+> J
+
+is contained in the linear span of the basis functions {ψJ, 0, . . . , ψ J,J }. These basis functions are linearly independent. Specifically, if PJj=0 aj ψJ,j (x) = 0 for all x ∈ [0 , 1] , then evaluating this equation at the grid points x = i/J leads to ai = 0 for every i = 0 , . . . , J , because 
+
+ψJ,j (i/J ) = 1 {i = j}. Consequently, the dimension of the ambient linear space is J + 1 .Next, Πmon  
+
+> J
+
+represents the class of subgraphs generated by Fmon  
+
+> J
+
+, as we define πθ(x1, x 2) = 1{x2 ≤ fθ(x1)}. Thus, Πmon  
+
+> J
+
+is a subclass of the subgraph class generated by the (J + 1) -dimensional linear span of the functions {ψJ, 0, . . . , ψ J,J }. According to Lemma 2.6.15 from van der Vaart and Wellner (1996), the VC dimension of the subgraph class of a finite-dimensional vector space of measurable functions is bounded by the dimension plus 2.Therefore, VC(Π ℓ) = VC(Π mon  
+
+> J
+
+) ≤ (J + 1) + 2 = J + 3 = 2 ℓ + 3 .30 To prove the approximation error bound, we define J = Jℓ = 2 ℓ and consider the grid ξj := jJ , j = 0 , 1, . . . , J . We define the coefficient vector by sampling the true boundary given by θ∗ 
+
+> j
+
+:= f ∗(ξj ), j = 0 , 1, . . . , J . Since f ∗ is non-increasing, it follows that θ∗ 
+
+> 0
+
+≥ θ∗ 
+
+> 1
+
+≥ · · · ≥ θ∗ 
+
+> J
+
+. This implies that DJ θ∗ 
+
+> J
+
+≤ 0, where θ∗ 
+
+> J
+
+= ( θ∗ 
+
+> 0
+
+, . . . , θ ∗ 
+
+> J
+
+)⊤. Thus, we can define the linear interpolant efℓ(x1) := PJj=0 θ∗ 
+
+> j
+
+ψJ,j (x1), which belongs to Fmon  
+
+> J
+
+.Consequently, we define eπℓ(x1, x 2) := 1 {x2 ≤ efℓ(x1)} ∈ Πℓ. By (B.1) , it is sufficient to bound d∆(eπℓ, π ∗).For i = 1 , . . . , J , we define the rectangles Mi := [ ξi−1, ξ i] × [f ∗(ξi), f ∗(ξi−1)] . Since f ∗
+
+is non-increasing, each Mi forms a rectangle (which may have zero height). On the interval 
+
+[ξi−1, ξ i], both the graph of f ∗ and the graph of its linear interpolant efℓ lie within Mi. This is due to the fact that the first graph respects monotonicity, while the second graph, efℓ, is represented by the straight line segment connecting (ξi−1, f ∗(ξi−1)) and (ξi, f ∗(ξi)) .Thus, the area where π∗ and eπℓ differ is included within the union of these rectan-gles: {(x1, x 2) : eπℓ(x1, x 2)̸ = π∗(x1, x 2)} ⊆ SJi=1 Mi. Therefore, we have d∆(eπℓ, π ∗) ≤
+
+PJi=1 PX (Mi). Let Mi = M1i × M2i, where M1i := [ ξi−1, ξ i] and M2i := ( f ∗(ξi), f ∗(ξi−1)] ,with boundary points omitted because they have zero probability under the conditional-density assumption. Based on the conditional-density assumption, we have: 
+
+P (( X1, X 2) ∈ Mi) = 
+
+ˆ
+
+> M2i
+
+P (X1 ∈ M1i | X2 = x2) dP X2 (x2)
+
+≤
+
+ˆ
+
+> M2i
+
+AX (ξi − ξi−1) dP X2 (x2) = AX J−1P (X2 ∈ M2i).
+
+Summing over i, we obtain d∆(eπℓ, π ∗) ≤ AX J−1 PJi=1 P (X2 ∈ M2i). Since f ∗ is non-increasing, the intervals M2i are disjoint and their union is contained within [0 , 1] . Therefore, we have PJi=1 PX2 (M2i) ≤ 1. Thus, d∆(eπℓ, π ∗) ≤ AX J−1 = AX 2−ℓ. Given that eπℓ ∈ Πℓ,this implies inf π∈Πℓ d∆(π, π ∗) ≤ d∆(eπℓ, π ∗) ≤ AX 2−ℓ. The bound for the approximation error W (π∗) − max π∈Πℓ W (π) follows immediately from (B.1) . This completes the proof. 
+
+■
+
+## B.2 Examples 2.2 and 2.3: A Smooth Decision Boundary Class 
+
+We will now consider a class of policies characterized by a smooth decision boundary. Let 
+
+d ≥ 2 and X = ( X−d, X d) ∈ [0 , 1] d−1 × [0 , 1] = [0 , 1] d. For a positive number M > 0 and 31 s ∈ N+, we define the class of policies as follows: 
+
+ΠSDB (M, s ) := πf (x−d, x d) = 1 {xd ≤ f (x−d)} : f ∈ Cs([0 , 1] d−1), ∥f ∥Cs ≤ M, 0 ≤ f ≤ 1 ,
+
+∥f ∥Cs := max  
+
+> α∈Nd−1,∥α∥1≤s
+
+sup 
+
+> x−d∈[0 ,1] d−1
+
+|∂αf (x−d)| .
+
+We will show that this class has an infinite VC dimension for d ≥ 2.
+
+Lemma B.1 (Infinite VC dimension of the fixed-radius smooth decision-boundary class) .
+
+For every s ∈ N+ and every M > 0, the class ΠSDB (M, s ) has an infinite VC dimension. Proof. Let n be any integer with n ≥ 1. We will demonstrate that ΠSDB (M, s ) can shatter n
+
+points in the space [0 , 1] d. Define the points as follows: uj :=   jn+1 , 12 , . . . , 12
+
+⊤ ∈ (0 , 1) d−1,
+
+j = 1 , . . . , n . Let rn := 1 
+
+> n+1
+
+. The points u1, . . . , un are distinct, and the distance, measured by the supremum norm ∥uj+1 − uj ∥∞, between consecutive points is exactly rn. Choose a nonnegative function ψ ∈ C∞(Rd−1) such that 0 ≤ ψ ≤ 1, ψ(0) = 1 , and supp( ψ) ⊂B(0, 1/4) , where B(0, 1/4) denotes the closed Euclidean ball of radius 1/4 centered at 
+
+0. Define Cψ := max {1, max α∈Nd−1, ∥α∥1≤s sup u∈Rd−1 |∂αψ(u)|} < ∞. For each j =1, . . . , n , define the rescaled bump function as φj (u) := ψ(( u − uj )/r n), u ∈ [0 , 1] d−1.Since the support of ψ is contained in B(0, 1/4) , we have supp( φj ) ⊂ B (uj , r n/4) . Given that the centers uj are spaced rn apart, these supports are pairwise disjoint. Therefore, at every point u ∈ [0 , 1] d−1, at most one of the functions φ1(u), . . . , φ n(u) can be nonzero. Next, set bM := min {M, 1}/2 and εn := min {M, 1}rsn/(8 Cψ). For any label vector 
+
+η = ( η1, . . . , η n) ∈ { 0, 1}n, define fη(u) := bM + εn
+
+Pnj=1 (2 ηj − 1) φj (u), u ∈ [0 , 1] d−1.We now verify that fη ∈ Cs([0 , 1] d−1), ∥fη∥Cs ≤ M , and 0 ≤ fη ≤ 1.First, since the supports of the φj ’s are pairwise disjoint, at each u at most one term in the sum contributes, so bM − εn ≤ fη(u) ≤ bM + εn for all u ∈ [0 , 1] d−1. Because 
+
+rsn ≤ 1, we have εn = min {M, 1} 
+
+> 8Cψ
+
+rsn ≤ min {M, 1} 
+
+> 8
+
+, and thus 0 ≤ bM − εn ≤ fη(u) ≤ bM + εn ≤ 
+
+> 58
+
+min {M, 1} ≤ 1, so, 0 ≤ fη ≤ 1. In particular, sup u∈[0 ,1] d−1 |fη(u)| ≤ 58 min {M, 1} ≤ 
+
+M .Next, let α ∈ Nd−1 satisfy 1 ≤ ∥ α∥1 ≤ s. Since the supports are disjoint, at each u at most one term is active. According to the chain rule, ∂αφj (u) = r−∥ α∥1 
+
+> n
+
+(∂αψ)(( u−uj )/r n);hence 
+
+sup 
+
+> u∈[0 ,1] d−1
+
+|∂αfη(u)| ≤ εn sup 
+
+> 1≤j≤n
+
+sup 
+
+> u∈[0 ,1] d−1
+
+|∂αφj (u)|≤ εnCψr−∥ α∥1 
+
+> n
+
+= min {M, 1}
+
+8 rs−∥ α∥1 
+
+> n
+
+≤ min {M, 1}
+
+8 ≤ M, 
+
+32 where the last line uses ∥α∥1 ≤ s and rn ≤ 1. Since ∥fη∥Cs ≤ M , it follows that fη
+
+belongs to the function class defining ΠSDB (M, s ). Consequently, the corresponding policy is defined as πη(x−d, x d) := 1 {xd ≤ fη(x−d)}, which also belongs to ΠSDB (M, s ).Define the n points in [0 , 1] d as ξj := ( uj , b M ), for j = 1 , . . . , n . Since φj (uj ) = 1 and 
+
+φi(uj ) = 0 for i̸ = j, we obtain that fη(uj ) = bM + εn(2 ηj − 1) for every j = 1 , . . . , n .Therefore, πη(ξj ) = 1 {bM ≤ fη(uj )} = 1 {bM ≤ bM +εn(2 ηj −1) } = ηj . Every labeling of the set {ξ1, . . . , ξn} can be achieved by a policy in ΠSDB (M, s ). Since n ≥ 1 is arbitrary, the class ΠSDB (M, s ) can shatter arbitrarily large finite sets. Thus, VC  ΠSDB (M, s ) = ∞. ■
+
+To obtain explicit rates of approximation error, we make the following assumption: 
+
+Assumption B.2. There exist s ∈ N+, M > 0, and a function f ∗ ∈ Cs([0 , 1] d−1) with 
+
+∥f ∗∥Cs ≤ M and 0 ≤ f ∗ ≤ 1 such that π∗(x−d, x d) = 1 {xd ≤ f ∗(x−d)}. Furthermore, for every x−d ∈ [0 , 1] d−1, the conditional distribution of Xd | X−d = x−d is absolutely continuous with a density that is bounded above by a constant AX < ∞, uniformly across all x−d.
+
+The next lemma is a crucial tool that transforms a uniform approximation of f ∗ into a 
+
+d∆-approximation of π∗.
+
+Lemma B.2 (Policy distance controlled by decision-boundary sup-norm error) . Assuming that Assumption B.2 holds, for any measurable functions f, g : [0 , 1] d−1 → [0 , 1] , let 
+
+πf (x−d, x d) = 1 {xd ≤ f (x−d)} and πg(x−d, x d) = 1 {xd ≤ g(x−d)}. Then d∆(πf , π g) ≤
+
+AX E[|f (X−d) − g(X−d)|] ≤ AX ∥f − g∥∞.Proof. Condition on X−d. The two policies differ when Xd lies between f (X−d) and 
+
+g(X−d). Hence, by the uniform bound AX on the conditional density of Xd | X−d = x−d,
+
+d∆(πf , π g) = E[P {min( f, g )( X−d) < X d ≤ max( f, g )( X−d) | X−d}]
+
+≤ AX E [|f (X−d) − g(X−d)|] ≤ AX ∥f − g∥∞ .
+
+This completes the proof. ■
+
+For Examples 2.2 and 2.3, we impose the smooth decision-boundary condition π∗ ∈
+
+ΠSDB (M, s ) for some fixed M and s, and use decision-tree and neural-network sieves as finite-dimensional approximation classes. 33 B.2.1 Example 2.2: decision trees 
+
+Fix an integer ℓ ≥ 1. A binary decision tree with a depth of at most ℓ is defined as follows: Each internal node is assigned a coordinate index j ∈ { 1, . . . , d } and a threshold b ∈ R.An observation x ∈ [0 , 1] d reaching that node is sent to the left child if xj < b and to the right child otherwise. Each leaf node is assigned an action label in {0, 1}. The tree defines a binary policy π : X → { 0, 1} by guiding x from the root to a terminal leaf according to these splitting rules, and then outputting the label of the terminal leaf. Let ΠDT  
+
+> ℓ
+
+denote the class of all such policies whose depth is at most ℓ.This class is sufficiently robust to represent the piecewise-constant threshold approxi-mants developed below. It also facilitates the VC-dimension analysis, as every tree in the class ΠDT  
+
+> ℓ
+
+can be embedded into a complete binary tree of depth ℓ. This is achieved by padding premature leaves with dummy descendants without altering the induced policy. 
+
+Proposition B.2 (Approximation error and VC dimension for the decision-tree sieve) .
+
+Assuming that d ≥ 2 and Assumptions 2.3 and B.2 are satisfied, let Πℓ = Π DT  
+
+> ℓ
+
+. Then, there exists a constant C > 0, independent of ℓ, such that for every ℓ ≥ 1,
+
+W (π∗) − max 
+
+> π∈Πℓ
+
+W (π) ≤ C · 2−⌊ ℓ−1 
+
+> d−1
+
+⌋, VC(Π ℓ) ≤ C · 2ℓ(ℓ + log d).
+
+Proof. Let Jℓ :=  ℓ−1
+
+> d−1
+
+ and hℓ := 2 −Jℓ . According to Assumption B.2, we have s ∈ N+
+
+and f ∗ ∈ Cs([0 , 1] d−1) with ∥f ∗∥Cs ≤ M . In particular, every first-order partial derivative of f ∗ is bounded by M . Thus, for any u, v ∈ [0 , 1] d−1, f ∗(u) − f ∗(v) = ´ 10 ∇f ∗ v + t(u −
+
+v)⊤(u − v) dt . Consequently, |f ∗(u) − f ∗(v)| ≤ ´ 10
+
+Pd−1 
+
+> j=1
+
+|∂j f ∗(v + t(u − v)) | | uj −
+
+vj | dt ≤ (d − 1) M ∥u − v∥∞. Thus, f ∗ is Lipschitz continuous with Lipschitz constant 
+
+Lf := ( d − 1) M .We now construct a piecewise-constant approximation to f ∗ on a dyadic partition of 
+
+[0 , 1] d−1. The term “dyadic” refers to the property that every side length is a negative power of 2. Specifically, for each multi-index k = ( k1, . . . , k d−1) where kr ∈ { 0, 1, . . . , 2Jℓ − 1},let Ir,k r = [ kr/2Jℓ , (kr + 1) /2Jℓ ) if kr < 2Jℓ − 1 and Ir,k r = [ kr/2Jℓ , 1] otherwise. Define 
+
+Qk := Qd−1 
+
+> r=1
+
+Ir,k r . Each set Qk is a (d − 1) -dimensional cube whose side length is exactly 
+
+hℓ = 2 −Jℓ ; we refer to such a set as a dyadic cube. The collection of all these cubes forms a partition of [0 , 1] d−1, which we denote by Qℓ. Thus every point u ∈ [0 , 1] d−1 belongs to exactly one cube Q ∈ Q ℓ. A two-dimensional illustration of the dyadic partition, a terminal cube Q, and the representative point uQ is provided in Figure 2. 34 x1
+
+x2
+
+Q
+
+uQ
+
+hℓ
+
+fℓ(u) = f ∗(uQ)
+
+for all u ∈ Q
+
+0 1
+
+1
+
+Figure 2: The dyadic partition of the square [0 , 1] 2 is depicted for the case where Jℓ = 2 
+
+(illustrated with d − 1 = 2 ). Each terminal cube has a side length of hℓ = 2 −Jℓ . Within each cube Q, the approximation fℓ is constant and equals f ∗(uQ) at a representative point 
+
+uQ ∈ Q. The representative point uQ is indicated by the black dot. For each cube Q ∈ Q ℓ, choose one representative point uQ ∈ Q and define fℓ(u) := 
+
+P 
+
+> Q∈Q ℓ
+
+f ∗(uQ)1 {u ∈ Q}. Since every u belongs to exactly one cube, the function fℓ is well-defined and constant on each cube Q. If u ∈ Q, then ∥u − uQ∥∞ ≤ hℓ because Q has a side length of hℓ. Therefore, we can express the difference as follows: |fℓ(u) − f ∗(u)| =
+
+|f ∗(uQ) − f ∗(u)| ≤ Lf hℓ = Lf 2−Jℓ . Thus, ∥fℓ − f ∗∥∞ ≤ Lf 2−Jℓ .Next, we define the policy πℓ(x−d, x d) := 1 {xd ≤ fℓ(x−d)}. We now demonstrate that 
+
+πℓ ∈ Πℓ by explicitly constructing a decision tree of a depth of at most ℓ that implements this policy. Figure 3 illustrates this construction in the case d = 3 and Jℓ = 1 : the first d − 1
+
+coordinates determine the terminal cube containing x−d, and the final split on xd compares 
+
+xd with the cube-specific threshold. Start from the root node, which corresponds to the entire domain [0 , 1] d−1 for the first 
+
+d − 1 coordinates. We first build the partition Qℓ using only these initial coordinates. The refinement process is defined as follows. Suppose the current cell in the first d − 1
+
+coordinates is of the form Qd−1
+
+> r=1
+
+[ar, a r + δ) for some side length δ > 0. We split this cell once in the first coordinate at the midpoint a1 + δ/ 2. Then, we split each resulting child cell once in the second coordinate at its midpoint. This process continues sequentially through coordinates 3 to d − 1. After these d − 1 successive splits, the original cell is divided into 
+
+2d−1 smaller cubes, each with a side length of δ/ 2.Apply this refinement procedure repeatedly. At the beginning, there is a unique cell, 35 x1 < 1/2
+
+x2 < 1/2 x2 < 1/2
+
+x3 ≤ c1 x3 ≤ c2 x3 ≤ c3 x3 ≤ c4
+
+1 0 1 0 1 0 1 0    
+
+> yes no
+> yes no yes no
+
+Q1 Q2 Q3 Q4
+
+Figure 3: In this illustration of tree construction where d = 3 and Jℓ = 1 , the first two levels divide the (x1, x 2)-space into four dyadic cubes Q1, . . . , Q 4. The final division on x3
+
+compares it to the cube-specific constant ci = f ∗(uQi ) = fℓ(x−3) for x−3 ∈ Qi.which is [0 , 1] d−1, so its side length is 1. After one refinement round, every resulting cell has a side length of 2−1. After two rounds of refinement, each resulting cell has a side length of 
+
+2−2. Continuing in this pattern, after exactly Jℓ refinement rounds, every resulting cell will have a side length of 2−Jℓ and will therefore be one of the cubes in Qℓ. These final cells are precisely the leaves produced by the partitioning stage of the construction. When we refer to a terminal cube , we mean one of these final cubes in Qℓ, or equivalently, one leaf cell obtained after the Jℓ refinement rounds on the first d − 1 coordinates. Along any root-to-leaf path in this partitioning stage, each refinement round uses exactly 
+
+d − 1 binary splits, one for each of the first d − 1 coordinates. Therefore, the total number of splits needed to determine which terminal cube in Qℓ contains x−d is exactly Jℓ(d − 1) .We then add one final split at each terminal cube Q ∈ Q ℓ using the last coordinate 
+
+xd. Since fℓ is constant on Q, the value fℓ(u) remains the same for all u ∈ Q and equals 
+
+f ∗(uQ) by construction. Thus, once the path has identified that x−d ∈ Q, we can perform a split on the last coordinate at the threshold f ∗(uQ). We send the observation to the left child if xd ≤ f ∗(uQ) and to the right child otherwise. We assign label 1 to the left leaf and label 0
+
+to the right leaf. Because fℓ(x−d) = f ∗(uQ) whenever x−d ∈ Q, this final split effectively implements exactly the rule 1{xd ≤ fℓ(x−d)} for all (x−d, x d) ∈ Q × [0 , 1] .Since this process is performed for every terminal cube Q ∈ Q ℓ, the resulting tree implements the policy πℓ(x−d, x d) = 1 {xd ≤ fℓ(x−d)} across the entire space. The depth 36 original tree 
+
+xj < b 
+
+1 xk < c 
+
+0 1
+
+pad 
+
+complete tree of depth 2
+
+xj < b 
+
+dummy xk < c 
+
+1 1 0 1
+
+Figure 4: Expanding an early leaf to achieve a complete tree of depth ℓ without altering the induced policy. This reduction is utilized in the VC-dimension argument. of the tree is Jℓ(d − 1) + 1 , because the first Jℓ(d − 1) splits determine the cube containing 
+
+x−d and the final split compares xd with the constant value associated with that cube. By definition, Jℓ(d − 1) + 1 ≤ ℓ, so πℓ ∈ Πℓ.From Lemma B.2, inf π∈Πℓ d∆(π, π ∗) ≤ d∆(πℓ, π ∗) ≤ AX ∥fℓ − f ∗∥∞ ≤ AX Lf 2−Jℓ .The bound for the welfare approximation error follows from (B.1). To prove the VC-dimension bound, we first reduce the problem to complete trees. A tree in the class Πℓ may terminate early at some branches, resulting in leaves appearing at a depth of r < ℓ . To address this, we can attach a full binary subtree of depth ℓ − r below each leaf that appears at depth r. All newly created leaves in this subtree will be assigned the same label as the original leaf. This adjustment does not alter the policy implemented by the tree: once the original leaf is reached, the continuation will still return the same label. Thus, for the purpose of bounding the VC dimension, we can focus on complete binary trees of depth ℓ, where every root-to-leaf path has a length of exactly ℓ. Such a tree contains 
+
+2ℓ − 1 internal nodes and 2ℓ leaves. Here, an internal node refers to a non-terminal splitting node, while a leaf denotes a terminal node that carries a label from the set {0, 1}. Figure 4 illustrates the padding argument, which reduces the problem to complete binary trees of depth ℓ without changing the induced policy. To analyze a sample set S = {x1, . . . , xm} ⊂ [0 , 1] d, we need to determine how many distinct binary labelings of these m sample points can be generated by trees in Πℓ.We begin by considering a single internal node of the tree. The decision to split at that node involves choosing a coordinate j ∈ { 1, . . . , d } and a threshold b ∈ R. A sample point 37 x will be sent to the left child if xj < b and to the right child otherwise. Focusing on the chosen coordinate j, the threshold b can only create changes in the left/right split of the sample when it passes one of the sample values x1j , . . . , x mj . Thus, for a fixed coordinate, there can be at most m + 1 distinct ways to divide the sample points into left and right groups. Since there are d coordinate options available, a single internal node can lead to at most d(m + 1) different ways to split sample points. A complete tree has 2ℓ − 1 internal nodes. As a result, the decisions made at all internal nodes can lead to at most {d(m + 1) }2ℓ−1 different ways of sending the sample points down the tree. This means there are at most {d(m + 1) }2ℓ−1 different ways to determine which leaf each sample point ultimately reaches. Once these paths are established, each of the 
+
+2ℓ leaves can be assigned label 0 or label 1 independently. Therefore, the total number of binary labelings of the set S induced by Πℓ is at most 22ℓ
+
+{d(m + 1) }2ℓ−1.If S were to be completely shattered by Πℓ, then every one of the 2m possible binary labelings of the sample would need to be achievable. Consequently, we must have 2m ≤
+
+22ℓ
+
+{d(m + 1) }2ℓ−1. Taking logarithms gives m log 2 ≤ 2ℓ log 2 + (2 ℓ − 1) log d + (2 ℓ −
+
+1) log( m + 1) , and hence m log 2 ≤ 2 · 2ℓ log 2 + 2 ℓ log d + 2 ℓ log( m + 1) . Next, we will eliminate the remaining log( m + 1) term from the right-hand side. First, we note that log( m + 1) ≤ log(2 m). We can rewrite log(2 m) = log(4 · 2ℓ) + log  m/ (2 · 2ℓ).Furthermore, for every t > 0, we know that log t ≤ t/ 2. By applying this inequality with t = m/ (2 · 2ℓ), we obtain log( m + 1) ≤ log(4 · 2ℓ) + m/ (4 · 2ℓ). Substituting this bound back and rearranging gives  log 2 − 14
+
+m ≤ 2ℓ 2 log 2 + log d + log(2 ℓ+2 ).Since log 2 − 14 > 0, we conclude that m ≤ C · 2ℓ log(2 ℓd) for some universal constant 
+
+C > 0. Thus, no sample larger than C · 2ℓ log(2 ℓd) can be shattered by Πℓ. Therefore, 
+
+VC(Π ℓ) ≤ C · 2ℓ log(2 ℓd) ≤ C · 2ℓ(ℓ + log d). This completes the proof. ■
+
+B.2.2 Example 2.3: deep neural networks 
+
+Let FDNN ,ℓ denote the class of fully connected feedforward ReLU networks defined on the domain [0 , 1] d, with a specified width Hℓ and depth Dℓ (see (A.1) ). We define the threshold-policy sieve ΠDNN ,ℓ = {πg(x) = 1 {g(x) ≥ 0} : g ∈ F DNN ,ℓ }.
+
+Proposition B.3 (Approximation rate and VC dimension for the neural-network sieve) .
+
+38 Assuming that Assumptions 2.3 and B.2 hold, let Πℓ = Π DNN ,ℓ . For all large Hℓ and Dℓ,
+
+W (π∗)−max 
+
+> π∈Πℓ
+
+W (π) ≲
+
+ Hℓ
+
+log Hℓ
+
+−2s/ (d−1)  Dℓ
+
+log Dℓ
+
+−2s/ (d−1) 
+
+, VC(Π ℓ) ≲ D2 
+
+> ℓ
+
+H2 
+
+> ℓ
+
+log  DℓH2
+
+> ℓ
+
+ .
+
+Proof. We begin by proving the approximation error bound. We apply the results from Lu et al. (2021, Corollary 1.2) to the decision-boundary function f ∗ : [0 , 1] d−1 → [0 , 1] as stated in Assumption B.2. Since f ∗ ∈ Cs([0 , 1] d−1) and ∥f ∗∥Cs ≤ M , this result indicates that there exists a ReLU network ϕℓ defined on [0 , 1] d−1 with width at most Hℓ − 1 and depth Dℓ. For large Hℓ and Dℓ, we have: 
+
+∥ϕℓ − f ∗∥∞ ≤ Cs,d M
+
+ Hℓ
+
+log(8 Hℓ + 8) 
+
+−2s/ (d−1)  Dℓ
+
+log(4 Dℓ + 4) 
+
+−2s/ (d−1) 
+
+,
+
+after absorbing fixed depth-convention differences into Cs,d .We will next convert ϕℓ into a neural network defined on the domain [0 , 1] d. We define 
+
+gℓ(x−d, x d) := ϕℓ(x−d) − xd. Since xd ∈ [0 , 1] , we can propagate the identity function 
+
+xd 7 → xd through a ReLU network. This can be achieved by dedicating a neuron in each hidden layer to carry the value of xd. In the first hidden layer, this neuron outputs σ(xd) = xd,and in each subsequent hidden layer, applying the activation function σ leaves the value unchanged. Thus, the function gℓ can be implemented by a ReLU network on [0 , 1] d with depth Dℓ and width at most Hℓ. Since Hℓ − 1 ≍ H ℓ for large Hℓ, the approximation rate is unchanged. Therefore, we can consider gℓ to be an element of the space FDNN ,ℓ .Define πℓ(x−d, x d) := 1 {gℓ(x−d, x d) ≥ 0} = 1 {xd ≤ ϕℓ(x−d)}. Then πℓ ∈ ΠDNN ,ℓ .By Lemma B.2, d∆(πℓ, π ∗) ≤ AX ∥ϕℓ − f ∗∥∞. Substituting the approximation error bound for ϕℓ, with 
+
+rℓ := 
+
+ Hℓ
+
+log(8 Hℓ + 8) 
+
+−2s/ (d−1)  Dℓ
+
+log(4 Dℓ + 4) 
+
+−2s/ (d−1) 
+
+,
+
+gives d∆(πℓ, π ∗) ≤ Cs,d AX M r ℓ. Since πℓ ∈ ΠDNN ,ℓ , inf π∈ΠDNN ,ℓ d∆(π, π ∗) ≤ Cs,d AX M r ℓ.The welfare approximation error bound follows from (B.1). To prove the VC-dimension bound, we observe that Dℓ counts the hidden layers in (A.1), a fully connected network. A network with a width of Hℓ and a depth of Dℓ has Dℓ hidden layers plus one output layer, resulting in Dℓ + 1 weight matrices. The total number of trainable parameters in such a network is given by the formula (d + 1) Hℓ + ( Dℓ − 1)( Hℓ +1) Hℓ + ( Hℓ + 1) , provided that Dℓ ≥ 1. Therefore, there exists a d-dependent Cd such that the total number of trainable parameters can be bounded by CdDℓH2 
+
+> ℓ
+
+for large Hℓ and Dℓ.39 According to a result from Bartlett et al. (2019), the VC dimension of the sign class associated with a piecewise-linear network is bounded by a universal constant multiplied by the number of parameters, the number of layers, and the logarithm of the number of parameters. In this context, we note that the number of layers is bounded by Dℓ +1 = O(Dℓ).Furthermore, the number of parameters is at most CdDℓH2 
+
+> ℓ
+
+. Using this information, we can derive the following result: 
+
+VC(Π ℓ) ≤ C CdDℓH2
+
+> ℓ
+
+(Dℓ + 1) log  CdDℓH2
+
+> ℓ
+
+ ≲ D2 
+
+> ℓ
+
+H2 
+
+> ℓ
+
+log  DℓH2
+
+> ℓ
+
+
+
+for some generic constant C > 0. This completes the proof. ■
+
+# C Some useful lemmas 
+
+Lemma C.1 (Nearness of argmins of convex functions) . Consider the functions An(s; π) : 
+
+S × Π → R and Bn(s; π) : S × Π∞ → R, which represent two sequences of random functions. Here, Π ⊂ Π∞ is a policy class and S ⊂ Rp is an open convex set. For every policy π ∈ Π, the function An(s; π) is convex with respect to s. Let αn(π) be a measurable minimizer of An(s; π) for any π ∈ Π, and assume that Bn(s; π) has a unique minimum at 
+
+βn(π). Then, for each δ ≥ 0, we have: 
+
+P
+
+
+
+sup 
+
+> π∈Π
+
+∥αn(π) − βn(π)∥ > δ 
+
+
+
+≤ P (∆ n(δ; π) ≥ hn(δ; π), ∃π ∈ Π) ,
+
+where hn(δ; π) = inf s∈S :∥s−βn(π)∥=δ Bn(s; π) − Bn(βn(π); π), and 
+
+∆n(δ; π) = sup 
+
+> s∈S :∥s−βn(π)∥=δ
+
+|An(s; π) − Bn(s; π) − { An(βn(π); π) − Bn(βn(π); π)}| .
+
+Proof. The proof is implicit in the reference Hjort and Pollard (1993, Lemma 2). However, we will provide a detailed proof here for completeness. The case δ = 0 is immediate, so take 
+
+δ > 0. To begin, we fix any policy π ∈ Π. Let s ∈ { x ∈ S : ∥x − βn(π)∥ ≥ δ} represent an arbitrary point that is located either on or outside the ball surrounding βn(π) with radius 
+
+δ. Specifically, we define s = βn(π) + l · u, where u is a unit vector and l ≥ δ. Due to the convexity of An(s; π), we have 
+
+(1 −δ/l )An(βn(π); π)+( δ/l )An(s; π) ≥ An((1 −δ/l )βn(π)+( δ/l )s; π) = An(βn(π)+ δ·u; π).
+
+By rearranging the inequality above, we obtain: 
+
+(δ/l ) {An(s; π) − An(βn(π); π)} ≥ An(βn(π) + δ · u; π) − An(βn(π); π)=Bn(βn(π) + δ · u; π) − Bn(βn(π); π) + An(βn(π) + δ · u; π) − Bn(βn(π) + δ · u; π)
+
+40 − An(βn(π); π) + Bn(βn(π); π) ≥ hn(δ; π) − ∆n(δ; π).
+
+If hn(δ; π) > ∆n(δ; π), then An(s; π) > A n(βn(π); π) for all s located either on or outside the δ-ball, which implies that {hn(δ; π) > ∆n(δ; π)} ⊂ {∥ αn(π) − βn(π)∥ < δ }. As a result, {hn(δ; π) > ∆n(δ; π), ∀π ∈ Π} ⊂ {∥ αn(π) − βn(π)∥ < δ, ∀π ∈ Π}, which leads to 
+
+sup 
+
+> π∈Π
+
+∥αn(π) − βn(π)∥ > δ 
+
+
+
+⊂ {∥ αn(π) − βn(π)∥ ≥ δ, ∃π ∈ Π}⊂ { ∆n(δ; π) ≥ hn(δ; π), ∃π ∈ Π} .
+
+This completes the proof. ■
+
+Lemma C.2 (Uniform entropy for the transformed function class) . Let F1, . . . , FM represent classes of measurable functions S → R, equipped with measurable envelopes F1, . . . , F M ,respectively. Also, let ϕ : RM → R be a map satisfying: 
+
+|ϕ ◦ f (x) − ϕ ◦ g(x)|2 ≤
+
+> M
+
+X
+
+> m=1
+
+L2
+
+> m
+
+(x) |fm(x) − gm(x)|2 , (C.1) 
+
+for all f = ( f1, . . . , f M ), g = ( g1, . . . , g M ) ∈ F 1 × · · · × F M =: F and every x ∈ S, where 
+
+L1, . . . , L M are non-negative measurable functions on S. Let ϕ ◦ F := {ϕ ◦ f : f ∈ F} 
+
+represent a class of functions. Additionally, define L · F (x) := 
+
+qPMm=1 L2
+
+> m
+
+(x)F 2
+
+> m
+
+(x) as a measurable function. Then, 
+
+sup 
+
+> Q
+
+log N
+
+
+
+ϵ ∥L · F ∥Q, 2 , ϕ ◦ F , ∥·∥ Q, 2
+
+
+
+≤
+
+> M
+
+X
+
+> m=1
+
+sup 
+
+> Rm
+
+log N
+
+
+
+ϵ ∥Fm∥Rm,2 , Fm, ∥·∥ Rm,2
+
+
+
+,
+
+for all 0 < ϵ ≤ 1, where the suprema are taken over all finite discrete probability measures on (S, S). Additionally, let Φ( x) := |ϕ ◦ f 0(x)| + 2 
+
+qPMm=1 L2
+
+> m
+
+(x)F 2
+
+> m
+
+(x) be a measurable function, where f 0 := ( f01 , . . . , f 0M ) is any function in F. Then, Φ serves as an envelope of ϕ ◦ F and 
+
+sup 
+
+> Q
+
+log N
+
+
+
+ϵ ∥Φ∥Q, 2 , ϕ ◦ F , ∥·∥ Q, 2
+
+
+
+≤
+
+> M
+
+X
+
+> m=1
+
+sup 
+
+> Rm
+
+log N
+
+
+
+ϵ ∥Fm∥Rm,2 , Fm, ∥·∥ Rm,2
+
+
+
+,
+
+for all 0 < ϵ ≤ 1, where the suprema are taken over all finite discrete probability measures on (S, S).Proof. The proof is implicit in van der Vaart and Wellner (1996, p. 199); see also Cher-nozhukov et al. (2014, Lemma A.6) and Kosorok (2008, Lemma 9.13). ■
+
+41 D Proofs for Section 2 
+
+Proof of Theorem 2.1. Let n = N/K denote the common fold size. Define 
+
+RCV (ℓ) := K−1
+
+> K
+
+X
+
+> k=1
+
+{cWIk (bπℓ,I −k ) − log ℓ/ √N }, Ekℓ := cWIk (bπℓ,I −k ) − W (bπℓ,I −k ).
+
+By (2.2), bℓ = arg max ℓ=1 ,2,... RCV (ℓ). Then, for every ℓ ≥ 1, it holds that 
+
+W (π∗) − W (bπ) = W (π∗) − RCV (bℓ) + RCV (bℓ) − W (bπ)
+
+≤ { W (π∗) − RCV (ℓ)}
+
+| {z }
+
+> term 1
+
++
+
+n
+
+RCV (bℓ) − W (bπ)
+
+o| {z }
+
+> term 2
+
+. (D.1) We will handle term 1 and term 2 sequentially. 
+
+Term 1. Note that 
+
+1
+
+K
+
+> K
+
+X
+
+> k=1
+
+W (bπℓ,I −k ) − RCV (ℓ) = 1
+
+K
+
+> K
+
+X
+
+> k=1
+
+n
+
+W (bπℓ,I −k ) − cWIk (bπℓ,I −k )
+
+o
+
++ log ℓ
+
+√N (D.2) We handle every summand on the right-hand side of the above equality. Since bπℓ,I −k only depends on {Zi := ( Xi, Y i, T i)}i∈I−k , it remains independent of {Zi}i∈Ik . For every k =1, . . . , K , Assumption 2.1 gives P (|E kℓ | ≥ ϵ + C1/√n) ≤ C2 exp {− C3nϵ 2}. A standard integration argument then gives E|E kℓ | ≤ C1/√n + ´ ∞ 
+
+> 0
+
+C2 exp {− C3nϵ 2}dϵ ≤ C5/√N , for every ℓ = 1 , 2, . . . , where in the last step we let C5 := √K C1 + ´ ∞ 
+
+> 0
+
+C2 · exp {− C3ϵ2} dϵ <
+
+∞. From the decomposition of (D.2), we obtain the following results: E[term 1 ] ≤
+
+W (π∗) − K−1 PKk=1 E[W (bπℓ,I −k )] + log ℓ/ √N + C5/√N for all ℓ = 1 , 2, . . . . Since the observed data are i.i.d., 1
+
+> K
+
+PKk=1 E W (bπℓ,I −k ) = E W (bπℓ,I −1 ). Since the decomposition above holds for every ℓ = 1 , 2, . . . , we obtain 
+
+E [term 1 ] ≤ inf 
+
+> ℓ=1 ,2,...
+
+
+
+W (π∗) − E W (bπℓ,I −1 ) + log ℓ
+
+√N
+
+
+
++ C5
+
+√N , (D.3) 
+
+Term 2. We now address term 2 in (D.1). Based on the definition of bπ in (2.3), we have: term 2 = RCV (bℓ) − W (bπ) = 1
+
+K
+
+> K
+
+X
+
+> k=1
+
+cWIk (bπbℓ,I −k ) − W (bπ) − log bℓ
+
+√N
+
+≤ cWIbk (bπbℓ,I −bk
+
+) − W (bπbℓ,I −bk
+
+) − log bℓ
+
+√N . (D.4) Since bπℓ,I −k only depends on {Zi}i∈I−k , it is independent of {Zi}i∈Ik . For every k =1, . . . , K and ℓ = 1 , 2, . . . , Assumption 2.1 gives 
+
+P
+
+
+
+|E kℓ | ≥ ϵ + log ℓ
+
+√N + C1
+
+√n
+
+
+
+≤ C2 exp 
+
+
+
+−C3
+
+log 2 ℓK
+
+
+
+exp −C3nϵ 2 .
+
+42 When combined with the union bound, this leads to 
+
+P Ebkbℓ − log bℓ
+
+√N ≥ ϵ + C1
+
+√n
+
+!
+
+≤
+
+> K
+
+X
+
+> k=1
+> ∞
+
+X
+
+> ℓ=1
+
+P
+
+
+
+Ekℓ ≥ ϵ + log ℓ
+
+√N + C1
+
+√n
+
+
+
+≤
+
+> ∞
+
+X
+
+> ℓ=1
+
+K · C2 exp 
+
+
+
+−C3
+
+log 2 ℓK
+
+
+
+exp −C3nϵ 2 =: ∆ · exp −C3nϵ 2 (D.5) for all ϵ ≥ 0 and n ≥ C4, where in the last step we define ∆ := P∞ 
+
+> ℓ=1
+
+KC 2 exp 
+
+
+
+−C3 log 2 ℓK
+
+
+
+<
+
+∞. Now, using a standard integration argument, we have 
+
+E
+
+"
+
+Ebkbℓ − log bℓ
+
+√N
+
+#
+
+≤ C1
+
+√n +
+
+ˆ ∞
+
+> 0
+
+∆ · exp −C3nϵ 2 dϵ ≤ C6
+
+√N ,
+
+where C6 := √K{C1 + ´ ∞ 
+
+> 0
+
+∆ · exp( −C3ϵ2)dϵ } < ∞. Thus, we conclude that 
+
+E [term 2 ] ≤ E
+
+"
+
+Ebkbℓ − log bℓ
+
+√N
+
+#
+
+≤ C6
+
+√N . (D.6) 
+
+Aggregating the results by combining (D.1), (D.3) and (D.6) leads to 
+
+E [W (π∗) − W (bπ)] ≤ inf 
+
+> ℓ=1 ,2,...
+
+
+
+W (π∗) − max 
+
+> π∈Πℓ
+
+W (π) + max 
+
+> π∈Πℓ
+
+W (π)
+
+−E W (bπℓ,I −1 ) + log ℓ
+
+√N
+
+
+
++
+
+r CN .
+
+for large N , where C > 0 is a constant. ■
+
+Proof of Corollary 2.1. By applying the union bound, we obtain: 
+
+P
+
+
+
+sup 
+
+> ℓ≥1,1≤k≤K
+
+cWIk (bπℓ,I −k ) − W (bπℓ,I −k ) − log ℓ
+
+√N
+
+
+
+≥ ϵ + C1
+
+√n
+
+
+
+≤
+
+> ∞
+
+X
+
+> ℓ=1
+> K
+
+X
+
+> k=1
+
+P
+
+cWIk (bπℓ,I −k ) − W (bπℓ,I −k ) − log ℓ
+
+√N ≥ ϵ + C1
+
+√n
+
+
+
+≤
+
+> ∞
+
+X
+
+> ℓ=1
+
+K · C2 exp 
+
+
+
+−C3
+
+log 2 ℓK
+
+
+
+exp −C3nϵ 2 = ∆ · exp −C3nϵ 2 ,
+
+where ∆ = P∞ 
+
+> ℓ=1
+
+KC 2 exp 
+
+
+
+−C3 log 2 ℓK
+
+
+
+< ∞. We note that term 1 defined in (D.1) can be bounded as term 1 = W (π∗) − 1
+
+K
+
+> K
+
+X
+
+> k=1
+
+W (bπℓ,I −k ) + 1
+
+K
+
+> K
+
+X
+
+> k=1
+
+W (bπℓ,I −k ) − RCV (ℓ)=W (π∗) − 1
+
+K
+
+> K
+
+X
+
+> k=1
+
+W (bπℓ,I −k ) + 1
+
+K
+
+> K
+
+X
+
+> k=1
+
+n
+
+W (bπℓ,I −k ) − cWIk (bπℓ,I −k )
+
+o
+
++ log ℓ
+
+√N
+
+43 ≤W (π∗) − 1
+
+K
+
+> K
+
+X
+
+> k=1
+
+W (bπℓ,I −k ) + sup 
+
+> 1≤k≤K
+
+W (bπℓ,I −k ) − cWIk (bπℓ,I −k ) + log ℓ
+
+√N
+
+≤W (π∗) − 1
+
+K
+
+> K
+
+X
+
+> k=1
+
+W (bπℓ,I −k ) + 2 log ℓ
+
+√N + sup 
+
+> ℓ≥1,1≤k≤K
+
+cWIk (bπℓ,I −k ) − W (bπℓ,I −k ) − log ℓ
+
+√N
+
+
+
+.
+
+Combining the two inequalities with (D.1) and (D.4)–(D.5) leads to the conclusion that 
+
+W (π∗) − W (bπ) ≤ inf 
+
+> ℓ≥1
+
+(
+
+W (π∗) − 1
+
+K
+
+> K
+
+X
+
+> k=1
+
+W (bπℓ,I −k ) + 2 log ℓ
+
+√N
+
+)
+
++
+
+rC + δN
+
+w.p. at least 1 − C1 exp( −C2δ) for all δ > 0 and large N , where C > 0 is a constant. ■
+
+Proof of Corollary 2.2. First, establish an arbitrary deterministic sequence {ℓN }N ≥1 such that VC(Π ℓN )/N → 0. It follows from Theorem 2.1 that: 
+
+E [W (π∗) − W (bπ)] ≤ W (π∗) − max 
+
+> π∈ΠℓN
+
+W (π) + max 
+
+> π∈ΠℓN
+
+W (π)
+
+− E W (bπℓN ,I −1 ) + log ℓN
+
+√N +
+
+r CN .
+
+Let π∗ 
+
+> ℓN
+
+∈ arg max π∈ΠℓN W (π). According to the definition of bπℓN ,I −1 , we can derive: 
+
+W (π∗ 
+
+> ℓN
+
+) − W (bπℓN ,I −1 ) ≤
+
+n
+
+W (π∗ 
+
+> ℓN
+
+) − cWI−1 (π∗ 
+
+> ℓN
+
+)
+
+o
+
++
+
+ncWI−1 (bπℓN ,I −1 ) − W (bπℓN ,I −1 )
+
+o
+
+≤ 2 sup 
+
+> π∈ΠℓN
+
+cWI−1 (π) − W (π) .
+
+Taking expectations on both sides of the inequality leads us to the conclusion that: 
+
+max 
+
+> π∈ΠℓN
+
+W (π) − E W (bπℓN ,I −1 ) ≤ 2E
+
+"
+
+sup 
+
+> π∈ΠℓN
+
+cWI−1 (π) − W (π)
+
+#
+
+.
+
+Since |I−1| = ( K − 1) N/K and VC(Π ℓN )/|I−1| → 0, Assumption 2.2 implies that 
+
+P sup 
+
+> π∈ΠℓN
+
+cWI−1 (π) − W (π) ≥ δ + C1
+
+s
+
+VC(Π ℓN )
+
+|I−1|
+
+!
+
+≤ C2 exp( −C3|I−1|δ2)
+
+for all δ > 0 and large N . Integrating this tail bound yields 
+
+E
+
+"
+
+sup 
+
+> π∈ΠℓN
+
+cWI−1 (π) − W (π)
+
+#
+
+≤ C1
+
+s
+
+VC(Π ℓN )
+
+|I−1| +
+
+ˆ ∞
+
+> 0
+
+C2 exp( −C3|I−1|δ2)dδ 
+
+≤ C1
+
+r KK − 1
+
+rVC(Π ℓN )
+
+N +
+
+r KK − 1
+
+r 1
+
+N
+
+ˆ ∞
+
+> 0
+
+C2 exp( −C3δ2)dδ. 
+
+Combining the previous inequalities and renaming constants as needed, we conclude that for 44 every deterministic sequence {ℓN }N ≥1 satisfying VC(Π ℓN )/N → 0, the following holds: 
+
+E [W (π∗) − W (bπ)] ≤ W (π∗) − max 
+
+> π∈ΠℓN
+
+W (π) + C′
+
+r KK − 1
+
+rVC(Π ℓN )
+
+N + log ℓN
+
+√N +
+
+r CN .
+
+(D.7) We still need to select an admissible sequence. Define 
+
+ΨN (ℓ) := W (π∗) − max 
+
+> π∈Πℓ
+
+W (π) + C′
+
+r KK − 1
+
+rVC(Π ℓ)
+
+N + log ℓ
+
+√N ,
+
+and let ℓN be the smallest minimizer of ΨN (ℓ) over ℓ = 1 , 2, . . . . A minimizer exists because all three terms are non-negative and log ℓ/ √N → ∞ as ℓ → ∞ for each fixed N . Next, we demonstrate that VC(Π ℓN )/N → 0. Fix any ϵ > 0. By the standing condition on the approximating sequence, there exists a fixed integer L such that W (π∗) − max π∈ΠL W (π) <ϵ/ 2. Since VC(Π L) < ∞, for all large N we also have C′pK/ (K − 1) pVC(Π L)/N +log L/ √N < ϵ/ 2. Thus ΨN (ℓN ) ≤ ΨN (L) < ϵ for all large N , so ΨN (ℓN ) → 0. Since 0 ≤
+
+C′pK/ (K − 1) pVC(Π ℓN )/N ≤ ΨN (ℓN ), we have VC(Π ℓN )/N → 0. It follows that ℓN
+
+satisfies the condition for (D.7). In addition, ΨN (ℓN ) = inf ℓ=1 ,2,... ΨN (ℓ). Substituting this identity into (D.7), we can conclude: 
+
+E [W (π∗) − W (bπ)] ≤ inf 
+
+> ℓ
+
+(
+
+W (π∗) − max 
+
+> π∈Πℓ
+
+W (π) + C′
+
+r KK − 1
+
+rVC(Π ℓ)
+
+N + log ℓ
+
+√N
+
+)
+
++
+
+r CN .
+
+■
+
+Proof of Remark 2.2. The proof closely resembles that of Theorem 2.1. Let n = N/K 
+
+denote the common fold size, let LN ≥ 2, and define Ekℓ := cWIk (bπℓ,I −k ) − W (bπℓ,I −k ) and 
+
+rN := C∗plog LN /N . For ℓ = 1 , . . . , L N , set RCV (ℓ) := K−1 PKk=1 cWIk (bπℓ,I −k ); then 
+
+bℓ = arg max ℓ=1 ,...,L N RCV (ℓ). Note that for every ℓ = 1 , . . . , L N , the following statement holds: 
+
+W (π∗) − W (bπ) = W (π∗) − RCV (bℓ) + RCV (bℓ) − W (bπ)
+
+≤ { W (π∗) − RCV (ℓ)}
+
+| {z }
+
+> term 1
+
++
+
+n
+
+RCV (bℓ) − W (bπ)
+
+o| {z }
+
+> term 2
+
+. (D.8) We will discuss term 1 and term 2 one at a time. 
+
+term 1. Note that 
+
+1
+
+K
+
+> K
+
+X
+
+> k=1
+
+W (bπℓ,I −k ) − RCV (ℓ) = 1
+
+K
+
+> K
+
+X
+
+> k=1
+
+n
+
+W (bπℓ,I −k ) − cWIk (bπℓ,I −k )
+
+o
+
+(D.9) We address each term on the right-hand side of the above equality. Since bπℓ,I −k only relies 45 on {Zi := ( Xi, Y i, T i)}i∈I−k , it remains independent of {Zi}i∈Ik . For every k = 1 , . . . , K ,Assumption 2.1 gives P (|E kℓ | ≥ ϵ+C1/√n) ≤ C2 exp {− C3nϵ 2}. By a standard integration argument, E|E kℓ | ≤ C1/√n + ´ ∞ 
+
+> 0
+
+C2 exp {− C3nϵ 2}dϵ ≤ C5/√N , for every ℓ = 1 , . . . , L N ,where C5 := √K{C1 + ´ ∞ 
+
+> 0
+
+C2 exp( −C3ϵ2)dϵ } < ∞. From (D.9), we obtain E[term 1 ] ≤
+
+W (π∗)−K−1 PKk=1 E[W (bπℓ,I −k )]+ C5/√N for all ℓ = 1 , . . . , L N . Since the observed data are i.i.d., we can express the expected value as 1
+
+> K
+
+PKk=1 E W (bπℓ,I −k ) = E W (bπℓ,I −1 ).Since the decomposition above holds for every ℓ = 1 , . . . , L N , we obtain 
+
+E [term 1 ] ≤ inf 
+
+> ℓ=1 ,...,L N
+
+W (π∗) − E W (bπℓ,I −1 ) + C5
+
+√N , (D.10) 
+
+term 2. Now we address term 2 in (D.8). According to the finite-candidate definition of 
+
+bπ in Remark 2.2, we have term 2 = RCV (bℓ) − W (bπ) = 1
+
+K
+
+> K
+
+X
+
+> k=1
+
+cWIk (bπbℓ,I −k ) − W (bπ) ≤ cWIbk (bπbℓ,I −bk
+
+) − W (bπbℓ,I −bk
+
+).
+
+Since bπℓ,I −k depends solely on {Zi}i∈I−k , it is independent of {Zi}i∈Ik . For every k =1, . . . , K and ℓ = 1 , . . . , L N , Assumption 2.1 gives P (|E kℓ | ≥ ϵ + rN + C1/√n) ≤
+
+C2 exp( −(C∗)2C3 log LN /K ) exp {− C3nϵ 2}, where C∗ > pK/C 3 is a constant. The union bound gives 
+
+P
+
+
+
+Ebkbℓ ≥ ϵ + C1
+
+√n + rN
+
+
+
+≤
+
+> K
+
+X
+
+> k=1
+> LN
+
+X
+
+> ℓ=1
+
+P
+
+
+
+|E kℓ | ≥ ϵ + C1
+
+√n + rN
+
+
+
+≤LN K · C2 exp 
+
+
+
+− (C∗)2 C3
+
+log LN
+
+K
+
+
+
+exp −C3nϵ 2 ≤ KC 2 exp −C3nϵ 2
+
+for all ϵ ≥ 0 and n ≥ C4. By applying a standard integration argument, we have 
+
+E[Ebkbℓ − rN ] ≤ C1/√n + ´ ∞ 
+
+> 0
+
+KC 2 exp {− C3nϵ 2}dϵ ≤ C6/√N , where C6 := √K{C1 +
+
+´ ∞ 
+
+> 0
+
+KC 2 exp( −C3ϵ2)dϵ } < ∞. Thus, we obtain that 
+
+E [term 2 ] ≤ E Ebkbℓ
+
+ ≤ C∗
+
+rlog LN
+
+N + C6
+
+√N . (D.11) Combining the results from (D.8), (D.10), and (D.11) leads to 
+
+E [W (π∗) − W (bπ)] ≤ inf 
+
+> ℓ=1 ,...,L N
+
+
+
+W (π∗) − max 
+
+> π∈Πℓ
+
+W (π) + max 
+
+> π∈Πℓ
+
+W (π)
+
+−E W (bπℓ,I −1 ) + C
+
+rlog LN
+
+N
+
+for large N and LN ≥ 2, where C > 0 is a constant. ■
+
+46 E Proof of Theorem 5.1 
+
+## E.1 The asymptotic properties of beI (X) and bμI,jt (X; bβinit  
+
+> I
+
+## (π)) 
+
+Lemma E.1. Suppose that Assumptions 3.1, 5.1, 5.2, 5.3, 5.4, 5.5, and 5.6 hold. Let I be a fixed index set such that I ⊂ { 1, . . . , N } and |I| = m. If the DNN class FDNN (He, De)
+
+is constructed with HeDe ≍ md/ (4 se+2 d) (log m)2, then the DNN estimator defined in (A.2) satisfies P
+
+
+
+∥beI (X) − e∗(X)∥P, 2 > ρ e,m + t
+
+
+
+≤ c1 exp ( −c2mt 2) for all t > 0, where 
+
+c1, c 2 > 0 are finite constants independent of t and I, and ρe,m is a non-negative sequence satisfying ρe,m = o(m−1/4).Proof. Without loss of generality, we let I = {1, . . . , m }. In what follows, we write 
+
+Fe,m := FDNN (He, De) ∩ { f : ∥f ∥∞ ≤ M }. Denote the logistic function 11+exp( −x) by ι(x).Let 
+
+L(t, u ) := tι(u)2 − 2
+
+ι(u) + 1 − t
+
+(1 − ι(u)) 2 − 21 − ι(u),
+
+L(f ) := E [L(T, f (X))] , bLm(f ) := 1
+
+m
+
+X
+
+> i∈I
+
+L(Ti, f (Xi)) .
+
+Let bλI (X) := log {beI (X)/(1 −beI (X)) }. By construction and Assumption 5.6(i), bλI ∈ F e,m 
+
+almost surely. Since beI minimizes the empirical risk in (A.2) over logistic ◦ F DNN (He, De),and the logistic map is one-to-one, we may regard bλI as satisfying bλI = arg min f ∈F e,m bLm(f ).Let λ∗ := log {e∗/(1 − e∗)} and λ := arg min f ∈F e,m L(f ). Then, beI = ι ◦ bλI and e∗ = ι ◦ λ∗.We will first establish the convergence results for bλI (X), and then extend these findings to derive the convergence properties of beI (X). According to Assumption 3.1(ii) and Assump-tion 5.1, e∗ is bounded away from zero and one and ∥λ∗∥∞ ≤ M . It is important to note that 
+
+L(f ) − L (λ∗) = E
+
+"
+
+e∗(X)
+
+ 1
+
+ι(f (X)) − 1
+
+e∗(X)
+
+2#
+
++ E
+
+"
+
+{1 − e∗(X)}
+
+ 11 − ι(f (X)) − 11 − e∗(X)
+
+2#
+
+.
+
+For f ∈ F e,m , since both f and λ∗ are bounded by M , both ι(f (X)) and e∗(X) = ι(λ∗(X)) 
+
+are bounded away from zero and one. Additionally, 
+
+e∗(X)
+
+ 1
+
+ι(f (X)) − 1
+
+e∗(X)
+
+2
+
+= {ι(f (X)) − e∗(X)}2
+
+ι(f (X)) 2e∗(X) ,
+
+47 {1 − e∗(X)}
+
+ 11 − ι(f (X)) − 11 − e∗(X)
+
+2
+
+= {ι(f (X)) − e∗(X)}2
+
+(1 − ι(f (X))) 2 (1 − e∗(X)) .
+
+By substituting these two identities into the expression for L(f ) − L (λ∗), we obtain: 
+
+L(f )−L (λ∗) = E
+
+
+
+{ι(f (X)) − e∗(X)}2
+
+ 1
+
+ι(f (X)) 2e∗(X) + 1(1 − ι(f (X))) 2 (1 − e∗(X)) 
+
+ 
+
+.
+
+The multiplier of {ι(f (X)) − e∗(X)}2 is bounded above and below by positive constants that depend solely on M . Additionally, by applying the mean value theorem and considering that ι′ is bounded above and below on the interval [−M, M ], the norms ∥ι ◦ f − ι ◦ λ∗∥P, 2
+
+and ∥f − λ∗∥P, 2 are equivalent. Therefore, 
+
+c∗ ∥f − λ∗∥2 
+
+> P, 2
+
+≤ c∗ 
+
+> 1
+
+∥ι ◦ f − ι ◦ λ∗∥2 
+
+> P, 2
+
+≤ L (f ) − L (λ∗)
+
+≤ C∗ 
+
+> 1
+
+∥ι ◦ f − ι ◦ λ∗∥2 
+
+> P, 2
+
+≤ C∗ ∥f − λ∗∥2 
+
+> P, 2
+
+. (E.1) for all f ∈ F e,m , where c∗
+
+> 1
+
+, C ∗ 
+
+> 1
+
+, c ∗, C ∗ > 0 are constants depending only on the assumptions. For any t ∈ { 0, 1} and −M ≤ v ≤ u ≤ M , we have 
+
+|L(t, u ) − L(t, v )| ≤ C′ 
+
+> lip
+
+|ι(u) − ι(v)| ≤ Clip |u − v| , (E.2) where Clip , C ′ 
+
+> lip
+
+> 0 are constants. We first document the approximation floor for the population projection. Passing from 
+
+FDNN (He, De) to Fe,m only imposes ∥f ∥∞ ≤ M , which does not change the approximation rate because ∥λ∗∥∞ ≤ M . By Assumption 5.1 and Lu et al. (2021, Corollary 1.2), there exists eλ ∈ F e,m such that 
+
+eλ − λ∗
+
+> ∞
+
+≤ C (He/ log He)−2se/d (De/ log De)−2se/d .
+
+Since λ minimizes L over Fe,m , it can be concluded from (E.1) that: 
+
+0 ≤ L (λ) − L (λ∗) ≤ L (eλ) − L (λ∗) ≤ C eλ − λ∗ 2
+
+> ∞
+
+≤ Cm −2se/(2 se+d)(log m)6, (E.3) where the last inequality utilizes the construction and growth conditions on He and De
+
+in Assumption 5.6(ii), and incorporates the resulting logarithmic factors into (log m)6.Define ae,m := Cm −2se/(2 se+d)(log m)6. By (E.3) and the definition of ae,m , it follows that 
+
+L(λ) − L (λ∗) ≤ ae,m . This error bound will be utilized in the localization argument below. In particular, by (E.1), for every f ∈ F e,m , and by substituting f = λ into the resulting inequality, we obtain 
+
+L(f ) − L (λ) = {L (f ) − L (λ∗)} − L(λ) − L (λ∗) ≥ c∗ ∥f − λ∗∥2 
+
+> P, 2
+
+− ae,m , (E.4) 
+
+λ − λ∗ 2 
+
+> P, 2
+
+≤ Ca e,m . (E.5) We also apply the crude bound 0 ≤ L (f )−L (λ) ≤ L (f )−L (λ∗) ≤ C∥f −λ∗∥2 
+
+> P, 2
+
+≤ 4CM 2,48 derived from the definition of λ and (E.1). Next, we bound the empirical process. Let ve,m := H2 
+
+> e
+
+D2 
+
+> e
+
+log( HeDe). By Bartlett et al. (2019, Theorem 7), the class Fe,m is a VC-subgraph class with a VC index that is bounded by 
+
+Cv e,m . Hence, van der Vaart and Wellner (1996, Theorem 2.6.7) implies that, for constants 
+
+a > 1 and C > 0,
+
+sup 
+
+> Q
+
+log N
+
+
+
+M ϵ, Fe,m , ∥·∥ Q, 2
+
+
+
+≤ Cv e,m log( a/ϵ ), 0 < ϵ < 1,
+
+By (E.2) and Lemma C.2, the loss-difference class {(T, X) 7 → L(T, f (X)) − L(T, h (X)) : 
+
+f, h ∈ F e,m } is VC-type with index ve,m , up to constants. For s > 0, define the localized class Ge(s) := {(T, X) 7 → L(T, f (X)) − L(T, λ (X)) : 
+
+f ∈ F e,m , L(f ) − L (λ) ≤ s}. Every function in Ge(s) is bounded by a constant that depends solely on M . Furthermore, if s ≥ 2ae,m and gf ∈ G e(s), it then follows from (E.2) that P g 2 
+
+> f
+
+≤ C f − λ 2
+
+> P, 2
+
+. Since gf ∈ G e(s), we have: L(f ) − L (λ) ≤ s. Thus, the implication from (E.4) leads to: ∥f − λ∗∥2 
+
+> P, 2
+
+≤ C(s + ae,m ). Combining these bounds with (E.5) and using s ≥ 2ae,m gives 
+
+P g 2 
+
+> f
+
+≤ C f − λ 2 
+
+> P, 2
+
+≤ C
+
+n
+
+∥f − λ∗∥2 
+
+> P, 2
+
++ λ − λ∗ 2
+
+> P, 2
+
+o
+
+≤ Cs. 
+
+For every s ≥ s0 := max {2ae,m , m −2}, the work by Chernozhukov et al. (2018, Lemma 6.2) provides the following result: 
+
+E
+
+"
+
+sup 
+
+> g∈G e(s)
+
+|(Pm − P ) g|
+
+#
+
+≤ C
+
+rsv e,m log mm + ve,m log mm
+
+!
+
+.
+
+Applying Bousquet’s version of Talagrand’s inequality (Bousquet, 2002, Theorem 2.3) results in the following for all u ≥ 0:
+
+P sup 
+
+> g∈G e(s)
+
+|(Pm − P ) g| > C 
+
+"r s(ve,m log m + u)
+
+m + ve,m log m + um
+
+#! 
+
+≤ e−u.
+
+Let sk := 2 ks0, k = 0 , 1, . . . , K m, where Km := max {0, ⌈log 2(4 CM 2/s 0)⌉} . Then 
+
+Km = O(log m) and the dyadic intervals (sk−1, s k], with s−1 := 0 , cover all possible values of L(f ) − L (λ). By applying the previous concentration bound to Ge(sk) with a tail parameter of u + k log 2 and taking a union bound, there exists an event Ee,m (u) such that 
+
+P {E e,m (u)} ≥ 1 − c1 exp( −c2u) and, on Ee,m (u), for every k = 0 , . . . , K m,
+
+sup  
+
+> g∈G e(sk)
+
+|(Pm − P ) g| ≤ C
+
+"r sk(ve,m log m + u)
+
+m + ve,m log m + um
+
+#
+
+,
+
+where k ≤ Km = O(log m) and ve,m ≥ 1 for large m.49 Set Rm := L(bλI ) − L (λ). Since bλI minimizes the empirical risk, we have that 
+
+Pm{L(T, bλI (X)) − L(T, λ (X)) } ≤ 0. Therefore, 
+
+Rm ≤ (P −Pm)
+
+n
+
+L(T, bλI (X)) − L(T, λ (X)) 
+
+o
+
+≤ (Pm − P )
+
+n
+
+L(T, bλI (X)) − L(T, λ (X)) 
+
+o
+
+.
+
+On Ee,m (u), if Rm ≤ s0, then since s0 = max {2ae,m , m −2} and m−2 ≤ (ve,m log m + u)/m 
+
+for large m, we have Rm ≤ C{ae,m + ( ve,m log m + u)/m }. If Rm > s 0, choose k such that sk < R m ≤ sk+1 . Then, bλI belongs to the localized class Ge(sk+1 ), and hence 
+
+Rm ≤ C[psk+1 (ve,m log m + u)/m + ( ve,m log m + u)/m ]. Since sk+1 = 2 sk ≤ 2Rm, the elementary inequality r ≤ A√r + B ⇒ r ≤ 2A2 + 2 B leads to 
+
+Rm ≤ C
+
+
+
+ae,m + ve,m log m + um
+
+
+
+(E.6) on Ee,m (u). By combining (E.6) with (E.5) and (E.1), we derive a result that holds w.p. at least 1 − c1 exp( −c2u):
+
+bλI − λ∗ 2
+
+> P, 2
+
+≤ CR m + C λ − λ∗ 2 
+
+> P, 2
+
+≤ Ca e,m + C ve,m log mm + C um.
+
+With u = mt 2 and using √x + y ≤ √x + √y, we find that, w.p. at least 1 −
+
+c1 exp( −c2mt 2), bλI − λ∗
+
+> P, 2
+
+≤ C(ae,m +ve,m log m/m )1/2+Ct . Since (ae,m + ve,m log m/m )1/2 ≤
+
+Cm −se/(2 se+d)(log m)3 = o(m−1/4), where the last equality follows from se > d/ 2, the desired deterministic rate follows for the logit estimator. Finally, the mean value theorem and the boundedness of the logits imply |beI (X) − e∗(X)| ≤ C bλI (X) − λ∗(X) . For every t > 0, the following expression holds w.p. at least 1 − c1 exp( −c2mt 2):
+
+∥beI (X) − e∗(X)∥P, 2 ≤ Cm −se/(2 se+d)(log m)3 + Ct ≤ o(m−1/4) + Ct. (E.7) After enlarging ρe,m , and renaming constants if necessary, we obtain the result for all t > 0.This completes the proof. ■
+
+Lemma E.2. Suppose Assumptions 3.1, 5.1, 5.2, 5.3, 5.4, 5.5, and 5.6 hold. Let I ⊂{1, . . . , N } be an index set with |I| = m. For any policy class Π ⊂ Π∞ with a VC dimension VC(Π) , if VC(Π) /m → 0 as m → ∞ , then the quantity bβinit  
+
+> I
+
+(π) defined by (A.5) satisfies 
+
+P sup 
+
+> π∈Π
+
+bβinit  
+
+> I
+
+(π) − β∗(π) ≥ C
+
+rVC(Π) 
+
+m + Cρ e,m + δ
+
+!
+
+≤ c1 exp  −c2mδ 2
+
+for all 0 < δ < c 3 and large m, where c1, c 2, c 3 > 0 are finite constants independent of δ,
+
+m, I and Π, and C > 0 is finite. 
+
+50 Proof. Without loss of generality, we assume I = {1, . . . , m }. For notational simplic-ity, we present the argument for one coordinate. Applying the same argument to j =1, . . . , p and taking a finite union bound yields the displayed vector-norm result, since 
+
+p is fixed; the constants below absorb p. In this proof, we write FDNN ,e for logistic ◦{F DNN (He, De) T{f : ∥f ∥∞ ≤ M }} . Let ve,m := H2 
+
+> e
+
+D2 
+
+> e
+
+log( HeDe). By Assumption 5.6(ii), we have pve,m /m = o(m−1/4). By Bartlett et al. (2019, Theorem 7) and van der Vaart and Wellner (1996, Theorem 2.6.7), the truncated DNN class inside FDNN ,e is VC-type with index ve,m . Since the logistic map is bounded Lipschitz on [−M, M ], Lemma C.2 yields 
+
+sup 
+
+> Q
+
+log N
+
+
+
+ϵ, FDNN ,e , ∥·∥ Q, 2
+
+
+
+≤ Cv e,m log ( a/ϵ ) for all 0 < ϵ < 1, (E.8) where a, C > 0 do not depend on m. Enlarging ρe,m if necessary, we may assume 
+
+pve,m /m ≤ ρe,m for large m. Let 
+
+Q(β; π, e ) = E
+
+ π(X)Te(X) + (1 − π(X)) (1 − T )1 − e(X)
+
+
+
+L1(Y − β)
+
+
+
+,Qm(β; π, e ) = 1
+
+m
+
+X
+
+> i∈I
+
+nπ(Xi)Ti
+
+e(Xi) + (1 − π(Xi))(1 − Ti)1 − e(Xi)
+
+o
+
+L1(Yi − β).
+
+Then bβinit  
+
+> I
+
+(π) = arg min 
+
+> β∈R
+
+Qm(β; π, be) and β∗(π) = arg min 
+
+> β∈R
+
+Q(β; π, e ∗), where be := beI .Since Qm(β; π, be) is convex in β, we apply Lemma C.1 to bound bβinit  
+
+> I
+
+(π) − β∗(π). We decompose the proof into three steps and write am(Π) := pVC(Π) /m + ρe,m .
+
+Step 1. (Developing a lower bound for h(δ; π)). For all δ ∈ (0 , min {(3 Q′′ )/(4 Q′′ 
+
+> lip
+
+), c 0}),let h(δ; π) := inf |β−β∗(π)|=δ Q(β; π, e ∗) − Q(β∗(π); π, e ∗). By the first-order condition for 
+
+β∗(π), the mean value theorem, and Assumption 5.2(ii), we have 
+
+inf 
+
+> π∈Π∞
+
+h(δ; π) ≥ Q′′ 
+
+4 δ2 for all 0 < δ ≤ min 
+
+( 3Q′′ 
+
+4Q′′ 
+
+> lip
+
+, c 0
+
+)
+
+. (E.9) 
+
+Step 2. (Fluctuation bound). For any δ in the interval specified in Step 1, we let 
+
+∆( δ; π) := sup 
+
+> |β−β∗(π)|=δ
+
+|Qm(β; π, be) − Qm(β∗(π); π, be) − { Q(β; π, e ∗) − Q(β∗(π); π, e ∗)}| .
+
+Let 
+
+Q′
+
+> m
+
+(β; π, e ) := 1
+
+m
+
+X
+
+> i∈I
+
+nπ(Xi)Ti
+
+e(Xi) + (1 − π(Xi))(1 − Ti)1 − e(Xi)
+
+o
+
+L′
+
+> 1
+
+(Yi − β),Q′(β; π, e ) := E
+
+ π(X)Te(X) + (1 − π(X)) (1 − T )1 − e(X)
+
+
+
+L′
+
+> 1
+
+(Y − β)
+
+
+
+.
+
+By Assumption 5.2, we have − ´ ββ∗(π) Q′
+
+> m
+
+( eβ; π, be)d eβ = Qm(β; π, be) − Qm(β∗(π); π, be), and 51 analogously for Q′, and thus 
+
+∆( δ; π) = sup 
+
+> |β−β∗(π)|=δ
+
+−
+
+ˆ ββ∗(π)
+
+n
+
+Q′
+
+> m
+
+( eβ; π, be) − Q′( eβ; π, e ∗)
+
+o
+
+d eβ
+
+≤ δ sup 
+
+> |β−β∗(π)|≤ δ
+
+|Q′
+
+> m
+
+(β; π, be) − Q′(β; π, e ∗)| = δ e∆( δ; π),
+
+where we have let e∆( δ; π) := sup |β−β∗(π)|≤ δ |Q′
+
+> m
+
+(β; π, be) − Q′(β; π, e ∗)|. Now, it suffices to bound e∆( δ; π). Note that e∆( δ; π) can be decomposed into 
+
+sup 
+
+> π∈Π
+
+e∆( δ; π) = sup 
+
+> π∈Π
+
+sup 
+
+> |β−β∗(π)|≤ δ
+
+|Q′
+
+> m
+
+(β; π, be) − Q′(β; π, e ∗)|≤ sup 
+
+> π∈Π
+
+sup 
+
+> |β−β∗(π)|≤ δ
+
+|Q′
+
+> m
+
+(β; π, be) − Q′(β; π, be)|
+
++ sup 
+
+> π∈Π
+
+sup 
+
+> |β−β∗(π)|≤ δ
+
+|Q′(β; π, be) − Q′(β; π, e ∗)| . (E.10) We bound these two terms one by one. 
+
+Step 2.1: Empirical-process term. By Lemma E.1, together with the construction of be
+
+and Assumption 5.6(i), we have 
+
+sup 
+
+> π∈Π
+
+sup 
+
+> |β−β∗(π)|≤ δ
+
+|Q′
+
+> m
+
+(β; π, be) − Q′(β; π, be)| ≤ sup  
+
+> f∈M
+
+|{ Pm − P } f (Z)|
+
+w.p. at least 1 − c1 exp ( −c2mt 2) for all 0 < t < c 3 and large m, where 
+
+M := 
+
+n
+
+Z 7 →
+
+π(X)Te(X) + (1 − π(X))(1 − T )1 − e(X)
+
+
+
+L′
+
+> 1
+
+(Y − β) : |β − β∗(π)| ≤ δ, e ∈ F DNN ,e , ∥e − e∗∥P, 2 ≤ ρe,m + t, π ∈ Π
+
+o
+
+is a function class with envelope C > 0. Since L′ 
+
+> 1
+
+is non-decreasing, van der Vaart and Wellner (1996, Lemma 2.6.16) implies that {Z 7 → L ′
+
+> 1
+
+(Y − β) : |β − β∗(π)| ≤ δ, π ∈ Π}
+
+is VC-type with a fixed index. The map (π, e, ℓ ) 7 → { πT /e + (1 − π)(1 − T )/(1 − e)}ℓ is bounded Lipschitz on the overlap range, so Lemma C.2, the VC-subgraph bound for Π, and (E.8) give 
+
+sup 
+
+> Q
+
+log N
+
+
+
+Cϵ, M, ∥·∥ Q, 2
+
+
+
+≤ C {VC(Π) + ve,m } log ( a/ϵ )
+
+for all 0 < ϵ < 1, where a > 1 is a constant. Applying Chernozhukov et al. (2018, Lemma 6.2) gives that 
+
+E
+
+
+
+sup  
+
+> f∈M
+
+|{ Pm − P } f (Z)|
+
+
+
+≤ C
+
+rVC(Π) 
+
+m + C
+
+rve,m 
+
+m .
+
+52 By the bounded difference inequality, we have 
+
+P
+
+
+
+sup  
+
+> f∈M
+
+|{ Pm − P } f (Z)| − E
+
+
+
+sup  
+
+> f∈M
+
+|{ Pm − P } f (Z)|
+
+
+
+≥ t
+
+
+
+≤ c1 exp  −c2mt 2
+
+for any t ≥ 0. Thus, we obtain that 
+
+sup 
+
+> π∈Π
+
+sup 
+
+> |β−β∗(π)|≤ δ
+
+|Q′
+
+> m
+
+(β; π, be) − Q′(β; π, be)| ≤ C
+
+rVC(Π) 
+
+m + C
+
+rve,m 
+
+m + t
+
+w.p. at least 1 − 2c1 exp ( −c2mt 2) for all 0 < t < c 3 and large m.
+
+Step 2.2: Bound sup π∈Π sup |β−β∗(π)|≤ δ |Q′(β; π, be) − Q′(β; π, e ∗)|. By Lemma E.1, together with the construction of be and Assumption 5.6(i), we have 
+
+sup 
+
+> π∈Π
+
+sup 
+
+> |β−β∗(π)|≤ δ
+
+|Q′(β; π, be) − Q′(β; π, e ∗)|≤ sup 
+
+> π∈Π
+
+sup 
+
+> e∈F DNN ,e :∥e−e∗∥P, 2≤ρe,m +t
+
+sup 
+
+> |β−β∗(π)|≤ δ
+
+|Q′(β; π, e ) − Q′(β; π, e ∗)|
+
+w.p. at least 1 − c1 exp ( −c2mt 2) for all 0 < t < c 3 and large m. By Assumption 5.2 and the boundedness of the functions in FDNN ,e , we have 
+
+sup 
+
+> π∈Π
+
+sup 
+
+> e∈F DNN ,e :∥e−e∗∥P, 2≤ρe,m +t
+
+sup 
+
+> |β−β∗(π)|≤ δ
+
+|Q′(β; π, e ) − Q′(β; π, e ∗)|
+
+≲ sup 
+
+> ∥e−e∗∥P, 2≤ρe,m +t
+
+∥e − e∗∥P, 2 ≤ ρe,m + t. 
+
+Therefore, 
+
+sup 
+
+> π∈Π
+
+sup 
+
+> |β−β∗(π)|≤ δ
+
+|Q′(β; π, be) − Q′(β; π, e ∗)| ≤ Cρ e,m + Ct 
+
+w.p. at least 1 − c1 exp ( −c2mt 2) for all 0 < t < c 3 and large m.
+
+Step 3: Aggregating the results. Recalling (E.10), we have 
+
+sup 
+
+> π∈Π
+
+e∆( δ; π) ≤ C
+
+rVC(Π) 
+
+m + Cρ e,m + Ct (E.11) w.p. at least 1 − 3c1 exp ( −c2mt 2) for all 0 < t < c 3 and large m. Since pve,m /m ≤ ρe,m 
+
+for large m, the bound in (E.11) holds as stated. For any δ < min {(3 Q′′ )/(8 Q′′ 
+
+> lip
+
+), c 0/2}
+
+and large m, let δ′ = δ + 8CQ′′ 
+
+qVC(Π)  
+
+> m
+
++ 8CQ′′ ρe,m < min {(3 Q′′ )/(4 Q′′ 
+
+> lip
+
+), c 0}. Applying Lemma C.1, we have 
+
+P
+
+
+
+sup 
+
+> π∈Π
+
+bβinit  
+
+> I
+
+(π) − β∗(π) > δ ′
+
+
+
+≤ P (∆( δ′; π) ≥ h(δ′; π), ∃π ∈ Π) ≤ P
+
+
+
+sup 
+
+> π∈Π
+
+e∆( δ′; π) ≥ Q′′ 
+
+4 δ′
+
+
+
+≤P sup 
+
+> π∈Π
+
+e∆( δ′; π) ≥ C
+
+rVC(Π) 
+
+m + Cρ e,m + Q′′ 
+
+8 δ
+
+!
+
+≤ 3c1 exp −c2m
+
+ Q′′ 2
+
+64 δ2
+
+!
+
+where the second inequality follows from (E.9) and the last one follows from (E.11). Since 53 δ′ ≤ Cδ + CpVC(Π) /m + Cρ e,m , the stated result follows for 0 < δ < c 3 and large m.This completes the proof. ■
+
+Lemma E.3. Suppose that Assumptions 3.1, 5.1, 5.2, 5.3, 5.4, 5.5, and 5.6 hold and 
+
+I ⊂ { 1, . . . , N } is an index set with |I| = m. Let Π ⊂ Π∞ be any policy class. If the DNN class FDNN (Hμ, Dμ) is constructed with HμDμ ≍ md/ (4 sμ+2 d) (log m)2, then the DNN estimators defined in (A.3) and (A.4) satisfy 
+
+P sup 
+
+> π∈Π
+
+sup 
+
+> ∥β−β∗(π)∥≤ c0
+
+bμI,jt (X; β) − μ∗
+
+> jt
+
+(X; β) P, 2 > ρ μ,m + δ
+
+!
+
+≤ c1 exp  −c2mδ 2
+
+for t = 0 , 1, j = 0 , . . . , p , δ ≥ 0, and large m, where c1, c 2 > 0 are finite constants independent of I, m, Π, j, t, and δ, and ρμ,m is a non-negative deterministic sequence satisfying ρμ,m = o(m−1/4). In particular, this lemma does not require any restriction on 
+
+VC(Π) .Proof. Without loss of generality, we assume I = {1, . . . , m }. We abbreviate bμI,jt (·; β)
+
+by bμ(·; β) and μ∗
+
+> jt
+
+(·; β) by μ∗(·; β) when no confusion arises. Fix j ∈ { 0, 1, . . . , p } and 
+
+t ∈ { 0, 1}. The proof below is written for this fixed pair; the constants are uniform over the finitely many choices of (j, t ). Let Rj (Y, X; β) := U (Y, X, β) for j = 0 , and 
+
+Rj (Y, X; β) := L′ 
+
+> j
+
+(Y − βj ) for j = 1 , . . . , p . Define B0 := {β ∈ Rp : ∥β − β∗(π)∥ ≤ 
+
+c0 for some π ∈ Π∞}. This set is deterministic, so the argument below does not involve the complexity of Π. We write Fμ,m := FDNN (Hμ, Dμ) ∩ { f : ∥f ∥∞ ≤ M }. This bounded class will be used throughout the proof; the truncation to ∥f ∥∞ ≤ M does not change the approximation rate used below because Assumption 5.4 implies ∥μ∗
+
+> ℓr
+
+(·; β)∥∞ ≤ M
+
+uniformly over ℓ = 0 , . . . , p , r ∈ { 0, 1} and β ∈ B 0. By construction and Assumption 5.6(i), for every β ∈ B 0 the estimator defined in (A.3)–(A.4) belongs to Fμ,m almost surely. Since this estimator minimizes the empirical risk over the larger class FDNN (Hμ, Dμ), we may also regard bμ(·; β) as an empirical risk minimizer over Fμ,m throughout the proof. Also define the approximation and complexity quantities 
+
+ϵμ,m := sup 
+
+> 0≤ℓ≤p
+
+sup 
+
+> r∈{ 0,1}
+
+sup 
+
+> β∈B 0
+
+inf  
+
+> f∈F μ,m
+
+∥f − μ∗
+
+> ℓr
+
+(·; β)∥∞
+
+and vμ,m := H2
+
+> μ
+
+D2 
+
+> μ
+
+log( HμDμ).First, the response is uniformly bounded. For j = 0 this follows from Assumption 5.3(i), 54 and for j ≥ 1 from Assumption 5.2(iii): 
+
+sup 
+
+> β∈B 0
+
+|Rj (Y, X; β)| ≤ M/ 4 almost surely. (E.12) Assumption 5.4 gives the corresponding uniform smoothness of μ∗
+
+> jt
+
+(·; β) over β ∈ B 0. Also, Assumption 5.1 implies that there exists e ∈ (0 , 1/2) such that e ≤ e∗(X) ≤ 1 − e almost surely. Finally, by Bartlett et al. (2019, Theorem 7) and van der Vaart and Wellner (1996, Theorem 2.6.7), there exist constants a > 1 and C > 0 such that 
+
+sup 
+
+> Q
+
+log N
+
+
+
+M ϵ, Fμ,m , ∥·∥ Q, 2
+
+
+
+≤ Cv μ,m log( a/ϵ ), 0 < ϵ < 1, (E.13) The response class {(Y, X) 7 → Rj (Y, X; β) : β ∈ B 0} is VC-type with a fixed index by Assumption 5.3(ii) for j = 0 and by van der Vaart and Wellner (1996, Lemma 2.6.16) and monotonicity of L′ 
+
+> j
+
+for j ≥ 1.For z = ( τ, y, x⊤)⊤ and v ∈ R, define 
+
+L(z, v ; β) := 1( τ = t){Rj (y, x; β) − v}2,
+
+L(f ; β) := E[L(Z, f (X); β)] , bLm(f ; β) := m−1
+
+> m
+
+X
+
+> i=1
+
+L(Zi, f (Xi); β).
+
+Then bμ(·; β) = arg min f ∈F μ,m bLm(f ; β) and μ∗(·; β) = arg min f L(f ; β). Let μ(·; β) := arg min f ∈F μ,m L(f ; β), E (f ; β) := L(f ; β)−L (μ(·; β); β), and aμ,m := sup β∈B 0 {L (μ(·; β); β)−L(μ∗(·; β); β)}.
+
+Step 1. We first record the curvature identity and the approximation floor. Since 
+
+μ∗(·; β) = E[Rj (Y, X; β) | X, T = t], for every measurable f , by overlap, 
+
+L(f ; β) − L (μ∗(·; β); β) = E 1( T = t){f (X) − μ∗(X; β)}2 , (E.14) 
+
+e ∥f (X) − μ∗(X; β)∥2 
+
+> P, 2
+
+≤ L (f ; β) − L (μ∗(·; β); β) ≤ ∥ f (X) − μ∗(X; β)∥2 
+
+> P, 2
+
+.
+
+(E.15) By the definition of ϵμ,m , for each β ∈ B 0 there exists fβ ∈ F μ,m with ∥fβ − μ∗(·; β)∥∞ ≤
+
+ϵμ,m . Since μ(·; β) minimizes L(·; β) over Fμ,m , (E.14) yields 
+
+aμ,m ≤ ϵ2
+
+> μ,m
+
+. (E.16) 
+
+Step 2. For s > 0, define the localized class F (s; β) := {f ∈ F μ,m : E (f ; β) ≤ s}
+
+and 
+
+G(s) := {z 7 → L(z, f (x); β) − L(z, μ (x; β); β) : β ∈ B 0, f ∈ F (s; β)} .
+
+Let s0 := max {2aμ,m , m −2}. If s ≥ s0 and f ∈ F (s; β), then L(f ; β) − L (μ∗(·; β); β) ≤
+
+s+aμ,m ≤ 32 s. Combining this bound with (E.15) and applying the same argument to μ(·; β)
+
+55 gives ∥f (X) − μ(X; β)∥P, 2 ≤ C√s. For any g ∈ G (s), write r = Rj (y, x; β), u = f (x)
+
+and v = μ(x; β). By (E.12) and the definition of Fμ,m , |(r − u)2 − (r − v)2| ≤ 3M |u − v|.Thus G(s) has a bounded envelope depending only on M , and 
+
+sup 
+
+> g∈G (s)
+
+∥g∥2 
+
+> P, 2
+
+≤ Cs, s ≥ s0. (E.17) 
+
+Step 3. We next bound the entropy of G(s). Since μ(·; β) ∈ F μ,m , the class G(s) is contained in 
+
+{z 7 → L(z, f (x); β) − L(z, g (x); β) : f, g ∈ F μ,m , β ∈ B 0} .
+
+This containment, together with the bounded Lipschitz map (r, u, v ) 7 → 1( τ = t){(r −
+
+u)2 − (r − v)2}, Lemma C.2, (E.13), and the fixed response-class entropy, implies that, for constants A > 1 and C > 0,
+
+sup 
+
+> Q
+
+log N
+
+
+
+Cϵ, G(s), ∥·∥ Q, 2
+
+
+
+≤ Cv μ,m log( A/ϵ ), 0 < ϵ < 1, (E.18) uniformly over s > 0.
+
+Step 4. By (E.17) and (E.18), Chernozhukov et al. (2018, Lemma 6.2) gives, for every 
+
+s ≥ s0 and all large m,
+
+E
+
+"
+
+sup 
+
+> g∈G (s)
+
+|(Pm − P ) g|
+
+#
+
+≤ C
+
+rsv μ,m log mm + vμ,m log mm
+
+!
+
+.
+
+Applying Bousquet’s version of Talagrand’s inequality (Bousquet, 2002, Theorem 2.3) together with (E.17) yields, for all u ≥ 0,
+
+P sup 
+
+> g∈G (s)
+
+|(Pm − P ) g| > C 
+
+"r s(vμ,m log m + u)
+
+m + vμ,m log m + um
+
+#! 
+
+≤ e−u. (E.19) Because |Rj (Y, X; β)| ≤ M/ 4 uniformly over β ∈ B 0 and all functions in Fμ,m are bounded by M , the loss satisfies 0 ≤ L(Z, f (X); β) ≤ 25 M 2/16 for every f ∈ F μ,m and 
+
+β ∈ B 0. Hence 0 ≤ E (f ; β) ≤ 25 M 2/16 . Let sk := 2 ks0 for k = 0 , 1, . . . , K m, where 
+
+Km := max {0, ⌈log 2(25 M 2/(16 s0)) ⌉} . Then sKm ≥ 25 M 2/16 . Since s0 ≥ m−2, we also have Km ≤ ⌈ log 2(25 M 2m2/16) ⌉ = O(log m). Thus the dyadic intervals {(sk−1, s k]}Km
+
+> k=0
+
+,with the convention s−1 := 0 , cover all possible values of E (f ; β). Applying (E.19) to each 
+
+G(sk) with tail parameter u + k log 2 gives, for each k = 0 , . . . , K m,
+
+P sup  
+
+> g∈G (sk)
+
+|(Pm − P ) g| > C 
+
+"r sk(vμ,m log m + u + k log 2) 
+
+m
+
++vμ,m log m + u + k log 2 
+
+m
+
+ 
+
+≤ 2−ke−u.
+
+56 By the union bound, the preceding display holds simultaneously for all k = 0 , . . . , K m w.p. at least 1 − 2e−u. Moreover, since k ≤ Km = O(log m) and vμ,m ≥ 1 for large m, the term 
+
+k log 2 /m can be absorbed into vμ,m log m/m after enlarging the constant. Therefore, for constants c1, c 2, C > 0, there exists an event Em(u) with P {E m(u)} ≥ 1 − c1 exp( −c2u)
+
+such that, on Em(u), for every k = 0 , . . . , K m,
+
+sup  
+
+> g∈G (sk)
+
+|(Pm − P ) g| ≤ C
+
+"r sk(vμ,m log m + u)
+
+m + vμ,m log m + um
+
+#
+
+. (E.20) 
+
+Step 5. Define Rm := sup β∈B 0 E (bμ(·; β); β). Since bμ(·; β) minimizes the empirical risk, for every β ∈ B 0,
+
+E (bμ(·; β); β) ≤ | (Pm − P ) [ L(Z, bμ(X; β); β) − L(Z, μ (X; β); β)] | . (E.21) On Em(u), if Rm ≤ s0, then Rm ≤ C(aμ,m + ( vμ,m log m + u)/m ) for all large m, since 
+
+s0 = max {2aμ,m , m −2} and m−2 ≤ (vμ,m log m + u)/m . If Rm > s 0, choose k ∈{0, . . . , K m − 1} such that sk < R m ≤ sk+1 . For any η > 0, there exists βη ∈ B 0 such that Rm − η < E (bμ(·; βη); βη) ≤ Rm. Then bμ(·; βη) ∈ F (sk+1 ; βη), so (E.21) and (E.20) imply Rm − η ≤ C[psk+1 (vμ,m log m + u)/m + ( vμ,m log m + u)/m ]. Letting η → 0 and using sk+1 ≤ 2Rm, we get Rm ≤ C[pRm(vμ,m log m + u)/m + ( vμ,m log m + u)/m ]. The elementary inequality r ≤ A√r + B ⇒ r ≤ 2A2 + 2 B therefore gives 
+
+Rm ≤ C
+
+
+
+aμ,m + vμ,m log m + um
+
+
+
+(E.22) on Em(u).
+
+Step 6. Combining (E.15) and (E.22), on Em(u),
+
+sup 
+
+> β∈B 0
+
+∥bμ(X; β) − μ∗(X; β)∥P, 2 ≤ C √aμ,m +
+
+rvμ,m log mm +
+
+r um
+
+!
+
+≤C ϵμ,m +
+
+rvμ,m log mm +
+
+r um
+
+!
+
+,
+
+where the last inequality uses (E.16). Since Π ⊂ Π∞, the supremum over {β : ∥β − β∗(π)∥ ≤ 
+
+c0, π ∈ Π} is bounded by the supremum over B0. Taking u to be a large enough multiple of 
+
+mδ 2 and absorbing constants into C1, C 2, c 2 gives 
+
+P sup 
+
+> π∈Π
+
+sup 
+
+> ∥β−β∗(π)∥≤ c0
+
+bμI,jt (X; β) − μ∗
+
+> jt
+
+(X; β) P, 2
+
+> C 1ϵμ,m + C2
+
+rvμ,m log mm + δ
+
+!
+
+≤ c1 exp  −c2mδ 2 .
+
+57 It remains to verify that the two deterministic terms have the claimed rates under the exist-ing assumptions. By Assumption 5.4, Lu et al. (2021, Corollary 1.2), and Assumption 5.6(ii), uniformly over j = 0 , . . . , p , t ∈ { 0, 1} and β ∈ B 0,
+
+ϵμ,m ≤ C (Hμ/ log Hμ)−2sμ/d (Dμ/ log Dμ)−2sμ/d = O  m−sμ/(2 sμ+d)(log m)3 = o(m−1/4),
+
+rvμ,m log mm =
+
+rH2
+
+> μ
+
+D2 
+
+> μ
+
+log( HμDμ) log mm = O  m−sμ/(2 sμ+d)(log m)3 = o(m−1/4),
+
+where the first line also uses sμ > d/ 2. Set ρμ,m := C1ϵμ,m + C2
+
+pvμ,m log m/m . The preceding displays imply ρμ,m = o(m−1/4), and the claimed statement follows. This completes the proof. ■
+
+Lemma E.4. Suppose that Assumptions 3.1, 5.1, 5.2, 5.3, 5.4, 5.5, and 5.6 hold and 
+
+I ⊂ { 1, . . . , N } is an index set with |I| = m. Let Π ⊂ Π∞ be a policy class with VC dimension VC(Π) and VC(Π) /m → 0 as m → ∞ . If the DNN class FDNN (Hμ, Dμ) is constructed with HμDμ ≍ md/ (4 sμ+2 d) (log m)2, then the DNN estimators bμI,jt (X; bβinit  
+
+> I
+
+(π)) 
+
+(t = 0 , 1 and j = 0 , 1, . . . , p ) satisfy 
+
+P
+
+
+
+sup π∈Π bμI,jt (X; bβinit  
+
+> I
+
+(π)) − μ∗
+
+> jt
+
+(X; β∗(π)) P, 2
+
+≤ Cρ μ,m + C
+
+qVC(Π)  
+
+> m
+
++ Cρ e,m + δ
+
+bμI,jt (X; bβinit  
+
+> I
+
+(π)) ∈ F DNN (Hμ, Dμ) T{f : ∥f ∥∞ ≤ M }, ∀π ∈ Π
+
+
+
+≥ 1 − c1 exp  −c2mδ 2
+
+for all 0 < δ < c 3, where c1, c 2, c 3 > 0 are finite constants independent of δ, I, m, and Π,and ρμ,m is a non-negative sequence satisfying ρμ,m = o(m−1/4).Proof. We focus on establishing the result for bμI, 01 (X; bβinit  
+
+> I
+
+(π)) , as the proofs for the remaining cases follow analogously. According to Lemma E.2, we have 
+
+sup 
+
+> π∈Π
+
+bβinit  
+
+> I
+
+(π) − β∗(π) ≤ c0 (E.23) w.p. at least 1 − c1 exp ( −c2mδ 2) for all 0 < δ < c 4 and large m, where c4 > 0 is finite. Applying Lemma E.3 we have 
+
+P
+
+
+
+sup 
+
+> π∈Π
+
+bμI, 01 (X; bβinit  
+
+> I
+
+(π)) − μ∗
+
+> 01
+
+(X; bβinit  
+
+> I
+
+(π)) P, 2
+
+> ρ μ,m + δ
+
+
+
+≤P sup 
+
+> π∈Π
+
+sup 
+
+> ∥β−β∗(π)∥≤ c0
+
+∥bμI, 01 (X; β) − μ∗
+
+> 01
+
+(X; β)∥P, 2 > ρ μ,m + δ
+
+!
+
++ P
+
+
+
+sup 
+
+> π∈Π
+
+bβinit  
+
+> I
+
+(π) − β∗(π) > c 0
+
+
+
+≤c1 exp  −c2mδ 2 + c1 exp  −c2mδ 2 ≤ 2c1 exp  −c2mδ 2
+
+58 for all 0 < δ < c 4 and large m. In addition, by Assumption 5.5 and Lemma E.2 we have 
+
+sup 
+
+> π∈Π
+
+μ∗
+
+> 01
+
+(X; bβinit  
+
+> I
+
+(π)) − μ∗
+
+> 01
+
+(X; β∗(π)) P, 2
+
+≤ Lμ sup 
+
+> π∈Π
+
+bβinit  
+
+> I
+
+(π) − β∗(π)
+
+≤ C
+
+rVC(Π) 
+
+m + Cρ e,m + Lμδ
+
+w.p. at least 1 − c1 exp ( −c2mδ 2) for all 0 < δ < c 3 and large m. Combining the last two displays, we have 
+
+sup 
+
+> π∈Π
+
+bμI, 01 (X; bβinit  
+
+> I
+
+(π)) − μ∗
+
+> 01
+
+(X; β∗(π)) P, 2
+
+≤ sup 
+
+> π∈Π
+
+bμI, 01 (X; bβinit  
+
+> I
+
+(π)) − μ∗
+
+> 01
+
+(X; bβinit  
+
+> I
+
+(π)) P, 2
+
++ sup 
+
+> π∈Π
+
+μ∗
+
+> 01
+
+(X; bβinit  
+
+> I
+
+(π)) − μ∗
+
+> 01
+
+(X; β∗(π)) P, 2
+
+≤ ρμ,m + C
+
+rVC(Π) 
+
+m + Cρ e,m + ( Lμ + 1) δ
+
+w.p. at least 1 − 3c1 exp ( −c2mδ 2) for all 0 < δ < min {c3, c 4} and large m.Besides, under (E.23), by construction and Assumption 5.6(i) we also have bμI, 01 (X; bβinit  
+
+> I
+
+(π)) ∈FDNN (Hμ, Dμ) ∩ { f : ∥f ∥∞ ≤ M } for all π ∈ Π. Thus, for all 0 < δ < min {c3, c 4} and large m, w.p. at least 1 − 4c1 exp ( −c2mδ 2),
+
+sup 
+
+> π∈Π
+
+bμI, 01 (X; bβinit  
+
+> I
+
+(π)) − μ∗
+
+> 01
+
+(X; β∗(π)) P, 2
+
+≤ ρμ,m + C
+
+rVC(Π) 
+
+m + Cρ e,m + ( Lμ + 1) δ, 
+
+and the membership condition above holds for all π ∈ Π. This completes the proof. ■
+
+## E.2 The asymptotic properties of the weights bwI,i (π)
+
+To begin with, we derive the asymptotic properties of the weights bwI,i (π). Without loss of generality, we assume I = {1, . . . , m }.We let bξ0(X) := ( bμI,j 0(X; bβinit  
+
+> I
+
+(π)) : j = 0 , 1, . . . , p )⊤ and bξ1(X) = ( bμI,j 1(X; bβinit  
+
+> I
+
+(π)) : 
+
+j = 0 , 1, . . . , p )⊤. We also write be := beI and bξ(X) := ( bξ0(X)⊤, bξ1(X)⊤)⊤, and let 
+
+A(T, X; e, ξ, π ) := (1 − T )(1 − π(X)) 1 − e(X) ξ0(X) + T π (X)
+
+e(X) ξ1(X).
+
+Write Ai := A(Ti, Xi; be, bξ, π ) for i ∈ I. Besides, let w = ( w1, . . . , w m)⊤ and B =
+
+m−1 P 
+
+> i∈I
+
+{(1 − π(Xi)) bξ0(Xi) + π(Xi)bξ1(Xi)}. For any v ∈ R, denote the derivative of D(v) by D′(v). Then D′(1) = 0 and D′′ (1) > 0. Let D(w) = P 
+
+> i∈I
+
+D(wi). Then the calibration problem can be rewritten as 
+
+( bwI,i (π)) i∈I = arg min  
+
+> wi>0: i∈I
+
+D(w) s.t. (A1, . . . , Am) w = mB. (E.24) 59 Note that the conjugate function of D(w) is 
+
+D∗(z) = X
+
+> i∈I
+
+zi · (D′)−1(zi) − D (D′)−1(zi) = X
+
+> i∈I
+
+−ρ(−zi), ∀z = ( z1, . . . , z m)⊤,
+
+where ρ(v) := D {(D′)−1(−v)} + v · (D′)−1(−v) for any v ∈ R. The dual problem of (E.24) is 
+
+max 
+
+> λ∈Rp+1
+
+λ⊤mB − D∗(( A1, . . . , Am)⊤λ) = max 
+
+> λ∈Rp+1
+
+X
+
+> i∈I
+
+λ⊤B + ρ(−λ⊤Ai)
+
+= max 
+
+> λ∈Rp+1
+
+1
+
+m
+
+X
+
+> i∈I
+
+ρ(λ⊤Ai) − λ⊤B .
+
+Let bG(λ; π) := 1
+
+> m
+
+P
+
+> i∈I
+
+ρ(λ⊤Ai) − λ⊤B and bλI (π) := arg max λ∈Rp+1 bG(λ; π). On any event on which the affine constraint in (E.24) admits a vector w = ( wi)i∈I with wi > 0
+
+for every i ∈ I, Slater’s condition for this equality-constrained entropy program holds, and strong duality follows from Section 5 of Boyd and Vandenberghe (2004). The bounded-dual argument in Lemma E.5 below verifies this strict feasibility on the high-probability event used in the asymptotic analysis. On this event, the first-order condition of the dual problem gives 
+
+bwI,i (π) = ρ′(bλI (π)⊤Ai), for all i ∈ I, (E.25) where ρ′(·) is the derivative of ρ(·). We now give the asymptotic behavior of bwI,i (π), which is critical in the subsequent analysis. 
+
+Lemma E.5. Suppose that Assumptions 3.1, 5.1, 5.2, 5.3, 5.4, 5.5, and 5.6 hold and 
+
+I ⊂ { 1, . . . , N } is an index set with |I| = m. Let Π ⊂ Π∞ be a policy class with VC dimension VC(Π) and VC(Π) /m → 0 as m → ∞ . Then 
+
+P sup 
+
+> π∈Π
+
+bλI (π) ≥ C
+
+rVC(Π) 
+
+m + Cρ e,m + Cρ μ,m + δ
+
+!
+
+≤ c1 exp  −c2mδ 2
+
+for all 0 < δ < c 3 and large m, where c1, c 2, c 3 > 0 are finite constants independent of δ, I,
+
+m and Π, and C > 0 is finite. Proof. Note that ρ′(v) = ( −v)d{(D′)−1(−v)} 
+
+> dv
+
++ v d{(D′)−1(−v)} 
+
+> dv
+
++ ( D′)−1(−v) = ( D′)−1(−v)
+
+and ρ′′ (v) = −1/D ′′ (( D′)−1(−v)) . Since D′(1) = 0 , D′′ (1) > 0 and D′′ (v), (D′)−1(v) are continuous, we have ρ′(0) = 1 , ρ′′ (0) < 0 and ρ′′ (v) is continuous. Since D(v) is strictly convex, ρ(v) is also strictly concave. In this proof we write FDNN ,e and FDNN ,μ for logistic ◦{F DNN (He, De) T{f : ∥f ∥∞ ≤ M }} 
+
+and FDNN (Hμ, Dμ) T{f : ∥f ∥∞ ≤ M }, respectively. We let ve,m := H2 
+
+> e
+
+D2 
+
+> e
+
+log( HeDe),60 vμ,m := H2
+
+> μ
+
+D2 
+
+> μ
+
+log( HμDμ), and am(Π) := pVC(Π) /m + ρe,m + ρμ,m . By Assumption 5.1 and Assumption 5.6(ii), we have pve,m /m = o(m−1/4) and pvμ,m /m = o(m−1/4). En-larging ρe,m and ρμ,m if necessary, we may assume pve,m /m ≤ ρe,m and pvμ,m /m ≤ ρμ,m 
+
+for all large m.Note that 
+
+∂ bG(λ; π)
+
+∂λ = 1
+
+m
+
+X
+
+> i∈I
+
+ρ′(λ⊤Ai)Ai − B and ∂2 bG(λ; π)
+
+∂λ∂λ⊤ = 1
+
+m
+
+X
+
+> i∈I
+
+ρ′′ (λ⊤Ai)AiA⊤ 
+
+> i
+
+.
+
+Then we have 
+
+∂ bG(0; π)
+
+∂λ = 1
+
+m
+
+X
+
+> i∈I
+
+Ai − B = {Pm − P } ϕ(T, X; be, bξ, π ) + P ϕ(T, X; be, bξ, π ) (E.26) where ϕ(T, X; e, ξ, π ) := 
+
+n 1−T 
+
+> 1−e(X)
+
+− 1
+
+o
+
+(1 − π(X)) ξ0(X) + 
+
+n Te(X) − 1
+
+o
+
+π(X)ξ1(X).We bound P ϕ(T, X; be, bξ, π ) and {Pm − P } ϕ(T, X; be, bξ, π ), respectively. By Lemma E.1, Lemma E.4, and the membership of the nuisance estimators in the corresponding bounded DNN classes, we have 
+
+sup 
+
+> π∈Π
+
+P ϕ(T, X; be, bξ, π ) ≤ sup 
+
+> π∈Π
+
+sup 
+
+> e∈F DNN ,e :∥e−e∗∥P, 2≤ρe,m +t
+
+sup 
+
+> ξ∈F 2p+2 DNN ,μ
+
+∥P ϕ(T, X; e, ξ, π )∥
+
+w.p. at least 1 − c1 exp( −c2mt 2) for all 0 < t < c 3 and large m. Note that by the definitions of FDNN ,e and FDNN ,μ , we have 
+
+∥P ϕ(T, X; e, ξ, π )∥ = E
+
+ e(X) − e∗(X)1 − e(X)
+
+
+
+(1 − π(X)) ξ0(X)+
+
+e∗(X) − e(X)
+
+e(X)
+
+
+
+π(X)ξ1(X)
+
+
+
+≲ ∥e(X) − e∗(X)∥P, 2 .
+
+Thus, 
+
+sup 
+
+> π∈Π
+
+P ϕ(T, X; be, bξ, π ) ≤ Cρ e,m + Ct (E.27) w.p. at least 1 − c1 exp( −c2mt 2) for all 0 < t < c 3 and large m. Furthermore, by Lemmas E.1 and E.4, and the membership of the nuisance estimators in the corresponding bounded DNN classes, we have 
+
+sup 
+
+> π∈Π
+
+{Pm − P } ϕ(T, X; be, bξ, π ) ≤ sup  
+
+> f∈M 1
+
+|{ Pm − P } f (T, X)| , (E.28) w.p. at least 1 − c1 exp( −c2mt 2) for all 0 < t < c 3 and large m, where 
+
+M1 := {(T, X) 7 → α⊤ϕ(T, X; e, ξ, π ) : ξ ∈ F 2p+2 DNN ,μ , α ∈ Sp, e ∈ F DNN ,e , π ∈ Π}
+
+is a class of functions with a measurable envelope C. Here Sp := {α ∈ Rp+1 : ∥α∥ = 1 }
+
+61 denotes the unit sphere. By the VC-subgraph property of Π, (E.8), (E.13), overlap, the fixed dimension of Sp, and Lemma C.2, 
+
+sup 
+
+> Q
+
+log N
+
+
+
+Cϵ, M1, ∥·∥ Q, 2
+
+
+
+≤ C {VC(Π) + ve,m + vμ,m } log ( a/ϵ ) . (E.29) for all 0 < ϵ < 1, where a > 1 is a constant. By Lemma 6.2 in Chernozhukov et al. (2018) we have 
+
+E
+
+
+
+sup  
+
+> f∈M 1
+
+|{ Pm − P } f (T, X)|
+
+
+
+≤ C
+
+rVC(Π) 
+
+m + C
+
+rve,m 
+
+m + C
+
+rvμ,m 
+
+m .
+
+Now, applying the bounded differences inequality (Corollary 2.21 in Wainwright (2019)) gives that 
+
+P
+
+
+
+sup  
+
+> f∈M 1
+
+|{ Pm − P } f (T, X)| ≥ E
+
+
+
+sup  
+
+> f∈M 1
+
+|{ Pm − P } f (T, X)|
+
+
+
++ t
+
+
+
+≤ c1 exp  −c2mt 2
+
+for all t ≥ 0. Combining the above two displays yields that 
+
+P sup  
+
+> f∈M 1
+
+|{ Pm − P } f (T, X)| ≥ C
+
+rVC(Π) 
+
+m + C
+
+rve,m 
+
+m + C
+
+rvμ,m 
+
+m + t
+
+!
+
+≤ c1 exp  −c2mt 2
+
+for all t ≥ 0. Recalling (E.26), (E.27), and (E.28), together with pve,m /m ≤ ρe,m and 
+
+pvμ,m /m ≤ ρμ,m , we can obtain that 
+
+P sup 
+
+> π∈Π
+
+∂ bG(0; π)
+
+∂λ ≥ Ca m(Π) + t
+
+!
+
+≤ c1 exp  −c2mt 2 (E.30) for all 0 < t < c 3 and large m.Now, we analyze m−1 P 
+
+> i∈I
+
+AiA⊤ 
+
+> i
+
+. Using the definition of A(T, X; e, ξ, π ) above, let 
+
+M2 := {(T, X) 7 → α⊤A(T, X; e, ξ, π )A(T, X; e, ξ, π )⊤α :
+
+ξ ∈ F 2p+2 DNN ,μ , α ∈ Sp, e ∈ F DNN ,e , π ∈ Π}
+
+be a function class with a measurable envelope C. By the same argument as for M1,the components of A have bounded envelopes and the same entropy bounds. The fixed-dimensional sphere Sp contributes only a constant-order entropy term, and the map (a, α) 7 →
+
+α⊤aa ⊤α is Lipschitz on bounded sets. Lemma C.2 gives 
+
+sup 
+
+> Q
+
+log N
+
+
+
+Cϵ, M2, ∥·∥ Q, 2
+
+
+
+≤ C {VC(Π) + ve,m + vμ,m } log ( a/ϵ )
+
+for all 0 < ϵ < 1, where a > 1 is a constant. By Wainwright (2019, Corollary 2.21), we have 
+
+P
+
+
+
+sup  
+
+> f∈M 2
+
+|{ Pm − P } f (T, X)| ≥ E
+
+
+
+sup  
+
+> f∈M 2
+
+|{ Pm − P } f (T, X)|
+
+
+
++ t
+
+
+
+≤ c1 exp  −c2mt 2
+
+62 for all t ≥ 0. Besides, by Chernozhukov et al. (2018, Lemma 6.2) we have 
+
+E
+
+
+
+sup  
+
+> f∈M 2
+
+|{ Pm − P } f (T, X)|
+
+
+
+≤ C
+
+rVC(Π) 
+
+m + C
+
+rve,m 
+
+m + C
+
+rvμ,m 
+
+m .
+
+Combining the above two displays we have 
+
+sup 
+
+> π∈Π,ξ∈F 2p+2 DNN ,μ ,e ∈F DNN ,e
+
+{Pm − P } A(T, X; e, ξ, π )A(T, X; e, ξ, π )⊤
+
+≤ sup  
+
+> f∈M 2
+
+|{ Pm − P } f (T, X)| ≤ C
+
+rVC(Π) 
+
+m + C
+
+rve,m 
+
+m + C
+
+rvμ,m 
+
+m + t
+
+w.p. at least 1 − c1 exp ( −c2mt 2) for all t ≥ 0. By Weyl’s inequality, we have 
+
+sup 
+
+> π∈Π,ξ∈F 2p+2 DNN ,μ ,e ∈F DNN ,e
+
+λmin 
+
+PmA(T, X; e, ξ, π )A(T, X; e, ξ, π )⊤
+
+− λmin 
+
+P A(T, X; e, ξ, π )A(T, X; e, ξ, π )⊤
+
+≤ sup 
+
+> π∈Π,ξ∈F 2p+2 DNN ,μ ,e ∈F DNN ,e
+
+{Pm − P } A(T, X; e, ξ, π )A(T, X; e, ξ, π )⊤
+
+≤ C
+
+rVC(Π) 
+
+m + C
+
+rve,m 
+
+m + C
+
+rvμ,m 
+
+m + t ≤ Ca m(Π) + t. (E.31) w.p. at least 1 − c1 exp ( −c2mt 2) for all t ≥ 0. Let ξ∗(X; π) := ( ξ∗
+
+> 0
+
+(X; π)⊤, ξ∗
+
+> 1
+
+(X; π)⊤)⊤.By Lemmas E.1 and E.4, and a finite union bound over j = 0 , . . . , p and t ∈ { 0, 1},
+
+∥be(X) − e∗(X)∥P, 2 + sup 
+
+> π∈Π
+
+max 
+
+> t=0 ,1
+
+bξt(X) − ξ∗ 
+
+> t
+
+(X; π) P, 2
+
+≤ Ca m(Π) + Ct, 
+
+w.p. at least 1 − c1 exp( −c2mt 2) for all 0 < t < c 3 and large m. Hence, by Assumptions 5.1, 5.4, and 5.6(i), 
+
+sup 
+
+> π∈Π
+
+P A(T, X; be, bξ, π )A(T, X; be, bξ, π )⊤
+
+− P A(T, X; e∗, ξ∗(π), π )A(T, X; e∗, ξ∗(π), π )⊤ ≤ Ca m(Π) + Ct 
+
+(E.32) w.p. at least 1 − c1 exp( −c2mt 2) for all 0 < t < c 3 and large m. Moreover, 
+
+P A(T, X; e∗, ξ∗(π), π )A(T, X; e∗, ξ∗(π), π )⊤ = E
+
+ 1 − π(X)1 − e∗(X)ξ∗
+
+> 0
+
+(X; π)ξ∗
+
+> 0
+
+(X; π)⊤
+
++ π(X)
+
+e∗(X)ξ∗
+
+> 1
+
+(X; π)ξ∗
+
+> 1
+
+(X; π)⊤
+
+
+
+,
+
+so, because Π ⊂ Π∞, Assumption 5.5(ii) and overlap imply 
+
+inf  
+
+> π∈Π
+
+λmin 
+
+P A(T, X; e∗, ξ∗(π), π )A(T, X; e∗, ξ∗(π), π )⊤ ≥ cξ. (E.33) Because am(Π) → 0, choose c4 > 0 small enough and then m large enough so that 
+
+Ca m(Π) + Ct ≤ cξ/2 for all 0 < t < c 4. Combining (E.31) , (E.32) , and (E.33) , w.p. at 63 least 1 − c1 exp ( −c2mt 2), for all 0 < t < c 4,
+
+inf  
+
+> π∈Π
+
+λmin 
+
+(
+
+1
+
+m
+
+X
+
+> i∈I
+
+AiA⊤
+
+> i
+
+)
+
+= inf  
+
+> π∈Π
+
+λmin 
+
+(
+
+1
+
+m
+
+X
+
+> i∈I
+
+A(Ti, Xi; be, bξ, π )A(Ti, Xi; be, bξ, π )⊤
+
+)
+
+≥ inf  
+
+> π∈Π
+
+λmin 
+
+n
+
+P A(T, X; be, bξ, π )A(T, X; be, bξ, π )⊤
+
+o
+
+− Ca m(Π) − t
+
+≥ inf  
+
+> π∈Π
+
+λmin 
+
+P A(T, X; e∗, ξ∗(π), π )A(T, X; e∗, ξ∗(π), π )⊤ − Ca m(Π) − Ct ≥ cξ/2
+
+(E.34) where the equality only expands Ai = A(Ti, Xi; be, bξ, π ), which depends on π. The first inequality follows from (E.31) evaluated at e = be and ξ = bξ. The second inequality follows from Weyl’s inequality and the perturbation bound (E.32) . The last inequality follows from (E.33) and the preceding choice of c4 and m.Let Υ( t) := {λ ∈ Rp+1 : ∥λ∥ ≤ CΥ(am(Π) + t)} and ∂Υ( t) := {λ ∈ Rp+1 : ∥λ∥ =
+
+CΥ(am(Π) + t)}, where the constant CΥ will be determined later. For any λ ∈ Υ( t), by Assumption 5.6 and Lemma E.4 we have 
+
+sup 
+
+> π∈Π
+
+sup 
+
+> i∈I
+
+sup 
+
+> λ∈Υ( t)
+
+λ⊤Ai ≤ sup 
+
+> λ∈Υ( t)
+
+∥λ∥ sup 
+
+> i∈I
+
+sup 
+
+> π∈Π
+
+∥Ai∥ ≤ CC Υ(am(Π) + t)
+
+w.p. at least 1 − c1 exp ( −c2mt 2) for all 0 < t < c 3 and large m. Then by am(Π) → 0,
+
+ρ′′  λ⊤Ai
+
+ ≤ ρ′′ (0) /2 < 0, ∀λ ∈ Υ( t), ∀i ∈ I, ∀π ∈ Π (E.35) w.p. at least 1 − c1 exp ( −c2mt 2) for all 0 < t < c 5 and large m.By Taylor’s expansion, for any λ ∈ ∂Υ( t), we have, for some eλ on the line segment between 0 and λ,
+
+bG(λ; π) − bG(0; π) = ∂ bG(0; π)
+
+∂λ⊤ λ + 12λ⊤ ∂2 bG(eλ; π)
+
+∂λ∂λ⊤ λ ≤ ∂ bG(0; π)
+
+∂λ ∥λ∥
+
++ 121
+
+m
+
+X
+
+> i∈I
+
+n
+
+ρ′′ (eλ⊤
+
+Ai)λ⊤AiA⊤ 
+
+> i
+
+λ
+
+o
+
+≤ C−1Υ ∥λ∥2 + ρ′′ (0) 41
+
+m
+
+X
+
+> i∈I
+
+λ⊤AiA⊤ 
+
+> i
+
+λ
+
+≤ C−1Υ ∥λ∥2 + ρ′′ (0) 4 ∥λ∥2 inf  
+
+> π∈Π
+
+λmin 
+
+(
+
+1
+
+m
+
+X
+
+> i∈I
+
+AiA⊤
+
+> i
+
+)
+
+≤ ∥ λ∥2
+
+
+
+C−1Υ + ρ′′ (0) cξ
+
+8
+
+
+
+for all π ∈ Π w.p. at least 1 − 4c1 exp ( −c2mt 2) for all 0 < t < min {c3, c 4, c 5}, where the second inequality follows from (E.30) and (E.35) and the last one follows from (E.34). If we take CΥ > 16 /(cξ|ρ′′ (0) |), then w.p. at least 1 − 4c1 exp ( −c2mt 2): bG(λ; π) < bG(0; π)
+
+for all λ ∈ ∂Υ( t) and π ∈ Π. For any π ∈ Π, since bG(λ; π) is continuous with respect to 
+
+λ, there exists a local maximum of bG(λ; π) in the interior of Υ( t). Since bG(λ; π) is also 64 strictly concave and has a unique global maximum point bλI (π), we conclude that bλI (π) ∈
+
+Υ( t)\∂Υ( t), which leads to bλI (π) ≤ CΥ(am(Π) + t). Therefore, P (sup π∈Π ∥bλI (π)∥ ≤ 
+
+CΥ(am(Π) + t)) ≥ 1 − 4c1 exp( −c2mt 2) for all 0 < t < min {c3, c 4, c 5} and large m.Setting t = δ completes the proof. ■
+
+## E.3 Asymptotic properties of bβI (π) and cWI (π)
+
+Lemma E.6 (Convergence rate of bβI (π) with unknown propensity score) . Suppose that Assumptions 3.1, 5.1, 5.2, 5.3, 5.4, 5.5, and 5.6 hold and I ⊂ { 1, . . . , N } is an index set with 
+
+|I| = m. For any policy class Π ⊂ Π∞ with VC dimension VC(Π) ≥ 1, if VC(Π) /m → 0
+
+as m → ∞ , then the bβI (π) defined by (4.1) satisfies 
+
+P sup 
+
+> π∈Π
+
+bβI (π) − β∗(π) ≥ C
+
+rVC(Π) 
+
+m + δ
+
+!
+
+≤ c1 exp  −c2mδ 2
+
+for all 0 < δ < c 3 and large m, where c1, c 2, c 3 > 0 are finite constants independent of δ,
+
+m, I and Π, and C > 0 is finite. Proof. Without loss of generality, we assume I = {1, . . . , m }. In this proof, we write 
+
+FDNN ,e and FDNN ,μ for logistic ◦{F DNN (He, De) T{f : ∥f ∥∞ ≤ M }} and FDNN (Hμ, Dμ) T{f :
+
+∥f ∥∞ ≤ M }, respectively. For notational simplicity, we present the argument for one coor-dinate. Applying the same argument to j = 1 , . . . , p and taking a finite union bound yields the displayed vector-norm result, since p is fixed; the constants below absorb p. Let 
+
+Q(β; π) = E
+
+ π(X)Te∗(X) + (1 − π(X)) (1 − T )1 − e∗(X)
+
+
+
+L1(Y − β)
+
+
+
+,Qm(β; π) = 1
+
+m
+
+X
+
+> i∈I
+
+bwI,i (π)
+
+nπ(Xi)Ti
+
+beI (Xi) + (1 − π(Xi))(1 − Ti)1 − beI (Xi)
+
+o
+
+L1(Yi − β).
+
+Then bβI (π) = arg min 
+
+> β∈R
+
+Qm(β; π) and β∗(π) = arg min 
+
+> β∈R
+
+Q(β; π). Since Qm(β; π) is convex in β, we apply Lemma C.1 to bound bβI (π) − β∗(π). We decompose the proof into two steps and write ve,m := H2 
+
+> e
+
+D2 
+
+> e
+
+log( HeDe), vμ,m := H2
+
+> μ
+
+D2 
+
+> μ
+
+log( HμDμ), and 
+
+am(Π) := pVC(Π) /m + ρe,m + ρμ,m . By Assumption 5.1 and Assumption 5.6(ii), we have 
+
+pve,m /m = o(m−1/4) and pvμ,m /m = o(m−1/4). Enlarging ρe,m and ρμ,m if necessary, we may assume pve,m /m ≤ ρe,m and pvμ,m /m ≤ ρμ,m for all large m.
+
+Step 1. (Developing a lower bound for h(δ; π)). For all δ ∈ (0 , min {(3 Q′′ )/(4 Q′′ 
+
+> lip
+
+), c 0}),let h(δ; π) = inf |β−β∗(π)|=δ Q(β; π) − Q(β∗(π); π). By the first-order condition for β∗(π),65 the mean value theorem, and Assumption 5.2(ii), we have 
+
+inf 
+
+> π∈Π∞
+
+h(δ; π) ≥ Q′′ 
+
+4 δ2 for all 0 < δ ≤ min 
+
+( 3Q′′ 
+
+4Q′′ 
+
+> lip
+
+, c 0
+
+)
+
+. (E.36) 
+
+Step 2. (Developing an upper bound for ∆( δ; π)). For any δ ∈ (0 , min {(3 Q′′ )/(4 Q′′ 
+
+> lip
+
+), c 0}),we let 
+
+∆( δ; π) := sup 
+
+> |β−β∗(π)|=δ
+
+|Qm(β; π) − Qm(β∗(π); π) − { Q(β; π) − Q(β∗(π); π)}| .
+
+Let 
+
+Q′
+
+> m
+
+(β; π) := 1
+
+m
+
+X
+
+> i∈I
+
+bwI,i (π)
+
+nπ(Xi)Ti
+
+beI (Xi) + (1 − π(Xi))(1 − Ti)1 − beI (Xi)
+
+o
+
+L′
+
+> 1
+
+(Yi − β),Q′(β; π) := E
+
+ π(X)Te∗(X) + (1 − π(X)) (1 − T )1 − e∗(X)
+
+
+
+L′
+
+> 1
+
+(Y − β)
+
+
+
+.
+
+By Assumption 5.2, we have − ´ ββ∗(π) Q′
+
+> m
+
+( eβ; π)d eβ = Qm(β; π) − Qm(β∗(π); π), and anal-ogously for Q′, and thus 
+
+∆( δ; π) = sup 
+
+> |β−β∗(π)|=δ
+
+−
+
+ˆ ββ∗(π)
+
+n
+
+Q′
+
+> m
+
+( eβ; π) − Q′( eβ; π)
+
+o
+
+d eβ
+
+≤ δ sup 
+
+> |β−β∗(π)|≤ δ
+
+|Q′
+
+> m
+
+(β; π) − Q′(β; π)| = δ e∆( δ; π), (E.37) where we have let e∆( δ; π) := sup |β−β∗(π)|≤ δ |Q′
+
+> m
+
+(β; π) − Q′(β; π)|. Now, it suffices to bound e∆( δ; π). We let 
+
+eQ′
+
+> m
+
+(β; e, μ, π ) := 1
+
+m
+
+X
+
+> i∈I
+
+π(Xi)Ti
+
+e(Xi) {L ′
+
+> 1
+
+(Yi − β) − μ11 (Xi)} + π(Xi)μ11 (Xi)
+
+
+
++ 1
+
+m
+
+X
+
+> i∈I
+
+(
+
+(1 − π(Xi))(1 − Ti)1 − e(Xi) {L ′
+
+> 1
+
+(Yi − β) − μ10 (Xi)} + (1 − π(Xi)) μ10 (Xi)
+
+)
+
+,Q′(β; e, μ, π ) = E
+
+π(X)Te(X) {L ′
+
+> 1
+
+(Y − β) − μ11 (X)}
+
+
+
++ E [π(X)μ11 (X)] + E
+
+(1 − π(X))(1 − T )1 − e(X) {L ′
+
+> 1
+
+(Y − β) − μ10 (X)}
+
+
+
++ E [(1 − π(X)) μ10 (X)] .
+
+Write be := beI . In the following decomposition, bμ(X) denotes the stacked vector formed from bμI, 10 (X; bβinit  
+
+> I
+
+(π)) and bμI, 11 (X; bβinit  
+
+> I
+
+(π)) , and μ∗(X) is defined analogously with 
+
+μ∗
+
+> 10
+
+(X; β∗(π)) and μ∗
+
+> 11
+
+(X; β∗(π)) . Then e∆( δ; π) can be decomposed into 
+
+sup 
+
+> π∈Π
+
+e∆( δ; π) ≤ sup 
+
+> π∈Π
+
+sup 
+
+> |β−β∗(π)|≤ δ
+
+Q′
+
+> m
+
+(β; π) − eQ′
+
+> m
+
+(β; be, bμ, π )
+
++ sup 
+
+> π∈Π
+
+sup 
+
+> |β−β∗(π)|≤ δ
+
+eQ′
+
+> m
+
+(β; be, bμ, π ) − Q′(β; be, bμ, π )
+
+66 + sup 
+
+> π∈Π
+
+sup 
+
+> |β−β∗(π)|≤ δ
+
+|Q′(β; be, bμ, π ) − Q′(β; e∗, μ ∗, π )| ,
+
+where we have used the fact that Q′(β; e∗, μ ∗, π ) = Q′(β; π). We bound these three terms one by one. 
+
+Step 2.1: Bound sup π∈Π sup |β−β∗(π)|≤ δ Q′
+
+> m
+
+(β; π) − eQ′
+
+> m
+
+(β; be, bμ, π ) . Note that by the definition of bwI,i (π) we have 
+
+Q′
+
+> m
+
+(β; π) − eQ′
+
+> m
+
+(β; be, bμ, π )= 1
+
+m
+
+X
+
+> i∈I
+
+bwI,i (π)
+
+nπ(Xi)Ti
+
+be(Xi) + (1 − π(Xi))(1 − Ti)1 − be(Xi)
+
+o
+
+L′
+
+> 1
+
+(Yi − β)
+
+− 1
+
+m
+
+X
+
+> i∈I
+
+π(Xi)Ti
+
+be(Xi) {L ′
+
+> 1
+
+(Yi − β) − bμ11 (Xi)} + π(Xi)bμ11 (Xi)
+
+
+
+− 1
+
+m
+
+X
+
+> i∈I
+
+(1 − π(Xi))(1 − Ti)1 − be(Xi) {L ′
+
+> 1
+
+(Yi − β) − bμ10 (Xi)} + (1 − π(Xi)) bμ10 (Xi)
+
+
+
+= 1
+
+m
+
+X
+
+> i∈I
+
+{ bwI,i (π) − 1}
+
+π(Xi)Ti
+
+be(Xi) {L ′
+
+> 1
+
+(Yi − β) − bμ11 (Xi)}
+
+| {z }
+
+> Q1
+
++ 1
+
+m
+
+X
+
+> i∈I
+
+{ bwI,i (π) − 1}
+
+(1 − π(Xi))(1 − Ti)1 − be(Xi) {L ′
+
+> 1
+
+(Yi − β) − bμ10 (Xi)}
+
+| {z }
+
+> Q2
+
+.
+
+By (E.25) and Taylor’s expansion, we have 
+
+∥Q 1∥ = 1
+
+m
+
+X
+
+> i∈I
+
+n
+
+ρ′(bλI (π)⊤Ai) − 1
+
+o π(Xi)Ti
+
+be(Xi) {L ′
+
+> 1
+
+(Yi − β) − bμ11 (Xi)}
+
+
+
+= bλI (π)⊤ 1
+
+m
+
+X
+
+> i∈I
+
+ρ′′ (eλi(π)⊤Ai)Ai
+
+π(Xi)Ti
+
+be(Xi) {L ′
+
+> 1
+
+(Yi − β) − bμ11 (Xi)}
+
+
+
+≤ sup 
+
+> π∈Π
+
+bλI (π) sup  
+
+> f∈M 3
+
+|Pmf (Z)| , (E.38) w.p. at least 1 − 2c1 exp( −c2mt 2) for all 0 < t < c 3 and large m, where the last step follows from Lemma E.5, Lemma E.4, and the membership of the nuisance estimators in the corresponding bounded DNN classes, and eλi(π) lies on the line segment between 0 and 
+
+bλI (π) for each i, where 
+
+M3 := 
+
+
+
+Z 7 → ρ′′ (λ⊤A(T, X; e, ξ, π )) α⊤A(T, X; e, ξ, π )
+
+×
+
+π(X)Te(X) {L ′
+
+> 1
+
+(Y − β) − μ11 (X)}
+
+
+
+: ∥λ∥ ≤ Ca m(Π) + t, α ∈ Sp,
+
+67 e ∈ F DNN ,e , ξ ∈ F 2p+2 DNN ,μ , μ ∈ F 2DNN ,μ , |β − β∗(π)| ≤ δ, ∥μ − μ∗∥P, 2 ≤ Cμρμ,m + t, π ∈ Π
+
+
+
+is a function class with envelope C, and Cμ > 0 is a constant. By the bounded difference inequality, we have 
+
+P
+
+
+
+sup  
+
+> f∈M 3
+
+|{ Pm − P } f (Z)| − E
+
+
+
+sup  
+
+> f∈M 3
+
+|{ Pm − P } f (Z)|
+
+
+
+> t 
+
+
+
+≤ c1 exp( −c2mt 2)
+
+(E.39) for all t ≥ 0. For the entropy bound, restrict to 0 < t < c 3 and large m. In this range, for the entropy objective D(w) = w log w − w, ρ′′ (v) = − exp( −v) is Lipschitz on the bounded range of λ⊤A considered here. Lemma C.2, the fixed dimensions of λ and α, the monotonicity of L′
+
+> 1
+
+, and the entropy bounds for Π, FDNN ,e , and FDNN ,μ yield 
+
+sup 
+
+> Q
+
+log N
+
+
+
+Cϵ, M3, ∥·∥ Q, 2
+
+
+
+≤ C {VC(Π) + ve,m + vμ,m } log ( a/ϵ ) (E.40) for all 0 < ϵ < 1, where a > 1 is a constant. Then it follows from Chernozhukov et al. (2018, Lemma 6.2) that 
+
+E
+
+
+
+sup  
+
+> f∈M 3
+
+|{ Pm − P } f (Z)|
+
+
+
+≤ C
+
+rVC(Π) 
+
+m + C
+
+rve,m 
+
+m + C
+
+rvμ,m 
+
+m .
+
+This, combined with (E.39) gives that 
+
+P sup  
+
+> f∈M 3
+
+|{ Pm − P } f (Z)| ≥ C
+
+rVC(Π) 
+
+m + C
+
+rve,m 
+
+m + C
+
+rvμ,m 
+
+m + t
+
+!
+
+≤ c1 exp( −c2mt 2)
+
+for all t ≥ 0. Furthermore, by the boundedness of the functions in FDNN ,μ and FDNN ,e and (E.35) we have 
+
+sup  
+
+> f∈M 3
+
+|P f (Z)| ≲ sup 
+
+> π∈Π
+
+sup 
+
+> |β−β∗(π)|≤ δ
+
+sup 
+
+> ∥μ−μ∗∥P, 2≤Cμρμ,m +t
+
+|E [μ∗
+
+> 11
+
+(X; β) − μ11 (X)] |≤ sup 
+
+> π∈Π
+
+sup 
+
+> |β−β∗(π)|≤ δ
+
+sup 
+
+> ∥μ−μ∗∥P, 2≤Cμρμ,m +t
+
+∥μ∗
+
+> 11
+
+(X; β) − μ11 (X)∥P, 2
+
+≲ sup 
+
+> π∈Π
+
+sup 
+
+> |β−β∗(π)|≤ δ
+
+∥μ∗
+
+> 11
+
+(X; β) − μ∗
+
+> 11
+
+(X; β∗(π)) ∥P, 2 + Cμρμ,m + t ≤ Lμδ + Cμρμ,m + t, 
+
+where the last step follows from Assumption 5.5. Therefore, combining the above two displays gives that sup f ∈M 3 |Pmf (Z)| ≤ CpVC(Π) /m + Cρ μ,m + Cδ + Ct w.p. at least 
+
+1 − c1 exp( −c2mt 2) for all 0 < t < c 3 and large m. Recalling (E.38), it follows from Lemma E.5 and the same argument that 
+
+sup 
+
+> π∈Π
+
+sup 
+
+> |β−β∗(π)|≤ δ
+
+∥Q 1∥ ≤ C {am(Π) + t} { δ + am(Π) + t} ,
+
+68 sup 
+
+> π∈Π
+
+sup 
+
+> |β−β∗(π)|≤ δ
+
+∥Q 2∥ ≤ C {am(Π) + t} { δ + am(Π) + t} ,
+
+each w.p. at least 1 − 3c1 exp( −c2mt 2) for all 0 < t < c 3 and large m. As a result, 
+
+sup 
+
+> π∈Π
+
+sup 
+
+> |β−β∗(π)|≤ δ
+
+Q′
+
+> m
+
+(β; π) − eQ′
+
+> m
+
+(β; be, bμ, π ) ≤ sup 
+
+> π∈Π
+
+sup 
+
+> |β−β∗(π)|≤ δ
+
+∥Q 1∥ + sup 
+
+> π∈Π
+
+sup 
+
+> |β−β∗(π)|≤ δ
+
+∥Q 2∥≤ C {am(Π) + t} { δ + am(Π) + t}
+
+w.p. at least 1 − 6c1 exp( −c2mt 2) for all 0 < t < c 3 and large m.
+
+Step 2.2: Bound sup π∈Π sup |β−β∗(π)|≤ δ eQ′
+
+> m
+
+(β; be, bμ, π ) − Q′(β; be, bμ, π ) . We have the following decomposition: 
+
+sup 
+
+> π∈Π
+
+sup 
+
+> |β−β∗(π)|≤ δ
+
+eQ′
+
+> m
+
+(β; be, bμ, π ) − Q′(β; be, bμ, π )
+
+≤ sup 
+
+> π∈Π
+
+sup 
+
+> |β−β∗(π)|≤ δ
+
+eQ′
+
+> m
+
+(β; be, bμ, π ) − Q′(β; be, bμ, π ) −
+
+n eQ′
+
+> m
+
+(β; e∗, μ ∗, π ) − Q′(β; e∗, μ ∗, π )
+
+o| {z }
+
+> Q3
+
++ sup 
+
+> π∈Π
+
+sup 
+
+> |β−β∗(π)|≤ δ
+
+eQ′
+
+> m
+
+(β; e∗, μ ∗, π ) − Q′(β; e∗, μ ∗, π )
+
+| {z }
+
+> Q4
+
+.
+
+We analyze Q3 and Q4 one by one. By Lemma E.1, Lemma E.4, and the membership of the nuisance estimators in the corresponding bounded DNN classes, we have 
+
+Q3 ≤ sup  
+
+> f∈M 4(t)
+
+|{ Pm − P } f (Z)| , (E.41) w.p. at least 1 − 2c1 exp( −c2mt 2) for all 0 < t < c 3 and large m, where 
+
+M4(t) := 
+
+
+
+Z 7 → ψ(Z; β, e, μ, π ) − ψ(Z; β, e ∗, μ ∗, π ) : |β − β∗(π)| ≤ δ, e ∈ F DNN ,e ,μ ∈ F 2DNN ,μ , ∥e − e∗∥P, 2 ≤ ρe,m + t, ∥μ − μ∗∥P, 2 ≤ Cμρμ,m + t, π ∈ Π
+
+
+
+is a function class with envelope C and ψ(Z; β, e, μ, π ) is defined as 
+
+ψ(Z; β, e, μ, π ) := π(X)Te(X) {L ′
+
+> 1
+
+(Y − β) − μ11 (X)} + π(X)μ11 (X)+ (1 − π(X))(1 − T )1 − e(X) {L ′
+
+> 1
+
+(Y − β) − μ10 (X)} + (1 − π(X)) μ10 (X).
+
+By the bounded difference inequality, we have 
+
+P sup  
+
+> f∈M 4(t)
+
+|{ Pm − P } f (Z)| − E
+
+"
+
+sup  
+
+> f∈M 4(t)
+
+|{ Pm − P } f (Z)|
+
+#
+
+≥ t
+
+!
+
+≤ c1 exp( −c2mt 2)
+
+(E.42) for all 0 < t < c 3 and large m. Applying Lemma C.2 to the two summands in ψ(·; β, e, μ, π )−
+
+69 ψ(·; β, e ∗, μ ∗, π ), using the monotonicity of L′ 
+
+> 1
+
+and noting that the local L2 restrictions only form subclasses, gives, uniformly in t,
+
+sup 
+
+> Q
+
+log N
+
+
+
+Cϵ, M4(t), ∥·∥ Q, 2
+
+
+
+≤ C {VC(Π) + ve,m + vμ,m } log ( a/ϵ )
+
+for all 0 < ϵ < 1, where a > 1 is a constant. Note that by the boundedness of the func-tions in FDNN ,e and FDNN ,μ , |ψ(Z; β, e, μ, π ) − ψ(Z; β, e ∗, μ ∗, π )| ≲ ∥μ(X) − μ∗(X)∥ +
+
+|e(X) − e∗(X)| almost surely. Then we have 
+
+σ2 := sup  
+
+> f∈M 4(t)
+
+E f (Z)2 ≲ sup 
+
+> ∥μ−μ∗∥P, 2≤Cμρμ,m +t
+
+E ∥μ − μ∗∥2 + sup 
+
+> ∥e−e∗∥P, 2≤ρe,m +t
+
+E |e − e∗|2
+
+≲ (Cμρμ,m + t)2 + ( ρe,m + t)2 ≤ (Cμρμ,m + ρe,m + 2 t)2 .
+
+Applying Chernozhukov et al. (2018, Lemma 6.2) gives that 
+
+E
+
+"
+
+sup  
+
+> f∈M 4(t)
+
+|{ Pm − P } f (Z)|
+
+#
+
+≤ C
+
+(r VC(Π) 
+
+m +
+
+rve,m 
+
+m +
+
+rvμ,m 
+
+m
+
+)
+
+{Cμρμ,m + ρe,m + 2 t}≤ Ca m(Π) 2 + Ct 2.
+
+This, combined with (E.41) and (E.42) yields that Q3 ≤ sup f ∈M 4(t) |{ Pm − P } f (Z)| ≤ 
+
+Ca m(Π) 2 + Ct w.p. at least 1 − 3c1 exp( −c2mt 2) for all 0 < t < c 3 and large m.Let M5 := {Z 7 → ψ(Z; β, e ∗, μ ∗, π ) : |β − β∗(π)| ≤ δ, π ∈ Π} be a function class with envelope C. By the VC-subgraph property of Π, the monotonicity of L′
+
+> 1
+
+, overlap, the one-dimensional variation of μ∗
+
+> 1t
+
+(·; β) controlled by Assumption 5.5, and Lemma C.2, 
+
+sup Q log N (Cϵ, M5, ∥·∥ Q, 2) ≲ VC(Π) log( a/ϵ ) for all 0 < ϵ < 1, where a > 1 is a constant. Applying the bounded difference inequality and Chernozhukov et al. (2018, Lemma 6.2) we have 
+
+Q4 ≤ sup  
+
+> f∈M 5
+
+|{ Pm − P } f (Z)| ≤ E
+
+
+
+sup  
+
+> f∈M 5
+
+|{ Pm − P } f (Z)|
+
+
+
++ t ≤ C
+
+rVC(Π) 
+
+m + t
+
+w.p. at least 1 − c1 exp( −c2mt 2) for all 0 < t < c 3 and large m.Aggregating the results for Q3 and Q4 we have 
+
+sup 
+
+> π∈Π
+
+sup 
+
+> |β−β∗(π)|≤ δ
+
+eQ′
+
+> m
+
+(β; be, bμ, π ) − Q′(β; be, bμ, π ) ≤ C
+
+rVC(Π) 
+
+m + Ca m(Π) 2 + Ct 
+
+w.p. at least 1 − 4c1 exp( −c2mt 2) for all 0 < t < c 3 and large m.
+
+Step 2.3: Bound sup π∈Π sup |β−β∗(π)|≤ δ |Q′(β; be, bμ, π ) − Q′(β; e∗, μ ∗, π )|. We let 
+
+ψ1(Z; β, e, μ, π ) := π(X)Te(X) {L ′
+
+> 1
+
+(Y − β) − μ11 (X)} + π(X)μ11 (X),
+
+70 ψ0(Z; β, e, μ, π ) := (1 − π(X))(1 − T )1 − e(X) {L ′
+
+> 1
+
+(Y − β) − μ10 (X)} + (1 − π(X)) μ10 (X).
+
+By Lemma E.1 and Lemma E.4, we have 
+
+sup 
+
+> π∈Π
+
+sup 
+
+> |β−β∗(π)|≤ δ
+
+|Q′(β; be, bμ, π ) − Q′(β; e∗, μ ∗, π )|≤ sup 
+
+> π∈Π
+
+sup 
+
+> |β−β∗(π)|≤ δ
+
+sup 
+
+> ∥e−e∗∥P, 2≤ρe,m +t
+
+sup 
+
+> ∥μ−μ∗∥P, 2≤Cμρμ,m +t
+
+|Eψ1(Z; β, e, μ, π ) − Eψ1(Z; β, e ∗, μ ∗, π )|
+
+| {z }
+
+> Q5
+
++ sup 
+
+> π∈Π
+
+sup 
+
+> |β−β∗(π)|≤ δ
+
+sup 
+
+> ∥e−e∗∥P, 2≤ρe,m +t
+
+sup 
+
+> ∥μ−μ∗∥P, 2≤Cμρμ,m +t
+
+|Eψ0(Z; β, e, μ, π ) − Eψ0(Z; β, e ∗, μ ∗, π )|
+
+| {z }
+
+> Q6
+
+(E.43) w.p. at least 1 − 2c1 exp( −c2mt 2) for all 0 < t < c 3 and large m.We analyze Q5. We let ∆e(X) = e(X)−1 − e∗(X)−1 and ∆μ = μ11 (X) − μ∗
+
+> 11
+
+(X),and 
+
+f (r) = rE [π(X)e∗(X)∆ eL′
+
+> 1
+
+(Y ∗(1) − β)] 
+
+− rE
+
+
+
+π(X)e∗(X)
+
+
+
+∆eμ∗
+
+> 11
+
+(X) + ∆μ
+
+e∗(X) + r∆e∆μ
+
+ 
+
++ rE [π(X)∆ μ]
+
+for r ∈ [0 , 1] . Then Eψ1(Z; β, e, μ, π ) − Eψ1(Z; β, e ∗, μ ∗, π ) = f (1) − f (0) = ´ 10 f ′(r)dr ,where 
+
+f ′(r) = E [π(X)e∗(X)∆ eL′
+
+> 1
+
+(Y ∗(1) − β)] − E
+
+
+
+π(X)e∗(X)∆ eμ∗
+
+> 11
+
+(X) + π(X)e∗(X) ∆μ
+
+e∗(X)
+
+
+
+− 2E [π(X)e∗(X)∆ e∆μ] r + E [π(X)∆ μ]= E [π(X)e∗(X)∆ e {L ′
+
+> 1
+
+(Y ∗(1) − β) − μ∗
+
+> 11
+
+(X)}] − 2E [π(X)e∗(X)∆ e∆μ] r
+
+= E [π(X)e∗(X)∆ e {μ∗
+
+> 11
+
+(X; β) − μ∗
+
+> 11
+
+(X; β∗(π)) }] − 2E [π(X)e∗(X)∆ e∆μ] r. 
+
+Note that by Assumptions 5.1, 5.2 and 5.5 we have 
+
+sup 
+
+> r∈[0 ,1]
+
+|f ′(r)| ≲ |E [∆ e {μ∗
+
+> 11
+
+(X; β) − μ∗
+
+> 11
+
+(X; β∗(π)) }]| + |E [∆ e∆μ]|
+
+≲ ∥e − e∗∥P, 2 ∥μ∗
+
+> 11
+
+(X; β) − μ∗
+
+> 11
+
+(X; β∗(π)) ∥P, 2 + ∥e − e∗∥P, 2 ∥μ − μ∗∥P, 2
+
+≲ {ρe,m + t} Lμδ + {ρe,m + t} { Cμρμ,m + t} ≤ Ca m(Π) δ + Ca m(Π) 2 + Ct 
+
+for all 0 < t < c 3 provided that |β − β∗(π)| ≤ δ, ∥e − e∗∥P, 2 ≤ ρe,m +t and ∥μ − μ∗∥P, 2 ≤
+
+Cμρμ,m + t. Therefore, we can obtain that 
+
+Q5 ≤ sup 
+
+> π∈Π
+
+sup 
+
+> |β−β∗(π)|≤ δ
+
+sup 
+
+> ∥e−e∗∥P, 2≤ρe,m +t
+
+sup 
+
+> ∥μ−μ∗∥P, 2≤Cμρμ,m +t
+
+ˆ 10
+
+|f ′(r)| dr ≤ Ca m(Π) δ + Ca m(Π) 2 + Ct 
+
+71 for all 0 < t < c 3 and large m. Similarly, we can also derive that Q6 ≤ Ca m(Π) δ +
+
+Ca m(Π) 2 + Ct for all 0 < t < c 3 and large m. Recalling (E.43), we have 
+
+sup 
+
+> π∈Π
+
+sup 
+
+> |β−β∗(π)|≤ δ
+
+|Q′(β; be, bμ, π ) − Q′(β; e∗, μ ∗, π )| ≤ Ca m(Π) δ + Ca m(Π) 2 + Ct 
+
+w.p. at least 1 − 2c1 exp( −c2mt 2) for all 0 < t < c 3 and large m.
+
+Step 2.4: Aggregating the results. Combining the results obtained in Steps 2.1–2.3 we have 
+
+sup 
+
+> π∈Π
+
+e∆( δ; π) ≤ C
+
+rVC(Π) 
+
+m + Ca m(Π) 2 + Ca m(Π) δ + Ct 
+
+w.p. at least 1 − c1 exp( −c2mt 2) for all 0 < t < c 3, 0 < δ < min {(3 Q′′ )/(4 Q′′ 
+
+> lip
+
+), c 0} and large m. Because VC(Π) ≥ 1 and VC(Π) /m → 0, we have VC(Π) /m ≤ pVC(Π) /m 
+
+and m−1/2 ≤ pVC(Π) /m . Since ρe,m = o(m−1/4) and ρμ,m = o(m−1/4), the second-order terms satisfy 
+
+ρe,m 
+
+pVC(Π) /m = o(pVC(Π) /m ), ρμ,m 
+
+pVC(Π) /m = o(pVC(Π) /m ),ρe,m ρμ,m = o(m−1/2) = O(pVC(Π) /m ), ρ2 
+
+> e,m
+
++ ρ2 
+
+> μ,m
+
+= o(m−1/2) = O(pVC(Π) /m ).
+
+Hence am(Π) 2 ≤ CpVC(Π) /m for some constant C > 0. Also, after reducing c3 if necessary, we restrict to 0 < δ < c 3 ≤ 1. Then the inequality xy ≤ ηy +x2/(4 η) for x, y ≥ 0
+
+and y ≤ 1 gives Ca m(Π) δ ≤ Q′′  
+
+> 8
+
+δ + Cηam(Π) 2 ≤ Q′′  
+
+> 8
+
+δ + CpVC(Π) /m . Therefore, for all large m and all 0 < t < c 3, sup π∈Π e∆( δ; π) ≤ C0
+
+pVC(Π) /m +Q′′ δ/ 8+ C1t. Taking t = δ
+
+and choosing a constant C2 > 0 large enough, we obtain that for δ′ := C2δ+C2
+
+pVC(Π) /m ,it holds w.p. at least 1 − c1 exp( −c2mδ 2) that sup π∈Π e∆( δ′; π) ≤ Q′′ δ′/4.Recall the definitions of h(δ; π) and ∆( δ; π). Applying Lemma C.1, we have 
+
+P
+
+
+
+sup 
+
+> π∈Π
+
+bβI (π) − β∗(π) > δ ′
+
+
+
+≤ P (∆( δ′; π) ≥ h(δ′; π), ∃π ∈ Π) 
+
+≤ P
+
+
+
+sup 
+
+> π∈Π
+
+e∆( δ′; π) ≥ Q′′ 
+
+4 δ′
+
+
+
+≤ c1 exp( −c2mδ 2)
+
+for all 0 < δ < c 3 and large m, where the second inequality follows from (E.36) and (E.37). Since δ′ ≤ Cδ + CpVC(Π) /m , the stated result follows. ■
+
+Lemma E.7 (Convergence rate of cWI (π) with unknown propensity score) . Suppose that Assumptions 3.1, 5.1, 5.2, 5.3, 5.4, 5.5, and 5.6 hold and I ⊂ { 1, . . . , N } is an index set with 
+
+|I| = m. For any policy class Π ⊂ Π∞ with VC dimension VC(Π) ≥ 1, if VC(Π) /m → 0
+
+72 as m → ∞ , then cWI (π) defined in (4.2) satisfies 
+
+P sup 
+
+> π∈Π
+
+cWI (π) − W (π) ≥ δ + C1
+
+rVC(Π) 
+
+m
+
+!
+
+≤ C2 exp( −C3mδ 2)
+
+for all δ ≥ 0 and m > C 4, where C1, . . . , C 4 > 0 are finite constants independent of δ, m,
+
+I, and Π.Proof. Without loss of generality, we assume I = {1, . . . , m }. For any β ∈ Rp, we let 
+
+ψ1(Z; β, e, μ, π ) := π(X)Te(X) {U (Y, X, β) − μ01 (X)} + π(X)μ01 (X),ψ0(Z; β, e, μ, π ) := (1 − π(X))(1 − T )1 − e(X) {U (Y, X, β) − μ00 (X)} + (1 − π(X)) μ00 (X),
+
+bΨm(β; π) := 1
+
+m
+
+X
+
+> i∈I
+
+bwI,i (π)
+
+π(Xi)Ti
+
+beI (Xi) + (1 − π(Xi))(1 − Ti)1 − beI (Xi)
+
+
+
+U (Yi, Xi, β),
+
+eΨm(β; e, μ, π ) = 1
+
+m
+
+X
+
+> i∈I
+
+ψ1(Zi; β, e, μ, π ) + 1
+
+m
+
+X
+
+> i∈I
+
+ψ0(Zi; β, e, μ, π ).
+
+Set Ψ( β; e, μ, π ) := E[ψ1(Z; β, e, μ, π ) + ψ0(Z; β, e, μ, π )] . Let am(Π) := pVC(Π) /m +
+
+ρe,m + ρμ,m . Write be := beI . In this decomposition, bμ(X) denotes the stacked vector formed from bμI, 00 (X; bβinit  
+
+> I
+
+(π)) and bμI, 01 (X; bβinit  
+
+> I
+
+(π)) , and μ∗(X) is defined analogously with 
+
+μ∗
+
+> 00
+
+(X; β∗(π)) and μ∗
+
+> 01
+
+(X; β∗(π)) . By Lemma E.6, we can decompose cWI (π) − W (π) as 
+
+sup 
+
+> π∈Π
+
+cWI (π) − W (π) = sup 
+
+> π∈Π
+
+bΨm(bβI (π); π) − Ψ( β∗(π); e∗, μ ∗, π )
+
+≤ sup 
+
+> π∈Π
+
+bΨm(bβI (π); π) − eΨm(bβI (π); be, bμ, π ) + sup 
+
+> π∈Π
+
+eΨm(bβI (π); be, bμ, π ) − Ψ( bβI (π); be, bμ, π )
+
++ sup 
+
+> π∈Π
+
+Ψ( bβI (π); be, bμ, π ) − Ψ( bβI (π); e∗, μ ∗, π ) + sup 
+
+> π∈Π
+
+Ψ( bβI (π); e∗, μ ∗, π ) − Ψ( β∗(π); e∗, μ ∗, π )
+
+≤ sup 
+
+> π∈Π
+
+sup 
+
+> ∥β−β∗(π)∥≤ δ+C
+
+√VC(Π) /m 
+
+bΨm(β; π) − eΨm(β; be, bμ, π )
+
+| {z }
+
+> Q1
+
++ sup 
+
+> π∈Π
+
+sup 
+
+> ∥β−β∗(π)∥≤ δ+C
+
+√VC(Π) /m 
+
+eΨm(β; be, bμ, π ) − Ψ( β; be, bμ, π )
+
+| {z }
+
+> Q2
+
++ sup 
+
+> π∈Π
+
+sup 
+
+> ∥β−β∗(π)∥≤ δ+C
+
+√VC(Π) /m 
+
+|Ψ( β; be, bμ, π ) − Ψ( β; e∗, μ ∗, π )|
+
+| {z }
+
+> Q3
+
+73 + sup 
+
+> π∈Π
+
+Ψ( bβI (π); e∗, μ ∗, π ) − Ψ( β∗(π); e∗, μ ∗, π )
+
+| {z }
+
+> Q4
+
+w.p. at least 1 − 3c1 exp ( −c2mδ 2) for all 0 < δ < c 3 and large m. The bounds for 
+
+Q1, Q2, Q3 follow from the same localized classes as in Steps 2.1–2.3 in the proof of Lemma E.6, with L′ 
+
+> 1
+
+replaced by U and with ∥β − β∗(π)∥ ≤ δ + CpVC(Π) /m . Thus, 
+
+Q1 + Q2 + Q3 ≤ C
+
+rVC(Π) 
+
+m + Ca m(Π) 2 + Ca m(Π) 
+
+(
+
+δ + C
+
+rVC(Π) 
+
+m
+
+)
+
++ Ct 
+
+w.p. at least 1−c1 exp( −c2mt 2) for all 0 < t < c 3, 0 < δ < c 4 and large m. By letting t = δ
+
+and using the same second-order dominance relations verified in the proof of Lemma E.6, we have Q1 + Q2 + Q3 ≤ CpVC(Π) /m + δ w.p. at least 1 − c1 exp( −c2mδ 2) for all 
+
+0 < δ < c 3 and large m.Now, we analyze Q4. Note that Ψ( β; e∗, μ ∗, π ) = E[{π(X)T /e ∗(X) + (1 − π(X))(1 −
+
+T )/(1 − e∗(X)) }U (Y, X, β)] = Ψ( β; π), where Ψ( β; π) is defined in Assumption 5.3. Then Q4 = sup π∈Π Ψ( bβI (π); π) − Ψ( β∗(π); π) . On the event that bβI (π) lies in the 
+
+c0-neighborhood of β∗(π) uniformly over π ∈ Π, the mean value theorem and Assump-tion 5.3(iii) give Q4 ≤ Ψ′ sup π∈Π ∥bβI (π) − β∗(π)∥. Applying Lemma E.6, we obtain 
+
+P (Q4 ≥ δ + CpVC(Π) /m ) ≤ c1 · exp( −c2mδ 2) for all 0 < δ < c 3 and large m.Combining the results for Q1 + Q2 + Q3 and Q4 we have 
+
+P sup 
+
+> π∈Π
+
+cWI (π) − W (π) ≥ δ + C
+
+rVC(Π) 
+
+m
+
+!
+
+≤ C′ 
+
+> 2
+
+exp( −C′
+
+> 3
+
+mδ 2)
+
+for all 0 < δ < C ′ and large m, where C′, C ′
+
+> 1
+
+, . . . , C ′ 
+
+> 3
+
+> 0 are constants. Note that 
+
+sup π∈Π cWI (π) − W (π) ≤ C almost surely for some constant C > 0, so the probability below is zero when δ ≥ 2C. For 0 < δ < 2C, the preceding bound gives 
+
+P sup 
+
+> π∈Π
+
+cWI (π) − W (π) ≥ δ + C
+
+rVC(Π) 
+
+m
+
+!
+
+≤ C′ 
+
+> 2
+
+exp 
+
+(
+
+−C′
+
+> 3
+
+(C′)2
+
+4C2 mδ 2
+
+)
+
+.
+
+Together with the zero-probability case, this bound holds for all δ > 0 and large m. This completes the proof. ■
+
+## E.4 Proof of Theorem 5.1 
+
+We first verify Assumption 2.3 for the welfare function W (π). For any π1, π 2 ∈ Π∞,write d∆ := P (π1(X)̸ = π2(X)) and wπ := π(X)T /e ∗(X) + (1 − π(X))(1 − T )/(1 −
+
+74 e∗(X)) . By overlap, |wπ| ≤ κ−1 and |wπ1 − wπ2 | ≤ κ−11{π1(X)̸ = π2(X)}. Recall that 
+
+Qj (β; π) := E[wπLj (Y −β)] . For j = 1 , . . . , p , since β∗ 
+
+> j
+
+(π2) minimizes Qj (β; π2), we have 
+
+Q′ 
+
+> j
+
+(β∗ 
+
+> j
+
+(π2); π2) = 0 . Moreover, for any fixed β, the derivative of Qj (β; π) with respect to β
+
+depends on π only through wπ. Hence, by the preceding display and Assumption 5.2(iii), 
+
+Q′ 
+
+> j
+
+(β∗ 
+
+> j
+
+(π2); π1) = Q′ 
+
+> j
+
+(β∗ 
+
+> j
+
+(π2); π1) − Q′ 
+
+> j
+
+(β∗ 
+
+> j
+
+(π2); π2)
+
+≤ E |wπ1 − wπ2 | L′ 
+
+> j
+
+(Y − β∗ 
+
+> j
+
+(π2))  ≤ CLd∆, (E.44) where CL > 0 is a constant. Choose η > 0 small enough so that η ≤ c0/√p, where c0 is the neighborhood radius in Assumption 5.2, and Q′′  
+
+> j
+
+(β; π1) ≥ Q′′ /2 whenever |β − β∗ 
+
+> j
+
+(π1)| ≤ η.Such an η exists by Assumption 5.2(ii). Let δ0 := min {1, Q ′′ η/ (2 CL)}. If d∆ < δ 0 and 
+
+|β∗ 
+
+> j
+
+(π2) − β∗ 
+
+> j
+
+(π1)| > η , then consider the point ¯βj between β∗ 
+
+> j
+
+(π1) and β∗ 
+
+> j
+
+(π2) such that 
+
+| ¯βj − β∗ 
+
+> j
+
+(π1)| = η. Since Q′ 
+
+> j
+
+(β∗ 
+
+> j
+
+(π1); π1) = 0 , the local lower bound on Q′′  
+
+> j
+
+(·; π1) gives 
+
+Q′ 
+
+> j
+
+( ¯βj ; π1) = ´ ¯βj  
+
+> β∗
+> j(π1)
+
+Q′′  
+
+> j
+
+(u; π1)du ≥ Q′′ η/ 2. If β∗ 
+
+> j
+
+(π2) > β ∗ 
+
+> j
+
+(π1), then β∗ 
+
+> j
+
+(π2) ≥ ¯βj and 
+
+Q′ 
+
+> j
+
+( ¯βj ; π1) ≥ Q′′ η/ 2. Since Q′ 
+
+> j
+
+(·; π1) is nondecreasing, it follows that Q′ 
+
+> j
+
+(β∗ 
+
+> j
+
+(π2); π1) ≥
+
+Q′′ η/ 2. If instead β∗ 
+
+> j
+
+(π2) < β ∗ 
+
+> j
+
+(π1), then β∗ 
+
+> j
+
+(π2) ≤ ¯βj and Q′ 
+
+> j
+
+( ¯βj ; π1) ≤ − Q′′ η/ 2, so monotonicity gives Q′ 
+
+> j
+
+(β∗ 
+
+> j
+
+(π2); π1) ≤ − Q′′ η/ 2. In both cases, |Q′ 
+
+> j
+
+(β∗ 
+
+> j
+
+(π2); π1)| ≥ Q′′ η/ 2,which contradicts (E.44), because d∆ < δ 0 ≤ Q′′ η/ (2 CL) implies CLd∆ < Q ′′ η/ 2. Hence 
+
+|β∗ 
+
+> j
+
+(π2) − β∗ 
+
+> j
+
+(π1)| ≤ η whenever d∆ < δ 0.Now consider the case d∆ < δ 0. On the interval between β∗ 
+
+> j
+
+(π1) and β∗ 
+
+> j
+
+(π2), the local lower bound Q′′  
+
+> j
+
+(β; π1) ≥ Q′′ /2 therefore applies. By the mean value theorem applied to Q′ 
+
+> j
+
+(·; π1), together with Q′ 
+
+> j
+
+(β∗ 
+
+> j
+
+(π1); π1) = 0 and (E.44), Q′′  
+
+> 2
+
+|β∗ 
+
+> j
+
+(π2) − β∗ 
+
+> j
+
+(π1)| ≤ |Q′ 
+
+> j
+
+(β∗ 
+
+> j
+
+(π2); π1) − Q′ 
+
+> j
+
+(β∗ 
+
+> j
+
+(π1); π1)| ≤ CLd∆. Thus |β∗ 
+
+> j
+
+(π2) − β∗ 
+
+> j
+
+(π1)| ≤ Cd ∆ for j =1, . . . , p , and therefore ∥β∗(π2) − β∗(π1)∥ ≤ Cd ∆. The choice η ≤ c0/√p also ensures that the line segment between β∗(π1) and β∗(π2) lies inside the c0-neighborhood of β∗(π1)
+
+whenever d∆ < δ 0. Using W (π) = Ψ( β∗(π); π), Assumption 5.3(iii), and the boundedness of U in Assumption 5.3(i), we obtain 
+
+|W (π1) − W (π2)| ≤ | Ψ( β∗(π1); π1) − Ψ( β∗(π2); π1)| + |Ψ( β∗(π2); π1) − Ψ( β∗(π2); π2)| ≤ Cd ∆
+
+whenever d∆ < δ 0.If d∆ ≥ δ0, then the bound |W (π)| ≤ C follows from |wπ| ≤ κ−1 and Assumption 5.3(i), so |W (π1) − W (π2)| ≤ 2C ≤ (2 C/δ 0)d∆. Therefore there exists a constant CW > 0 such that |W (π1) − W (π2)| ≤ CW P (π1(X)̸ = π2(X)) for all π1, π 2 ∈ Π∞. This proves Assumption 2.3. 75 By Lemma E.7, the debiased empirical welfare function cWI (π) satisfies Assumption 2.2 for policy classes with VC dimension at least one. For Assumption 2.1, repeating the same proof for a fixed policy π yields the simpler bound P (|cWI (π) − W (π)| ≥ δ + C/ √m) ≤
+
+C1 exp( −C2mδ 2) for all δ > 0 and large m. Together with the preceding Lipschitz bound for W , this verifies all claims of Theorem 5.1. This completes the proof. 
+
+# References 
+
+A. Abadie, J. Angrist, and G. Imbens. Instrumental variables estimates of the effect of subsidized training on the quantiles of trainee earnings. Econometrica , 70(1):91–117, 2002. C. Acerbi. Spectral measures of risk: A coherent representation of subjective risk aversion. 
+
+Journal of Banking & Finance , 26(7):1505–1518, 2002. C. Ai, O. Linton, K. Motegi, and Z. Zhang. A unified framework for efficient estimation of general treatment models. Quantitative Economics , 12(3):779–816, 2021. C. Ai, Y. Fang, and H. Xie. Data-driven policy learning for continuous treatments. Journal of Econometrics , 253:106170, 2026. S. Athey and S. Wager. Policy learning with observational data. Econometrica , 89(1): 133–161, 2021. A. B. Atkinson. On the measurement of inequality. Journal of Economic Theory , 2(3): 244–263, 1970. D. H. Autor, L. F. Katz, and M. S. Kearney. Trends in U.S. wage inequality: Revising the revisionists. The Review of Economics and Statistics , 90(2):300–323, 2008. P. L. Bartlett, N. Harvey, C. Liaw, and A. Mehrabian. Nearly-tight VC-dimension and pseudodimension bounds for piecewise linear neural networks. Journal of Machine Learning Research , 20(63):1–17, 2019. D. Bhattacharya and P. Dupas. Inferring welfare maximizing treatment assignment under budget constraints. Journal of Econometrics , 167(1):168–196, 2012. 76 O. Bousquet. A Bennett concentration inequality and its application to suprema of empirical processes. Comptes Rendus Mathematique , 334(6):495–500, 2002. O. Bousquet and A. Elisseeff. Stability and generalization. Journal of Machine Learning Research , 2(Mar):499–526, 2002. S. P. Boyd and L. Vandenberghe. Convex Optimization . Cambridge University Press, Cambridge, 2004. K. C. G. Chan, S. C. P. Yam, and Z. Zhang. Globally efficient non-parametric inference of average treatment effects by empirical balancing calibration weighting. Journal of the Royal Statistical Society Series B: Statistical Methodology , 78(3):673–700, 2016. X. Chen. Large sample sieve estimation of semi-nonparametric models. In Handbook of Econometrics , volume 6, pages 5549–5632. Elsevier, Amsterdam, 2007. X. Chen, Z. Chen, W. Y. Gao, X. Yan, and G. Zhang. Optimization via the strategic law of large numbers. Proceedings of the National Academy of Sciences of the United States of America , 123(4):e2519845123, 2026. Z. Chen, S. Chen, Z. Qi, X. Chen, and Z. Yang. Quantile-optimal policy learning under unmeasured confounding, 2025. arXiv preprint arXiv:2506.07140. V. Chernozhukov, D. Chetverikov, and K. Kato. Gaussian approximation of suprema of empirical processes. The Annals of Statistics , 42(4):1564–1597, 2014. V. Chernozhukov, D. Chetverikov, M. Demirer, E. Duflo, C. Hansen, W. Newey, and J. Robins. Double/debiased machine learning for treatment and structural parameters. 
+
+The Econometrics Journal , 21(1):C1–C68, 2018. F. Crippa. Regret analysis in threshold policy design. Journal of Econometrics , 249:105998, 2025. L. Devroye, L. Gy ¨orfi, and G. Lugosi. A Probabilistic Theory of Pattern Recognition .Springer, New York, 1996. K. Dowd and D. Blake. After VaR: The theory, estimation, and insurance applications of quantile-based risk measures. The Journal of Risk and Insurance , 73(2):193–229, 2006. 77 Y. Fan, Y. Qi, and G. Xu. Policy learning with α-expected welfare, 2025. arXiv preprint arXiv:2505.00256. Y. Fang, G. Ridder, and H. Xie. Semiparametric efficiency in policy learning with general treatments, 2025a. arXiv preprint arXiv:2512.19230. Y. Fang, J. Xi, and H. Xie. Model selection for multivalued-treatment policy learning in observational studies. Journal of Business & Economic Statistics , 43(4):897–909, 2025b. M. H. Farrell, T. Liang, and S. Misra. Deep neural networks for estimation and inference. 
+
+Econometrica , 89(1):181–213, 2021. H. Fouayzi and A. S. Ash. High-frequency hospital users: The tail that wags the readmissions dog. Health Services Research , 57(3):579–586, 2022. J. L. Gastwirth. A general definition of the Lorenz curve. Econometrica , 39(6):1037–1039, 1971. J. L. Gastwirth. The estimation of the Lorenz curve and Gini index. The Review of Economics and Statistics , 54(3):306–316, 1972. L. Gy ¨orfi, M. Kohler, A. Krzy ˙zak, and H. Walk. A Distribution-Free Theory of Nonparamet-ric Regression . Springer, New York, 2002. P. Hall. Large sample optimality of least squares cross-validation in density estimation. The Annals of Statistics , 11(4):1156–1174, 1983. K. Hirano and J. R. Porter. Asymptotics for statistical treatment rules. Econometrica , 77(5): 1683–1701, 2009. N. L. Hjort and D. Pollard. Asymptotics for minimisers of convex processes, 1993. Unpub-lished Paper, arXiv:1107.3806. K. Imai and M. Ratkovic. Covariate balancing propensity score. Journal of the Royal Statistical Society Series B: Statistical Methodology , 76(1):243–263, 2014. G. Imbens and D. B. Rubin. Causal Inference for Statistics, Social, and Biomedical Sciences: An Introduction . Cambridge University Press, New York, 2015. 78 Y. Jiao, G. Shen, Y. Lin, and J. Huang. Deep nonparametric regression on approximate manifolds: Nonasymptotic error bounds with polynomial prefactors. The Annals of Statistics , 51(2):691–716, 2023. R. Khera, K. Dharmarajan, Y. Wang, Z. Lin, S. M. Bernheim, Y. Wang, S.-L. T. Normand, and H. M. Krumholz. Association of the hospital readmissions reduction program with mortality during and after hospitalization for acute myocardial infarction, heart failure, and pneumonia. JAMA Network Open , 1(5):e182777, 2018. T. Kitagawa and A. Tetenov. Who should be treated? empirical welfare maximization methods for treatment choice. Econometrica , 86(2):591–616, 2018. T. Kitagawa and A. Tetenov. Equality-minded treatment choice. Journal of Business & Economic Statistics , 39(2):561–574, 2021. M. R. Kosorok. Introduction to Empirical Processes and Semiparametric Inference . Springer, New York, 2008. G. Lecu ´e and C. Mitchell. Oracle inequalities for cross-validation type procedures. Elec-tronic Journal of Statistics , 6:1803–1837, 2012. N. Liu, Y. Liu, Y. Sasaki, and Y. Wan. Nonparametric uniform inference in binary classifica-tion and policy values, 2025. arXiv preprint arXiv:2511.14700. J. Lu, Z. Shen, H. Yang, and S. Zhang. Deep network approximation for smooth functions. 
+
+SIAM Journal on Mathematical Analysis , 53(5):5465–5506, 2021. A. R. Luedtke and M. J. van der Laan. Statistical inference for the mean outcome under a possibly non-unique optimal treatment strategy. The Annals of Statistics , 44(2):713–742, 2016. W. G. Manning, A. Basu, and J. Mullahy. Generalized modeling approaches to risk adjust-ment of skewed outcomes data. Journal of Health Economics , 24(3):465–488, 2005. C. F. Manski. Statistical treatment rules for heterogeneous populations. Econometrica , 72 (4):1221–1246, 2004. 79 E. Mbakop and M. Tabord-Meehan. Model selection for treatment choice: Penalized welfare maximization. Econometrica , 89(2):825–848, 2021. M. Qian and S. A. Murphy. Performance guarantees for individualized treatment rules. The Annals of Statistics , 39(2):1180–1210, 2011. J. M. Robins, A. Rotnitzky, and L. P. Zhao. Estimation of regression coefficients when some regressors are not always observed. Journal of the American Statistical Association , 89 (427):846–866, 1994. R. T. Rockafellar and S. Uryasev. Optimization of conditional Value-at-Risk. The Journal of Risk , 2(3):21–41, 2000. A. M. Ryan, S. Krinsky, J. Adler-Milstein, C. L. Damberg, K. A. Maurer, and J. M. Hollingsworth. Association between hospitals’ engagement in value-based reforms and readmission reduction in the hospital readmission reduction program. JAMA Internal Medicine , 177(6):862–868, 2017. J. Schmidt-Hieber. Nonparametric regression using deep neural networks with ReLU activation function. The Annals of Statistics , 48(4):1875–1897, 2020. M. Stone. Cross-validatory choice and assessment of statistical predictions. Journal of the Royal Statistical Society Series B: Statistical Methodology , 36(2):111–133, 1974. J. Stoye. Minimax regret treatment choice with finite samples. Journal of Econometrics ,151(1):70–81, 2009. J. Stoye. Minimax regret treatment choice with covariates or with limited validity of experiments. Journal of Econometrics , 166(1):138–156, 2012. J. Terschuur. Locally robust policy learning: Inequality, inequality of opportunity and intergenerational mobility, 2025. arXiv preprint arXiv:2502.13868. A. Tetenov. Statistical treatment choice based on asymmetric minimax regret criteria. 
+
+Journal of Econometrics , 166(1):157–165, 2012. A. W. van der Vaart. Asymptotic Statistics . Cambridge University Press, Cambridge, 1998. 80 A. W. van der Vaart and J. A. Wellner. Weak Convergence and Empirical Processes: With Applications to Statistics . Springer, New York, 1996. M. J. Wainwright. High-Dimensional Statistics: A Non-Asymptotic Viewpoint . Cambridge University Press, Cambridge, 2019. L. Wang, Y. Zhou, R. Song, and B. Sherwood. Quantile-optimal treatment regimes. Journal of the American Statistical Association , 113(523):1243–1254, 2018. Y. Zhao, D. Zeng, A. J. Rush, and M. R. Kosorok. Estimating individualized treatment rules using outcome weighted learning. Journal of the American Statistical Association , 107 (499):1106–1118, 2012. Z. Zhou, S. Athey, and S. Wager. Offline multi-action policy learning: Generalization and optimization. Operations Research , 71(1):148–183, 2023. R. B. Zuckerman, S. H. Sheingold, E. J. Orav, J. Ruhter, and A. M. Epstein. Readmissions, observation, and the hospital readmissions reduction program. New England Journal of Medicine , 374(16):1543–1551, 2016. 81

@@ -6,99 +6,102 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-01
-- 运行时间：2026-06-01 23:31:34 UTC
+- 最新运行日期：2026-06-02
+- 运行时间：2026-06-02 23:28:55 UTC
 - 运行状态：成功
-- 本次总论文数：25
-- 精读区：10
+- 本次总论文数：26
+- 精读区：11
 - 速读区：15
 
 ### 今日简报（AI）
-今日梳理25篇论文，精读10篇，重点聚焦两篇高分研究。
+今日推荐26篇论文，精读11篇，其中极端事件因果推断和多元尾部依赖测量获最高评分。
 
-最值得关注的两个方向：稀疏金融网络的违约传染与控制，以及人民币在岸-离岸远期定价的差异之谜。
+最值得关注方向：满分论文《Stop Suppressing the Tail》提出极端事件因果推断新方法，9分论文《Measuring multivariate maximal tail dependence》聚焦多元尾部依赖测度。
 
-建议普通读者优先阅读这两篇精读论文，理解金融网络风险与汇率定价机制的核心发现。
-- 详情：[/202606/01/README](/202606/01/README)
+建议优先精读这两篇高分论文，并速读供应链知识图谱LLM构建等8分方向以拓宽视野。
+- 详情：[/202606/02/README](/202606/02/README)
 
 ### 精读区论文标签
-1. [Default Contagion, Matrix Approximation, and Control in Sparse Financial Networks](/202606/01/2605.24833v1-default-contagion-matrix-approximation-and-control-in-sparse-financial-networks)  
+1. [Stop Suppressing the Tail: Causal Inference for Extreme Events](/202606/02/2605.27474v1-stop-suppressing-the-tail-causal-inference-for-extreme-events)  
+   标签：评分：10.0/10、query:etr
+   evidence：针对重尾极端事件的因果推断
+2. [Measuring multivariate maximal tail dependence](/202606/02/2605.25766v1-measuring-multivariate-maximal-tail-dependence)  
    标签：评分：9.0/10、query:etr
-   evidence：金融网络中的系统性违约传染与尾部风险
-2. [One Currency, Two Forward Prices: The Onshore-Offshore Renminbi Puzzle](/202606/01/2605.25392v1-one-currency-two-forward-prices-the-onshore-offshore-renminbi-puzzle)  
-   标签：评分：9.0/10、query:mp
-   evidence：在岸-离岸人民币远期价差，直接关联利率动态与货币政策工具
-3. [Partial Identification of Causal Effects that Vary by Setting](/202606/01/2605.25483v1-partial-identification-of-causal-effects-that-vary-by-setting)  
+   evidence：多元尾部依赖测量
+3. [Likelihood-Free Inference for Multivariate Generalized Pareto Models](/202606/02/2605.27694v1-likelihood-free-inference-for-multivariate-generalized-pareto-models)  
+   标签：评分：9.0/10、query:etr
+   evidence：多元极端值模型用于尾部风险推断
+4. [IV regression with distribution-valued outcomes](/202606/02/2605.28749v1-iv-regression-with-distribution-valued-outcomes)  
    标签：评分：9.0/10、query:pe
-   evidence：跨设定因果效应的部分识别方法用于政策评估
-4. [Measuring multivariate maximal tail dependence](/202606/01/2605.25766v1-measuring-multivariate-maximal-tail-dependence)  
-   标签：评分：9.0/10、query:etr
-   evidence：多元最大尾部一致性度量，直接用于极端尾部依赖的量化
-5. [Semiparametric Inference for Causal Effects on Functional Outcomes](/202606/01/2605.26964v1-semiparametric-inference-for-causal-effects-on-functional-outcomes)  
+   evidence：分布值结果的IV回归，可应用于因果政策评估
+5. [Modifying causal models to distinguish between transient and lasting causal effects](/202606/02/2605.29961v1-modifying-causal-models-to-distinguish-between-transient-and-lasting-causal-effects)  
    标签：评分：9.0/10、query:pe
-   evidence：将差分中的差分方法扩展到功能结果，提供因果政策评估的半参数推断框架
-6. [Stop Suppressing the Tail: Causal Inference for Extreme Events](/202606/01/2605.27474v2-stop-suppressing-the-tail-causal-inference-for-extreme-events)  
+   evidence：修改因果模型以区分瞬时与持久效应，用于政策评估
+6. [Out-of-Distribution generalization of quantile regression with heavy tailed inputs: an SVM approach](/202606/02/2606.00265v1-out-of-distribution-generalization-of-quantile-regression-with-heavy-tailed-inputs-an-svm-approach)  
    标签：评分：9.0/10、query:etr
-   evidence：极端事件的因果推断，尾部平均剂量反应函数估计
-7. [Likelihood-Free Inference for Multivariate Generalized Pareto Models](/202606/01/2605.27694v1-likelihood-free-inference-for-multivariate-generalized-pareto-models)  
+   evidence：重尾数据的极端分位数回归
+7. [Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference](/202606/02/2606.00320v1-adversarially-robust-control-of-conditional-value-at-risk-via-rockafellar-uryasev-conformal-inference)  
    标签：评分：9.0/10、query:etr
-   evidence：针对多元广义帕累托模型的似然自由推断方法，可直接用于经济尾部风险估计
-8. [Improved Guarantees for Heterogeneous Treatment-Effect Estimation via Matrix Completion](/202606/01/2605.30319v1-improved-guarantees-for-heterogeneous-treatment-effect-estimation-via-matrix-completion)  
+   evidence：分布自由的在线CVaR控制用于尾部风险
+8. [Recession Detection in Japan using Labor Market Data](/202606/02/2606.00948v1-recession-detection-in-japan-using-labor-market-data)  
+   标签：评分：9.0/10、query:etr
+   evidence：使用日本劳动力市场数据检测衰退
+9. [Recession Detection Using Real Time GDP Data](/202606/02/2606.00989v1-recession-detection-using-real-time-gdp-data)  
+   标签：评分：9.0/10、query:etr
+   evidence：使用实时GDP数据检测衰退
+10. [Data-Automated Policy Learning for Nonlinear Welfare](/202606/02/2606.01659v1-data-automated-policy-learning-for-nonlinear-welfare)  
    标签：评分：9.0/10、query:pe
-   evidence：通过矩阵补全改进异质处理效应估计，适用于面板数据政策评估
-9. [Linear Ordering Problem: Time for a Change](/202606/01/2605.31051v1-linear-ordering-problem-time-for-a-change)  
-   标签：评分：9.0/10、query:pn
-   evidence：通过经济投入产出表的三角化来识别关键产业，直接涉及产业间生产网络
-10. [A Statistical Physics View of the S&P 500: Pairwise Interactions and Time-Varying Dynamics](/202606/01/2605.25261v1-a-statistical-physics-view-of-the-sp-500-pairwise-interactions-and-time-varying-dynamics)  
-   标签：评分：8.0/10、query:etr
-   evidence：统计物理模型分析标普500市场扰动和尾部事件
+   evidence：非线性福利的因果政策学习
+11. [Higher-Order Efficient Estimators: A Review and Simulation-Based Benchmark Study](/202606/02/2606.01674v1-higher-order-efficient-estimators-a-review-and-simulation-based-benchmark-study)  
+   标签：评分：9.0/10、query:pe
+   evidence：高阶有效估计量的因果推断基准
 
 ### 速读区论文标签
-1. [Disentangled Double Machine Learning for Accurate Causal Effect Estimation](/202606/01/2605.24808v1-disentangled-double-machine-learning-for-accurate-causal-effect-estimation)  
-   标签：评分：8.0/10、query:pe
-   evidence：解耦双重机器学习用于因果效应估计
-2. [Estimation of Directed Acyclic Graphs by Frequentist Model Averaging](/202606/01/2605.25496v1-estimation-of-directed-acyclic-graphs-by-frequentist-model-averaging)  
+1. [Estimation of Directed Acyclic Graphs by Frequentist Model Averaging](/202606/02/2605.25496v1-estimation-of-directed-acyclic-graphs-by-frequentist-model-averaging)  
    标签：评分：8.0/10、query:pn
-   evidence：有向无环图估计方法用于金融经济网络，直接支持生产网络建模
-3. [Beyond Differences: Doubly Robust Meta-Learners for Ratio-Based Treatment Effects](/202606/01/2605.26288v1-beyond-differences-doubly-robust-meta-learners-for-ratio-based-treatment-effects)  
-   标签：评分：8.0/10、query:pe
-   evidence：用于比率型处理效应的双重稳健元学习器
-4. [A Unified Theory of Ownership Concentration, Overlap, and Dependence](/202606/01/2605.26740v1-a-unified-theory-of-ownership-concentration-overlap-and-dependence)  
+   evidence：经济网络的有向无环图估计
+2. [Ownership Networks and Economic Power in the Italian Energy Sector](/202606/02/2605.25555v1-ownership-networks-and-economic-power-in-the-italian-energy-sector)  
+   标签：评分：8.0/10、query:pn
+   evidence：所有权网络与经济权力，网络权力框架
+3. [Helicase: Uncertainty-Guided Supply Chain Knowledge Graph Construction with Autonomous Multi-Agent LLMs](/202606/02/2605.26835v1-helicase-uncertainty-guided-supply-chain-knowledge-graph-construction-with-autonomous-multi-agent-llms)  
+   标签：评分：8.0/10、query:pn
+   evidence：供应链知识图谱构建用于冲击传播分析
+4. [Nonlinear and Heavy-Tailed Predictability in Transition-Energy Financial Markets](/202606/02/2605.26890v1-nonlinear-and-heavy-tailed-predictability-in-transition-energy-financial-markets)  
    标签：评分：8.0/10、query:etr
-   evidence：所有权集中度的统一二次框架，刻画市场传导，直接用于系统性风险评估
-5. [Time Series Causal Discovery via Context-Conditioned and Causality-Augmented Pretraining](/202606/01/2605.26759v1-time-series-causal-discovery-via-context-conditioned-and-causality-augmented-pretraining)  
+   evidence：转型能源金融市场中的重尾可预测性与尾部风险相关
+5. [Semiparametric Inference for Causal Effects on Functional Outcomes](/202606/02/2605.26964v2-semiparametric-inference-for-causal-effects-on-functional-outcomes)  
    标签：评分：8.0/10、query:pe
-   evidence：用于政策评估的时间序列因果发现方法
-6. [Modeling dependence in sparse time series of Insurance Claims](/202606/01/2605.25559v1-modeling-dependence-in-sparse-time-series-of-insurance-claims)  
+   evidence：基于双重差分的功能结果因果推断
+6. [Generating Logically Consistent Synthetic Supply Chain Data with LLM-Driven Knowledge Graph Reasoning](/202606/02/2605.26823v1-generating-logically-consistent-synthetic-supply-chain-data-with-llm-driven-knowledge-graph-reasoning)  
+   标签：评分：7.0/10、query:pn
+   evidence：具有逻辑一致性的合成供应链数据生成
+7. [High-Quality Synthetic Financial Time-Series using a GAN-Diffusion Framework](/202606/02/2605.27113v1-high-quality-synthetic-financial-time-series-using-a-gan-diffusion-framework)  
    标签：评分：7.0/10、query:etr
-   evidence：基于copula的稀疏保险索赔时间序列依赖建模
-7. [Quantile autoregressive moving average models for ratio-based bounded time series](/202606/01/2605.26052v1-quantile-autoregressive-moving-average-models-for-ratio-based-bounded-time-series)  
+   evidence：合成金融时间序列用于尾部风险场景
+8. [Deep Learning Forecasting of the U.S. Aggregate Bond Index](/202606/02/2605.27977v1-deep-learning-forecasting-of-the-us-aggregate-bond-index)  
+   标签：评分：7.0/10、query:mp
+   evidence：预测美国综合债券指数，涉及利率动态与货币政策工具
+9. [Stabilizing distribution-free probabilistic forecasts](/202606/02/2605.28531v1-stabilizing-distribution-free-probabilistic-forecasts)  
    标签：评分：7.0/10、query:etr
-   evidence：适用于尾部风险测量的分位数ARMA模型
-8. [Function-Valued Causal Influence in Nonlinear Time Series](/202606/01/2605.26408v1-function-valued-causal-influence-in-nonlinear-time-series)  
-   标签：评分：7.0/10、query:pe
-   evidence：时间序列因果推断方法
-9. [Function-Valued Causal Influence in Nonlinear Time Series](/202606/01/2605.26408v2-function-valued-causal-influence-in-nonlinear-time-series)  
-   标签：评分：7.0/10、query:pe
-   evidence：时间序列因果推断方法
-10. [Learning a directed acyclic graph with additive heteroscedastic errors](/202606/01/2605.26515v1-learning-a-directed-acyclic-graph-with-additive-heteroscedastic-errors)  
-   标签：评分：7.0/10、query:pe
-   evidence：利用异方差误差和分位数回归的因果发现
-11. [Global Average Treatment Effects for Individualized Randomization Experiments with Aggregate Data](/202606/01/2605.26532v1-global-average-treatment-effects-for-individualized-randomization-experiments-with-aggregate-data)  
+   evidence：分位数回归的概率预测方法可用于尾部风险
+10. [Evolutionary Rule Extraction from Corporate Default Prediction Models](/202606/02/2605.29478v1-evolutionary-rule-extraction-from-corporate-default-prediction-models)  
+   标签：评分：7.0/10、query:etr
+   evidence：中小企业违约预测与可解释信贷风险模型
+11. [Auditing and Fixing Economic Validity in Tabular Foundation Models for Discrete Choice](/202606/02/2605.26559v1-auditing-and-fixing-economic-validity-in-tabular-foundation-models-for-discrete-choice)  
    标签：评分：6.0/10、query:pe
-   evidence：基于聚合数据的因果效应估计，处理干扰问题
-12. [The Role of Causal Features in Strategic Classification for Robustness and Alignment](/202606/01/2605.27163v1-the-role-of-causal-features-in-strategic-classification-for-robustness-and-alignment)  
+   evidence：确保选择模型的经济有效性以用于政策评估
+12. [Identification and Inference for Structural Accelerated Failure Time Models via Instrument Interactions](/202606/02/2605.28341v2-identification-and-inference-for-structural-accelerated-failure-time-models-via-instrument-interactions)  
    标签：评分：6.0/10、query:pe
-   evidence：因果特征在策略分类中实现分布外鲁棒性
-13. [Near-Unit-Root Theory for Affine Processes](/202606/01/2605.27859v1-near-unit-root-theory-for-affine-processes)  
+   evidence：工具变量交互在时间至事件结果因果推断中的应用
+13. [Three-Currency HJM for Brazilian Credit Markets](/202606/02/2605.29376v1-three-currency-hjm-for-brazilian-credit-markets)  
    标签：评分：6.0/10、query:mp
-   evidence：用于利率建模的仿射过程近单位根理论
-14. [Early warnings of critical transitions through vector autoregression: lessons from multiscale systems](/202606/01/2605.28260v1-early-warnings-of-critical-transitions-through-vector-autoregression-lessons-from-multiscale-systems)  
+   evidence：信用市场中的利率动态与盈亏平衡通胀
+14. [Change-point estimation for Weibull time series with copula-based Markov models](/202606/02/2605.29541v1-change-point-estimation-for-weibull-time-series-with-copula-based-markov-models)  
    标签：评分：6.0/10、query:etr
-   evidence：向量自回归（VAR）用于临界转变预警，方法可迁移至经济尾部风险测量与预测
-15. [Insurance Pricing Optimization via Off-Policy Evaluation](/202606/01/2605.28327v1-insurance-pricing-optimization-via-off-policy-evaluation)  
-   标签：评分：6.0/10、query:pe
-   evidence：离线策略评估用于策略优化
+   evidence：极值事件的变点检测
+15. [Distributional Portfolio Optimization (DPO): A Unified Framework for Distributions over Weights, Returns, and Parameters](/202606/02/2605.30464v1-distributional-portfolio-optimization-dpo-a-unified-framework-for-distributions-over-weights-returns-and-parameters)  
+   标签：评分：6.0/10、query:etr
+   evidence：分布投资组合优化框架用于风险建模
 
 
 <div class="dpr-home-promo-card">

@@ -1,0 +1,4765 @@
+Title: Out-of-Distribution generalization of quantile regression with heavy tailed inputs: an SVM approach
+
+URL Source: https://arxiv.org/pdf/2606.00265v1
+
+Published Time: Tue, 02 Jun 2026 00:18:47 GMT
+
+Number of Pages: 48
+
+Markdown Content:
+# Out-of-Distribution generalization of quantile regression with heavy tailed inputs: an SVM approach 
+
+## Baptiste Leroux 1, Cl´ ement Dombry 2, and Anne Sabourin 31Universit´ e Paris Cit´ e, CNRS, MAP5, F-75006 Paris, France, baptiste.leroux@u-paris.fr 
+
+> 2
+
+## Universit´ e Marie et Louis Pasteur, CNRS, LmB (UMR 6623), F-25000 Besan¸ con, France 
+
+> 3
+
+## Universit´ e Paris Cit´ e, Universit´ e Paris Saclay, ENS Paris Saclay, CNRS, SSA, INSERM, Centre Borelli, F-75006, Paris, France June 2, 2026 
+
+Abstract 
+
+We study quantile regression in an extrapolation regime where the covariate takes unusually large values. Under regular variation assumptions, extreme observations can be effectively char-acterized through their angular components, enabling learning strategies that focus on the angle of the most extreme observations. This approach is formalized through the minimization of an asymptotic conditional risk that localizes learning in the tail of the covariate distribution. We propose a novel Support Vector Machine (SVM) framework for extreme quantile regression, leveraging reproducing kernel Hilbert spaces to handle high-dimensional and nonlinear settings. Our method also accommodates unbounded response variables and avoids restrictive transforma-tions. We establish finite-sample learning guarantees under mild regularity assumptions. The proposed framework unifies ideas from statistical learning and multivariate extremes, pro-viding a tractable and theoretically grounded approach to extrapolation. We complement our theoretical findings with an empirical study on river flow data from the Danube, demonstrating the practical relevance of our methods. 
+
+Mathematics Subject Classification (2020): Primary 62G08; Secondary 62G32 
+
+Keywords: Extreme value theory, finite-sample error bounds, quantile regression, Support Vector Machines 
+
+# 1 Introduction 
+
+Let ( X, Y ) ∈ Rd ×R be a pair of random variables with unknown distribution P . Supervised regression aims at learning a rule from i.i.d . observations (( Xi, Y i)) 1≤i≤n to estimate some target functional, typ-ically the conditional expectation or another summary of the conditional distribution L (Y | X = x). In this context, Empirical Risk Minimization (ERM) algorithms provide a principled approach to this problem and enjoy well-established theoretical guarantees under combinatorial complexity as-sumptions, notably through Vapnik–Chervonenkis (VC) theory (Devroye et al., 2013; Lugosi, 2002). Among other state-of-the-art learning strategies, Support Vector Machine (SVM) methods (Steinwart and Christmann, 2008; Berlinet and Thomas-Agnan, 2011) have proven particularly successful, both in classification (Blanchard et al., 2008) and regression settings. By leveraging reproducing kernel Hilbert spaces (RKHS), SVMs provide flexible nonlinear models while maintaining strong theoretical 1
+
+> arXiv:2606.00265v1 [stat.ML] 29 May 2026
+
+control and computational tractability. A substantial body of literature has investigated their statis-tical properties, including achievable learning rates under various regularity assumptions (Steinwart and Christmann, 2008, 2011; Caponnetto and De Vito, 2007). These methods often rely on the assumption of bounded covariates and only offer guarantees on the average performance. As a result, they may fail to provide reliable predictions in rare regimes, when covariates take values potentially outside the support of the observed domain. Maintaining a model’s predictive capabilities outside the support of its training data constitutes extrapolation, a notoriously difficult task in machine learning. A closely related framework is domain adaptation (Ben-David et al., 2010; Sugiyama et al., 2007), which specifically addresses settings where the test distribution shifts from the training distribution. However, domain adaptation techniques still rely on target domain samples, hence they are inherently unsuited for regions devoid of data. In contrast, extrapolation tackles the more challenging objective of generalizing to regions where no data has ever been observed. This challenge is especially relevant in climate science, where ML models exhibit limited extrapolation capacities for the prediction of extreme events (Pasche et al., 2025). 
+
+Related works This work contributes to a recent strain of research dedicated to developing pre-diction functions that exhibit high performance within the extreme regions of the covariate space. Contrary to the literature on extreme quantile regression, which focuses on extreme values of the re-sponse variable Y (Chernozhukov et al., 2017; Daouia et al., 2013), our emphasis is on extremes on the covariate ∥X∥. The objective is to provide reliable predictions for the response Y in an extrapolation regime, i.e. when ∥X∥ takes an unusually, potentially unprecedentedly large value. Extreme Value Theory (EVT) provides a natural framework to address this problem (Cl´ emen¸ con and Sabourin, 2026; Engelke et al., 2026). Extant literature in this field spans both methodological developments and practical applications, which can be broadly categorized into two main paradigms: the construction of flexible probabilistic models evaluated via experimental simulations, and the study of constrained, styl-ized frameworks designed to establish non-asymptotic statistical guarantees. For instance, Buritic´ a and Engelke (2024) propose flexible models that accommodate unbounded targets through quantile regres-sion; however, their framework is restricted to a unidimensional covariate and lacks formal theoretical guarantees. Similarly, de Carvalho et al. (2022) provide results for quantile regression in a multivariate framework, but their approach is limited to parametric models under max-stable assumptions. In par-allel, recent studies have explored extrapolation learning tasks under regular variation assumptions. This line of work has led to the development of machine learning algorithms tailored for extrapolation, for both binary classification (Jalalzai et al., 2018) and least-squares regression (Cl´ emen¸ con et al., 2025). These methods are supported by non-asymptotic statistical learning guarantees regarding the expected error of the prediction function generated by the algorithm, conditional on the covariate being asymptotically large. A key insight from this literature is that extrapolation can be achieved in this setting by learning a prediction function that depends solely on the angular components associated to the most extreme observations. Following this strategy, a penalized LASSO approach is explored by Cl´ emen¸ con and Sabourin (2026) in a linear setting. Applications of such strategies include text representation in natural language processing (Jalalzai et al., 2020) and environmental modeling such as sea-level analysis (Huet et al., 2025). The aforementioned works introduce a conditioned version of the risk functional to the event where the norm of the covariate X exceeds some large threshold t > 0, 
+
+Rt(f ) = E [ℓ(Y, f (X)) | ∥ X∥ ≥ t] .
+
+Instead of minimizing the non conditioned version of the risk R(f ) = R0(f ), which accounts essentially for non-extreme regions on the input space, the objective shifts to minimizing an asymptotic version of the conditional risk 
+
+R∞(f ) = lim sup 
+
+> t→∞
+
+Rt(f ).
+
+Existing approaches to this minimization problem face several limitations. First, the finite-sample guarantees established in Cl´ emen¸ con et al. (2025) and Jalalzai et al. (2018) rely heavily on the re-2strictive assumption that the predictor class has a finite VC dimension. In practice, this constrains the hypothesis class to linear or low-complexity models. This limitation, coupled with the absence of a regularization term, make their approach poorly suited to high dimensional settings. Moreover, the boundedness assumption on the target made in Cl´ emen¸ con et al. (2025) simplifies the theoretical analysis but is overly restrictive in many applications, particularly in extreme value analysis where responses are typically unbounded. Although boundedness can be artificially enforced via nonlinear transformations of the target (Cl´ emen¸ con et al., 2025; Cl´ emen¸ con and Sabourin, 2026), such trans-formations interact poorly with the conditional expectation. Consequently, the guarantees obtained in Cl´ emen¸ con et al. (2025) hold only for the transformed target, with no obvious extension for the original untransformed variable. 
+
+Purpose and contributions It this work, we establish a methodological and theoretical framework for extrapolation that delivers strong practical performance under realistic assumptions. Crucially, our approach addresses a combination of challenges left unresolved by the current state of the art: it accommodates unbounded target variables and operates outside the restrictive VC-dimension frame-work, all while maintaining rigorous theoretical guarantees. Specifically, we leverage quantile regression (Koenker and Bassett, 1978) to bypass the boundedness assumption of the response variable. We first propose an ERM algorithm that extends the work carried in Cl´ emen¸ con et al. (2025), deriving guaran-tees for the excess asymptotic risk under VC-dimension assumptions. Our main contribution, however, is the introduction of a novel Support Vector Machine (SVM) algorithm tailored for extreme quan-tile regression. SVM approaches for quantile regression offer a rich class of predictors that do not rely on VC-dimension bounds. While they have been extensively studied in the literature in stan-dard setting, providing consistency and learning rate guarantees (Takeuchi et al., 2006; Steinwart and Christmann, 2011; Eberts and Steinwart, 2012), their capacity for extrapolation remains unexplored. Combining quantile regression with the SVM approach, we lift the boundedness assumption on the response variable and establish rigorous, tractable high-probability bounds for the excess asymptotic risk. We derive finite-sample learning guarantees in both the ERM and SVM settings under regular variation assumptions on the covariate distribution. Finally, we illustrate the practical relevance of our methodology on a real-world dataset of river flow measurements from the Danube, where accurate prediction in extreme regimes is of practical importance. The remainder of this paper is organized as follows. The theoretical framework and proposed algo-rithms are introduced in Section 2, alongside examples demonstrating the validity of our assumptions in several standard Extreme Value Analysis (EVA) settings. Statistical guarantees are established in Section 3. Section 4 presents the empirical study on the Danube river flow data. All proofs are deferred to the Appendix. 
+
+# 2 Framework 
+
+Here and throughout, ∥·∥ represents any norm on Rd. The associated sphere is defined as S = {x ∈
+
+Rd : ∥x∥ = 1 } and the angular component of a vector x ∈ Rd \ { 0} is denoted by θ(x) = x/ ∥x∥. Given a probability space (Ω , A, P), and an event A ∈ A , we let 1A be the associated indicator function. For any random variable Z, we write L(Z) its law, and denote weak convergence by w
+
+−→.
+
+## 2.1 Quantile regression 
+
+Let ( X, Y ) be a pair of random variables with joint distribution P , where X takes values in X ⊂ Rd
+
+and Y is real-valued. Fix τ ∈ (0 , 1). The goal of quantile regression is to estimate the conditional quantile function , defined for x ∈ X by 
+
+q(x) = inf {t ∈ R : P(Y ≤ t | X = x) ≥ τ }.
+
+3A common strategy for regression problems consists in introducing a risk function whose minimizer corresponds to the target quantity. For quantile regression, the appropriate loss is the pinball loss 
+
+(Koenker and Bassett, 1978; Koenker, 2020), defined by 
+
+ℓτ (y, z ) = (1 − τ )( z − y)1y<z + τ (y − z)1y≥z .
+
+It is known (see e.g. Steinwart and Christmann, 2011) that the conditional quantile function minimizes the pinball risk E [ℓ(Y, f (X))] over all measurable functions f : X → R, whenever the distribution of the target Y has bounded support. This result extends to targets with unbounded support by considering the modified pinball loss , defined as 
+
+ℓ′ 
+
+> τ
+
+(y, z ) = ℓτ (y, z ) − ℓτ (y, 0) .
+
+Although this modified loss is not necessarily positive, it has the advantage of remaining bounded as a function of y. Moreover, the pinball loss is max( τ, 1 − τ )-Lipschitz with respect to each variable and satisfies, for any z ∈ R,
+
+|ℓ′ 
+
+> τ
+
+(y, z )| ≤ max( τ, 1 − τ )|z|.
+
+For any measurable function f : Rd → R such that E [|f (X)|] < ∞, the associated risk is defined by 
+
+R(f ) = E [ℓ′ 
+
+> τ
+
+(Y, f (X))] .
+
+The assumption E [|f (X)|] < ∞ ensures that the modified pinball risk is well defined, given that the bound 
+
+|ℓ′ 
+
+> τ
+
+(y, f (x)) | ≤ max( τ, 1 − τ )|f (x)|
+
+guarantees the integrability of the loss function. This integrability condition on f is essential to secure a finite risk. The corresponding Bayes risk is defined by 
+
+R∗ = inf {R (f ) : f measurable, E [|f (X)|] < ∞} .
+
+The following result shows that the conditional quantile function q minimizes the modified pinball even when the target is unbounded, provided that the conditional quantile q satisfies the integrability condition E [|q(X)|] < ∞. This extends the work of Steinwart and Christmann (2011) which establishes the identifiability of the quantile function under the strict assumption of a bounded support for Y .Here, we relax this constraint, replacing it with this mild integrability condition on the quantile function itself to provide a significantly broader framework. 
+
+Proposition 2.1. Suppose the conditional quantile function satisfies E [|q(X)|] < ∞. Then the condi-tional quantile function minimizes the modified pinball risk R(f ) over all measurable functions f such that E [|f (X)|] < ∞, that is, 
+
+R(q) = R∗.
+
+As an illustrative example, consider a heavy-tailed random variable Y that is independent of X. While the support of Y is explicitly unbounded, its conditional quantile function is constant and is there-fore integrable, demonstrating the utility of our relaxed distributional assumptions. Proposition 2.1 provides the theoretical foundation of quantile regression within the empirical risk minimization frame-work. Given a training sample, the goal is to find a function bq whose risk is close to the Bayes risk. A natural approach is to minimize the empirical risk over a suitable class of functions, possibly com-plemented by an appropriate regularization term. The aim of this paper is to establish statistical guarantees for such strategies when attention is restricted to extreme regions of the covariate space. This extreme covariate setting is introduced in the next subsection. 42.2 The extreme covariate setting 
+
+The challenge of regression in extreme regions stems from the fact that estimating quantiles via the direct minimization of the (possibly penalized) modified pinball risk often yields poor performance when ∥X∥ takes unusually large values. Indeed, by the law of total probability, the risk can be decomposed into a weighted sum of its behavior in typical and extreme regimes 
+
+R(f ) = P(∥X∥ < t ) E [ℓ′ 
+
+> τ
+
+(Y, f (X)) | ∥ X∥ < t ] + P(∥X∥ ≥ t) E [ℓ′ 
+
+> τ
+
+(Y, f (X)) | ∥ X∥ ≥ t] .
+
+As t → ∞ , the contribution of the second term vanishes, causing standard machine learning algorithms to prioritize the bulk of the distribution at the expense of accuracy in the tail regions of the covariate. Following Cl´ emen¸ con et al. (2025), we therefore focus on estimating the conditional quantiles of Y
+
+when the norm of X exceeds a large threshold t, and consider the conditional pinball risk 
+
+Rt(f ) = E [ℓ′ 
+
+> τ
+
+(Y, f (X)) | ∥ X∥ ≥ t] .
+
+If the conditional quantile function satisfies E [|q(X)|] < ∞, applying Proposition 2.1 to the conditional distribution L (X, Y | ∥ X∥ ≥ t) implies that it also minimizes the conditional pinball risk. It follows that for any t ≥ 0, the corresponding conditional Bayes risk is given by 
+
+R∗ 
+
+> t
+
+= inf {R t(f ) : f measurable, E [|f (X)|] < ∞} = Rt(q). (2.1) Since we are interested in the regime where t becomes large, we define the asymptotic conditional risk 
+
+as 
+
+R∞(f ) = lim sup 
+
+> t→∞
+
+Rt(f ) = lim sup 
+
+> t→∞
+
+E [ℓ′ 
+
+> τ
+
+(Y, f (X)) | ∥ X∥ ≥ t] , (2.2) and the corresponding asymptotic conditional Bayes risk as 
+
+R∗∞ = inf {R ∞(f ) : f measurable, E [|f (X)|] < ∞} .
+
+Since R∗ 
+
+> t
+
+= Rt(q) for any t ≥ 0, for any f measurable such that E [|f (X)|] < ∞, we have 
+
+R∞(f ) = lim sup 
+
+> t→∞
+
+Rt(f ) ≤ lim sup 
+
+> t→∞
+
+Rt(q) = R∞(q).
+
+Consequently, when E [|q(X)|] < ∞, the conditional quantile function also minimizes the asymptotic risk, therefore, 
+
+R∗∞ = R∞(q).
+
+Alternatively, the joint behavior of ( X, Y ) when ∥X∥ is exceptionally large can be analyzed by imposing a regular variation condition on the joint distribution of ( X, Y ). Although the framework considered in this paper is similar to the one in Cl´ emen¸ con et al. (2025), we relax the boundedness assumption on Y , which we believe extends significantly the scope of application in a context where the covariate has heavy tails. Recall that a function b is said to be regularly varying with tail index α > 0 if 
+
+b(tx )/b (t) → xα as t → ∞ .
+
+Assumption 1 (First-component regular variation) . The pair (X, Y ) is first-component regularly varying (or regularly varying with respect to the covariate), i.e. there exists a nonzero Borel measure 
+
+μ on Rd × R, finite on sets bounded away from {0} × R, and a regularly varying function b such that 
+
+b(t) P  (t−1X, Y ) ∈ A × C −−−→ 
+
+> t→∞
+
+μ(A × C)
+
+for all Borel sets A, C , with A bounded away from 0 and μ(∂(A × C)) = 0 .
+
+Under the latter assumption, we can define the joint angular measure 
+
+Φ( B × C) = μ{(x, y ) ∈ Rd × R : ∥x∥ ≥ 1, θ (x) ∈ B, y ∈ C}.
+
+5Cl´ emen¸ con et al. (2025) showed that, this assumption is equivalent to the convergence in distribution 
+
+ X/t, Y | ∥ X∥ ≥ t w
+
+−−−→ 
+
+> t→∞
+
+(X∞, Y ∞),
+
+where ( X∞, Y ∞) has distribution P∞ defined by 
+
+P∞{(x, y ) ∈ Rd × R : ∥x∥ ≥ r, θ (x) ∈ B, y ∈ C} = r−αΦ( B × C). (2.3) Intuitively, the quantile regression of Y on X in the extreme region ∥X∥ ≥ t, with t → ∞ , can be understood through the quantile regression of Y∞ on X∞. Let qP∞ (x) denote the conditional quantile of Y∞ given X∞ = x. An important consequence of (2.3) is that the radial component ∥X∞∥ is independent of the pair (Θ ∞, Y ∞), where Θ ∞ = θ(X∞) denotes the angular component of X∞. This implies the following structural property of the extreme conditional quantile. 
+
+Lemma 2.1 (Angular structure of the extreme conditional quantile) . The extreme conditional quantile function can be written as qP∞ = hP∞ ◦ θ, where hP∞ : S → R is continuous. 
+
+It turns out that the asymptotic risk R∞ defined by (2.2) is closely related to the risk associated with (X∞, Y ∞). Define the extreme risk as 
+
+RP∞ (f ) = E [ℓ′ 
+
+> τ
+
+(Y∞, f (X∞))] ,
+
+which is well defined for any function f such that E [|f (X∞)|] < ∞. The corresponding extreme Bayes risk is defined as 
+
+R∗ 
+
+> P∞
+
+= inf {R P∞ (f ) : f measurable, E [|f (X∞)|] < ∞} .
+
+If the extreme conditional quantile is measurable and satisfies E [|qP∞ (X∞)|] < ∞, then by Proposi-tion 2.1, 
+
+R∗ 
+
+> P∞
+
+= RP∞ (qP∞ ).
+
+Parallel to the framework of Cl´ emen¸ con et al. (2025), but adapted to conditional quantiles rather than conditional expectations, we assume the following regularity property. 
+
+Assumption 2 (Regularity and stability assumption) . The extreme conditional quantile function qP∞
+
+is continuous on Rd \ { 0}, and 
+
+E[|q(X) − qP∞ (X)| | ∥ X∥ ≥ t] −−−→ 
+
+> t→∞
+
+0. (2.4) Under this assumption, the function qP∞ is continuous on the compact sphere S and is therefore bounded. Consequently, E [|qP∞ (X∞)|] ≤ ∥ qP∞ ∥∞ < ∞, and the minimizer of the extreme risk RP∞
+
+coincides with the extreme conditional quantile function qP∞ . The precise relationship between the asymptotic conditional risk R∞ and the extreme risk RP∞ is stated in the following theorem. 
+
+Theorem 2.1. Under Assumptions 1 and 2, we have: 1. For any function of the form f = h ◦ θ, where h : S → R is continuous, Rt(f ) −−−→ 
+
+> t→∞
+
+RP∞ (f ). In particular, R∞(f ) = lim sup t→∞ Rt(f ) = RP∞ (f ).2. The conditional Bayes risk converges to the extreme Bayes risk as t → ∞ , i.e. R∗ 
+
+> t
+
+−−−→ 
+
+> t→∞
+
+R∗ 
+
+> P∞
+
+.3. The asymptotic conditional Bayes risk equals the extreme Bayes risk, i.e. R∗∞ = R∗ 
+
+> P∞
+
+.4. The asymptotic conditional Bayes risk equals the asymptotic risk of the extreme conditional quantile function, i.e. R∗∞ = R∞(qP∞ ).
+
+Lemma 2.1 and Theorem 2.1 justify our approach to quantile regression in the extreme covariate setting: we estimate an angular function bh : S → R that minimizes an empirical counterpart, potentially penalized, of the extreme risk RP∞ , and set bq = bh ◦ θ.62.3 Examples 
+
+In this subsection we describe several examples related to standard EVA framework for which Assump-tions 1 and 2 are satisfied, thereby illustrating the practical relevance of the setting presented in the preceding section. All proofs are deferred to the appendix, section A.3. 
+
+Example 2.1 (Additive noise model with regularly varying design) . Assume X is regularly varying and that the target Y has the form 
+
+Y = g(X) + ε
+
+for some noise ε independent from X, and some continuous function g satisfying E [|g(X)|] < ∞.Assume also that there exists some continuous function gθ : S → R satisfying sup 
+
+> ∥x∥≥ t
+
+|g(x) − gθ (θ(x)) | − −−→ 
+
+> t→∞
+
+0. (2.5) Then, Assumptions 1 and 2 hold. The next example concerns the prediction of the missing component of some regularly varying vector. 
+
+Example 2.2 (Predicting a missing component of a regularly varying vector) . Let ( X, Z ) ∈ Rd × R be a random pair, with P(X = 0) = 0. We equip Rd+1 with the norm ∥·∥ = ∥·∥ p for some p ∈ [1 , ∞]. Assume that the pair ( X, Z ) has positive continuous density π on Rd+1 \ { 0}. Assume also that there exists some regularly varying function b(t) with tail index α > 0 and some positive, continuous density 
+
+π∞ such that sup 
+
+> ∥(x,z )∥>1
+
+|td+1 b(t)π(tx, tz ) − π∞(x, z )| − −−→ 
+
+> t→∞
+
+0. (2.6) For x ∈ Rd, Denote π∞(x) = R 
+
+> R
+
+π∞(x, z ) d z, and assume that this marginal density has a lower bound on the sphere, i.e. there exists c > 0 such that inf  
+
+> ω∈S
+
+π∞(ω) ≥ c. (2.7) Define Y = Z 
+
+> ∥X∥
+
+. Then, it is shown in Proposition 2.2 that the pair ( X, Y ) satisfies both Assumption 1 and Assumption 2. The framework introduced in Example 2.2 resembles the one presented in Cl´ emen¸ con et al. (2025) (Example 2.2), adapted to the context of quantile regression. A key advantage of our setting is that the missing component Z is rescaled only by ∥X∥, whereas in Cl´ emen¸ con et al. (2025) is it rescaled by the norm of the whole vector ∥(X, Z )∥. This modification yields a much simpler expression for the prediction of the missing component Z = Y ∥X∥. This rescaling also allows us to consider the case 
+
+∥·∥ = ∥·∥ ∞, which is standard in extreme value analysis. The same normalization strategy can be found in Cl´ emen¸ con and Sabourin (2026) (Proposition 4.1), however, their framework still relies on a boundedness assumption on the target Y . The following proposition states that Example 2.2 falls into the Extreme covariate setting introduced in the previous section. 
+
+Proposition 2.2. In the framework of Example 2.2, Assumption 1 and Assumption 2 are satisfied. 
+
+## 2.4 Notations and algorithms 
+
+Theorem 2.1 ensures that the extreme conditional quantile function qP∞ is a minimizer of the asymp-totic conditional risk R∞. Moreover, from Lemma 2.1, qP∞ is of angular type. Thus, the asymptotic Bayes risk R∗∞ satisfies 
+
+R∗∞ = R∞(qP∞ ) = inf {R ∞(f ◦ θ) : f measurable, E|f (θ(X)) | < ∞} .
+
+Thus, in order to estimate the extreme quantile function qP∞ , one can aim at minimizing R∞, restrict-ing the search to angular predictors. Because the asymptotic risk is not directly available, we instead 7aim at minimizing Rt(f ◦ θ) for some large threshold t. Let ( X1, Y 1), . . . , (Xn, Y n) be an i.i.d . sample with P(X1 = 0) = 0, ensuring that, almost surely, θ(Xi) is well-defined. One natural strategy for this problem consists in minimizing the empirical version of 
+
+Rt(f ◦ θ) = E ℓ′ 
+
+> τ
+
+(Y, f ◦ θ(X)) 1∥X∥≥ t
+
+
+
+P(∥X∥ ≥ t) .
+
+If t = tn,k is the (1 − k/n )-quantile of the law of ∥X∥, we obtain the intermediate risk 
+
+eRk(f ◦ θ) = 1
+
+nP(∥X∥ ≥ tn,k )
+
+> n
+
+X
+
+> i=1
+
+ℓ′ 
+
+> τ
+
+(Yi, f ◦ θ(Xi)) 1∥Xi∥≥ tn,k 
+
+= 1
+
+k
+
+> n
+
+X
+
+> i=1
+
+ℓ′ 
+
+> τ
+
+(Yi, f ◦ θ(Xi)) 1∥Xi∥≥ tn,k .
+
+(2.8) However, the quantile tn,k is unknown in practice, hence we instead aim at minimizing the empirical risk , defined by 
+
+bRk(f ◦ θ) = 1
+
+k
+
+> k
+
+X
+
+> i=1
+
+ℓ′ 
+
+> τ
+
+(Y(i), f ◦ θ(X(i))) where ( X(i), Y (i))i∈{ 1,...,n } are the sorted observations, by decreasing order of magnitude of the norm of the covariate X. For a given class F of functions f : S → R, we obtain the corresponding ERM algo-rithm, and the estimator of the extreme quantile function qP∞ is obtained by solving the optimization problem min  
+
+> f∈F
+
+bRk(f ◦ θ).
+
+This approach, leading to Algorithm 1, is a natural extension of the algorithm proposed in Cl´ emen¸ con et al. (2025) to the context of quantile regression. 
+
+Algorithm 1 Quantile regression on extremes with unpenalized ERM 
+
+Input: Training dataset Dn = {(X1, Y 1), . . . , (Xn, Y n)}, family F of functions f : S −→ R, number 
+
+k ≤ n of extreme observations, τ ∈ (0 , 1). New observation x.
+
+Training step: Sort the training sample by decreasing order of magnitude of the norm to form an extreme training sample (( X(1) , Y (1) ), . . . , (X(k), Y (k))) where ∥X(1) ∥ ≥ · · · ≥ ∥ X(k)∥. Compute the extreme angles θ1 = X(1)  
+
+> ∥X(1) ∥
+
+, . . . , θ k = X(k) 
+
+> ∥X(k)∥
+
+.Solve the optimization problem min  
+
+> f∈F
+
+1
+
+k
+
+> k
+
+X
+
+> i=1
+
+ℓ′ 
+
+> τ
+
+(Y(i), f (θ(i))) .
+
+Output bf the minimizer. 
+
+Prediction step: If x ≤ ∥ X(k)∥, use some off-the-shelf method to estimate the quantile of the law of 
+
+Y given X = x. Else, output bf (θ(x)). However, the lack of a penalization term in the ERM approach described in Algorithm 1 makes it highly vulnerable to the challenges of high dimensionality. Moreover, the statistical guarantees obtained in this framework typically rely on VC-dimension arguments, which severely restrict the capacity of the predictor class over which optimization can be performed. These observations motivate our SVM-based approach, described in Algorithm 2. Given a parameter λ > 0 and a RKHS H, the penalized empirical risk is defined by 
+
+bR(λ) 
+
+> k
+
+(h ◦ θ) = bRk(h ◦ θ) + λ∥h∥2
+
+> H
+
+.
+
+8Algorithm 2 SVM Quantile regression on extremes 
+
+Input: Training dataset Dn = {(X1, Y 1), . . . , (Xn, Y n)}, RKHS H of functions h : Rd −→ R, number 
+
+k ≤ n of extreme observations, parameter λ > 0 and τ ∈ (0 , 1). New observation x.
+
+Training step: Sort the training sample by decreasing order of magnitude of the norm to form an extreme training sample (( X(1) , Y (1) ), . . . , (X(k), Y (k))where ∥X(1) ∥ ≥ · · · ≥ ∥ X(k)∥. Compute the extreme angles θ(1) = X(1)  
+
+> ∥X(1) ∥
+
+, . . . , θ (k) = X(k) 
+
+> ∥X(k)∥
+
+.Solve the optimization problem min 
+
+> h∈H
+
+1
+
+k
+
+> k
+
+X
+
+> i=1
+
+ℓ′ 
+
+> τ
+
+(Y(i), h (θ(i))) + λ∥h∥2
+
+> H
+
+.
+
+Output bhλ,k the minimizer. 
+
+Prediction step: If x ≤ ∥ X(k)∥, use some off-the-shelf method to estimate the quantile of the law of 
+
+Y given X = x. Else, output bhλ,k (θ(x)). The estimator bhλ,k ◦ θ of qP∞ is obtained by solving the optimization problem min 
+
+> h∈H
+
+bR(λ) 
+
+> k
+
+(h ◦ θ).
+
+Note that this optimization step can be performed working with the pinball loss or its modified version, and produces the same output because the two corresponding risk functionals only differ by a finite constant. In this paper, the RKHS H consists of functions h : Rd → R. We will also always assume that the reproducing kernel K associated to the RKHS H is continuous, bounded by 1. All the results we provide extend to the more general case where K is bounded by some constant MK .In many RKHS frameworks, the compactness of the input space for the covariate X is essential. Here, this assumption is violated since the input space is Rd, moreover, analyzing extremes inherently prevents restricting the domain to a compact set. However, Theorem 2.1 implies that we only need to consider the behavior of any h ∈ H on the sphere S. This motivates the introduction of the space HS
+
+of functions from H restricted to S,
+
+HS = {h|S : h ∈ H} . (2.9) By applying the results of Aronszajn (1950) regarding the restriction of reproducing kernels, we estab-lish the following proposition, which ensures that HS inherits the RKHS structure of H.
+
+Proposition 2.3 (RKHS structure on HS). Let HS be the space of functions of H restricted to the sphere, defined by (2.9) . Let KS be the restriction of K to the sphere, i.e. the kernel defined on S × S
+
+by 
+
+KS(θ1, θ 2) = K(θ1, θ 2).
+
+Then, HS equipped with the norm 
+
+∥hS∥HS = min {∥ h∥H : h|S= hS}
+
+is a RKHS, with reproducing kernel KS.
+
+In the following, we will denote by BH the closed unit ball of H, and BHS the closed unit ball of HS.
+
+# 3 Statistical guarantees 
+
+We now present nonasymptotic results for both approaches. The statistical guarantees regarding the ERM approach, described in Algorithm 1, are described in the next subsection. Our main contribu-tions, however, lie in the statistical guarantees for our penalized approach, described in Algorithm 2, 9which is the focus of Section 3.2. For both algorithms, when bf ◦θ is the issued estimator of the extreme quantile function qP∞ , we provide a high probability bound for the excess asymptotic pinball risk , that is, R∞( bf ◦ θ) − R ∗∞.
+
+## 3.1 Statistical guarantees in the ERM framework 
+
+This section serves a preparatory role, highlighting the limitations of the ERM approach studied in Cl´ emen¸ con et al. (2025). We first demonstrate that their statistical guarantees can be adapted to the quantile regression framework, yielding explicit bounds on the excess risk for the estimator produced by Algorithm 1. These guarantees require several strong assumptions on the class F. Namely, we assume that the functions f ∈ F are uniformly bounded by a constant M .
+
+Assumption 3 (Uniform boundedness of the family F). There exists M > 0 such that 
+
+sup  
+
+> f∈F
+
+∥f ∥∞ ≤ M. 
+
+This assumption ensures, in particular, that the risk functionals under consideration are well-defined. With this assumption, the exact same decomposition of the excess asymptotic risk R∞( bf ) −R∗∞ as in Cl´ emen¸ con et al. (2025) can be recovered, their result not being specific to the context of least-square setting but rather to the ERM framework. The proof is omitted for brevity, as it is straightforward to verify that the arguments used in Cl´ emen¸ con et al. (2025) (Theorem 3.3) remain valid for any arbitrary loss function. We thus obtain the following proposition. 
+
+Proposition 3.1 (Bias-variance decomposition of the excess asymptotic risk in the ERM framework) .
+
+Suppose Assumptions 1, 2 and 3 hold and let tn,k be the (1 − k/n ) quantile of ∥X∥. Let bf be the prediction function issued by Algorithm 1. Then, 
+
+R∞( bf ◦ θ) − R ∗∞ ≤ B1(tn,k ) + B2(F) + Dk
+
+where B1(t) is the threshold bias, defined by 
+
+B1(t) = 2 sup  
+
+> f∈F
+
+|R ∞(f ◦ θ) − R t(f ◦ θ)|,B2(H) is the class bias, defined by 
+
+B2(F) = inf   
+
+> f∈F
+
+R∞(f ◦ θ) − R ∞(qP∞ ◦ θ),
+
+and Dk is a stochastic deviation term, defined by 
+
+Dk = 2 sup  
+
+> f∈F
+
+|R tn,k (f ◦ θ) − bRk(f ◦ θ)|.
+
+Recall that a metric space ( E, d ) is totally bounded if, for any ε > 0, it can be covered by a finite number of balls of radius ε with centers in E. The following proposition shows that, whenever the class F is totally bounded, the bias term vanishes as t → ∞ .
+
+Proposition 3.2 (Control of the threshold bias) . Suppose Assumptions 1, 2 and 3 hold, and that the family F is totally bounded in the space (C(S), ∥·∥ ∞). Then, as t → ∞ ,
+
+B1(t) = sup  
+
+> f∈F
+
+Rt(f ◦ θ) − R ∞(f ◦ θ) −−−→ 
+
+> t→∞
+
+0.
+
+The proof of this proposition is deferred to the appendix in Section B.1. To obtain statistical guarantees on the deviation term Dk, we make an additional VC-dimension assumption on the class F.10 Assumption 4 (Finite VC-dimension of F). The class F has finite VC-dimension, denoted by VF ,and it is pointwise measurable, i.e. there exists F0 ⊂ F which is countable and such that for any θ ∈ S
+
+and f ∈ F , there exists a sequence (fi)i∈N of functions in F0 with 
+
+fi(θ) −−−→ 
+
+> i→∞
+
+f (θ).
+
+In this setting, a high-probability bound can be derived for the deviation term Dk.
+
+Proposition 3.3 (Control on the deviation term) . Suppose Assumptions 3 and 4 hold. Then, there exists a universal constant C such that, with probability no less than 1 − δ,
+
+sup  
+
+> f∈F
+
+|R tn,k (f ◦ θ) − bRk(f ◦ θ)| ≤ M max( τ, 1 − τ )
+
+√k
+
+
+
+CpVF + 2 p2 log(1 /δ ) + 3 log(1 /δ )
+
+√k + CV F
+
+√k
+
+.
+
+We do not claim originality in the technique of proof employed for Proposition 3.3. For completeness, we provide the proof in the Appendix, Section B.2. We now examine the results of Proposition 3.1 and the assumptions required to establish the statistical guarantees in this subsection. First, note that Assumption 3 is not necessarily unrealistic as the Bayes asymptotic predictor is the extreme quantile function qP∞ , which we assumed to be continuous on the sphere. This guarantees that it is, in particular, bounded. However, ∥qP∞ ∥ is unobservable in practice. This dependency on an unknown uniform bound introduces a operational challenge regarding the calibration of M . Selecting M incorrectly may drastically inflate the approximation error B2(F), or the deviation term Dk, yielding an implicit bias-variance tradeoff for the choice of M . Additionally, control over the approximation bias B2(F) remains theoretically elusive. Finally, note that the VC-type assumption on the class F severely limits the capacity of the hypothesis spaces available for optimization. Collectively, these drawbacks, alongside the well-known vulnerability of ERM methods to the curse of dimensionality underscore the necessity of a regularized approach. This is the object of the next subsection, investigating the penalized approach described in Algorithm 2. 
+
+## 3.2 Statistical guarantees in the SVM framework 
+
+In this section, we propose to derive theoretical guarantees for the SVM approach, described in Al-gorithm 2. We derive a complete error decomposition for the excess asymptotic risk and bound each resulting term, thereby establishing tractable guarantees under relatively mild assumptions. One ad-vantage of the SVM approach is that it yields bounds on ∥bhλ,k ∥H. In the case where the kernel of the RKHS H is bounded, this property ensures that bhλ,k is uniformly bounded as well. This ultimately allows us to completely drop any boundedness assumption on the target Y , or any boundedness as-sumption similar to Assumption 3. Likewise, we will drop Assumption 4, at the cost of replacing the bias term B2(F) by another error term, the asymptotic approximation error of the RKHS H.
+
+3.2.1 Preliminary results on SVM solutions 
+
+Recall that our predictor bhλ,k is defined as a minimizer of the penalized empirical risk 
+
+bR(λ) 
+
+> k
+
+(h ◦ θ) = bRk(h ◦ θ) + λ∥h∥2
+
+> H
+
+, h ∈ H ,
+
+where bRk(h ◦ θ) = 1
+
+> k
+
+Pki=1 ℓ′ 
+
+> τ
+
+(Y(i), h ◦ θ(X(i))). We say that bhλ,k is the empirical SVM solution .In the sequel, we introduce three other notions of SVM solution that will be useful in our analysis and correspond to the different notions of risk considered in Section 2. The existence and uniqueness of these minimizers are proved in Corollary 3.1 below. For a threshold t > 0, we define the conditional objective SVM solution h∗ 
+
+> λ,t
+
+as a minimizer of the penalized objective conditional risk 
+
+R(λ) 
+
+> t
+
+(h ◦ θ) = Rt(h ◦ θ) + λ∥h∥2
+
+> H
+
+, h ∈ H ,
+
+11 where Rt(h ◦ θ) = E [ℓ′ 
+
+> τ
+
+(Y, f (X)) | ∥ X∥ ≥ t]. We also introduce the asymptotic SVM solution h∗
+
+> λ, ∞
+
+defined as a minimizer of 
+
+R(λ) 
+
+> P∞
+
+(h ◦ θ) = RP∞ (h ◦ θ) + λ∥h∥2
+
+> H
+
+, h ∈ H ,
+
+where RP∞ (h ◦ θ) = E [ℓ′ 
+
+> τ
+
+(Y∞, h ◦ θ(X∞))]. Finally, we introduce a final SVM solution that we call the 
+
+intermediate SVM solution . Let tn,k be the (1 − k/n )-quantile of ∥X∥ and define ehλ,t n,k as a minimizer of the penalized pseudo-empirical risk 
+
+eR(λ) 
+
+> k
+
+(h ◦ θ) = eRk(h ◦ θ) + λ∥h∥2
+
+> H
+
+, h ∈ H ,
+
+where eRk(h ◦ θ) was defined by (2.8). In this section, we state some preliminary results on these SVM solutions. The first step is to show all of these SVM solutions are well defined. 
+
+Lemma 3.1. Assume the kernel K is bounded with sup x∈Rd K(x, x ) = 1 . For any λ > 0 and any distribution P on Rd × R such that P (0 × R) = 0 , there exists a unique h∗ 
+
+> λ,P
+
+∈ H minimizing the penalized conditional risk 
+
+R(λ) 
+
+> P
+
+(h ◦ θ) = RP (h ◦ θ) + λ∥h∥2
+
+> H
+
+, h ∈ H ,
+
+where RP (h ◦ θ) = EP [ℓ′ 
+
+> τ
+
+(Y, h ◦ θ(X))] denotes the modified pinball risk under P . Moreover, h∗
+
+> λ,P
+
+satisfies 
+
+∥h∗ 
+
+> λ,P
+
+∥H ≤ max( τ, 1 − τ )
+
+λ .
+
+The proof of Lemma 3.1 follows the lines of Steinwart and Christmann (2008), Lemma 5.1 and Theorem 5.2, with an adaptation for the existence. This adaptation is necessary because the modified pinball loss may take negative values and consequently, we do not have in general that λ∥h∥2 
+
+> H
+
+≤ λ∥h∥2 
+
+> H
+
++Rt(h◦θ), which is a crucial inequality in the proof of Steinwart and Christmann (2008). However, using the fact that the modified pinball loss is Lipschitz and the reproducing property of the RKHS H, we still manage to bypass this difficulty, and remove the integrability assumption on the target Y . The details for this proofs and other proofs for this section are deferred to the Appendix, Section C.1. By ensuring the existence and uniqueness of the SVM solution under general conditions, this lemma confirms that the previously defined SVM solutions are well-posed. This is formally stated in the following corollary. 
+
+Corollary 3.1 (The SVM solutions are well-defined) . Assume the kernel K is bounded with sup x∈Rd K(x, x ) = 1 and let t > 0. Then, the SVM solutions bhλ,k , h ∗
+
+> λ,t
+
+, h ∗
+
+> λ, ∞
+
+, ehλ,t n,k are well defined. Moreover, 
+
+max 
+
+
+
+∥bhλ,k ∥H, ∥h∗
+
+> λ,t
+
+∥H, ∥h∗
+
+> λ, ∞
+
+∥H
+
+
+
+≤ max( τ, 1 − τ )
+
+λ .
+
+Note that Proposition 2.9 implies that the restrictions of bhλ,k , h ∗
+
+> λ,t
+
+, h ∗ 
+
+> λ, ∞
+
+to the sphere S satisfy the same inequalities in the RKHS HS, i.e. max 
+
+
+
+∥hλ|S∥HS , ∥h∗
+
+> λ,t |S
+
+∥HS , ∥h∗
+
+> λ, ∞| S
+
+∥HS
+
+
+
+≤ max( τ, 1 − τ )
+
+λ .
+
+This is a straightforward consequence of the inequality ∥h|S∥HS ≤ ∥ h∥H, for all h ∈ H . Finally, the following proposition justifies the use of a RKHS H of functions in the whole space Rd instead of a RKHS HS of functions on the sphere S, as the two approaches yield the same SVM solutions. 
+
+Proposition 3.4 (Equivalence of the SVM problems in H and HS). Let P be any probability distri-bution on Rd × R with P (0 × R) = 0 . Consider the conditional objective SVM solution h∗ 
+
+> λ,P
+
+, obtained by minimizing the penalized conditional risk over H. The restriction h∗  
+
+> λ,P |S
+
+of h∗ 
+
+> λ,P
+
+to the sphere is the unique minimizer in HS of 
+
+R(λ) 
+
+> P
+
+(h ◦ θ) = RP (h ◦ θ) + λ∥h∥2 
+
+> HS
+
+, h ∈ H S.
+
+12 3.2.2 Decomposition of the excess asymptotic risk in the SVM framework 
+
+Equipped with the preliminary results established in the previous section, we now provide a non asymptotic analysis for the excess risk of the estimator bhλ,k . More precisely, we provide a high probability bound for the penalized excess asymptotic risk , that is, 
+
+R∞(bhλ,k ◦ θ) + λ∥bhλ,k ∥2 
+
+> H
+
+− R ∗∞.
+
+We derive a decomposition for the excess asymptotic penalized risk analogous to the one presented in Proposition 3.1, which is formally stated below. 
+
+Theorem 3.1 (Bias-variance decomposition for the excess asymptotic risk in the SVM framework) .
+
+Suppose Assumptions 1 and 2 hold. Let λ > 0, and assume that the RKHS H has a continuous kernel 
+
+K that is bounded by 1. Consider bhλ,k issued by Algorithm 2. Then, 
+
+R∞(bhλ,k ◦ θ) + λ∥bhλ,k ∥2 
+
+> H
+
+− R ∗∞ ≤ B(n, k, λ ) + A∞ 
+
+> 2
+
+(λ) + D(n, k, λ ), (3.1) 
+
+where 
+
+B(n, k, λ ) = 2 sup  
+
+> ∥h∥H≤max( τ, 1−τ)λ−1
+
+Rtn,k (h ◦ θ) − R ∞(h ◦ θ) (3.2) 
+
+is the threshold bias ,
+
+A∞ 
+
+> 2
+
+(λ) = R∞(h∗ 
+
+> λ, ∞
+
+◦ θ) + λ∥h∗
+
+> λ, ∞
+
+∥2 
+
+> H
+
+− R ∗∞
+
+= inf 
+
+> h∈H
+
+
+
+R∞(h ◦ θ) + λ∥h∥2
+
+> H
+
+
+
+− R ∗∞. (3.3) 
+
+is the asymptotic approximation error of the RKHS H, and 
+
+D(n, k, λ ) = R(λ) 
+
+> tn,k
+
+(bhλ,k ) − R (λ) 
+
+> tn,k
+
+(h∗ 
+
+> λ,t n,k
+
+) (3.4) 
+
+is a variance term .
+
+In the following, we analyze the different terms appearing in the decomposition (3.1). We start with the threshold bias B(n, k, λ ) defined by Equation (3.2). The following proposition shows that, analogous to Proposition 3.2, the bias term B(n, k, λ ) vanishes as n → ∞ for any fixed λ > 0. Notably, this result is obtained without imposing any additional assumptions on the RKHS H, whereas the corresponding ERM guarantee required the hypothesis space F to be totally bounded. 
+
+Proposition 3.5 (Bias control) . Let Assumption 1 hold. Then, for any λ > 0,
+
+sup  
+
+> ∥h∥H≤max( τ, 1−τ)λ−1
+
+Rt(h ◦ θ) − R ∞(h ◦ θ) −−−→ 
+
+> t→∞
+
+0.
+
+As a corollary to Proposition 3.5 we obtain that, for any sequence k(n) such that k(n)/n → 0 and 
+
+k(n)/n is non-increasing, there exists a vanishing sequence λ(n) for which the bias term vanishes in the asymptotic regime as n → ∞ .
+
+Corollary 3.2. Let k = k(n) depend on n in a way such that k(n)/n → 0 as n → ∞ . There exists a sequence λ(n) → 0 such that the bias term B(n, k (n), λ (n)) defined in Proposition 3.5, converges to 0
+
+as n → ∞ .
+
+3.2.3 Bounding the variance term 
+
+We now turn to the variance term D(n, k, λ ) defined by equation (3.4). A high-probability bound for 
+
+D(n, k, λ ) can be obtained by exploiting the fact that bhλ,k minimizes the penalized empirical risk. This implies 
+
+bR(λ) 
+
+> k
+
+(bhλ,k ◦ θ) ≤ bR(λ) 
+
+> k
+
+(h∗ 
+
+> λ,t n,k
+
+◦ θ).
+
+13 Thus, 
+
+R(λ) 
+
+> t
+
+(bhλ,k ◦ θ) = bR(λ) 
+
+> k
+
+(bhλ,k ◦ θ) + 
+
+
+
+Rt(bhλ,k ◦ θ) − bRk(bhλ,k ◦ θ)
+
+
+
+≤ bR(λ) 
+
+> k
+
+(h∗ 
+
+> λ,t n,k
+
+◦ θ) + 
+
+
+
+Rt(bhλ,k ◦ θ) − bRk(bhλ,k ◦ θ)
+
+
+
+= R(λ) 
+
+> t
+
+(h∗ 
+
+> λ,t n,k
+
+◦ θ) + 
+
+
+
+Rt(bhλ,k ◦ θ) − bRk(bhλ,k ◦ θ)
+
+
+
+−
+
+
+
+Rt(h∗ 
+
+> λ,t n,k
+
+◦ θ) − bRk(h∗ 
+
+> λ,t n,k
+
+◦ θ)
+
+
+
+.
+
+Leveraging the bound on ∥bhλ,k ∥H and ∥h∗ 
+
+> λ,t n,k
+
+∥H provided by Corollary 3.1, we obtain 
+
+
+
+Rt(bhλ,k ◦ θ) − bRk(bhλ,k ◦ θ)
+
+
+
+−
+
+
+
+Rt(h∗ 
+
+> λ,t
+
+◦ θ) − bRk(h∗ 
+
+> λ,t
+
+◦ θ)
+
+
+
+≤ 2 sup    
+
+> h∈max( τ, 1−τ)
+> λBH
+
+|R t(h ◦ θ) − bRk(h ◦ θ)|.
+
+(3.5) While this latter quantity could be bounded with high probability by adapting the techniques estab-lished in Cl´ emen¸ con et al. (2025), such an approach yields a suboptimal rate of order ( λ√k)−1. To secure faster convergence rates, standard literature leverages the method of localization (Boucheron et al., 2005; Bartlett et al., 2005; Lecu´ e and Mendelson, 2012), which measures the capacity of a lo-calized subset of functions near the optimum rather than the global hypothesis space. A key technical difficulty in our context stems from the random nature of the sample size exceeding the threshold 
+
+tn,k , coupled with the small number of observations k retained for training. Addressing this requires a careful analysis via tailored Bernstein-type concentration inequalities. Moreover, the classical local-ized bounds require both a variance-control condition and a light-tailed (bounded or sub-exponential) target variable Y . We prefer to circumvent these requirements in order to accommodate unbounded, potentially heavy-tailed targets. The method we propose instead leverages the stability of SVM (Stein-wart and Christmann, 2008; Bousquet and Elisseeff, 2002) and prove that bhλ,k is close to h∗ 
+
+> λ,t
+
+with high probability. Consequently, we can restrict the supremum in (3.5) to a localized subset of the form sup 
+
+> h∈BH(h∗
+> λ,t ,ρ (λ,k,δ ))
+
+
+
+Rt(h ◦ θ) − bRk(h ◦ θ)
+
+
+
+−
+
+
+
+Rt(h∗ 
+
+> λ,t
+
+◦ θ) − bRk(h∗ 
+
+> λ,t
+
+◦ θ)
+
+
+
+for some small radius ρ(λ, k, δ ). To obtain a sharp estimate on ∥bhλ,k − h∗ 
+
+> λ,t n,k
+
+∥H, we first bound the distance of ˆhλ to the intermediate SVM solution ˜hλ. The following lemma demonstrates that the norm ∥ˆhλ − ˜hλ∥H can be controlled by a term capturing how closely the (1 − k/n )-quantile of ∥X∥ is approximated by the order statistic ∥X(k)∥.
+
+Lemma 3.2. Let t = tn,k be the 1 − kn -quantile of ∥X∥. Assume the kernel K is bounded by 1. Then, 
+
+∥bhλ,k − ehλ,t n,k ∥H ≤ max( τ, 1 − τ )2λk 
+
+> n
+
+X
+
+> i=1
+
+1∥Xi∥≥ tn,k − k . (3.6) Applying Bernstein’s inequality to the right-hand side of (3.6) yields a high probability bound on 
+
+∥bhλ,k − ehλ,t n,k ∥H.
+
+Corollary 3.3. If the kernel K is bounded by 1, with probability no less than 1 − δ,
+
+∥bhλ,k − ehλ,t n,k ∥H ≤ max( τ, 1 − τ )2λ
+
+r 2 log(2 /δ )
+
+k + log(2 /δ )3k
+
+
+
+. (3.7) With the bound on ∥bhλ,k −ehλ,t n,k ∥H established, it remains to control ∥ehλ,t n,k − h∗
+
+> λ,t
+
+∥H. We leverage a variant of the representer theorem, utilizing Theorem 5.8 and Corollary 5.10 in Steinwart and Christ-mann (2008). When paired with a Hilbert-space adaptation of Bernstein’s inequality, this approach delivers a tight probabilistic control on ∥bhλ,k − ehλ,t n,k ∥H.14 Proposition 3.6 (High probability bound on ∥ehλ,t n,k −h∗ 
+
+> λ,t n,k
+
+∥H). With probability no less than 1−δ,
+
+∥ehλ,t n,k − h∗ 
+
+> λ,t n,k
+
+∥H ≤ max( τ, 1 − τ )
+
+λ
+
+r 2 log(1 /δ )
+
+k + 1
+
+√k + 4 log(1 /δ )3k
+
+!
+
+. (3.8) The details for the proof of the previous claims are in the Appendix, Section C.3. Combining the two high probability bounds (3.7) and (3.8) yields a high probability bound on the distance between the two SVM solutions bhλ,k and h∗ 
+
+> λ,t n,k
+
+.
+
+Theorem 3.2 (high probability bound on ∥bhλ,k − h∗ 
+
+> λ,t n,k
+
+∥H). Assume the kernel K is bounded by 1. Then, with probability no less than 1 − δ,
+
+∥bhλ,k − h∗ 
+
+> λ,t n,k
+
+∥H ≤ max( τ, 1 − τ )
+
+λ√k 1 + 3 
+
+r log(3 /δ )2 + 3 log(3 /δ )2√k
+
+!
+
+. (3.9) Based on this high-probability control, we are now in a position to establish a non-asymptotic bound for the variance term D(n, k, λ ). The proof is deferred to the Appendix, Section C.4. 
+
+Theorem 3.3 (Control of the variance term) . Consider bhλ,k issued by Algorithm 2. Assume the kernel 
+
+K of the RKHS H is continuous and bounded by 1. Define 
+
+C(k, δ ) = 
+
+
+
+1 + 3 
+
+r log(1 /δ )2 + 3 log(1 /δ )2√k
+
+
+
+.
+
+Then, it holds that, with probability no less than 1 − 4δ:
+
+D(n, k, λ ) ≤ D1(k, λ, δ ) + D2(k, λ, δ ), (3.10) 
+
+where 
+
+D1(k, λ, δ ) = max( τ, 1 − τ )2
+
+λk 
+
+r log(1 /δ )2 + log(1 /δ )3√k
+
+2
+
+(3.11) 
+
+and 
+
+D2(k, λ, δ ) = max( τ, 1 − τ )2
+
+λk C(k, δ )
+
+
+
+3 + 
+
+r 2 log(1 /δ )
+
+k + 16 log(1 /δ )3k
+
+
+
+. (3.12) 
+
+3.2.4 Bounding the approximation error 
+
+The remaining term to analyze in Theorem 3.1 is the asymptotic approximation error A∞ 
+
+> 2
+
+(λ), defined by 
+
+A∞ 
+
+> 2
+
+(λ) = inf 
+
+> h∈H
+
+
+
+R∞(h ◦ θ) + λ∥h∥2
+
+> H
+
+
+
+− R ∗∞. (3.13) A standard assumption regarding this error is formulated as follows. 
+
+Assumption 5. There exists c > 0 and β ∈ (0 , 1] such that, for any λ > 0,
+
+A∞ 
+
+> 2
+
+(λ) ≤ cλ β .
+
+Combining Assumption 5 with the decomposition from Theorem 3.1 and the variance bound established in Theorem 3.3, and and choosing λ = k− 1 
+
+> β+1
+
+, we find that the error term A∞ 
+
+> 2
+
+(λ)+ D(λ, k, δ ) is of order 
+
+k− ββ+1 . In this section, we discuss additional conditions that ensure Assumption 5 is satisfied and we outline several directions for future research. A particularly simple example where Assumption 5 holds true with β = 1, is when the quantile function belongs to the angular RKHS HS, as stated formally below. 15 Proposition 3.7. Write qP∞ = hP∞ ◦ θ as in Lemma 2.1 and suppose that hP∞ belongs to HS. Then, 
+
+A∞ 
+
+> 2
+
+(λ) ≤ λ∥hP∞ ∥2 
+
+> HS
+
+.Proof. This is a straightforward adaptation of the result of Steinwart and Christmann (2008), Corol-lary 5.18, with some necessary adaptation caused by the angular structure of the considered risk functionals and the extreme quantile function qP∞ . Write qP∞ = hP∞ ◦ θ as in Lemma 2.1, and assume that hP∞ ∈ H S. By Theorem 2.1, item 4, R∗∞ = R∞(qP∞ ) = R∞(hP∞ ◦ θ). We obtain 
+
+A∞ 
+
+> 2
+
+(λ) = inf 
+
+> h∈H
+
+
+
+R∞(h ◦ θ) + λ∥h∥2
+
+> H
+
+
+
+− R ∗∞
+
+≤ R ∞(hP∞ ◦ θ) + λ∥hP∞ ∥2 
+
+> H
+
+− R ∞(hP∞ ◦ θ) = λ∥hP∞ ∥2 
+
+> HS
+
+.
+
+The assumption that hP∞ belongs to HS is arguably very stringent. Several relaxations of this condition have been proposed in the SVM literature. For instance, consider the case where ( X, Y ) ∼ P where P
+
+be any distribution on Rd × R. In the case of quantile regression in this setting where no extrapolation is involved, the approximation error is 
+
+A2(λ) = inf 
+
+> h∈H
+
+ EP [ℓτ (Y, h (X))] + λ∥h∥2
+
+> H
+
+ − EP [ℓτ (Y, q (X))] .
+
+Steinwart and Christmann (2008) (section 5.6) show that if the corresponding quantile function q
+
+belongs to some interpolation space (see, e.g., Smale and Zhou, 2003), then Assumption 5 is satisfied with explicit forms for β and c. Alternatively, if q belongs to a Besov-like space and a Gaussian kernel is employed, Eberts and Steinwart (2012) and Meister and Steinwart (2016) obtain explicit upper bounds on the approximation error by exploiting the regularity of q and utilizing a convolution scheme to smooth the conditional quantile function. We anticipate that these results could be extended to our context. The primary bottleneck would be modifying the working assumption in the cited reference, namely, that the input space is a subset of Rd with non-empty interior and a bounded Lipschitz domain, to accommodate the case of interest here, where the kernel’s domain is the sphere S.
+
+# 4 Case study on a real dataset 
+
+The aim of our experiments is threefold: (i) to compare the relative performance of ERM using an unpenalized linear model that satisfies the VC assumptions against, an SVM with a Gaussian kernel, thereby illustrating the bias-variance trade-off; (ii) to visualize the effect of marginal standardization on predicted and observed target values when covariates are not on a standard Pareto scale; and (iii) to compare the proposed SVM and ERM approaches against natural baselines, namely naive methods that do not specifically rely on the angular component of the covariate, or that apply a standard mean-deviation standardization instead of the probability integral transform. Introduced by Asadi et al. (2015), the dataset we consider constitutes a classic benchmark in the extreme value theory literature, having been further analyzed across multiple studies (Engelke and Hitz, 2020; Mhalla et al., 2020). It comprises river flow measurements from 31 gauging stations in the upper Danube basin. Our goal is to predict a conditional quantile of the river flow at a target station, based on large measurements from the other stations. This prediction should be reliable in a crisis scenario e.g. in case of a flood in the Danube basin, which translates in our setting to unusually high flow levels at one or more stations. This study focuses exclusively on learning the conditional median, but our methodology generalizes to arbitrary quantiles. We treat the daily measurements as an i.i.d . sample. While this assumption ignores potential temporal dependencies, we set this issue aside for the purpose of our analysis. In our experiment, we take ∥·∥ = ∥·∥ ∞, so that the event ∥X∥ ≥ t occurs whenever one of the component of 
+
+X exceeds the threshold t.16 4.1 Workflow 
+
+This section describes the proposed prediction procedure, which is applicable for extreme values of the covariate. We describe in detail the marginal standardization step, the choice and rescaling of the target station, and the cross-validation procedure employed to select all hyper-parameters. 
+
+Marginal standardization The observations are grouped into a vector eX ∈ R31 . We begin by a marginal standardization step, aiming at transforming the vector eX to unit-Pareto margins. This standardization step is necessary in this case because the river flow is not homogeneous along the Danube river basin, thus the distribution of the observed river flow vary greatly from one station to another. The standardization of the vector eX considered here follows the approach of Coles and Tawn (1994) (see also Coles and Tawn (1991) or Beirlant et al. (2006), Equation (9.65)). Denote by Fj the cumulative distribution function of the marginal eXj . For some high threshold uj , the exceedance over the threshold uj is modeled by a generalized Pareto distribution, i.e. , denoting ζj = P(Xj > u j ) for some parameters ξj , σ j and for any x > u j ,
+
+Fj (x) = 1 − ζj (1 + ξj
+
+x − uj
+
+σj
+
+)−1/ξ j .
+
+The transformation of Fj in the bulk of the distribution, i.e. in the domain x < u j , is done with the marginal empirical distribution. Given an i.i.d . sample eX1, . . . , eXn, for each station j ∈ { 1, . . . , 31 }
+
+and corresponding vector eX:j , the estimation of Fj (x) is 
+
+bFj (x) = 
+
+
+
+1 − ζj
+
+
+
+1 + ˆξj x−ˆuj
+
+> ˆσj
+
+− 1ˆξj if x ≥ ˆuj
+
+> 1
+> n
+
+Pnk=1 1 ˜Xk,j ≤x otherwise. where ˆ uj is an empirical ζj -quantile for Fj , and ˆξj , ˆσj are estimated by maximum likelihood. The vector of observations for station j, standardized to unit Pareto margins is defined by 
+
+bVj = 11 − bFj ( ˜Xij )
+
+!
+
+> i∈{ 1,...,n }
+
+.
+
+In the following, we work with the resulting standardized dataset bV = ( bVi,j )(i,j )∈{ 1,...,n }×{ 1,..., 31 }.Without loss of generality we assume that the target station is the last one, and we denote ( Xi, Z i) = bVi.In this work we do not investigate theoretically the impact of the standardization error, leaving this important question to further work. This question is a notoriously technical one in the literature of multivariate EVT involving pseudo-polar coordinates with non-linear transforms, although some asymptotic results exist regarding estimation of the angular measure in dimension d = 2 using an empirical estimator of the marginal distribution functions (Einmahl et al., 2001; Einmahl and Segers, 2009), as well as non-asymptotic ones in arbitrary dimension (Cl´ emen¸ con et al., 2023). 
+
+Prediction algorithm In light of Example 2.2, we propose the following procedure for predicting the missing component of the (transformed) vector ( X, Z ): 1. For each measurement ( Xi, Z i), compute Yi = Zi 
+
+> ∥Xi∥
+
+.2. Use Algorithm 1 or 2 to learn an estimate bqY (x) of the quantile function of Y given X = x.The theoretical justification relies on Example 2.2 which requires regular variation as well as a non degeneracy condition for the limiting distribution. 3. The estimated conditional quantile function for the Pareto-scaled target Z given the transformed covariate x is then 
+
+bqZ (x) = ∥x∥bqY (x).
+
+17 12345678910 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31     
+
+> 47° 30'N 48° 00'N 48° 30'N 49° 00'N 49° 30'N
+> 10°E 11°E 12°E 13°E 14°E
+
+Figure 1: The geographical distribution of the gauging stations along the Danube in Bavaria, Germany. Line thickness is proportional to the average flow volume. 4. In the end, when it comes to predicting the original target, based on a new observation ˜ x1:30 =(˜ x1, . . . , ˜x30 ), we apply the Pareto transformation to the new covariate, and the inverse transfor-mation to the estimated quantile function. The final output is the predicted conditional quantile of eX31 given ( eX1, . . . eX30 ) = ˜ x1:30 },
+
+bq eX (˜ x1:30 ) = bF ←
+
+> 31
+
+
+
+1 − 1
+
+bqZ (x)
+
+
+
+,
+
+where x = ( x1, . . . , x 30 ) with xj =  1 − bFj (˜ xj )−1 and where ( · )← denotes the generalized quantile function. 
+
+Choice of the target station Our proposed method is applicable to any target station Z for which the normalized variable Y = Z/ ∥X∥ does not degenerate to 0 as ∥X∥ → ∞ . Consequently, our theoretical guarantees apply to target stations where extreme values coincide with large covariate norms. Based on this criterion, stations 15 through 18 serve as suitable candidates for our analysis. As illustrated in Figure 1, these stations are situated consecutively in a downstream direction of the Danube. Focusing on station 18, Figure 2 shows that large values for Z and ∥X∥ may occur simultaneously. The scatter plot of Y = Z/ ∥X∥ against ∥X∥ illustrates that, conditionally on ∥X∥ ≥ t,the distribution of Y approaches a mixture of a point mass at zero and a non-degenerate component. More precisely, Figure 2 suggests that the conditional distribution of Y given X = x degenerates to 
+
+δ0 whenever x lies in the region where the coordinates corresponding to stations 15, 16, and 17 are negligible relative to ∥x∥, and remains non-degenerate otherwise. This empirical insight indicates that the framework established in Example 2.2 may not strictly hold. Furthermore, due to the asymptotic dependencies among the coordinates of eX, the existence of a limiting density π∞ for the distribution of the limiting vector as in Example 2.2 is not guaranteed. Nevertheless, despite these theoretical challenges, the empirical performance of our procedure remains robust. A rigorous treatment of these issues lies beyond the scope of this work and is deferred to future research. The selection of the station to carry our experiments is consistent with the existing work on the Danube dataset. In particular, stations 15 , 16 , 17 and 18 are flow connected and, as demonstrated in Engelke and Hitz (2020), they exhibit asymptotic dependence. 18 Selection of hyper-parameters In all our experiments, the hyper-parameters are selected via cross-validation. We investigate two learning frameworks: Empirical Risk Minimization (ERM) and Support Vector Machines (SVM) equipped with a Gaussian kernel. The hyperparameter configurations differ substantially between the two approaches. In the ERM framework, the optimization involves a single parameter, namely the number of extreme observations retained for training, denoted by 
+
+ktrain . Conversely, the SVM approach requires the simultaneous tuning of three hyper-parameters: the training sample size ktrain , the regularization parameter λ, and the Gaussian kernel bandwidth γ. In the latter case, the hyper-parameters γ and λ are selected via a grid search already implemented in the 
+
+liquidSVM package (Steinwart and Thomann, 2017). We now detail the specific procedure employed to select the remaining parameter, ktrain .To select the optimal number of training observations ktrain , we employ a modified cross-validation scheme. The entire dataset is partitioned into K disjoint folds. In each iteration, a single fold is reserved for training the model, while the remaining K − 1 folds constitute the validation set. This layout inverts the standard K-fold cross-validation procedure, where K − 1 folds are typically used for training. The rationale behind this design stems from the fact that the generalization error is evaluated exclusively on a subsample of the validation set containing the most extreme observations. Consequently, the validation set must be sufficiently large to ensure a statistically reliable evaluation of the performance metrics above high thresholds. In our empirical implementation, we set K = 5. Thus, in each iteration, the training set comprises 20% of the total observations, while the validation set contains the remaining 80%. We evaluate the predictive performance by comparing the estimated conditional median m(X) learned during training against the true values of Y in the validation set. To do so, we employ an empirical approximation of the asymptotic pinball risk, computed exclusively on the subset of validation points exhibiting the largest covariate norms. Specifically, the asymptotic risk is estimated via 1
+
+ktest 
+
+> ktest
+
+X
+
+> i=1
+
+ℓ1/2(Y(i), m (X(i))) , (4.1) where ( X(1) , Y (1) ), . . . , (X(ktest ), Y (ktest )) denote the observations corresponding to the ktest largest co-variate norms ∥X∥. This estimator provides a precise approximation of the asymptotic risk provided the fraction τtest = ktest /n test is sufficiently small. In our empirical analysis, we fix τtest = 1%. We perform these measurements over 10 permutations of the whole transformed dataset, varying the number ktrain of extreme observations to learn from. We compare the results obtained using Algorithm 1 and Algorithm 2. The ERM framework (Algorithm 1) is implemented using the sklearn 
+
+quantile regressor, where the predictor class F is restricted to linear functionals h(θ) = ⟨w, θ ⟩ for 
+
+w ∈ Rd. For the SVM alternative (Algorithm 2), the model operates over a Gaussian RKHS with an adjustable bandwidth parameter γ.
+
+## 4.2 Experimental Results 
+
+Bias-Variance trade-off and ERM versus SVM Figure 3 displays the predictive pinball risks for the SVM method (Algorithm 2 with a Gaussian kernel) and the ERM method (Algorithm 1 with a linear predictor class) for varying values of ktrain . These curves are estimated using the cross-validation procedure detailed above. The results reveal a clear bias-variance trade-off regarding ktrain :the best performance for both SVM and ERM occurs at a ktrain /n train ratio between 0 .05 and 0 .1. This ratio is five to ten times larger than that of the test set, meaning the test set’s radial threshold is much higher than the optimal training threshold. This discrepancy confirms the effectiveness of our approach for extreme value extrapolation. Additionally, the results reported in Figure 3 illustrate that SVMs outperform ERM with a non-penalized linear model at lower sample sizes, specifically when the covariate dimension is large relative to the sample size and the curse of dimensionality becomes more apparent. 19 10 3 10 4 10 5  
+
+> 10 0
+> 10 1
+> 10 2
+> 10 3
+> 10 410 310 410 5
+> 0.0
+> 0.5
+> 1.0
+> 1.5
+> 2.0
+
+Figure 2: Left panel: log-log Scatter plot of Z with respect to ∥X∥ for station 18, on the 5% most extreme observations. Right panel: Scatter plot of Y = Z/ ∥X∥ with respect to ∥X∥ for station 18, on the 5% most extreme observations. Points are colored red if the maximum for the norm ∥X∥∞ is attained in one of the three stations 16, 17 or 18, and blue otherwise. 0.0 0.1 0.2 0.3 0.4 
+
+> 0.015
+> 0.016
+> 0.017
+> 0.018
+> 0.019
+> SVM
+> ERM
+
+Figure 3: Mean approximated asymptotic pinball risk over 10 permutations of the whole dataset with the described 5-fold cross-validation procedure, for different values ktrain . The generalization error is estimated when using the ERM approach corresponding to Algorithm 1, or the SVM approach corresponding to Algorithm 2. 20 Figure 4: Left panel: Prediction versus true values for the prediction of Y = Z/ ∥X∥, where the coordinates have been standardized to unit Pareto margins. Right panel: Predictions versus true values for the prediction of Z with our approach in its original, non transformed scale. 
+
+Effect of standardization Figure 4 displays the effect of standardization in Algorithm 2. Specifi-cally, it plots the predicted quantiles for Y = Z/ ∥X∥ against their corresponding true observed values on both the transformed and original scale. The left panel shows the predictions and observations on the Pareto scale, while the right panel displays both values back-transformed to the original scale. Based on the bias-variance tradeoff observed in Figure 3, a proportion of 5% of the most extreme observations were retained for training. 
+
+Comparison with baseline approaches We evaluate the proposed ERM and SVM methods by comparing them against naive baseline counterparts. For these baselines, each component of eX is independently standardized using empirical means and standard deviations, yielding bV ′ = ( bV ′ 
+
+> i,j
+
+) ∈
+
+Rn×31 . Let ( X′ 
+
+> i
+
+, Z ′
+
+> i
+
+) = bV ′ 
+
+> i
+
+. We then train a quantile ERM or SVM on the subset of observations with the largest infinity norms to estimate the conditional median m(x) of Z′ given X′ = x. The hyperparameters are determined via grid search using our cross-validation framework. A key distinction is that the baseline models use the raw covariate X′ directly, whereas our proposed approach relies on the angular component θ(X). Figure 5 displays the results, showing that the naive approach fails to provide accurate predictions for large station measurements. Conversely, our proposed methodology remains relevant in this regime. 
+
+# A Proofs of the results in Section 2 
+
+## A.1 Proof of Proposition 2.1 
+
+The proof of Proposition 2.1 relies on the following lemma, which shows, in a univariate setting without covariates that the modified pinball loss elicits the quantile. 
+
+Lemma A.1. Let Y be any real-valued random variable. The τ -quantile q of Y minimizes the modified pinball risk, that is, 
+
+E [ℓ′ 
+
+> τ
+
+(Y, q )] = min  
+
+> z∈R
+
+E [ℓ′ 
+
+> τ
+
+(Y, z )] 
+
+Proof. The technique of proof is similar to that of Proposition 3.9 in Steinwart and Christmann (2008), except that we drop the assumption that Y is integrable by considering the modified version of the pinball loss. We fix z > 0, and compute the associated inner risk. If y < 0, we also have y < z and by the definition of the modified pinball loss, 
+
+ℓ′ 
+
+> τ
+
+(y, z ) = ℓτ (y, z ) − ℓτ (y, 0) = (1 − τ )( z − y) − (1 − τ )( −y)= (1 − τ )z. 
+
+21 0 100 200 300 400 
+
+> True Values
+> 0
+> 100
+> 200
+> 300
+> 400
+> Predictions
+
+(a) Baseline approach, SVM algorithm 0 100 200 300 400  
+
+> True Values
+> 0
+> 100
+> 200
+> 300
+> 400
+> Predictions
+
+(b) Baseline approach, ERM algorithm 0 100 200 300 400 
+
+> True Values
+> 0
+> 100
+> 200
+> 300
+> 400
+> Predictions
+
+(c) Our approach, Algorithm 2 (SVM) 0 100 200 300 400  
+
+> True Values
+> 0
+> 100
+> 200
+> 300
+> 400
+> Predictions
+
+(d) Our approach, Algorithm 1 (ERM) 
+
+Figure 5: Predictions against true values for different approaches, in the original scale of the dataset, on the 1% most extreme observations in the test set. By a similar calculation, we find that, if 0 ≤ y < z :
+
+ℓ′
+
+τ (y, z ) = (1 − τ )z − y
+
+and, if y ≥ z,
+
+ℓ′
+
+τ (y, z ) = −τ z. 
+
+Denote Q the law of Y . Since the pinball loss is max( τ, 1 − τ ) with respect to its second variable, it holds that for any ( y, z ) ∈ R2,
+
+|ℓ′
+
+τ (y, z )| = |ℓτ (y, z ) − ℓτ (y, 0) | ≤ max( τ, 1 − τ )|z|
+
+which is integrable with respect to Q the distribution of Y . Moreover, with the calculations above, we obtain, for any z > 0, 
+
+E [ℓ′
+
+τ (Y, z )] = 
+
+Z
+
+y< 0
+
+(1 − τ )z dQ(y) + 
+
+Z
+
+0≤y<z 
+
+ (1 − τ )z − y dQ(y) + 
+
+Z
+
+y≥z
+
+−τ z dQ(y)= (1 − τ )zQ (( −∞ , 0)) + (1 − τ )zQ ([0 , z )) −
+
+Z
+
+0≤y<z 
+
+y dQ(y) − τ zQ ([ z, +∞)) = (1 − τ )zQ (( −∞ , z )) −
+
+Z
+
+0≤y<z 
+
+y dQ(y) − τ zQ ([ z, +∞)) = zQ (( −∞ , z )) − τ z −
+
+Z
+
+0≤y<z 
+
+y dQ(y)(A.1) 22 where the last line follows follows from the fact that Q([ z, +∞)) = 1 − Q(( −∞ , z )). Now, notice that 
+
+Z
+
+> 0≤y<z
+
+y dQ(y) = E 1Y ∈[0 ,z )Y 
+
+=
+
+Z ∞
+
+> s=0
+
+P(Y 1Y ∈[0 ,z ) ≥ s) d s
+
+=
+
+Z
+
+> s∈[0 ,z )
+
+Q([ s, z )) d s
+
+=
+
+Z
+
+> s∈[0 ,z )
+
+Q(( −∞ , z )) − Q(( −∞ , s )) d s
+
+= zQ (( −∞ , z )) −
+
+Z
+
+> s∈[0 ,z )
+
+Q(( −∞ , s )) d s. 
+
+(A.2) Combining equations (A.1) and (A.2), we obtain 
+
+E [ℓ′ 
+
+> τ
+
+(Y, z )] = 
+
+Z
+
+> s∈[0 ,z )
+
+Q(( −∞ , s )) d s − τ z 
+
+=
+
+Z
+
+> s∈[0 ,z )
+
+(Q(( −∞ , s )) − τ ) d s
+
+To address the case where z ≤ 0, observe that E [ℓ′ 
+
+> τ
+
+(Y, z )] = E ℓ′ 
+
+> 1−τ
+
+(−Y, −z). Consequently, applying the previously established result by substituting z, τ , and Y with −z, 1 − τ , and −Y , respectively, yields for any z < 0 that 
+
+E [ℓ′ 
+
+> τ
+
+(Y, z )] = 
+
+Z
+
+> s∈[0 ,−z)
+
+Q(( −s, +∞)) − (1 − τ ) d s
+
+=
+
+Z
+
+> s∈[0 ,−z)
+
+τ − Q(( −∞ , −s]) d s
+
+=
+
+Z
+
+> u∈(z, 0]
+
+τ − Q(( −∞ , u ]) d u
+
+Now, assume that the generalized quantile q of Y is non-negative. Then, for any z < 0, and any 
+
+u ∈ (z, 0], we have u ≤ q, thus Q(( −∞ , u ]) ≤ τ by the definition of q as the generalized quantile. It follows that, for any z ≤ 0, 
+
+E [ℓ′ 
+
+> τ
+
+(Y, z )] = 
+
+Z
+
+> u∈(z, 0]
+
+τ − Q(( −∞ , u ]) d u ≥ 0.
+
+Now, for any s ∈ R, we have Q(( −∞ , s )) < τ for any s < q and Q(( −∞ , s )) ≥ τ for any s ≥ q. It follows that, for any z ≥ 0
+
+E [ℓ′ 
+
+> τ
+
+(Y, z )] = 
+
+Z
+
+> s∈[0 ,z )
+
+(Q(( −∞ , s )) − τ ) d s
+
+has a minimum for z = q, and the corresponding risk is non-positive. Hence, in the case q ≥ 0, the risk E [ℓ′ 
+
+> τ
+
+(Y, z )] is minimized by the generalized quantile q. This reasoning extends analogously to the case where the generalized quantile q is negative. 
+
+Proof of Proposition 2.1. For any function f with E [|f (X)|] < ∞, we have 
+
+E [ℓ′ 
+
+> τ
+
+(Y, f (X))] = E[E [ℓ′ 
+
+> τ
+
+(Y, f (x)) | X = x]] 23 Applying Lemma A.1 to the conditional law of Y given X = x, we obtain that the inner risk 
+
+E [ℓ′ 
+
+> τ
+
+(Y, f (x)) | X = x] is minimized when f (x) = q(x) where q is the conditional quantile function. Moreover, since the coniditional function satisfies E [|q(X)|] < ∞, it follows that 
+
+E [ℓ′ 
+
+> τ
+
+(Y, q (X))] = inf {E [ℓ′ 
+
+> τ
+
+(Y, f (X))] : f measurable, E [|f (X)|] < ∞} .
+
+## A.2 Proofs of Lemma 2.1 and Theorem 2.1 
+
+Proof of Lemma 2.1. Recall that within the regular variation framework, the pair ( Y∞, Θ∞) is inde-pendent from ∥X∞∥. Therefore, (Y∞ | Θ∞, ∥X∥∞) L
+
+= ( Y∞ | Θ∞)So that the conditional quantile of Y∞ given X∞ = x is the conditional quantile of Y∞ given Θ ∞ = θ(x). Thus, the extreme conditional quantile qP∞ is of angular type and we may write qP∞ = hP∞ ◦ θ for a certain measurable function hP∞ : S → R. Moreover, Assumption 2 ensures we can choose hP∞ to be continuous. 
+
+Proof of Theorem 2.1. 1. Let f = h ◦ θ be as in the theorem. h is continuous on the compact set 
+
+S so it is bounded. In particular, f is bounded and its risk is well defined. Moreover, for any (θ, y ) ∈ S × R,
+
+|ℓ′ 
+
+> τ
+
+(y, h (θ)) | = |ℓτ (y, h (θ)) − ℓτ (y, 0) |≤ max( τ, 1 − τ )∥h∥∞.
+
+Consequently, the function ( θ, y ) 7 → ℓ′ 
+
+> τ
+
+(y, h (θ)) is bounded and continuous. Now, Assumption 1 implies the convergence in law (Y, θ (X) | ∥ X∥ ≥ t) L
+
+−−−→ 
+
+> t→∞
+
+(Y∞, Θ∞).
+
+Thus, we have the convergence 
+
+Rt(f ) = E [ℓ′ 
+
+> τ
+
+(Y, h ◦ θ(X)) | ∥ X∥ ≥ t] −−−→ 
+
+> t→∞
+
+E [ℓ′ 
+
+> τ
+
+(Y∞, h (Θ ∞))] = RP∞ (f ).
+
+2. First, note that 
+
+E [|q(X)| | ∥ X∥ ≥ t] ≤ E [|q(X) − qP∞ (X)| | ∥ X∥ ≥ t] + E [|qP∞ (X)| | ∥ X∥ ≥ t]Lemma 2.1 ensures that qP∞ is bounded, and Assumption 2 ensures that 
+
+E [|q(X) − qP∞ (X)| | ∥ X∥ ≥ t] −−−→ 
+
+> t→∞
+
+0.
+
+Hence, for t sufficiently large, we have E [|q(X) − qP∞ (X)| | ∥ X∥ ≥ t] < ∞ and 
+
+E [|q(X)| | ∥ X∥ ≥ t] ≤ E [|q(X) − qP∞ (X)| | ∥ X∥ ≥ t] + E [|qP∞ (X)| | ∥ X∥ ≥ t] < ∞.
+
+It follows that the conditional Bayes risk is R∗ 
+
+> t
+
+= Rt(q) for t large enough. Since qP∞ is bounded, we also have that the extreme Bayes risk is R∗ 
+
+> P∞
+
+= RP∞ (qP∞ ). Now, for t large enough such that E [|q(X)| | ∥ X∥ ≥ t] < ∞, we have 
+
+R∗ 
+
+> t
+
+= E [ℓ′ 
+
+> τ
+
+(Y, q (X)) | ∥ X∥ ≥ t]= E [ℓ′ 
+
+> τ
+
+(Y, q P∞ (X)) | ∥ X∥ ≥ t] + E [ℓ′ 
+
+> τ
+
+(Y, q (X)) − ℓ′ 
+
+> τ
+
+(Y, q P∞ (X)) | ∥ X∥ ≥ t]= Rt(qP∞ ) + E [ℓ′ 
+
+> τ
+
+(Y, q (X)) − ℓ′ 
+
+> τ
+
+(Y, q P∞ (X)) | ∥ X∥ ≥ t] .
+
+24 To deal with the first term, recall that from Lemma 2 .1, we know that the function qP∞ is angular. Property 1 thus implies Rt(qP∞ ) −−−→ 
+
+> t→∞
+
+RP∞ (qP∞ ). To show that the second term vanishes, we use the fact that the function ℓ′ 
+
+> τ
+
+is max( τ, 1 − τ )-Lipschitz in each variable, which yields 
+
+|E [ℓ′ 
+
+> τ
+
+(Y, q (X)) − ℓ′ 
+
+> τ
+
+(Y, q P∞ (X)) | ∥ X∥ ≥ t]| ≤ E [|ℓ′ 
+
+> τ
+
+(Y, q (X)) − ℓ′ 
+
+> τ
+
+(Y, q P∞ (X)) | | ∥ X∥ ≥ t]
+
+≤ max( τ, 1 − τ )E [|q(X) − qP∞ (X)| | ∥ X∥ ≥ t] .
+
+Assumption 2 ensures that E [|q(X) − qP∞ (X)| | ∥ X∥ ≥ t] −−−→ 
+
+> t→∞
+
+0. 3. By Property 2, we have R∗ 
+
+> t
+
+−−−→ 
+
+> t→∞
+
+R∗ 
+
+> P∞
+
+, and, since R∗∞ = R∞(q) = lim sup t→∞ R∗ 
+
+> t
+
+, we obtain 
+
+R∗∞ = R∗ 
+
+> P∞
+
+.
+
+4. Property 3 ensures that R∗∞ = RP∞ (qP∞ ). Now, since qP∞ is angular, we deduce from Property 1 that R∞(qP∞ ) = lim sup 
+
+> t→∞
+
+Rt(qP∞ ) = RP∞ (qP∞ ) = R∗ 
+
+> P∞
+
+.
+
+## A.3 Proofs for Section 2.3 
+
+Proof for Example 2.1. The proof is analogous to the proof of Example 2.A in Cl´ emen¸ con et al. (2025). We begin by proving that Assumption 1 is satisfied. Let r : Rd × R → R be a bounded and Lipschitz function, and t > 0. We have 
+
+E [r(X/t, Y ) | ∥ X∥ ≥ t] = E [r(X/t, g θ (θ(X)) + ε) | ∥ X∥ ≥ t]+ E [r(X/t, g θ (θ(X)) + ε) | ∥ X∥ ≥ t] − E [r(X/t, g (X) + ε) | ∥ X∥ ≥ t]Because X is regularly varying and ε is independent from X, we have 
+
+E [r(X/t, g θ (θ(X)) + ε) | ∥ X∥ ≥ t] −−−→ 
+
+> t→∞
+
+E [r(X∞, g θ (Θ ∞) + ε)] .
+
+And, since r is C-Lipschitz, 
+
+E [r(X/t, g (X) + ε) | ∥ X∥ ≥ t] − E [r(t/tX, g θ (θ(X)) + ε) | ∥ X∥ ≥ t]
+
+≤ E [|r(X/t, g (X) + ε) − r(X/t, g θ (θ(X)) + ε)| | ∥ X∥ ≥ t]
+
+≤ CE [|g(X) − gθ (θ(X)) | | ∥ X∥ ≥ t]
+
+≤ C sup 
+
+> ∥x∥≥ t
+
+|g(x) − gθ (θ(x)) |
+
+which vanishes as t tends to infinity because of the condition (2.5). We obtain that, for any bounded Lipschitz function r,
+
+E [r(X/t, Y ) | ∥ X∥ ≥ t] −−−→ 
+
+> t→∞
+
+E [r(X∞, g θ (Θ ∞) + ε)] .
+
+Combined with Portemanteau’s theorem, this shows the convergence in distribution (X/t, g θ (θ(X)) + ε | ∥ X∥ ≥ t) w
+
+−−−→ 
+
+> t→∞
+
+(X∞, g θ (Θ ∞)) and Assumption 1 is satisfied. To prove that Assumption 2 also holds, denote by qε the τ -quantile of 
+
+ε. By independence of the variables X and ε, the following equality holds in distribution: (g(X) + ε | X = x) (d)
+
+= g(x) + ε
+
+25 Thus, the conditional τ -quantile of Y = g(X) + ε given X = x is q(x) = g(x) + qε. Similarly, the 
+
+τ -conditional of Y∞ = gθ (Θ ∞) + ε given X∞ = x is qP∞ = gθ (θ(x)) + qε. It follows from the continuity of gθ that qP∞ is continuous. Now, we have, for any x ∈ Rd,
+
+|q(x) − qP∞ (x)| = |g(x) − gθ (θ(x)) |
+
+which implies 
+
+E [|q(X) − qP∞ (X)| | ∥ X∥ ≥ t] = E [|g(X) − gθ (θ(X)) | | ∥ X∥ ≥ t]
+
+≤ sup 
+
+> ∥x∥≥ t
+
+|g(x) − gθ (θ(x)) | − −−→ 
+
+> t→∞
+
+0.
+
+Remark A.1 . In Cl´ emen¸ con et al. (2025), a more general result is provided, for a target Y of the form 
+
+Y = g(X, ε ) for some continuous function g. Unfortunately, in the context of quantile regression, we do not obtain such a general result. Indeed, for least-squares regression, the convenient conditional expectation expression E [Y | X = x] of the Bayes predictor greatly simplifies the theoretical analysis. The absence of an analogous closed-form expression for quantiles complicates the proofs. 
+
+Proof of Proposition 2.2. This proof requires several lemmas. We begin by showing that Assumption 1 holds, that is, the pair ( X, Y ) is regularly varying. 
+
+Lemma A.2. In the framework described in 2.2, the pair (X, Y ) has joint density p(x, y ) = ∥x∥π(x, ∥x∥y).This density is first component-regularly varying with limit density p∞(x, y ) = ∥x∥π∞(x, ∥x∥y) and same scaling function b(t), i.e. sup 
+
+> ∥x∥≥ 1,y ∈R
+
+|b(t)tdp(tx, y ) − p∞(x, y )| − −−→ 
+
+> t→∞
+
+0. (A.3) 
+
+Proof of Lemma A.2. The steps for the proof are provided in the proof of Proposition 4.1 in Cl´ emen¸ con and Sabourin (2026). Their result could not be applied directly here because we do not assume that the target Z 
+
+> ∥X∥
+
+is bounded, which is a needed assumption in the statements of Proposition 4.1. Nevertheless, it turns out that this boundedness assumption is not needed for the statement of Lemma A.2. Regular variation for the pair ( X, Z ) implies regular variation in the classical sense. More precisely, regular variation of densities implies regular variation of the distribution (see e.g. , Cai et al. (2011)), that is, there exists a limit pair ( eX∞, eZ∞) such that 
+
+ t−1(X, Z ) ∥(X, Z )∥ ≥ t L
+
+−−−→ 
+
+> t→∞
+
+( eX∞, eZ∞).
+
+Where ( eX∞, eZ∞) has density π∞, which is homogeneous of order −α − d − 1 because of the conver-gence (2.6). This implies that the marginal density of eX, defined by π∞(x) = R 
+
+> R
+
+π∞(x, z ) d z is also homogeneous, of order −α − d. Thus, the random variable eX satisfies: 
+
+P(∥ eX∥ > 1) = 
+
+Z
+
+> ∥x∥>1
+
+π∞(x) d x
+
+=
+
+Z
+
+> ∥x∥>1
+
+∥x∥−α−dπ∞(θ(x)) d x
+
+≥ c
+
+Z
+
+> ∥x∥>1
+
+∥x∥−α−d dx > 0where the last line follows from the lower bound of the marginal of the sphere, given by the condition (2.7). We can now apply Proposition 4.1, item 1 of Cl´ emen¸ con and Sabourin (2026) which ensures that we also have the convergence in distribution when conditioning on ∥X∥ large, 
+
+ t−1(X, Z ) ∥X∥ ≥ t w
+
+−−−→ 
+
+> t→∞
+
+(X∞, Z ∞),
+
+26 where (X∞, Z ∞) (d)
+
+=
+
+
+
+( eX∞, eZ∞) ∥ eX∞∥ ≥ 1
+
+
+
+. (A.4) and we also have (( X/t, Y ) | ∥ X∥ ≥ t) w
+
+−−−→ 
+
+> t→∞
+
+(X∞, Y ∞)with ( X∞, Y ∞) (d)
+
+= ( X∞, Z∞ 
+
+> ∥X∞∥
+
+). The formula p(x, y ) = ∥x∥π(x, ∥x∥y) follows from a simple change of variable formula. To ensure that the convergence condition (2.6) holds, it suffices to show the uniform convergence on S × R (see De Haan and Resnick (1987), proof of Theorem 2.1), and we have sup 
+
+> ω∈S,y ∈R
+
+|b(t)tdp(tω, y ) − p∞(ω, y )| = sup 
+
+> ω∈S,y ∈R
+
+|b(t)td+1 π(tω, ty ) − π∞(ω, y )|≤ sup 
+
+> ∥(x,z )∥≥ 1
+
+|b(t)td+1 π(tx, tz ) − π∞(x, z )| − −−→ 
+
+> t→∞
+
+0where the last inequality follows from the fact that ∥(ω, y )∥ ≥ 1 for any ω ∈ S.In the following, we will denote by pY |X (y|x) the conditional density of Y given X = x and pY∞|X∞ (y|x)the conditional density of Y∞ given X∞ = x. To check that Assumption 2 also holds, we begin by showing that the function ω 7 → qP∞ (ω) is continuous on the sphere in a separate lemma. 
+
+Lemma A.3. Recall that qP∞ (ω) is the τ -quantile of Y∞ given θ(X∞) = ω. Assume that the limit marginal density π∞(x) is lower bounded on the sphere i.e. there exists c > 0 such that π∞(ω) ≥ c for any ω ∈ S. Assume also that ∥·∥ = ∥·∥ p for some p ∈ [1 , +∞]. Then, the function qP∞ is continuous. Proof of Lemma A.3. Let ω ∈ S and consider the extreme conditional cumulative distribution function 
+
+F∞(s|ω) = P (Y∞ ≤ s | X∞ = ω) .
+
+We first prove that for any s ∈ R, the mapping ω ∈ S 7 → F∞(s|ω) = R s 
+
+> −∞
+
+p∞,Y |X (ω, y ) d y is continuous. Note first that the convergence sup 
+
+> ∥(x,z )∥>1
+
+|td+1 b(t)π(tx, tz ) − π∞(x, z )| − −−→ 
+
+> t→∞
+
+0.
+
+implies that π∞ is homogeneous of order −α − d − 1. Now, the function ( ω, y ) ∈ S × R 7 → p∞,Y |X (ω, y )is continuous (by continuity of p∞) and, for any ω ∈ S, we have 
+
+pY∞|X∞ (y|ω) = π∞(ω, y )
+
+π∞(ω)
+
+≤ ∥(ω, y )∥−α−d−1π∞( (ω,y ) 
+
+> ∥(ω,y )∥
+
+)
+
+c
+
+≤ ∥(ω, y )∥−α−d−1 sup x∈Sd+1 π∞(x)
+
+c
+
+where we used both the homogeneity of π∞ and the lower bound on its marginal on the sphere. Now, for any p ∈ [1 , ∞), we have 
+
+∥(ω, y )∥pp = ∥ω∥pp + |y|p = 1 + |y|p
+
+where we have used the fact that ω ∈ S for the last equality. We obtain 
+
+pY∞|X∞ (y|ω) ≤ (1 + |y|p)− α+d+1  
+
+> p
+
+sup ω∈Sd+1 π∞(ω)
+
+c
+
+which is a bound independent from ω, and defines an integrable function of y. Indeed, (1 + |y|p)− α+d+1  
+
+> p
+
+∼ 
+
+> |y|→∞
+
+|y|−α−d−1
+
+27 which is integrable at ±∞ . If the case where p = ∞, we simply write 
+
+∥(ω, y )∥−α−d−1 
+
+> ∞
+
+≤ (1 + |y|)−α−d−1 (A.5) hence the same argument ensuring the domination of the density by an integrable function of y also holds. By dominated convergence, we deduce that the function ω 7 → F∞(s|ω) is continuous. Then Proposition 0.1 in Resnick (2008) ensures that the weak convergence of non decreasing functions implies that of their generalized inverse. In particular, if ωn → ω, we have qP∞ (ωn) → qP∞ (ω), hence qP∞ is continuous. We now check that the stability condition (2.4) holds, and begin with an explicit expression for pY |X
+
+and pY∞|X∞ as functions of π and π∞ respectively. First, by definition of the conditional density, for any x ∈ Rd \ { 0} and y ∈ R,
+
+pY |X (y|x) = p(x, y )
+
+p(x) = ∥x∥π(x, ∥x∥y)
+
+R
+
+> R
+
+∥x∥π(x, ∥x∥y) d y = ∥x∥π(x, ∥x∥y)
+
+R 
+
+> R
+
+π(x, u ) d u = ∥x∥π(x, ∥x∥y)
+
+π(x) .
+
+For the conditional density pY∞|X∞ , note first the homogeneity of π∞ of order −α − d − 1 implies that 
+
+p∞ is homogeneous of order −α − d with respect to the first component, i.e. for any x ∈ Rd \ { 0} and 
+
+t > 0: 
+
+p∞(tx, y ) = t−α−dp∞(x, y ).
+
+The joint density of ( X∞, Z ∞) is proportional to π∞(x, z ) on {x ∈ Rd : ∥x∥ ≥ 1} × R. It follows that the joint density of ( X∞, Y ∞) is proportional to p∞ on {x ∈ Rd : ∥x∥ ≥ 1} × R, thus 
+
+pY∞|X∞ (y|x) = p∞(x, y )
+
+R 
+
+> R
+
+p∞(x, y ) d y ,
+
+so, by homogeneity of p∞,
+
+pY∞|X∞ (y|x) = ∥x∥−α−dp∞(θ(x), y )
+
+∥x∥−α−d R 
+
+> R
+
+p∞(θ(x), y ) d y = π∞(θ(x), y )
+
+π∞(θ(x)) .
+
+The following lemma then shows the uniform convergence of the conditional probability densities and their associated conditional distribution functions. 
+
+Lemma A.4. 
+
+1. The conditional density of Y given X = tω converges to the conditional density of Y∞ given 
+
+X∞ = ω uniformly on the sphere, i.e. sup 
+
+> ω∈S
+
+|pY |X (y|tω ) − pY∞|X∞ (y, ω )| − −−→ 
+
+> t→∞
+
+0
+
+2. Denote by Ft(s|ω) = P (Y ≤ t | X = tω ) the conditional cumulative distribution function of Y
+
+given X = tω . Also denote F∞(s|ω) = P (Y∞ ≤ s | X∞ = ω) the extreme conditional cumu-lative distribution function. The conditional cumulative function Ft converges to the extreme conditional cumulative distribution function F∞, uniformly on the sphere, as t → ∞ , i.e. sup 
+
+> s∈R,ω ∈S
+
+|Ft(s|ω) − F∞(s|ω)| − −−→ 
+
+> t→∞
+
+0.
+
+Proof of Lemma A.4. We use several results from Cl´ emen¸ con et al. (2025). More precisely, we use Lemma B.1 and the computation done in the proof of Proposition 2.2 (item ( c)). Note that both results are exploitable here because they do not require the boundedness of the target Y , and the statements can be proven only working with the densities π, π ∞. This ensures that Lemma B.1 in Cl´ emen¸ con et al. (2025) also applies in our setting, as well as the computation in the proof of Proposition 2.2. 28 1. From Lemma B.1 in Cl´ emen¸ con et al. (2025), we have the convergence of the marginals uniformly on the sphere, sup 
+
+> ω∈S
+
+|tdb(t)π(tω ) − π∞(ω)| − −−→ 
+
+> t→∞
+
+0.
+
+Thus, we have the convergence 
+
+tπ (tω, ty )
+
+π(ω) = td+1 b(t)π(tω, ty )
+
+tdb(t)π(tω ) −−−→
+
+> t→∞
+
+π∞(ω, y )
+
+π∞(ω) .
+
+Moreover, this convergence is uniform on the sphere because both the numerator and the denom-inator converge uniformly on the sphere and the denominator is greater than inf ω∈S π∞(ω)2 > 0 for 
+
+t large enough. 2. Let t > 0. For any s ∈ R, We have: sup 
+
+> ω∈S
+
+|Ft(s|ω) − F∞(s|ω)| = sup 
+
+> ω∈S
+
+Z s
+
+> −∞
+
+pY |X (y|tω ) d y −
+
+Z s
+
+> −∞
+
+pY∞|X∞ (y|ω) d y
+
+= sup 
+
+> ω∈S
+
+Z s
+
+> −∞
+
+  tπ (tω, ty )
+
+π(tω ) − π∞(ω, y )
+
+π∞(ω)
+
+ dy
+
+= sup 
+
+> ω∈S
+
+Z s
+
+> −∞
+
+  td+1 b(t)π(tω, ty )
+
+tdb(t)π(tω ) − π∞(ω, y )
+
+π∞(ω)
+
+ dy
+
+≤
+
+Z
+
+> R
+
+sup 
+
+> ω∈S
+
+td+1 b(t)π(tω, ty )
+
+tdb(t)π(tω ) − π∞(ω, y )
+
+π∞(ω) dy
+
+which is independent from s. It has been shown in Cl´ emen¸ con et al. (2025) (proof of Proposition 2.2, equation 2.19) that this integral converges to 0 as t → ∞ , which ends the proof. We now have all the necessary tools to show that the condition (2.4) in Assumption 2 holds. We actually show the stronger condition sup 
+
+> ∥x∥≥ t
+
+|q(x) − qP∞ (x)| − −−→ 
+
+> t→∞
+
+0. (A.6) 
+
+Step 1: Let x = tω . We first establish a lower bound on the conditional density pY |X (y, tω ) which holds on a specified domain. Lemma A.3 ensures that by qP∞ is continuous on the sphere, hence it is bounded. Thus, there exists M > 0 such that, for any ω ∈ S, |qP∞ (ω)| ≤ M . since S × [−M − 1, M + 1] is compact, by the continuity of the extreme conditional density, we can define 
+
+c = min    
+
+> (ω,y )∈S×[−M−1,M +1]
+
+pY∞|X∞ (y|ω)and c > 0 by positivity of pY∞|X∞ . Now, by the uniform convergence of the conditional densities given by Lemma A.4, it holds that, for y ∈ [−M − 1, M + 1] and any ω ∈ S,
+
+pY |X (y, tω ) = pY∞|X∞ (y, ω ) + ( pY |X (y, tω ) − pY∞|X∞ (y, ω )) 
+
+≥ pY∞|X∞ (y, ω ) − sup 
+
+> ω∈S
+
+pY |X (y, tω ) − pY∞|X∞ (y, ω )
+
+if t is large enough so that sup ω∈S|pY |X (y, tω ) − pY∞|X∞ (y, ω )| ≤ c 
+
+> 2
+
+, we obtain, for any ω ∈ S and 
+
+y ∈ [−M − 1, M + 1]: 
+
+pY |X (y, tω ) ≥ c
+
+2 (A.7) 29 Step 2: We now use the uniform convergence of the conditional cumulative distribution function. We have, from Lemma A.4, sup 
+
+> ω∈S
+
+|Ft(qP∞ (ω)|ω) − F∞(qP∞ (ω)|ω)| ≤ sup 
+
+> s∈R,ω ∈S
+
+|Ft(s|ω) − F∞(s|ω)| − −−→ 
+
+> t→∞
+
+0Moreover, by positivity of the conditional densities, we have F∞(qP∞ (ω)|ω) = τ = Ft(q(tω )|ω). We obtain sup 
+
+> ω∈S
+
+|Ft(qP∞ (ω)|ω) − Ft(q(tω )|ω)| − −−→ 
+
+> t→∞
+
+0. (A.8) 
+
+Step 3: We now show that (A.7) along with (A.8) imply that qP∞ (ω) and q(tω ) are close for t large enough. We first show that q(tω ) ∈ [−M − 1, M + 1] if t is large enough. Assume by contradiction that, for any T > 0 there exists t ≥ T and ω ∈ S such that |q(tω )| > M + 1. Assume for simplicity that q(tω ) > M + 1, and take T large enough so that the lower bound on the conditional density (A.7) holds. Then, 
+
+Ft(q(tω )) − Ft(qP∞ (ω)) ≥ Ft(M + 1) − Ft(qP∞ (ω)) =
+
+Z M +1  
+
+> qP∞(ω)
+
+pY |X (y, tω ) d y
+
+≥ c
+
+2 (M + 1 − qP∞ (ω)) 
+
+≥ c
+
+2which contradicts the convergence (A.8). Thus, there exists T > 0 such that, for t ≥ T and any ω ∈ S,
+
+q(tω ) ∈ [−M − 1, M + 1]. We can now leverage the lower bound on the conditional density pY |X
+
+provided by (A.7), which yields 
+
+|Ft(q(tω )) − Ft(qP∞ (ω)) | =
+
+Z q(tω ) 
+
+> qP∞(ω)
+
+pY |X (y, tω ) d y
+
+≥ c
+
+2 |q(tω ) − qP∞ (ω)|
+
+and we obtain sup 
+
+> ω∈S
+
+q(tω ) − qP∞ (ω)| ≤ 2
+
+c sup 
+
+> ω∈S
+
+|Ft(qP∞ (ω)|ω) − Ft(q(tω )|ω) −−−→ 
+
+> t→∞
+
+0.
+
+Thus, it also holds that sup s≥t sup ω∈S|q(tω ) − qP∞ (tω )| − −−→ 
+
+> t→∞
+
+0, and sup 
+
+> ∥x∥≥ t
+
+|q(x) − qP∞ (x)| = sup 
+
+> ∥x∥≥ 1
+
+|q(tx ) − qP∞ (tx )|
+
+= sup 
+
+> s≥t
+
+sup 
+
+> ∥x∥=1
+
+|q(sx ) − qP∞ (sx )| − −−→ 
+
+> t→∞
+
+0which shows that the condition (A.6) is satisfied. 
+
+# B Proofs of the results in Section 3.1 
+
+## B.1 Proof of Proposition 3.2 
+
+This is an adaptation of Proposition 3.2 in Cl´ emen¸ con et al. (2025) to the case of quantile regression with the modified pinball loss. For any h1, h 2 ∈ F , we have, because the modified pinball loss is max( τ, 1 − τ ) Lipschitz in each variable, 
+
+|R t(h1 ◦ θ) − R t(h2 ◦ θ)| ≤ max( τ, 1 − τ )∥h1 − h2∥∞
+
+30 and the same holds for RP∞ ,
+
+|R P∞ (h1 ◦ θ) − R P∞ (h2 ◦ θ)| ≤ max( τ, 1 − τ )∥h1 − h2∥∞.
+
+By total boundedness of F, for any ε, there exists h1, . . . , h n such that F ⊂ Sni=1 B(hi, ε, ∥·∥ ∞) where 
+
+B(hi, ε, ∥·∥ ∞) is the ball centered in hi and of radius ε in the space ( C(S), ∥·∥ ∞). Because Assumption 1 holds, we can apply Theorem 2.1, item 1, which ensures that, for any i ∈ { 1, . . . , n },
+
+Rt(hi ◦ θ) −−−→ 
+
+> t→∞
+
+RP∞ (hi ◦ θ).
+
+Thus, for t > T large enough, we have |R t(hi ◦ θ) − R P∞ (hi ◦ θ)| ≤ ε for any i ∈ { 1, . . . , n }. Now, given h ∈ F , there exists i ∈ { 1, . . . , n } such that ∥h − hi∥∞ ≤ ε. Thus, for t ≥ T ,
+
+|R t(h ◦ θ) − R P∞ (h ◦ θ)| ≤ |R t(h ◦ θ) − R t(hi ◦ θ)| + |R t(hi ◦ θ) − R P∞ (hi ◦ θ)| + |R P∞ (hi ◦ θ) − R P∞ (h ◦ θ)|≤ (2 max( τ, 1 − τ ) + 1) ε
+
+This holds for any h ∈ F , hence, for t > T ,sup 
+
+> h∈F
+
+|R t(h ◦ θ) − R P∞ (h ◦ θ)| ≤ (2 max( τ, 1 − τ ) + 1) ε. 
+
+Since ε > 0 is arbitrary, we deduce the uniform convergence of the quantity above as t → ∞ . Note finally that RP∞ (h ◦ θ) can be replaced by R∞(h ◦ θ) using item 1 of Theorem 2.1. 
+
+## B.2 Proof of Proposition 3.3 
+
+First, we split by the triangular inequality the supremum, introducing the intermediate risk eRk(f ◦ θ), defined by equation (2.8), sup  
+
+> f∈F
+
+|R tn,k (f ◦ θ) − bRk(f ◦ θ)| ≤ sup  
+
+> f∈F
+
+|R tn,k (f ◦ θ) − eRk(f ◦ θ)| + sup  
+
+> f∈F
+
+| eRk(f ◦ θ) − bRk(f ◦ θ)|. (B.1) We now provide a high probability bound on sup  
+
+> f∈F
+
+eRk(f ◦ θ) − bRk(f ◦ θ) .
+
+Notice first that by the uniform boundedness assumption (Assumption 3) on the class F, we have, for any i ∈ { 1, . . . , n },
+
+|ℓ′ 
+
+> τ
+
+(Yi, f (Xi)) | ≤ max( τ, 1 − τ )|f (Xi)| ≤ max( τ, 1 − τ )M. 
+
+Applying the triangular inequality yields sup  
+
+> f∈F
+
+bRk(f ◦ θ) − eRk(f ◦ θ) = sup  
+
+> f∈F
+
+1
+
+k
+
+> n
+
+X
+
+> i=1
+
+ℓ′ 
+
+> τ
+
+(Yi, f (Xi))( 1∥Xi∥≥∥ X(k)∥ − 1∥Xi∥≥ tn,k )
+
+≤ M max( τ, 1 − τ )
+
+k
+
+> n
+
+X
+
+> i=1
+
+1∥Xi∥≥∥ X(k)∥ − 1∥Xi∥≥ tn,k .
+
+(B.2) Now, if tn,k > ∥X(k)∥, the previous sum counts all indices i for which ∥Xi∥ lies between ∥Xk∥ (in-cluded) and t (excluded), and there are exactly Pni=1 1∥Xi∥≥ tn,k − k such indices. Applying the same reasoning when tn,k ≤ ∥ X(k)∥ leads to the same result, thus, 
+
+> n
+
+X
+
+> i=1
+
+1∥Xi∥≥∥ X(k)∥ − 1∥Xi∥≥ tn,k =
+
+> n
+
+X
+
+> i=1
+
+1∥Xi∥≥ tn,k − k . (B.3) 31 The sum on the right-hand side of the equation can be bounded with high probability with Bernstein’s inequality (see for instance Bercu et al. (2015), Theorem 2.1 with Remark 2.4). Indeed, 1∥Xi∥≥ tn,k fol-lows a binomial distribution with parameter ( n, kn ), with E
+
+h
+
+12
+
+> ∥Xi∥≥ tn,k
+
+i
+
+= kn . By applying Bernstein’s inequality along with a union bound argument, we obtain that, with probability no less than 1 − 2δ,
+
+> n
+
+X
+
+> i=1
+
+1∥Xi∥≥ tn,k − k ≤ p2k log(1 /δ ) + log(1 /δ )3 .
+
+Multiplying this inequality by M max( τ, 1−τ ) 
+
+> k
+
+, and replacing in (B.2), we obtain that, with probability no less than 1 − 2δ,sup  
+
+> f∈F
+
+bRk(f ◦ θ) − eRk(f ◦ θ) ≤ M max( τ, 1 − τ )
+
+√k
+
+p 2 log(1 /δ ) + log(1 /δ )3√k
+
+
+
+. (B.4) To deal with the first term in (B.1), we use a Talagrand type inequality (see Bousquet (2002), or the version in Steinwart and Christmann (2008), Theorem 7.5, with γ = 12 ). We have, for any f ∈ F ,
+
+eRk(f ◦ θ) − R tn,k (f ◦ θ)| = nk
+
+1
+
+n
+
+> n
+
+X
+
+> i=1
+
+ℓ′ 
+
+> τ
+
+(Yi, f (θ(Xi))) 1{∥ Xi∥ ≥ tn,k } − E [ℓ′ 
+
+> τ
+
+(Yi, f (θ(Xi))) 1{∥ Xi∥ ≥ tn,k }]
+
+= nk
+
+1
+
+n
+
+> n
+
+X
+
+> i=1
+
+g(Xi, Y i)
+
+where 
+
+g(Xi, Y i) = ℓ′ 
+
+> τ
+
+(Yi, f (θ(Xi))) 1{∥ Xi∥ ≥ tn,k } − E [ℓ′ 
+
+> τ
+
+(Yi, f (θ(Xi))) 1{∥ Xi∥ ≥ tn,k }] . (B.5) The function g satisfies E [g(X1, Y 1)] = 0. Moreover, for any f ∈ F , we have 
+
+|ℓ′ 
+
+> τ
+
+(Y, f (X)) | ≤ max( τ, 1 − τ )∥f ∥∞ ≤ max( τ, 1 − τ )M. 
+
+The second moment of g(Xi, Y i) can be bounded with 
+
+E g(Xi, Y i)2 = Var( ℓ′ 
+
+> τ
+
+(Yi, f (θ(Xi))) 1∥Xi∥≥ tn,k )
+
+≤ E ℓ′ 
+
+> τ
+
+(Yi, f (θ(Xi))) 21∥Xi∥≥ tn,k 
+
+
+
+≤ max( τ, 1 − τ )2M 2 kn = v. 
+
+Note finally that the family F is pointwise measurable, thus, we can restrict the supremum to F0
+
+which is at most countable, hence the supremum is measurable. We denote by ψn,k the expectation of the supremum 
+
+ψn,k = nk E
+
+"
+
+sup  
+
+> f∈F
+
+1
+
+n
+
+> n
+
+X
+
+> i=1
+
+g(( Xi, Y i)) 
+
+#
+
+.
+
+Talagrand’s inequality yields that, with probability no less than 1 − δ,sup  
+
+> f∈F
+
+1
+
+n
+
+> n
+
+X
+
+> i=1
+
+g(( Xi, Y i)) ≤ 3k
+
+2n ψn,k +
+
+r 2vn log(1 /δ ) + 8M max( τ, 1 − τ ) log(1 /δ )3n .
+
+Multiplying both sides by nk and replacing v by its value, we obtain sup  
+
+> f∈F
+
+|R tn,k (f ◦ θ) − eRk(f ◦ θ)| ≤ 32 ψn,k + M max( τ, 1 − τ )
+
+r 2 log(1 /δ )
+
+k + 8M max( τ, 1 − τ ) log(1 /δ )3k .
+
+32 We now provide a bound on the expectation ψn,k . We do exactly as in Cl´ emen¸ con et al. (2025), and introduce the Rademacher average Rad( F, k ) = sup  
+
+> f∈F
+
+1
+
+k
+
+> n
+
+X
+
+> i=1
+
+σiℓ′ 
+
+> τ
+
+(Yi, f (θ(Xi))) 1∥Xi∥≥ tn,k 
+
+where the σi are independent Rademacher variables. A standard symmetrization argument yields 
+
+E
+
+"
+
+sup  
+
+> f∈F
+
+|R tn,k (f ◦ θ) − eRk(f ◦ θ)|
+
+#
+
+≤ 2E [Rad( F, k )] .
+
+To deal with the Rademacher average, we use a conditioning lemma (see Lhaut et al. (2022), Lemma 2.1), which ensures that 
+
+> n
+
+X
+
+> i=1
+
+σiℓ′ 
+
+> τ
+
+(Yi, f (θ(Xi))) 1∥Xi∥≥ tn,k 
+
+> (d)
+
+=
+
+> K
+
+X
+
+> i=1
+
+σiℓ′ 
+
+> τ
+
+(Y ki , f (θ(Xki ))) where ( Xki , Y ki ) are independent variables, independent from the variables ( Xi, Y i) and from K ∼ 
+
+Bin (n, kn ), and follow the same distribution as ( X, Y | ∥ X∥ ≥ tn,k ). Letting G = {g(x, y ) = ℓ′ 
+
+> τ
+
+(y, f ◦
+
+θ(x)) : f ∈ F} , and considering any probability Q on Rd × R, we have 
+
+∥g1 − g2∥L2(Q) =
+
+q
+
+EQ[( ℓ′ 
+
+> τ
+
+(Y, f 1 ◦ θ(X)) − ℓ′ 
+
+> τ
+
+(Y, f 2 ◦ θ(X))) 2]
+
+≤ max( τ, 1 − τ )
+
+q
+
+EQ[( f1(X) − f2(X)) 2]= max( τ, 1 − τ )∥f1 − f2∥L2(QX ◦θ−1)
+
+where QX is the marginal distribution of X. Denoting ˜Q = QX ◦ θ−1, we obtain that the covering number N (G, L 2(Q), ε ) is bounded by N (F, L 2( ˜Q), ε  
+
+> max( τ, 1−τ)
+
+). Since F is of finite VC-dimension, with envelope function M 1S, Theorem 2.6.7 in Vaart and Wellner (1997) yields 
+
+N (F, L 2( ˜Q), M ε ) ≤
+
+ Aε
+
+2VF
+
+where VF is the VC dimension of F, and A is some universal constant. We deduce 
+
+N (G, L 2(Q), ε ) ≤ N  F, L 2( ˜Q), ε
+
+max( τ, 1 − τ )
+
+
+
+≤
+
+ M max( τ, 1 − τ )
+
+ε
+
+2VF
+
+.
+
+Since the functions in G are uniformly bounded by max( τ, 1−τ )M , we obtain that G = max( τ, 1−τ )M
+
+is an envelope function of G and 
+
+N (G, L 2(Q), ε ∥G∥L2(Q)) ≤
+
+ Aε
+
+2VF
+
+.
+
+Now, applying Proposition 2.1 of Gin´ e and Guillou (2001) along with sup g∈G E g2 ≤ max( τ, 1−τ )2M 2
+
+and sup g∈G ∥g∥∞ ≤ max( τ, 1 − τ )M , we obtain for any m ≥ 1, 
+
+E
+
+"
+
+sup  
+
+> f∈F
+> m
+
+X
+
+> i=1
+
+σiℓ′ 
+
+> τ
+
+(Y ki , f ◦ θ(Xki )) 
+
+#
+
+≤ C′M max( τ, 1 − τ )( VF + pmV F )for some universal constant C′. Thus, 
+
+E
+
+h
+
+sup  
+
+> f∈F K
+
+X
+
+> i=1
+
+σiℓ′ 
+
+> τ
+
+(Y ki , f (θ(Xki ))) K
+
+i
+
+≤ C′M max( τ, 1 − τ )( VF + pKVF ).
+
+33 We deduce 
+
+E [Rad( F, k )] = E
+
+h 1
+
+k E
+
+h
+
+sup  
+
+> f∈F
+> m
+
+X
+
+> i=1
+
+σiℓ′ 
+
+> τ
+
+(Y ki , f ◦ θ(Xki )) K
+
+ii 
+
+≤ C′M max( τ, 1 − τ )
+
+k E
+
+h
+
+VF + pKVF
+
+i
+
+≤ C′M max( τ, 1 − τ )VF
+
+k + C′M max( τ, 1 − τ )√VF
+
+√k .
+
+Thus, for some universal constant C′′ 
+
+,
+
+ψn,k ≤ C′′ 
+
+M max( τ, 1 − τ )
+
+ VF
+
+k +
+
+r VF
+
+k
+
+
+
+. (B.6) Replacing ψn,k by the previous bound in (B.2), we obtain that with probability no less than 1 − δ, and some universal constant C,sup  
+
+> f∈F
+
+|R tn,k (f ◦ θ) − eRk(f ◦ θ)| ≤ M max( τ, 1 − τ )
+
+√k
+
+
+
+CpVF + p2 log(1 /δ ) + 8 log(1 /δ )3√k + CV F
+
+√k
+
+
+
+.
+
+(B.7) Combining (B.4) with (B.7) and replacing in (B.1), we obtain that, with probability no less than 1 −3δ,sup  
+
+> f∈F
+
+|R tn,k (f ◦ θ) − bRk(f ◦ θ)| ≤ M max( τ, 1 − τ )
+
+√k
+
+
+
+CpVF + 2 p2 log(1 /δ ) + 3 log(1 /δ )
+
+√k + CV F
+
+√k
+
+.
+
+# C Proofs of the results in Section 3.2 
+
+## C.1 Proof of the results in Section 3.2.1 
+
+Proof of Lemma 3.1. Uniqueness : By convexity of the pinball loss with respect to its first variable, we have, for any h1, h 2 ∈ H and x, y ∈ Rd
+
+ℓ′
+
+> τ
+
+  h1 + h2
+
+2 ◦ θ(x), y  ≤ ℓ′ 
+
+> τ
+
+(h1 ◦ θ(x), y ) + ℓ′ 
+
+> τ
+
+(h1 ◦ θ(x), y )2Integrating both sides with respect to the distribution P , we obtain 
+
+RP
+
+  h1 + h2
+
+2 ◦ θ ≤ 12 (RP (h1 ◦ θ) + RP (h2 ◦ θ)) that is, the function h 7 → R P (h ◦ θ) is convex. Moreover, for any λ > 0, the function h 7 → λ∥h∥2 
+
+> H
+
+is strictly convex. Hence, the map h 7 → R P (h ◦ θ) + λ∥h∥2 
+
+> H
+
+is strictly convex, and the minimum is unique. 
+
+Existence : For any h1, h 2 ∈ H , since the risk is max( τ, 1 − τ )-Lipschitz, 
+
+RP (h1 ◦ θ) − R P (h2 ◦ θ) ≤ max( τ, 1 − τ )∥h1 − h2∥∞ (C.1) Furthermore, since the kernel K is bounded with sup K(x, x ) ≤ 1, we have 
+
+∥h∥∞ ≤ ∥ h∥H. (C.2) Replacing in (C.2) in (C.1), we obtain 
+
+RP (h1 ◦ θ) − R P (h2 ◦ θ) ≤ max( τ, 1 − τ )∥h1 − h2∥H
+
+34 that is to say, the function h ∈ H 7 → R P (h◦θ) is max( τ, 1−τ )-Lipschitz. In particular, it is continuous, and therefore the map h ∈ H 7 → λ∥h∥2 
+
+> H
+
++ RP (h ◦ θ) is continuous. Now, consider the set 
+
+A = {h ∈ H : λ∥h∥2 
+
+> H
+
++ RP (h ◦ θ) ≤ 0}.
+
+Since RP (0 ◦ θ) = 0, it follows that 0 ∈ A. Moreover, if h ∈ A, we have 
+
+λ∥h∥2 
+
+> H
+
+≤ |R P (h ◦ θ)|≤ max( τ, 1 − τ )∥h∥∞. (C.3) We obtain, replacing (C.2) in (C.3), 
+
+λ∥h∥2 
+
+> H
+
+≤ max( τ, 1 − τ )∥h∥H.
+
+Dividing both sides by λ∥h∥H yields 
+
+∥h∥H ≤ max( τ, 1 − τ )
+
+λ .
+
+Therefore, A is a non empty bounded subset of the reflexive Banach space H. Then, (see Theorem A.6.9 in Steinwart and Christmann (2008)) the map h ∈ H 7 → λ∥h∥2 
+
+> H
+
++RP (h) has a minimum, achieved at h∗ 
+
+> λ,P
+
+. Moreover, this SVM solution satisfies, by the previous inequality, 
+
+∥h∗ 
+
+> λ,P
+
+∥H ≤ max( τ, 1 − τ )
+
+λ .
+
+Proof of Corollary 3.1. Define bPk the empirical distribution of ( X(i), Y (i))1≤i≤k, Pt the conditional law of ( X, Y ) given ∥X∥ ≥ t and recall that P∞ is the joint law of ( X∞, Y ∞) defined by (2.3). Recall that (( X1, Y 1), . . . , (Xn, Y n)) are sampled from a distribution such that P(Xi = 0) = 0 for any i, so that the empirical distribution bPk satisfies the condition bPk(0 × R) = 0. This condition is also satisfied by 
+
+Pt since this distribution is supported on {(x, y ) ∈ Rd × R : ∥x∥ ≥ t}, and the probability distribution 
+
+P∞ defined by (2.3) also satisfies P∞(0 × R) = 0. Hence, Lemma 3.1 applies to these 3 probability distributions, and yields the existence of bhλ,k , h∗ 
+
+> λ,t
+
+and h∗ 
+
+> λ, ∞
+
+respectively, along with the bound on their norm. For the intermediate SVM solution ehλ,t n,k , denote by N = Pni=1 1∥Xi∥≥ tn,k the number of observations above the threshold tn,k . If N = 0, the intermediate risk defined by (2.8) is identically equal to 0, and in this case ehλ,t n,k = 0. Otherwise, denote by ePk the probability distribution associated to the observations ( Xi, Y i) where ∥Xi∥ ≥ tn,k ,
+
+ePk = 1
+
+N
+
+> n
+
+X
+
+> i=1
+
+δ(Xi,Y i)1∥Xi∥≥ tn,k .
+
+This defines a random probability distribution supported on {(x, y ) ∈ Rd × R : ∥x∥ ≥ tn,k }. Lemma 3.1 applies and the minimizer of 1
+
+N
+
+> n
+
+X
+
+> i=1
+
+ℓ′ 
+
+> τ
+
+(h(θ(Xi)) , Y i) + λ′∥h∥2
+
+> H
+
+is well-defined, for any λ′ > 0. Now, multiply this penalized risk by Nk , and we obtain that the minimizer of 
+
+eRk(h ◦ θ) + λ′∥h∥2
+
+> H
+
+Nk
+
+is well defined for any λ > 0. In particular, taking λ′ = λ kN yields the existence and uniqueness of 
+
+ehλ,t n,k .35 Proof of Proposition 3.4. Notice first that the RKHS-norm of the SVM solution h∗ 
+
+> λ,P
+
+is equal to the RKHS-norm of its restriction as an element of HS,
+
+∥h∗ 
+
+> λ,P
+
+∥H = ∥h∗ 
+
+> λ,P
+
+|S∥HS . (C.4) Indeed, recall that by definition of the norm ∥·∥ HS ,
+
+∥h∗ 
+
+> λ,P
+
+|S∥HS = min {∥ h∥H : h|S= h∗ 
+
+> λ,P
+
+|S} ≤ ∥ h∗ 
+
+> λ,P
+
+∥H.
+
+Assume by contradiction that ∥h∗ 
+
+> λ,P
+
+|S∥HS < ∥h∗ 
+
+> λ,P
+
+∥H. Then there exists h ∈ H such that h|S= h∗ 
+
+> λ,P
+
+|S
+
+and ∥h∥H < ∥h∗ 
+
+> λ,P
+
+∥H. Since both functions coincide on the sphere, their conditional risk are equal, and we obtain 
+
+R(λ) 
+
+> P
+
+(h ◦ θ) = RP (h ◦ θ) + λ∥h∥2
+
+> H
+
+= RP (h∗ 
+
+> λ,t n,k
+
+◦ θ) + λ∥h∥2
+
+> H
+
+< R(λ) 
+
+> P
+
+(h∗ 
+
+> λ,t n,k
+
+◦ θ)which contradicts the definition of h∗ 
+
+> λ,P
+
+as the minimizer of the penalized conditional risk. Now, take 
+
+h∗ 
+
+> S
+
+the element of the RKHS H such that h∗
+
+> S
+
+|S= h∗ 
+
+> λ,P, S
+
+and ∥h∗
+
+> S
+
+∥H = ∥h∗
+
+> λ,P, S
+
+∥HS . Proposition 2.9 ensure that such an element exists and is unique. By definition of h∗
+
+> S
+
+, we have 
+
+R(λ)
+
+> P, S
+
+(h∗ 
+
+> λ,P, S
+
+◦ θ) = RP (h∗
+
+> S
+
+) + λ∥h∗
+
+> S
+
+∥2
+
+> H
+
+.
+
+By definition of h∗ 
+
+> λ,P, S
+
+as the minimizer of the penalized conditional risk over HS, we obtain 
+
+RP (h∗
+
+> S
+
+) + λ∥h∗
+
+> S
+
+∥2 
+
+> H
+
+≤ R P (h∗ 
+
+> λ,P
+
+|S◦θ) + λ∥h∗ 
+
+> λ,P
+
+|S∥HS
+
+= RP (h∗ 
+
+> λ,P
+
+◦ θ) + λ∥h∗ 
+
+> λ,P
+
+∥H
+
+where the last line follows from the equality (C.4). Hence, h∗ 
+
+> S
+
+also minimizer the penalized conditional risk, that is, h∗ 
+
+> S
+
+= h∗ 
+
+> λ,P
+
+. It follows, restricting to the sphere, that h∗ 
+
+> λ,P, S
+
+= h∗ 
+
+> λ,P
+
+|S.
+
+## C.2 Proof the results in Section 3.2.2 
+
+Proof of Theorem 3.1. We start with the decomposition 
+
+R∞(bhλ,k ◦ θ) + λ∥bhλ,k ∥2 
+
+> H
+
+− R ∗∞ = I + II + III where I = Rtn,k (h∗ 
+
+> λ,t n,k
+
+◦ θ) + λ∥h∗ 
+
+> λ,t n,k
+
+∥2 
+
+> H
+
+− R ∗∞,
+
+II = R∞(bhλ,k ◦ θ) − R tn,k (bhλ,k ◦ θ),
+
+III = 
+
+
+
+Rtn,k (bhλ,k ◦ θ) + λ∥bhλ,k ∥2
+
+> H
+
+
+
+−
+
+
+
+Rtn,k (h∗ 
+
+> λ,t n,k
+
+◦ θ) + λ∥h∗ 
+
+> λ,t n,k
+
+∥2
+
+> H
+
+
+
+.
+
+For term III, we notice that III = R(λ) 
+
+> tn,k
+
+(bhλ,k ◦ θ) − R (λ) 
+
+> tn,k
+
+(h∗ 
+
+> λ,t n,k
+
+◦ θ) = D(n, k, λ ).
+
+For term II, we know from Corollary 3.1 that ∥bhλ,k ∥HS ≤ max( τ, 1−τ ) 
+
+> λ
+
+, so that we can deduce II = R∞(bhλ,k ◦ θ) − R tn,k (bhλ,k ◦ θ) ≤ sup  
+
+> ∥h∥H≤max( τ, 1−τ)λ−1
+
+Rtn,k (h ◦ θ) − R ∞(h ◦ θ) .
+
+36 Finally for term I, we use the fact that h∗ 
+
+> λ,t n,k
+
+minimizes the penalized conditional risk so that its penalized conditional risk is smaller than that of h∗
+
+> λ, ∞
+
+. Hence I = Rtn,k (h∗ 
+
+> λ,t n,k
+
+◦ θ) + λ∥h∗ 
+
+> λ,t n,k
+
+∥2 
+
+> H
+
+− R ∗∞
+
+≤ R tn,k (h∗ 
+
+> λ, ∞
+
+◦ θ) + λ∥h∗
+
+> λ, ∞
+
+∥2 
+
+> H
+
+− R ∗∞
+
+= R∞(h∗ 
+
+> λ, ∞
+
+◦ θ) + λ∥h∗
+
+> λ, ∞
+
+∥2 
+
+> H
+
+− R ∗∞
+
+| {z }
+
+> Ia
+
++ Rtn,k (h∗ 
+
+> λ, ∞
+
+◦ θ) − R ∞(h∗ 
+
+> λ, ∞
+
+◦ θ)
+
+| {z }
+
+> Ib
+
+For term I a, we immediately recognize the asymptotic approximation error of the RKHS H:Ia = A∞ 
+
+> 2
+
+(λ).
+
+Finally, we know from Corollary 3.1 that ∥h∗
+
+> λ, ∞
+
+∥HS ≤ max( τ, 1−τ ) 
+
+> λ
+
+, so that Ib ≤ sup  
+
+> ∥h∥H≤max( τ, 1−τ)λ−1
+
+Rtn,k (h ◦ θ) − R ∞(h ◦ θ) .
+
+Combining all of the previous inequalities yields the result. 
+
+Proof of Proposition 3.5. Let R = max( τ, 1−τ ) 
+
+> λ
+
+> 0. We want to prove sup 
+
+> h∈RBH
+
+Rt(h ◦ θ) − R ∞(h ◦ θ) −−−→ 
+
+> t→∞
+
+0.
+
+Since h ◦ θ depends only on the restriction to the sphere h|S, we can work in the RKHS HS. Using also 
+
+∥h|S∥HS ≤ ∥ h∥H, we obtain sup 
+
+> h∈RBH
+
+Rt(h ◦ θ) − R ∞(h ◦ θ) ≤ sup 
+
+> h∈RBHS
+
+Rt(h ◦ θ) − R ∞(h ◦ θ) .
+
+Since the sphere S ⊂ Rd is compact, it follows from Corollary 4.31 in Steinwart and Christmann (2008) that the inclusion HS → C (S) is compact. Thus, the ∥·∥ ∞-closure of BHS is a compact subset of C(S). In particular, RBHS is totally bounded in the space ( C(S), ∥·∥ ∞). We conclude by applying Proposition 3.2. 
+
+Proof of Corollary 3.2. Define a function of two variables, 
+
+β(n, λ ) := B(n, k (n), λ ), λ > 0.
+
+From the definition of the bias term (3.2), the function β is clearly non increasing in its second argument, and from the previous proposition and the fact that k(n)/n → 0, for any fixed λ > 0, 
+
+β(n, λ ) converges to 0 as n → ∞ . We need to construct a sequence λ(n) > 0 such that λ(n) → 0 and 
+
+β(n, λ (n)) → 0. Consider the subset Λn = {λ > 0 : β(n, λ ) ≤ λ}.
+
+First, we claim that Λ n is nonempty. If Λ n = (0 , +∞) then it is clearly nonempty, otherwise we can choose λ > 0 such that β(n, λ ) > λ . Then for x ≥ β(n, λ ), we have by monotonicity, 
+
+β(n, x ) ≤ β(n, λ ) ≤ x, 
+
+thus x ∈ Λn. In addition, the set Λ n is clearly lower bounded by 0. Consequently, the function 
+
+ψ(n) = inf(Λ n)37 is valued in [0 , +∞). We now show that for all n, the set Λ n is an interval of the kind ( ψ(n), +∞) or [ψ(n), +∞). Indeed since Λ n is nonempty, let λ ∈ Λn and let λ′ > λ . By monotonicity we have 
+
+β(n, λ ′) ≤ β(n, λ ) ≤ λ < λ ′,
+
+proving that λ′ ∈ Λn too and that Λ n is an interval. Now, define λ(n) = ψ(n) + 1 
+
+> n
+
+so that, for all n,
+
+λ(n) ∈ Λn. Then, 
+
+β(n, λ (n)) ≤ λ(n) = ψ(n) + 1 /n. 
+
+It remains only to prove that ψ(n) → 0 as n → ∞ . We proceed by contradiction: assume that ψ(n)does not converge to 0. Then for some ε > 0, and some subsequence ϕ(n) → ∞ , we have ψ ◦ ϕ(n) > ε ,for all n. Thus ε / ∈ Λϕ(n), which means 
+
+β(ϕ(n), ε ) > ε, 
+
+contradicting the fact that β(ϕ(n), ε ) → 0 as n → ∞ .
+
+## C.3 Proof of the results in Section 3.2.3 
+
+Proof of Lemma 3.2. The proof shares some similarities with the one of Theorem 5.9 (see also The-orem 5.8) in Steinwart and Christmann (2008). Since our setting involves restricting the empirical distributions to regions above order statistics and true quantiles, respectively, we find it simpler to propose a full proof rather than attempting to apply the above mentioned results. The intuition behind this result is linked with the stability of SVM solutions. Given a distribution P on Rd × R, consider 
+
+h∗ 
+
+> λ,P
+
+the SVM solution obtained by minimizing 
+
+bR(λ) 
+
+> P
+
+(h ◦ θ) = bRP (h ◦ θ) + λ∥h∥2
+
+> H
+
+.
+
+If P and P ′ be two probability distribution on Rd ×R, results concerning the stability of SVM solutions typically show that the distance between the two resulting SVM solutions h∗ 
+
+> λ,P
+
+and h∗  
+
+> λ,P ′
+
+can be bounded by some term quantifying the distance between P and P ′. Here, we are considering instead the two SVM solutions ehλ,t n,k and bhλ,k . Recall that bRk is associated with the empirical measure of the sample ( X(i), Y (i))1≤i≤k but that eRk cannot be directly interpreted as a risk against a probability measure. Still, we can prove that some similar property holds, and provide on ∥bhλ,k − ehλ,t n,k ∥H close depending on how well the quantile tn,k is estimated by ∥X(k)∥ the k-th statistic order of ∥X∥.First, note that the risk functions eRk, S : h ∈ H 7 → eRk(h ◦ θ) and bRk, S : h ∈ H 7 → bRk(h ◦ θ) are convex functions from H to R, by convexity of the pinball loss. Moreover, the function h ∈ H 7 → ∥ h∥2
+
+> H
+
+is differentiable and convex. Therefore, the regularized risks eR(λ) 
+
+> k
+
+: h ∈ H 7 → λ∥h∥2 
+
+> H
+
++ eRt, S(h) and 
+
+bR(λ) 
+
+> k
+
+: h ∈ H 7 → λ∥h∥2 
+
+> H
+
++ bRk, S(h) are both subdifferentiable, and their subgradient verifies 
+
+∂ eR(λ) 
+
+> k
+
+(h) = ∂ eRk, S(h) + 2 λιh, 
+
+and 
+
+∂ bR(λ) 
+
+> k
+
+(h) = ∂ bRk, S(h) + 2 λιh, 
+
+where ι : H → H ′ is the Fr´ echet-Riesz isomorphism that maps H to its dual H′. Now, by definition of 
+
+ehλ,t n,k and bhλ,k , we have 0 ∈ ∂ eR(λ) 
+
+> k
+
+(ehλ,t n,k ) and 0 ∈ ∂ bR(λ) 
+
+> k
+
+(bhλ,k ). Thus, there exists ew ∈ ∂ eRk, S(ehλ,t n,k )and bw ∈ ∂ bRk, S(bhλ,k ) such that: 
+
+ew + 2 λι ehλ,t n,k = 0 and 
+
+bw + 2 λι bhλ,k = 0 .
+
+38 Now, by definition of the subgradient, we have 
+
+⟨ bw, ehλ,t n,k − bhλ,k ⟩H′,H ≤ bRk(ehλ,t n,k ◦ θ) − bRk(bhλ,k ◦ θ),
+
+which implies 
+
+⟨− bw, bhλ,k − ehλ,t n,k ⟩H′,H ≤ bRk(ehλ,t n,k ◦ θ) − bRk(bhλ,k ◦ θ),
+
+and 
+
+⟨ ew, bhλ,k − ehλ,t n,k ⟩H′,H ≤ eRk(bhλ,k ◦ θ) − eRk(ehλ,t n,k ◦ θ).
+
+Adding the two equations above yields 
+
+⟨ ew − bw, bhλ,k − ehλ,t n,k ⟩H′,H ≤ bRk(ehλ,t n,k ◦ θ) − bRk(bhλ,k ◦ θ) + eRk(bhλ,k ◦ θ) − eRk(ehλ,t n,k ◦ θ).
+
+Using the relations ew = −2λι ehλ,t n,k and bw = −2λι bhλ,k , we obtain 2λ⟨ι(bhλ,k − ehλ,t n,k ), bhλ,k − ehλ,t n,k ⟩H′,H ≤ bRk(ehλ,t n,k ◦ θ) − bRk(bhλ,k ◦ θ) + eRk(bhλ,k ◦ θ) − eRk(ehλ,t n,k ◦ θ).
+
+By definition of ι and ⟨ · ⟩ H′,H, we have 
+
+⟨ι(bhλ,k − ehλ,t n,k ), bhλ,k − ehλ,t n,k ⟩H′,H = ⟨bhλ,k − ehλ,t n,k , bhλ,k − ehλ,t n,k ⟩H = ∥bhλ,k − ehλ,t n,k ∥2
+
+> H
+
+.
+
+Replacing in the previous inequality, we obtain the following bound: 2λ∥bhλ,k − ehλ,t n,k ∥2 
+
+> H
+
+≤ bRk(ehλ,t n,k ◦ θ) − bRk(bhλ,k ◦ θ) + eRk(bhλ,k ◦ θ) − eRk(ehλ,t n,k ◦ θ). (C.5) Now, using the definition of eRk and bRk,
+
+bRk(ehλ,t n,k ◦ θ) − bRk(bhλ,k ◦ θ) + eRk(bhλ,k ◦ θ) − eRk(ehλ,t n,k ◦ θ)
+
+= 1
+
+k
+
+> n
+
+X
+
+> i=1
+
+(ℓ′ 
+
+> τ
+
+(ehλ,t n,k (θ(i)), Y i) − ℓ′ 
+
+> τ
+
+(bhλ,k (θ(i)), Y i)( 1∥Xi∥≥∥ X(k)∥ − 1∥Xi∥≥ tn,k )
+
+≤ max( τ, 1 − τ )∥ehλ,t n,k − bhλ,k ∥∞
+
+k
+
+> n
+
+X
+
+> i=1
+
+1∥Xi∥≥∥ X(k)∥ − 1∥Xi∥≥ tn,k ,
+
+The sum can be rewritten as in (B.3). Moreover, since the kernel K is bounded by 1, we have 
+
+∥ehλ,t n,k − bhλ,k ∥∞ ≤ ∥ ehλ,t n,k − bhλ,k ∥H.
+
+Replacing in (C.5), we obtain 2λ∥bhλ,k − ehλ,t n,k ∥2 
+
+> H
+
+≤ max( τ, 1 − τ )∥bhλ,k − ehλ,t n,k ∥H
+
+k
+
+> n
+
+X
+
+> i=1
+
+1∥Xi∥≥ tn,k − k
+
+and we obtain the result by dividing both sides by 2 λ∥bhλ,k − ehλ,t n,k ∥H.
+
+Proof of Proposition 3.6. Theorem 5.8 in Steinwart and Christmann (2008) ensures that, for any prob-ability measure P on Rd × R, the SVM solution 
+
+hλ,P ∈ argmin RP (h) + λ∥h∥2
+
+> H
+
+can be written as an expectation involving a certain function w and the feature map Φ of the RKHS 
+
+H. More precisely, we have 
+
+hλ,P = − 12λ EP [wΦ] 39 and the function w satisfies w(x, y ) ∈ ∂ℓ ′ 
+
+> τ
+
+(y, h λ,P (x)) for any ( x, y ) ∈ Rd × R. This theorem covers also our setting because hλ,t minimizes 
+
+E [ℓτ (Y, h ◦ θ(X)) | ∥ X∥ ≥ tn,k ] + λ∥h∥2
+
+> H
+
+and we can take P = Ptn,k ,S the joint distribution of ( θ(X), Y | ∥ X∥ ≥ tn,k ). More precisely, Corollary 5.10 in Steinwart and Christmann (2008) ensures that, for any ( x, y ) ∈ Rd × R, the function w satisfies 
+
+w(θ(x), y ) ∈ ∂ℓ ′ 
+
+> τ
+
+(y, h ∗ 
+
+> λ,t n,k
+
+(θ(x))) .
+
+Note that the non-negativity of the loss is not satisfied in our case. However, this is not an issue for quantile regression because the modified pinball loss is globally Lipschitz and the result from Steinwart and Christmann (2008) can still be used. The max( τ, 1 − τ )-Lipschitzianity of the pinball loss also yields ∥w∥∞ ≤ max( τ, 1 − τ ). Moreover, for any distribution P on Rd × R, we obtain, from the propositions in Steinwart and Christmann (2008), 
+
+∥h∗ 
+
+> λ,t n,k
+
+− h∗ 
+
+> λ,P
+
+∥H ≤ 1
+
+λ EPtn,k ,S [wΦ] − EPS [wΦ] H, (C.6) where PS is the distribution of ( θ(X), Y ) when ( X, Y ) ∼ P . It turns out that this result can be extended to even discrete finite measures (not necessarily probability measures), with exactly the same proof as in Steinwart and Christmann (2008) (see the end of the proof of Theorem 5.9 in particular). Taking 
+
+μ = 1
+
+> k
+
+Pni=1 δ(θ(Xi),Y i)1{∥ Xi∥ ≥ tn,k } the measure associated to a sample (( X1, Y 1) . . . , (Xn, Y n)), with associated SVM solution ehλ,t n,k , (C.6) extends in this case to 
+
+∥h∗ 
+
+> λ,t
+
+− ehλ,t n,k ∥H ≤ 1
+
+λ EPt, S [wΦ] − 1
+
+k
+
+> n
+
+X
+
+> i=1
+
+w(θ(Xi), Y i)Φ( θ(Xi)) 1{∥ Xi∥ ≥ tn,k } H
+
+. (C.7) An application of a Bernstein’s type inequality adapted to Hilbert-spaces valued random variables allows to control the term on the right-hand side. We will use the Bernstein’s inequality stated below. 
+
+Proposition C.1 (Bernstein’s inequality in Hilbert spaces, Steinwart and Christmann (2008) Theorem 6.14) . Let H be a separable RKHS, B > 0 and σ > 0. Let ξ1, . . . , ξ n be random variables taking values in H and satisfying, for all i ∈ { 1, . . . , n }, E [ξi] = 0 , E ∥ξi∥2
+
+> H
+
+ ≤ σ2 and such that, with probability 1,
+
+∥ξi∥H ≤ B for some B > 0 . Then, with probability no less than 1 − δ,
+
+∥ 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+ξi∥H ≤
+
+r 2σ2 log(1 /δ )
+
+n +
+
+r σ2
+
+n + 2B log(1 /δ )3n .
+
+Applying this high probability bound in our context leads to the following proposition: 
+
+Proposition C.2. Let tn,k be the 1 − kn -quantile of ∥X∥. Suppose the kernel K is bounded by 1, and take w : Rd × R any bounded function. With probability no less than 1 − δ, the following holds: 
+
+1
+
+k
+
+> n
+
+X
+
+> i=1
+
+wΦ( Xi, Y i)1∥Xi∥≥ tn,k − E [wΦ( Y, θ ) | ∥ X∥ ≥ tn,k ] H
+
+≤ ∥ w∥∞
+
+r 2 log(1 /δ )
+
+k + 1
+
+√k + 4 log(1 /δ )3k
+
+!
+
+.
+
+Proof. We apply Bernstein’s inequality (Proposition C.1) with 
+
+ξi = ( wΦ)( Yi, θ (Xi)) 1∥Xi∥≥ tn,k − E wΦ( Y, θ )1∥X∥≥ tn,k 
+
+ .
+
+40 Note first that these variables are H-valued. Indeed, for any ω ∈ Ω, we have (wΦ)( Yi(ω), θ (Xi(ω)) 1∥Xi(ω)∥≥ tn,k = w(θ(Xi(ω), Y i(ω))) 1∥Xi(ω)∥≥ tn,k Φ( θ(Xi(ω))) which is an element of H as product of a real number and an element of H. Moreover, for any ω ∈ Ω, 
+
+∥w(θ(Xi(ω), Y i(ω))) 1∥Xi(ω)∥≥ tn,k Φ( θ(Xi(ω))) ∥H ≤ ∥ w∥∞∥Φ( Xi(ω)∥H ≤ ∥ w∥∞,
+
+where the last inequality holds because the kernel is bounded by 1. Hence, the random variable 
+
+wΦ( Y, θ (X)) 1∥X∥≥ tn,k defines a Bochner-P integrable function, thus E wΦ( Y, θ )1∥X∥≥ tn,k 
+
+ ∈ H . We have E [ξi] = 0, and by the triangular inequality, 
+
+∥ξi∥H ≤ ∥ (wΦ)( Yi, θ (Xi)) 1∥Xi∥≥ tn,k ∥H + ∥E wΦ( Y, θ )1∥X∥≥ tn,k 
+
+∥H
+
+≤ ∥ (wΦ)( Yi, θ (Xi)) 1∥Xi∥≥ tn,k ∥H + E ∥(wΦ)( Yi, θ (Xi)) 1∥Xi∥≥ tn,k ∥H
+
+
+
+≤ 2∥w∥∞,
+
+where we used the fact that, for any θ ∈ S, ∥Φ( θ)∥H ≤ 1. Finally, we have, 
+
+E [∥ξi∥2
+
+> H
+
+] ≤ E ∥wΦ( Y θ (X)) 1∥X∥≥ tn,k ∥2
+
+> H
+
+
+
+≤ ∥ w∥2
+
+> ∞
+
+E 1∥Xi∥≥ tn,k 
+
+
+
+= ∥w∥2
+
+> ∞
+
+kn .
+
+We can now apply Theorem C.1 which yields, with probability no less than 1 − δ,
+
+∥ 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+ξi∥H ≤
+
+p2 log(1 /δ )kn ∥w∥∞ +
+
+√kn ∥w∥∞ + 4∥w∥∞ log(1 /δ )3n . (C.8) Multiplying this inequality by nk , we get the result. Combining the high probability bound obtained in Proposition C.2 with equation (C.7), and using the estimate ∥w∥∞ ≤ max( τ, 1 − τ ), we obtain the result stated in Proposition 3.6. 
+
+## C.4 Proof of Theorem 3.3 
+
+The first part of the proof consists in replacing the empirical risk bRk by the intermediate risk eRk and 
+
+bhλ,k by ehλ the minimizer of eRk(h) + λ∥h∥2
+
+> H
+
+. We have 
+
+R(λ) 
+
+> tn,k
+
+(bhλ,k ) = λ∥bhλ,k ∥2 
+
+> H
+
++ Rtn,k (bhλ,k )= bR(λ) 
+
+> k
+
+(bhλ,k ) + 
+
+
+
+Rtn,k (bhλ,k ) − bRk(bhλ,k )
+
+
+
+≤ bR(λ) 
+
+> k
+
+(ehλ) + 
+
+
+
+Rtn,k (bhλ,k ) − bRk(bhλ,k )
+
+
+
+= eR(λ) 
+
+> k
+
+(ehλ) + 
+
+
+
+Rtn,k (bhλ,k ) − eRk(bhλ,k )
+
+
+
++
+
+ bRk(ehλ) − eRk(ehλ)
+
+
+
+−
+
+ bRk(bhλ,k ) − eRk(bhλ,k )
+
+| {z }
+
+> d1
+
+.
+
+The term d1 has its absolute value controlled by 
+
+|d1| = 1
+
+k
+
+> n
+
+X
+
+> i=1
+
+(ℓ′ 
+
+> τ
+
+(bhλ,k (θ(i)), Y i) − ℓ′ 
+
+> τ
+
+(ehλ(θ(i)), Y i))( 1∥Xi∥≥∥ X(k)∥ − 1∥Xi∥≥ tn,k )
+
+≤ max( τ, 1 − τ )∥bhλ,k − ehλ∥∞
+
+k
+
+> n
+
+X
+
+> i=1
+
+1∥Xi∥≥∥ X(k)∥ − 1∥Xi∥≥ tn,k .
+
+41 From Lemma 3.2, we have 
+
+∥bhλ,k − ehλ,t n,k ∥∞ ≤ ∥ bhλ,k − ehλ,t n,k ∥H ≤ max( τ, 1 − τ )2λk 
+
+> n
+
+X
+
+> i=1
+
+1∥Xi∥≥ tn,k − k .
+
+and, the equality (B.3) still holds, that is, 
+
+> n
+
+X
+
+> i=1
+
+|1∥Xi∥≥∥ X(k)∥ − 1∥Xi∥≥ tn,k | =
+
+> n
+
+X
+
+> i=1
+
+1∥Xi∥≥ tn,k − k .
+
+Replacing in the inequality for |d1|, we obtain 
+
+|d1| ≤ max( τ, 1 − τ )2
+
+2λk 2
+
+> n
+
+X
+
+> i=1
+
+1∥Xi∥≥ tn,k − k 2
+
+. (C.9) Now that we have bounded d1, we can proceed with the decomposition of the penalized risk and replace the intermediate SVM solution ehλ,t n,k by the true SVM solution h∗ 
+
+> λ,t n,k
+
+. Using the fact that ehλ,t n,k 
+
+minimizes the penalized pseudo-empirical risk yields 
+
+eR(λ) 
+
+> k
+
+(ehλ) + 
+
+
+
+Rtn,k (bhλ,k ) − eRk(bhλ,k )
+
+
+
+≤ eR(λ) 
+
+> k
+
+(h∗ 
+
+> λ,t n,k
+
+) +  Rtn,k (bhλ,k ) − eRk(bhλ,k )
+
+= R(λ) 
+
+> tn,k
+
+(h∗ 
+
+> λ,t n,k
+
+) +   eRk(h∗ 
+
+> λ,t n,k
+
+) − R tn,k (h∗ 
+
+> λ,t n,k
+
+) −   eRk(bhλ,k ) − R tn,k (bhλ,k )| {z }
+
+> d2
+
+We now bound with high probability both terms d1 and d2. Combining Lemma 3.2 and Proposition 3.6 we obtain that, with probability no less than 1 − 3δ, we have simultaneously 
+
+> n
+
+X
+
+> i=1
+
+1∥Xi∥≥ tn,k − k ≤ p2k log(1 /δ ) + log(1 /δ )3 (C.10) and 
+
+∥bhλ,k −h∗ 
+
+> λ,t n,k
+
+∥H ≤ max( τ, 1 − τ )
+
+λ
+
+1
+
+√k + 3 
+
+r log(1 /δ )2k + 3 log(1 /δ )2k
+
+!
+
+= max( τ, 1 − τ )
+
+λ√k C(k, δ ) = ρ(λ, k, δ ).
+
+(C.11) Combining (C.9) with (C.10), we obtain that, on this high probability event, 
+
+d1 ≤ max( τ, 1 − τ )2
+
+λk 
+
+r log(1 /δ )2 + log(1 /δ )3√k
+
+2
+
+= D1(λ, k, δ ).
+
+Leveraging the bound on the distance ∥bhλ,k − h∗ 
+
+> λ,t n,k
+
+∥H provided by (C.11) also yields 
+
+d2 =   eRk(h∗ 
+
+> λ,t n,k
+
+) − R tn,k (h∗ 
+
+> λ,t n,k
+
+) −   eRk(bhλ,k ) − R tn,k (bhλ,k )
+
+≤ sup  
+
+> h∈BH(h∗
+> λ,t n,k ,ρ (λ,k,δ ))
+
+  eRk(h∗ 
+
+> λ,t n,k
+
+) − R tn,k (h∗ 
+
+> λ,t n,k
+
+) −   eRk(h) − R tn,k (h) . (C.12) It remains to provide a high probability bound for the right-hand side of the last inequality. Denote, for h ∈ BH(h∗ 
+
+> λ,t n,k
+
+, ρ (λ, k, δ )), 
+
+Zh =  ℓ′ 
+
+> τ
+
+(Yi, h ∗ 
+
+> λ,t n,k
+
+(Xi)) − ℓ′ 
+
+> τ
+
+(Yi, h (Xi)) 1{∥ Xi∥ ≥ tn,k },
+
+42 Equation (C.12) is equivalent to 
+
+d2 ≤ sup  
+
+> h∈BH(h∗
+> λ,t n,k ,ρ (λ,k,δ ))
+
+1
+
+k
+
+> n
+
+X
+
+> i=1
+
+ Zh − E [Zh]  .
+
+Define 
+
+ψn,k,δ = E
+
+ sup  
+
+> h∈BH(h∗
+> λ,t n,k ,ρ (λ,k,δ ))
+
+1
+
+k
+
+> n
+
+X
+
+> i=1
+
+ Zh − E [Zh]  .
+
+We have, for any h ∈ BH(h∗ 
+
+> λ,t n,k
+
+, ρ (λ, k, δ )), 
+
+Zh − E [Zh] ≤ 2 max( τ, 1 − τ )ρ(λ, k, δ )and 
+
+E (Zh − E [Zh]) 2 = E (ℓ′ 
+
+> τ
+
+(Yi, h ∗ 
+
+> λ,t n,k
+
+(Xi)) − ℓ′ 
+
+> τ
+
+(Yi, h (Xi))) 21{∥ Xi∥ ≥ tn,k }
+
+≤ max( τ, 1 − τ )2ρ(λ, k, δ )2E [1{∥ Xi∥ ≥ tn,k }]= max( τ, 1 − τ )2ρ(λ, k, δ )2 kn .
+
+Note that the set of functions we are considering is BH(h∗ 
+
+> λ,t n,k
+
+, ρ (λ, k, δ )), which is separable by sepa-rability of the RKHS H (see for instance Lemma 4.33 in Steinwart and Christmann (2011) with the continuity of the kernel k) and the metric induced by the norm ∥·∥ H dominates the pointwise conver-gence by the reproducing property of H. Hence, the set ( h∗ 
+
+> λ,t n,k
+
+, ρ (λ, k, δ )) is pointwise measurable, and Talagrand’s inequality may be applied. It follows that, from Talagrand’s inequality (see Theorem 7.5 in Steinwart and Christmann (2008) with γ = 12 ), with probability 1 − δ,sup  
+
+> h∈BH(h∗
+> λ,t n,k ,ρ (λ,k,δ ))
+> n
+
+X
+
+> i=1
+
+Zh − E [Zh] ≤ 32 kψ n,k,δ + max( τ, 1 − τ )ρ(λ, k, δ )
+
+p2k log(1 /δ ) + 16 log(1 /δ )3
+
+
+
+Multiplying both sides by 1 
+
+> k
+
+, we obtain that, on the event with probability 1 − 4δ where the previous inequality, (C.10), and (C.11) hold simultaneously, we have 
+
+d2 ≤ 32 ψn,k,δ + max( τ, 1 − τ )ρ(λ, k, δ )
+
+r 2 log(1 /δ )
+
+k + 16 log(1 /δ )3k
+
+!
+
+. (C.13) We now bound the expectation ψn,k,δ . To this end, let σ = ( σ1, . . . , σ n) be a sequence of independent Rademacher variables. We introduce the Rademacher average 
+
+Rσk = 1
+
+k Eσ
+
+h
+
+sup  
+
+> ∥h−h∗
+> λ,t n,k ∥H≤ρ(λ,k,δ )
+> n
+
+X
+
+> i=1
+
+σi
+
+ ℓ′ 
+
+> τ
+
+(Yi, h ∗ 
+
+> λ,t n,k
+
+(Xi)) − ℓ′ 
+
+> τ
+
+(Yi, h (Xi)) 1∥Xi∥≥ tn,k 
+
+i
+
+= 1
+
+k Eσ
+
+h
+
+sup  
+
+> ∥h−h∗
+> λ,t n,k ∥H≤ρ(λ,k,δ )
+> n
+
+X
+
+> i=1
+
+σi
+
+ ℓτ (Yi, h ∗ 
+
+> λ,t n,k
+
+(Xi)) − ℓτ (Yi, h (Xi)) 1∥Xi∥≥ tn,k 
+
+i
+
+where we recall that ℓτ is the non-modified pinball loss. Following the classical symmetrization argu-ment, we have 
+
+ψn,k,δ = E
+
+h
+
+sup  
+
+> ∥h−h∗
+> λ,t n,k ∥H≤ρ(λ,k,δ )
+
+  eRk(h∗ 
+
+> λ,t n,k
+
+) − R tn,k (h∗ 
+
+> λ,t n,k
+
+) −   eRk(h) − R tn,k (h) i
+
+≤ 2E [Rσk ] .
+
+(C.14) 43 Now, by symmetry of the Rademacher variables σi,
+
+Eσ
+
+h nX
+
+> i=1
+
+σiℓτ (Yi, h ∗ 
+
+> λ,t n,k
+
+(Xi)) 
+
+i
+
+= 0 thus 
+
+Rσk = 1
+
+k Eσ
+
+h
+
+sup  
+
+> ∥h−h∗
+> λ,t n,k ∥H≤ρ(λ,k,δ )
+> n
+
+X
+
+> i=1
+
+σiℓτ (Yi, h (Xi)) 1∥Xi∥≥ tn,k 
+
+i
+
+Now, by the conditioning lemma from Lhaut et al. (2022) (see Lemma 2.1), we have the equality in distribution nX
+
+> i=1
+
+σiℓτ (Yi, h (Xi)) 1{∥ Xi∥ ≥ tn,k } d
+
+=
+
+> K
+
+X
+
+> i=1
+
+σiℓτ (Y ki , h (Xki )) where (( Xk 
+
+> 1
+
+, Y k 
+
+> 1
+
+), . . . , (Xkn , Y kn )) are independent variables with distribution L (( Xi, Y i) | ∥ Xi∥ ≥ tn,k )and K ∼ Bin (n, kn ) is independent from the Xki , Y ki , σ i. We obtain 
+
+E [Rσk ] = 1
+
+k E
+
+h
+
+Eσ
+
+h
+
+sup  
+
+> ∥h−h∗
+> λ,t n,k ∥H≤ρ(λ,k,δ )
+> K
+
+X
+
+> i=1
+
+σiℓτ (Y ki , h (Xki )) 
+
+ii 
+
+= 1
+
+k E
+
+KE
+
+Eσ
+
+ 1
+
+K sup  
+
+> ∥h−h∗
+> λ,t n,k ∥H≤ρ(λ,k,δ )
+> K
+
+X
+
+> i=1
+
+σiℓτ (Y ki , h (Xki )) K
+
+ .
+
+(C.15) We now provide a bound for 
+
+Eσ
+
+ 1
+
+K sup  
+
+> ∥h−h∗
+> λ,t n,k ∥H≤ρ(λ,k,δ )
+> K
+
+X
+
+> i=1
+
+σiℓτ (Y ki , h (Xki )) K
+
+ .
+
+Now, notice that the pinball loss is distance based. More precisely, we have 
+
+ℓτ (Y ki , h (Xki )) = gτ (h(Xki ) − Y ki )where gτ is defined by gτ (x) = (1 − τ )1x≥0 − τ x 1x< 0. gτ is max( τ, 1 − τ ) Lipschitz, hence, by the contraction lemma (see Ledoux and Talagrand (2013), see also Theorem 5.7 in Mohri (2018)), 
+
+Eσ
+
+ 1
+
+K sup  
+
+> ∥h−h∗
+> λ,t n,k ∥H≤ρ(λ,k,δ )
+> K
+
+X
+
+> i=1
+
+σiℓτ (Y ki , h (Xki )) K
+
+
+
+≤ max( τ, 1 − τ )Eσ
+
+ 1
+
+K sup  
+
+> ∥h−h∗
+> λ,t n,k ∥H≤ρ(λ,k,δ )
+> K
+
+X
+
+> i=1
+
+σi(h(Xki ) − Y ki ) K
+
+
+
+= max( τ, 1 − τ )Eσ
+
+ 1
+
+K sup  
+
+> ∥h−h∗
+> λ,t n,k ∥H≤ρ(λ,k,δ )
+> K
+
+X
+
+> i=1
+
+σi(h(Xki ) − h∗ 
+
+> λ,t n,k
+
+(Xki )) K
+
+
+
+= max( τ, 1 − τ )Eσ
+
+"
+
+1
+
+K sup 
+
+> h∈BH(ρ(λ,k,δ ))
+> K
+
+X
+
+> i=1
+
+σih(Xki ) K
+
+#
+
+where the second equality holds once again because of the symmetry of the Rademacher variables. Now, it holds from Proposition 6.12 in Mohri (2018) that 
+
+E
+
+"
+
+1
+
+K sup 
+
+> h∈BH(ρ(λ,k,δ ))
+> K
+
+X
+
+> i=1
+
+σih(Xki ) K
+
+#
+
+≤ ρ(λ, k, δ )
+
+√K .
+
+44 Thus, we obtain, from C.15 and then applying Jensen’s inequality, 
+
+E [Rσk ] ≤ max( τ, 1 − τ )
+
+k ρ(λ, k, δ )E
+
+h√K
+
+i
+
+≤ max( τ, 1 − τ )
+
+k ρ(λ, k, δ )pE [K]= max( τ, 1 − τ )
+
+√k ρ(λ, k, δ ).
+
+Finally, replacing the bound we obtain for the Rademacher average in (C.14), we get 
+
+ψn,k,δ ≤ 2 max( τ, 1 − τ )
+
+√k ρ(λ, k, δ ). (C.16) Combining this inequality with (C.13), we obtain that, on an event with probability no less than 1 −4δ,
+
+d2 ≤ max( τ, 1 − τ )ρ(λ, k, δ )
+
+√k 3 + 
+
+r 2 log(1 /δ )
+
+k + 16 log(1 /δ )3k
+
+!
+
+= max( τ, 1 − τ )2
+
+λk C(k, δ )
+
+
+
+3 + 
+
+r 2 log(1 /δ )
+
+k + 16 log(1 /δ )3k
+
+
+
+.
+
+# References 
+
+Aronszajn, N. (1950). Theory of reproducing kernels. Transactions of the American mathematical society , 68(3):337–404. Asadi, P., Davison, A. C., and Engelke, S. (2015). Extremes on river networks. The Annals of Applied Statistics , 9(4). Bartlett, P., Bousquet, O., and Mendelson, S. (2005). Local rademacher complexities. Annals of Statistics , 33(4):1497–1537. Beirlant, J., Goegebeur, Y., Segers, J., and Teugels, J. L. (2006). Statistics of extremes: theory and applications . John Wiley & Sons. Ben-David, S., Blitzer, J., Crammer, K., Kulesza, A., Pereira, F., and Vaughan, J. W. (2010). Atheory of learning from different domains. Machine learning , 79(1):151–175. Bercu, B., Delyon, B., and Rio, E. (2015). Concentration inequalities for martingales. In Concentration Inequalities for Sums and Martingales , pages 61–98. Springer. Berlinet, A. and Thomas-Agnan, C. (2011). Reproducing kernel Hilbert spaces in probability and statistics . Springer Science & Business Media. Blanchard, G., Bousquet, O., and Massart, P. (2008). Statistical performance of support vector machines. Annals of Statistics , 36:489–531. Boucheron, S., Bousquet, O., and Lugosi, G. (2005). Theory of classification: A survey of some recent advances. ESAIM: probability and statistics , 9:323–375. Bousquet, O. (2002). A bennett concentration inequality and its application to suprema of empirical processes. Comptes Rendus Mathematique , 334(6):495–500. 45 Bousquet, O. and Elisseeff, A. (2002). Stability and generalization. Journal of machine learning research , 2(Mar):499–526. Buritic´ a, G. and Engelke, S. (2024). Progression: an extrapolation principle for regression. arXiv preprint arXiv:2410.23246 .Cai, J.-J., Einmahl, J. H., and De Haan, L. (2011). Estimation of extreme risk regions under multi-variate regular variation. Caponnetto, A. and De Vito, E. (2007). Optimal rates for the regularized least-squares algorithm. 
+
+Foundations of Computational mathematics , 7(3):331–368. Chernozhukov, V., Fern´ andez-Val, I., and Kaji, T. (2017). Extremal Quantile Regression. In Handbook of Quantile Regression . Chapman and Hall/CRC. Cl´ emen¸ con, S., Huet, N., and Sabourin, A. (2025). On regression in extreme regions. Electronic Journal of Statistics , 19(2):4784–4828. Cl´ emen¸ con, S., Jalalzai, H., Lhaut, S., Sabourin, A., and Segers, J. (2023). Concentration bounds for the empirical angular measure with statistical learning applications. Bernoulli , 29(4):2797 – 2827. Cl´ emen¸ con, S. and Sabourin, A. (2026). Weak signals and heavy tails: learning theory meets extreme value analysis. Extremes , pages 1–43. Coles, S. G. and Tawn, J. A. (1991). Modelling extreme multivariate events. Journal of the Royal Statistical Society Series B: Statistical Methodology , 53(2):377–392. Coles, S. G. and Tawn, J. A. (1994). Statistical methods for multivariate extremes: an application to structural design. Journal of the Royal Statistical Society: Series C (Applied Statistics) , 43(1):1–31. Daouia, A., Gardes, L., and Girard, S. (2013). On kernel smoothing for extremal quantile regression. 
+
+Bernoulli , 19(5B):2557–2589. de Carvalho, M., Kumukova, A., and Dos Reis, G. (2022). Regression-type analysis for multivariate extreme values. Extremes , 25(4):595–622. De Haan, L. and Resnick, S. (1987). On regular variation of probability densities. Stochastic processes and their applications , 25:83–93. Devroye, L., Gy¨ orfi, L., and Lugosi, G. (2013). A probabilistic theory of pattern recognition , volume 31. Springer Science & Business Media. Eberts, M. and Steinwart, I. (2012). Optimal regression rates for svms using gaussian kernels. Electronic Journal of Statistics , 6:2627–2668. Einmahl, J. H., Piterbarg, V. I., and de Haan, L. (2001). Nonparametric estimation of the spectral measure of an extreme value distribution. The Annals of Statistics , 29(5):1401 – 1423. Einmahl, J. H. and Segers, J. (2009). Maximum empirical likelihood estimation of the spectral measure of an extreme-value distribution. The Annals of Statistics , pages 2953–2989. Engelke, S., Gnecco, N., and Sabourin, A. (2026). Extrapolation in statistical learning with extreme value theory. Engelke, S. and Hitz, A. S. (2020). Graphical models for extremes. Journal of the Royal Statistical Society Series B: Statistical Methodology , 82(4):871–932. 46 Gin´ e, E. and Guillou, A. (2001). On consistency of kernel density estimators for randomly censored data: rates holding uniformly over adaptive intervals. In Annales de l’IHP Probabilit´ es et statistiques ,volume 37, pages 503–522. Huet, N., Naveau, P., and Sabourin, A. (2025). Multi-site modelling and reconstruction of past extreme skew surges along the french atlantic coast. arXiv preprint arXiv:2505.00835 .Jalalzai, H., Cl´ emen¸ con, S., and Sabourin, A. (2018). On binary classification in extreme regions. 
+
+Advances in Neural Information Processing Systems , 31. Jalalzai, H., Colombo, P., Clavel, C., Gaussier, E., Varni, G., Vignon, E., and Sabourin, A. (2020). Heavy-tailed representations, text polarity classification & data augmentation. Advances in Neural Information Processing Systems , 33:4295–4307. Koenker, R. (2020). Quantile regression: 40 years on. Annual Review of Economics , 12:155–176. Koenker, R. and Bassett, G. (1978). Regression quantiles. Econometrica , 46(1):33–50. Lecu´ e, G. and Mendelson, S. (2012). General nonexact oracle inequalities for classes with a subexpo-nential envelope. Annals of Statistics , 40(2):832–860. Ledoux, M. and Talagrand, M. (2013). Probability in Banach Spaces: isoperimetry and processes .Springer Science & Business Media. Lhaut, S., Sabourin, A., and Segers, J. (2022). Uniform concentration bounds for frequencies of rare events. Statistics & Probability Letters , 189:109610. Lugosi, G. (2002). Pattern classification and learning theory. In Principles of nonparametric learning ,pages 1–56. Springer. Meister, M. and Steinwart, I. (2016). Optimal learning rates for localized svms. Journal of Machine Learning Research , 17(194):1–44. Mhalla, L., Chavez-Demoulin, V., and Dupuis, D. J. (2020). Causal mechanism of extreme river discharges in the upper danube basin network. Journal of the Royal Statistical Society Series C: Applied Statistics , 69(4):741–764. Mohri, M. (2018). Foundations of machine learning. Pasche, O. C., Wider, J., Zhang, Z., Zscheischler, J., and Engelke, S. (2025). Validating deep learning weather forecast models on recent high-impact extreme events. Artificial Intelligence for the Earth Systems , 4(1):e240033. Resnick, S. I. (2008). Extreme values, regular variation, and point processes , volume 4. Springer Science & Business Media. Smale, S. and Zhou, D.-X. (2003). Estimating the approximation error in learning theory. Analysis and Applications , 1(01):17–41. Steinwart, I. and Christmann, A. (2008). Support vector machines . Springer Science & Business Media. Steinwart, I. and Christmann, A. (2011). Estimating conditional quantiles with the help of the pinball loss. Bernoulli , 17(1):211–225. Steinwart, I. and Thomann, P. (2017). liquidsvm: A fast and versatile svm package. arXiv preprint arXiv:1702.06899 .Sugiyama, M., Krauledat, M., and M¨ uller, K.-R. (2007). Covariate shift adaptation by importance weighted cross validation. Journal of Machine Learning Research , 8(5). 47 Takeuchi, I., Le, Q. V., Sears, T. D., and Smola, A. J. (2006). Nonparametric quantile estimation. 
+
+Journal of Machine Learning Research , 7(45):1231–1264. Vaart, A. v. d. and Wellner, J. A. (1997). Weak convergence and empirical processes with applications to statistics. Journal of the Royal Statistical Society-Series A Statistics in Society , 160(3):596–608. 48

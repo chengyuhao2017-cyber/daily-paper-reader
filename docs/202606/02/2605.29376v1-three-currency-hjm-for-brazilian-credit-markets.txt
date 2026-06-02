@@ -1,0 +1,2275 @@
+Title: Three-Currency HJM for Brazilian Credit Markets
+
+URL Source: https://arxiv.org/pdf/2605.29376v1
+
+Published Time: Fri, 29 May 2026 00:38:03 GMT
+
+Number of Pages: 53
+
+Markdown Content:
+# Three-Currency HJM for Brazilian Credit Markets 
+
+Raphael R. R. Coelho ∗
+
+May 29, 2026 
+
+Abstract 
+
+This paper develops a three-currency Heath-Jarrow-Morton framework in which corporate credit is treated as a separate economy, connected to the nominal and real economies through synthetic inflation and credit exchange rates. The framework produces a testable identity. Under joint no-arbitrage, the credit spread of an issuer expressed over the inflation-rate-indexed risk-free curve equals the same issuer’s credit spread expressed over the nominal-rate-indexed risk-free curve plus the model-implied breakeven inflation forward at the same maturity. The identity holds within any single calibration of the framework. It is empirically falsifiable across two parallel corporate-bond segments of the same market: in a segmented market the two segments may price different corporate credit economies, and the gap be-tween their implied corporate forwards measures the failure of the shared-credit-economy assumption. Applied to Brazilian debenture markets, the framework delivers a sharp empirical finding. Fifteen large issuers placed paper in both the CDI-indexed general-purpose segment and the IPCA-indexed infrastructure segment between January 2021 and February 2026. The within-issuer triangle residual at the 3-year tenor averages 640 basis points, with cross-sectional standard deviation of 26 basis points across the 15 issuer means, and remains stable through both the 2021-2023 BCB tightening cycle and the 2024-2026 easing phase. A retail post-tax indifference benchmark anchored on Lei 12.431 closes the bulk of the residual. The remainder is consistent with institutional participation on the CDI side, contractual asymmetries between debentures with different use-of-proceeds restrictions, and segment-specific liquidity gaps. 
+
+Keywords: HJM term structure; no-arbitrage restrictions; credit spread modelling; inflation-linked debt; tax clientele. 
+
+JEL classification: G12, G13, G18. 
+
+# 1 Introduction 
+
+Heath et al. [1992] showed that arbitrage-free term-structure dynamics impose a drift restriction on forward rates within a single curve. The restriction determines the drift of each forward rate from the volatility structure once a numeraire is fixed, and it remains the workhorse condition 
+
+> ∗
+
+Independent researcher. Email: raphaelrrcoelho@gmail.com. 
+
+1
+
+> arXiv:2605.29376v1 [q-fin.MF] 28 May 2026
+
+behind most of the term-structure literature that followed. Less studied is the parallel question for an investor who simultaneously observes several term structures of different indexations on the same set of underlying issuers. When a single legal entity raises debt in a nominal-rate-indexed segment and in an inflation-rate-indexed segment of the same fixed-income market, what no-arbitrage restriction must its two credit-spread curves satisfy? The within-curve drift condition is silent on the question. The natural setting in which to ask it is a Heath-Jarrow-Morton economy with three cur-rencies. Jarrow and Yildirim [2003] treat the nominal and real economies as separate economies linked through inflation as a synthetic exchange rate. The construction in this paper adds cor-porate credit as a third economy connected to the nominal economy through a credit exchange rate, defined as the discounted ratio of a corporate-credit bank account and the nominal-risk-free bank account. The three pricing measures are linked through their numeraire ratios, and joint absence of arbitrage forces an algebraic identity between three observable forward objects: the issuer’s credit spread over the nominal-indexed risk-free curve, the same issuer’s credit spread over the inflation-indexed risk-free curve, and the model-implied breakeven inflation forward at the same maturity. The identity says the inflation-indexed credit spread equals the nominal-indexed credit spread plus the breakeven inflation forward, provided both segments price the same under-lying corporate-credit economy. It is the cross-curve analog of the HJM drift condition: it does not constrain the dynamics of any single curve, but it constrains the joint level of two corporate spread curves observed under different risk-free bases. The identity is testable. Each segment defines its own observed corporate forward, equal to its risk-free forward plus the segment’s observed credit spread. The framework’s shared-credit-economy null is that these two implied corporate forwards coincide. The empirical content of the framework, in a market with two parallel corporate segments, is whether the null holds. If it does, both segments price the same credit economy and the framework’s three-currency structure characterises that pricing. If it fails, the gap between the two implied corporate forwards measures the failure of the shared-credit-economy assumption, and the explanation lies outside the framework, in the institutional mechanism that separates the two clienteles. Brazilian debenture markets are a setting in which the test is sharply informative. Two par-allel segments exist with partly overlapping but institutionally distinct issuer universes: general-purpose debentures indexed to CDI and infrastructure debentures indexed to IPCA. Both seg-ments trade through JGP Idex constituent baskets. Lei 12.431 exempts individual investors from the 15 percent withholding tax otherwise applied to debenture coupons under Lei 11.033, conditional on the debenture qualifying as infrastructure under the statute. The exemption produces a marginal-investor wedge: retail investors are tax-advantaged on the IPCA side and tax-disadvantaged on the CDI side, while institutional investors, who dominate the CDI seg-ment, are not subject to the wedge. The wedge breaks the shared-credit-economy assumption in a known and quantifiable direction. For 15 large issuers active in both segments between 2021 and 2026, the within-issuer triangle residual at the 3-year tenor averages 640 basis points, with cross-sectional standard deviation of 26 basis points across the 15 issuer means. The narrow cross-sectional dispersion indicates 2that the gap is a property of the segments rather than of issuer-specific credit risk. A retail post-tax indifference benchmark anchored on Lei 12.431 accounts for the bulk of the residual. The remainder is consistent with institutional participation on the CDI side and with structural and liquidity asymmetries between general-purpose and use-of-proceeds-restricted infrastructure debentures. The contribution sits between two strands of the literature. The first is multi-currency term-structure modelling. Jarrow and Yildirim [2003] provide the nominal-real foundation. Credit extensions of HJM developed in Schönbucher [2000], Eberlein and Özkan [2003], and Bielecki and Rutkowski [2002] treat credit within a single economy and study default-time intensity rather than parallel-curve spreads; the intensity-based framework of Duffie and Singleton [1999] provides the closest precedent for the reduced-form treatment of corporate credit adopted here. Multi-curve frameworks following Mercurio [2010] address post-crisis basis spreads between OIS, LIBOR, and tenor-specific discount curves, but the curves they relate share an indexation. The closest precedent in spirit is the inflation-linked literature on real-nominal arbitrage in sovereign markets, which uses a two-curve breakeven identity to characterise no-arbitrage between govern-ment nominal and inflation-indexed bonds. The contribution here is the three-curve restriction that emerges when corporate credit is added as a separate economy alongside nominal and real, and the recognition that the resulting identity becomes empirically informative when applied to two parallel corporate segments of the same fixed-income market. The second strand is empirical clientele effects in fixed income. Tax-induced retail clien-tele effects have a long history in U.S. municipal bonds, where the marginal-investor tax rate is identified from the spread between municipal and taxable corporate yields. The most di-rectly related Brazilian literature studies the fiscal efficiency of Lei 12.431 from the issuer’s side. Pereira and Miterhof [2021] estimate the fraction of foregone federal tax revenue that transfers to project issuers through reduced funding costs, finding pass-through that is partial and varies with debenture duration and rating. Brand [2022] tests whether the fiscal benefit is appropriated by issuers under a no-arbitrage condition on the secondary-market spread between incentivised and non-incentivised debentures. Both studies focus on the supply side of the wedge. The within-issuer cross-segment test developed here measures the wedge from the investor’s pricing under joint no-arbitrage in a three-currency framework, delivering a precise quantitative mag-nitude (640 basis points at the 3-year tenor, with cross-sectional standard deviation of 26 basis points across 15 issuers). The Brazilian credit-spread literature has also documented level and time-series determinants of debenture spreads under the local term-structure setting [Sheng and Saito, 2005, Varga, 2009]; the within-issuer cross-segment test exploiting the parallel CDI- and IPCA-indexed corporate markets has not been reported. The Brazilian setting differs from the U.S. muni precedent in two respects. The exemption is type-specific (infrastructure debentures only) rather than issuer-specific (municipal issuers in the U.S.), and the empirical identification is within-issuer rather than across heterogeneous universes. Within-issuer identification removes rating, sector, and duration composition from the comparison, leaving the segmentation channel as the residual to interpret. 32 The three-currency framework 
+
+The framework treats nominal, real, and corporate-credit instruments as three connected economies in the sense of Jarrow and Yildirim [2003]. Each economy carries its own pricing measure and bank-account numeraire. Two synthetic exchange rates, one for inflation and one for credit, link the three measures, and joint absence of arbitrage pins down both the within-curve drift restrictions and the cross-economy relations between forward-rate dynamics. 
+
+Remark 1 (Inner-product convention) . For volatility-loading vectors x, y ∈ Rm, the symbol 
+
+x · y throughout the paper denotes the ρ-weighted form x⊤ρ y, equal to the instantaneous quadratic covariation d⟨x · W N , y · W N ⟩t/dt , Under the canonical-basis volatility decomposition with PC-aligned blocks introduced in Section B.1.2 and proposition 17, ρ reduces to the identity within each block by construction (PCA factor scores are orthogonal in time), and the standard Euclidean inner product applies for vectors supported on a single block. Cross-block entries of 
+
+ρ are estimated empirically (Section B.4) and enter formulas only through inner products of vectors supported on different blocks. 
+
+2.1 Economies and numeraires 
+
+Let (Ω , F, (Ft)t≥0, QN ) be a filtered probability space carrying a d-dimensional Brownian motion 
+
+W N under the nominal pricing measure QN . The nominal economy is a Heath-Jarrow-Morton economy: a family of forward rates {f N (t, T ) : T ≥ t} satisfies rN (t) = f N (t, t ), where rN is the instantaneous nominal risk-free rate, and evolves under QN as 
+
+df N (t, T ) = αN (t, T ) dt + σN (t, T )⊤dW N (t). (1) The drift αN is pinned by the HJM no-arbitrage condition to σN (t, T )⊤ R Tt σN (t, u ) du . The nominal bank account is BNt = exp  R t 
+
+> 0
+
+rN (u) du .The real economy is defined symmetrically. Under its pricing measure QR, a real bank account BRt = exp  R t 
+
+> 0
+
+rR(u) du  accrues at the instantaneous real risk-free rate rR(t) = f R(t, t ),and the real forward curve evolves as 
+
+df R(t, T ) = αR(t, T ) dt + σR(t, T )⊤dW R(t), (2) with αR determined by the within-curve HJM restriction under QR.The corporate-credit economy follows the same pattern. Let sC (t, t ) denote the instantaneous corporate-credit spread of a representative issuer above the nominal short rate; the credit short rate is rC (t) = rN (t) + sC (t, t ). The credit bank account BCt = exp  R t 
+
+> 0
+
+rC (u) du  accrues at the rate at which a continuously-rolled, instantaneously-resetting corporate-credit position would compound. Under the credit pricing measure QC , the corporate-credit forward curve {f C (t, T )}
+
+evolves as 
+
+df C (t, T ) = αC (t, T ) dt + σC (t, T )⊤dW C (t), (3) with the corresponding HJM drift restriction under QC .42.2 Exchange rates 
+
+Two synthetic exchange rates connect the three economies. The inflation exchange rate It is the level of the consumer price index at t, normalised so that I0 = 1 . Absence of arbitrage between nominal and inflation-indexed instruments requires that ItBRt /B Nt be a QN -martingale, which is equivalent to the dynamics 
+
+dI t
+
+It
+
+= rN (t) − rR(t) dt + σI (t)⊤dW N (t), (4) with inflation-FX volatility σI (t) [Jarrow and Yildirim, 2003]. The drift rN − rR is the model-implied breakeven inflation rate. The credit exchange rate Jt is the analogous object connecting the nominal and corporate-credit economies. Define Jt = BNt /B Ct , the cumulative discount of a corporate-credit-numeraire position relative to a nominal-risk-free position. Under QN , Jt satisfies 
+
+dJ t
+
+Jt
+
+= −sC (t, t ) dt + σJ (t)⊤dW N (t), (5) with credit-FX volatility σJ (t). A position long J loses the instantaneous corporate-credit spread per unit time, by construction. The volatility σJ (t) governs the dynamics of a synthetic instrument that is not directly traded. It is not separately identified from histories of the nominal, real, and corporate forward curves alone: its marginal contribution to a likelihood function over those three curves is degen-erate against the contributions of σN , σR, σC under any finite-factor decomposition consistent with the data. Pricing of credit-FX-sensitive instruments such as quanto credit derivatives re-quires fixing σJ by economic convention or by external instruments. The empirical content of the triangle identity derived in Section 3 does not depend on σJ .
+
+2.3 Change of measure 
+
+Girsanov’s theorem relates the three pricing measures through the exchange-rate dynamics. The Radon-Nikodym derivative from QN to QR is 
+
+dQR
+
+dQN Ft
+
+= E
+
+Z t
+
+> 0
+
+σI (u)⊤ dW N (u)
+
+
+
+, (6) where E(·) denotes the stochastic exponential. The corresponding Brownian motion under QR
+
+is W R(t) = W N (t) − R t 
+
+> 0
+
+σI (u) du . The Radon-Nikodym derivative from QN to QC takes the analogous form with σJ in place of σI , yielding W C (t) = W N (t) − R t 
+
+> 0
+
+σJ (u) du . The change of measure between QR and QC is the composition, with Brownian-motion shift R t 
+
+> 0
+
+[σJ (u) −
+
+σI (u)] du .Drift corrections under change of measure produce the cross-economy relations between forward-rate dynamics. A process whose QN dynamics include σX (t)⊤dW N (t) acquires a quadratic-covariance correction −σX (t)⊤σI (t) dt when its dynamics are rewritten under QR,and −σX (t)⊤σJ (t) dt under QC . These corrections close the system of within-curve drift re-strictions across the three economies. Appendix A contains the explicit bond-price dynamics 5under each measure and the resulting joint drift constraints on σN , σR, σC .
+
+2.4 Spread definitions 
+
+A corporate issuer that raises debt under two parallel index bases admits two conventions for its credit spread. Let f C (t, T ) denote the issuer’s corporate-credit forward curve under the framework. The credit spread expressed over the nominal-rate-indexed risk-free curve is 
+
+sN (t, T ) ≡ f C (t, T ) − f N (t, T ), (7) and the credit spread expressed over the inflation-rate-indexed risk-free curve is 
+
+sR(t, T ) ≡ f C (t, T ) − f R(t, T ). (8) The two spreads share the same corporate forward f C and differ only in the risk-free basis against which the credit is measured. The breakeven inflation forward is the standard differential 
+
+BE( t, T ) ≡ f N (t, T ) − f R(t, T ), (9) which is the model-implied breakeven inflation rate at maturity T .In the Brazilian instantiation developed in Section 4, the nominal-rate-indexed risk-free curve f N is constructed from DI futures, the standard market for Brazilian nominal-rate term structure, and the inflation-rate-indexed risk-free curve f R is constructed from NTN-B prices, Brazilian Treasury notes whose principal is indexed to IPCA. The credit spread sN is identified with the spread of corporate debentures indexed to CDI (denoted sCDI ), and the credit spread 
+
+sR is identified with the spread of corporate debentures indexed to IPCA (denoted sIPCA ). 
+
+# 3 The triangle restriction 
+
+Proposition 2 (Triangle identity) . Under the framework of Section 2, the credit-spread con-ventions (7) and (8) satisfy, identically in t and T ,
+
+sR(t, T ) = sN (t, T ) + BE( t, T ). (10) 
+
+Proof. Subtract (7) from (8). The corporate forward f C cancels, leaving f N − f R = BE .The identity is algebraic, not statistical. It follows from the definitional structure of the two spreads, both expressed relative to the same corporate forward f C . Within any single calibration of the framework, the identity holds by construction. The framework’s empirical content arises when the identity is applied across two parallel corporate-bond segments of a market, each segment generating its own observed corporate forward. 
+
+3.1 From algebraic identity to empirical restriction 
+
+In a market with two parallel corporate-bond segments, two corporate forwards are observable. The nominal-indexed segment yields f C,N  
+
+> mkt
+
+(t, T ) = f N (t, T ) + sN
+
+> mkt
+
+(t, T ) from its observed credit 6spread sN
+
+> mkt
+
+. The inflation-indexed segment yields f C,R  
+
+> mkt
+
+(t, T ) = f R(t, T ) + sR
+
+> mkt
+
+(t, T ) from its observed credit spread sR
+
+> mkt
+
+. The framework’s shared-credit-economy null is that the two implied corporate forwards coincide, 
+
+H0 : f C,N  
+
+> mkt
+
+(t, T ) = f C,R  
+
+> mkt
+
+(t, T ) for all t, T. (11) Equivalently, define the within-issuer triangle residual 
+
+∆( t, T ) ≡ sR
+
+> mkt
+
+(t, T ) − sN
+
+> mkt
+
+(t, T ) − BE( t, T ). (12) The null is ∆ ≡ 0. The residual ∆ measures the gap between the two implied corporate forwards in basis points. The residual admits a transparent interpretation. If the two segments share the same un-derlying corporate-credit economy, the two implied corporate forwards coincide and ∆ = 0 . If the two segments price different corporate economies, ∆ measures the gap. Three classes of mechanisms can produce ∆̸ = 0 : segmentation of marginal investors across the two segments by tax treatment, by investor type, or by institutional access; contractual differences between the segments, such as covenant packages, use-of-proceeds restrictions, or ring-fencing of cash flows, that produce different effective credit risks for the same legal entity; and liquidity differences that produce a discount on the less actively traded side. The test of ∆ = 0 does not separately identify these channels but rejects the shared-credit-economy assumption in their joint presence. 
+
+3.2 Interpretation as a cross-curve no-arbitrage restriction 
+
+The HJM literature derives drift restrictions on forward rates within a single curve, conditional on a chosen numeraire. The triangle identity (10) is a cross-curve restriction of a different structure. It does not constrain the dynamics of any single forward rate. It constrains the joint level of two corporate spread curves measured against two different risk-free bases. The two are equivalent if and only if the framework’s shared-credit-economy assumption holds. A failure of ∆ ≡ 0 does not invalidate the HJM framework or the change-of-measure ma-chinery. It rejects only the joint hypothesis that one corporate-credit economy describes both segments. The empirical violation of ∆ = 0 is informative when accompanied by a candidate mechanism that breaks the shared-credit-economy hypothesis in a known direction. Section 4 describes the regulatory mechanism in the Brazilian setting that breaks the assumption: an income-tax exemption for individual investors in the inflation-indexed segment, sustained by a 2011 statute (Lei 12.431) and absent in the nominal-indexed segment. 
+
+# 4 Brazilian debenture markets and data 
+
+Brazilian fixed-income markets price three benchmark curves and three corporate-credit seg-ments in parallel. The CDI overnight rate anchors the nominal curve through DI futures on B3; ANBIMA-mediated NTN-B prices anchor the real (IPCA-linked) curve; corporate deben-tures trade in two index-tracked families, JGP Idex-CDI and JGP Idex-Infra. The Idex-CDI Core universe tracks the spread of liquid, rated CDI-linked corporate debentures over the DI 7curve across a broad issuer base. The Idex-Infra Core universe tracks the spread of IPCA-linked infrastructure debentures over the NTN-B curve; these instruments are typically issued under 
+
+Lei 12.431. 
+
+Lei 12.431 and the retail tax exemption. Enacted in 2011 to encourage retail funding of long-tenor infrastructure investment, Lei 12.431 exempts qualifying IPCA-linked infrastruc-ture debentures from Brazilian individual-investor income tax on coupons and amortization. The exemption applies to securities meeting use-of-proceeds restrictions tied to specific infras-tructure sectors (energy, sanitation, logistics, telecommunications) and to minimum-tenor and amortization-profile requirements set by inter-ministerial decree. Comparable long-tenor non-infrastructure CDI-linked corporate debentures held by individual investors longer than 720 days face the 15% rate of Lei 11.033. The two regimes coexist over our sample with no overlap in coverage: an infrastructure debenture is either qualifying under 12.431 (exempt) or it is not (subject to 11.033). 
+
+Dual-listed issuers. Many large Brazilian corporates with infrastructure assets fund them-selves through both index families. Telecom operators, electricity utilities, sanitation conces-sionaires, and integrated logistics operators commonly place CDI-linked general-purpose deben-tures alongside IPCA-linked debentures issued under Lei 12.431 against specific infrastructure projects. For each such issuer, the two index families produce two parallel spread quotes ref-erenced to a common legal entity. In our sample, 15 issuers have at least 800 days of joint observation in both index families at the 3-year tenor; the within-issuer comparison restricted to these issuers is the headline test of Section 5.2. 
+
+Marginal investor and clientele structure. The qualifying IPCA-linked infrastructure debenture market is, by construction of the exemption, populated disproportionately by individ-ual investors holding either directly or through self-directed brokerage accounts. The CDI-linked corporate market is held more broadly across investment vehicles: credit funds, multimarket and pension funds, and corporate treasuries. Institutional ownership of Lei 12.431 paper exists but is non-marginal at the level of the headline retail-incentive-driven flow. The distinction at the margin between the two clienteles is what generates the tax-driven price wedge tested below. 
+
+4.1 Data and curve construction 
+
+The empirical test uses four time series aligned on common business dates: nominal forwards from DI futures, real forwards from NTN-B prices, and credit-spread curves from JGP Idex-CDI and Idex-Infra. This subsection describes each source and the alignment. 
+
+4.1.1 Nominal curve: DI futures 
+
+The nominal term structure is extracted from B3-listed DI1 (one-day interbank deposit) futures contracts [B3, 2026]. B3 defines DI1 as an exchange-traded futures contract on the average daily interbank-deposit rate between trade date and maturity, with all listed monthly maturities 8eligible for trading. From the strip of DI1 settlement prices, we bootstrap zero-coupon rates using the standard business-day compounding convention: 
+
+P N (t, T i) = 1
+
+ 1 + yN (t, T i)du (t,T i)/252 , (13) where yN (t, T i) is the annualized yield and du (t, T i) the number of business days from t to 
+
+Ti following the ANBIMA calendar. We convert to continuously compounded instantaneous forward rates via: 
+
+f N (t, T ) = − ∂∂T ln P N (t, T ), (14) implemented numerically as a finite difference on the interpolated zero curve. Interpolation be-tween DI1 maturities uses the flat-forward convention (piecewise-constant forward rates between nodes), which is the market standard and avoids introducing curvature artifacts. The resulting dataset consists of daily nominal forward curves at pillar maturities τ ∈{0.25 , 0.50 , 1, 2, 3, 5, 7, 10 } years over 1,270 business days from 2021-01-04 to 2026-02-05 (after alignment with NTN-B and JGP series, below). 
+
+4.1.2 Real curve: NTN-B government bonds 
+
+The real term structure is derived from NTN-B (Notas do Tesouro Nacional, Série B) prices, which are IPCA-linked government bonds paying semiannual coupons of 6% p.a. on the inflation-adjusted principal. We use ANBIMA indicative prices [ANBIMA, 2021], which reflect the me-dian of broker-dealer quotes and are the standard source for marking-to-market in Brazilian institutional portfolios. From the NTN-B yield-to-maturity quotes {yN T N -B (t, T i)}, we strip the coupon structure to obtain zero-coupon real rates via a bootstrap procedure that accounts for: (i) The business-day compounding convention (same du/ 252 structure as DI). (ii) The semi-annual coupon schedule with IPCA indexation. (iii) The VNA (Valor Nominal Atualizado) accrual convention for the inflation-adjusted prin-cipal. Over the sample, the outstanding NTN-B universe comprises 9 to 14 maturities at any given date, with the longest currently extending to 2060. The stripped zero-coupon real curve is inter-polated using the Svensson [1994] parametrization, an extension of the Nelson and Siegel [1987] family adopted by ANBIMA and standard in the Brazilian term-structure literature [Varga, 2009]; we fit it by nonlinear least squares to match the observed ANBIMA indicative rates to within approximately 20 bp of yield error on typical days. The resulting real forward curves are evaluated at the same pillar maturities as the nominal curve. 
+
+Remark 3 (Maturity mismatch and short-end filter) . The NTN-B grid is substantially coarser than the DI strip (9 to 14 outstanding maturities versus roughly 30 DI1 contracts). Below about six months, NTN-B is genuinely absent from primary issuance, so the Svensson fit at 
+
+τ < 1 year is pure extrapolation. For the real-curve PCA (Section B) we therefore restrict to 9pillars τ ∈ { 1, 2, 3, 5, 7, 10 } years; the full eight-pillar grid is retained only for the cross-sectional curve diagnostics. Decay parameters are shared with the nominal block defined in Section B.1.2. 
+
+4.1.3 Credit spread curves: JGP Idex-CDI and Idex-Infra 
+
+The corporate credit term structures are obtained from the JGP Idex index families [JGP Asset Management, 2026a,b]. The Idex-CDI Core tracks the spread of liquid, rated CDI-linked (CDI +)corporate debentures over the DI curve, across a broad issuer universe. The Idex-Infra Core 
+
+tracks the spread of IPCA-linked (IPCA +) infrastructure debentures over the NTN-B curve; these instruments are typically issued under Lei 12.431, which grants an income-tax exemption to Brazilian individual investors holding infrastructure debentures [Brazilian Federal Government, 2011], creating a distinct retail-driven demand clientele. At each date we form a duration-bucketed spread curve at vertices τi ∈ { 1, 2, 3, 5} years: 
+
+smkt (t, τ i) = 
+
+P 
+
+> d∈Bi(t)
+
+wd(t) sd(t)
+
+P 
+
+> d∈Bi(t)
+
+wd(t) , (15) where Bi(t) is the set of index constituents with modified duration within a half-width of vertex 
+
+τi (half-widths ±0.5 y for the 1, 2, 3-year vertices and ±1.0 y for the 5-year vertex), wd(t) is the constituent weight, and sd(t) its daily quoted spread. The bucketing provides a stable term structure despite the sparse per-debenture quote history. 
+
+From observable quotes to instantaneous forwards. The theoretical objects in the three-currency framework are instantaneous credit-forward spreads sCDI (t, T ) and sIP CA (t, T ). The empirical objects in (15) are duration-bucketed averages of constituent par-yield spreads. We treat smkt (t, τ i) as a discrete-tenor proxy for sCDI (t, t + τi) and sIP CA (t, t + τi), with the un-derstanding that par-yield-to-forward conversion at the constituent level would introduce a duration-dependent convexity correction of at most a few basis points across the maturity range used in the test. The IPCA-linked constituents carry a publication lag relative to nominal data; we align them to a common observation date using the publication-date convention. Robustness checks in Section 6 vary the duration half-widths by ±0.25 y and shift the IPCA lag by ±1 busi-ness day; the mean within-issuer wedge ¯∆i moves by less than 5 bp under either perturbation, which bounds the contribution of this quote-to-forward conversion to the headline result. 
+
+Remark 4 (Constituent universe) . Over our sample, Idex-CDI Core contains 643 unique deben-tures from 181 issuers spanning sectors including Energia , Financeiro , Distribuidores , Industrial ,
+
+Imobiliário , Consumo , Educação , and Insumos ; per-date constituent counts average 195 (min 48, max 346). Idex-Infra Core contains 337 debentures from 108 issuers concentrated in Ener-gia , Saneamento , Logística , Telecom , Bioenergia , Papel e Celulose , Produção Rural , and Metais e Mineração ; per-date counts average 115 (min 38, max 301). The two universes partially overlap: 68 issuers have debentures in both families, which plays a central role in the cross-model test of Section 5.2. The 1-year IPCA + vertex is sparsely populated because Idex-Infra Core concentrates on longer-duration infrastructure debt: even under the wider half-window, only about 8% of sample 10 dates have five or more constituents in the 1-year bucket. Vertex τ = 2 y has 42% coverage, 
+
+τ = 3 y reaches 75%, and τ = 5 y is 97% populated. We therefore use the 3-year pillar as the short-end reference for IPCA + realized-vol identification. 
+
+4.1.4 Data alignment and sample overview 
+
+We align the four time series (DI, NTN-B, Idex-CDI, Idex-Infra) on common business dates, excluding dates with missing observations in any of the rate series (the Idex-Infra spread curves have structural sparsity at short pillars, handled separately). The effective sample comprises 1,270 daily business-day observations from 2021-01-04 to 2026-02-05. PCA and correlation estimation use weekly (Friday-close) changes, yielding 155 weekly observations in the estimation window (2021-01-04 to 2023-12-29) and 110 in the out-of-sample window (2024-01-02 to 2026-02-05). Table 1 reports summary statistics at the 3-year maturity, chosen because it is both densely populated across all four series and the maturity at which the dual-listed issuer test (Section 5.2) is most informative. Table 1: Summary statistics over 2021-01-04 to 2026-02-05 at the 3-year maturity. Rates in % p.a. (continuous compounding); spreads in bp. 
+
+Variable Mean Std Min Max 
+
+f N (t, 3) 11.13 1.43 7.14 14.33 
+
+f R(t, 3) 5.79 1.13 3.05 8.24 Breakeven f N (t, 3) − f R(t, 3) 5.34 0.66 2.82 7.53 
+
+sCDI mkt (t, 3) (bp) 182.4 37.7 125.9 310.9 
+
+sIP CA mkt (t, 3) (bp) 24.2 38.7 −57 .8 123.6 Figure 1 (produced by the calibration code) plots the time series of the same four variables. The 2022 tightening cycle, the mid-2023 disinflation turn, and a localized credit-fund redemption episode in mid-2024 are all visible in the CDI + series. The IPCA + spread series is strikingly lower in level than the CDI + series, averaging about 24 bp over the NTN-B curve versus 182 bp for CDI + over DI. This 160 bp level difference foreshadows the tax-incentive finding of Section 5.2. 11 7              
+
+> 8
+> 9
+> 10
+> 11
+> 12
+> 13
+> 14
+> % p.a.
+> fN(t, 3Y) Nominal forward
+> 3
+> 4
+> 5
+> 6
+> 7
+> 8
+> % p.a.
+> fR(t, 3Y) Real forward
+> 2021 2022 2023 2024 2025 2026
+> 125
+> 150
+> 175
+> 200
+> 225
+> 250
+> 275
+> 300
+> bp
+> sCDI (t, 3Y) CDI+ spread
+> 2021 2022 2023 2024 2025 2026
+> 50
+> 25
+> 0
+> 25
+> 50
+> 75
+> 100
+> 125
+> bp
+> sIPCA (t, 3Y) IPCA+ spread
+
+Figure 1: Time series of the four 3-year series: DI futures yield, NTN-B real yield, sCDI mkt (t, 3) , and 
+
+sIP CA mkt (t, 3) , over the full sample 2021-01-04 to 2026-02-05. The vertical dashed line separates the estimation window (through 2023-12-29) from the out-of-sample window. 
+
+# 5 Within-issuer test of the triangle restriction 
+
+5.1 Calibration summary 
+
+The framework is calibrated as two parallel credit economies. Model A treats CDI + spreads as the credit block; Model B treats IPCA + spreads as the credit block. The nominal and real rate blocks and the inflation FX volatility σI are shared across the two models; the spread loadings, rate-spread correlations, and the credit FX volatility σJ are model-specific. Weekly curve changes identify mN = 3 nominal factors, mR = 2 real factors, and mS = 2 
+
+spread factors. The retained factors explain 84.3% of nominal-rate variance, 90.5% of real-rate variance, 82.4% of CDI + spread-change variance, and 95.9% of IPCA + spread-change variance (Model B is fitted on pillars {2, 3, 5} yr, with the sparsely populated 1-year vertex dropped). The inflation FX volatility, read from monthly IPCA log-returns after deseasonalization, is 
+
+|σI | = 135 bp/ √yr. The credit FX volatilities |σAJ | = 80 .7 and |σBJ | = 75 .9 bp/ √yr are set by convention to the shortest-pillar realized spread volatility, not separately identified from market data; the within-issuer wedge analyzed in Section 5.2 does not depend on this choice (see Remark 25 in Appendix B). Cross-block dependence is read from raw factor-score correlations: within-block PCA or-thogonalizes each block’s loadings, so no further filtering is needed before computing the off-block entries of the 7 × 7 correlation matrix ˆρ. The full matrix is reported in Table 16; an in-sample/out-of-sample comparison for the four pairs of economic interest appears in Table 22. Out-of-sample coverage is adequate for the objects used in the main test. One-week 90% intervals cover nominal-rate changes at 90.9 to 98.2% across reported maturities and CDI +
+
+12 spread changes at 85.5 to 92.7%. Real-rate coverage falls to 69.1 to 75.5% at the 5- and 7-year maturities because the 2024 to 2026 long-end NTN-B moves were larger than in the estimation window. Spread innovations are heavier-tailed than rates, which is the main distributional limitation of the Gaussian HJM specification. 
+
+5.2 Dual-listed test 
+
+For an issuer i observed in both the Idex-CDI and Idex-Infra constituent lists, the common-f C
+
+hypothesis under which Models A and B agree predicts that 
+
+∆i(t) ≡ ¯sIP CA i (t) − ¯sCDI i (t) − [f N (t, ¯τi) − f R(t, ¯τi)] ≈ 0, (16) up to maturity-matching and idiosyncratic noise, where bars denote per-date weight averages across the issuer’s tickers in each family and ¯τi is the average duration matched to the nearest vertex of the breakeven curve. Table 2: Dual-listed issuer test: per-issuer time-series statistics of ∆i (bp) across the 15 dual-listed issuers with the longest joint observation windows. Positive ∆i means IPCA + spread is 
+
+higher than the triangle-consistent level; negative means lower.                                                                        
+
+> Issuer Mean Median Std nobs
+> Eletrobras −629 .6−632 .661.8 1,270 Eneva −660 .2−659 .053.8 1,270 Energisa Mato Grosso - Distribuidora de Energia −625 .5−629 .472.8 1,210 Cemig Distribuicao −604 .8−601 .974.7 1,207 CTEEP −663 .8−668 .663.0 1,190 Sabesp −647 .2−641 .768.3 1,190 Energisa −637 .8−637 .668.7 1,149 BRK AMBIENTAL −693 .7−692 .449.5 1,141 CCR −643 .5−635 .473.1 1,022 Algar Telecom −625 .2−627 .765.2 1,003 Coelce −607 .5−606 .859.3 961 Taesa −663 .1−654 .288.0 943 Coelba −665 .1−667 .147.8 943 Copel Geracao e Transmissao −642 .1−648 .270.8 898 AES Tiete Energia −596 .8−594 .361.8 815
+> Summary across 15 issuers
+> Mean of per-issuer means −640 .4bp Across-issuer std of means 26 .4bp Mean of per-issuer std 65 .2bp Total observations 16,212
+
+Two features dominate Table 2 and Figure 2. Every dual-listed issuer has ∆i negative and clustered in the −600 to −700 bp range: the IPCA + spread on each issuer’s infrastructure debentures is systematically below the triangle-consistent level. The cross-sectional dispersion of issuer means is 26 bp, substantially smaller than the within-issuer time-series standard deviation of ∆i, which averages 65 bp. The wedge is a property of the market segment, not the issuer. The pattern rules out the common-f C hypothesis even within the subset of issuers that trade in both segments. Sign, magnitude, and cross-sectional uniformity all point to the retail-tax channel of Lei 12.431: Brazilian individual investors holding qualifying infrastructure debentures 13 2021 2022 2023 2024 2025 2026  
+
+> 0
+> 200
+> 400
+> 600
+> 800
+> (bp)
+> Triangle consistency gap at = 3Y
+
+Figure 2: Time series of the within-issuer triangle residual ∆i(t) for the 15 dual-listed Brazilian issuers between 2021-01-04 and 2026-02-05. Each line corresponds to one issuer’s ∆i at the 3-year tenor. The residual is uniformly negative and clusters in a narrow band around −640 bp, with cross-sectional standard deviation of issuer means equal to 26 bp, well below the within-issuer time-series standard deviation of approximately 65 bp. The pattern is stable through the 2021–2023 BCB tightening cycle and the 2024–2026 easing phase. with maturity above 720 days pay no income tax on coupons and amortization, whereas the same investors would face a 15% withholding tax on income from a comparable long-tenor non-exempt CDI + debenture [Brazilian Federal Government, 2011, 2004]. Section 5.4 quantifies the tax channel against the observed wedge under both a breakeven-adjusted reading and a raw-spread reading, and treats the residual as a candidate for the institutional, contractual, and liquidity effects discussed there. In modelling terms, the framework’s Models A and B must be treated as distinct credit economies. Forcing both segments into a single f C would absorb a 640 bp deterministic wedge that is structural rather than residual measurement error. 
+
+5.3 Post-tax indifference benchmark 
+
+The triangle-test residual ∆i defined in (12) measures how far the within-issuer comparison departs from the common-credit-economy null. To quantify how much of any such departure is attributable to a known regulatory channel, we derive the prediction of post-tax indifference for a Brazilian retail investor under the Lei 11.033 progressive schedule (15% on debentures held longer than 720 days) with the Lei 12.431 exemption applied to qualifying infrastructure debentures. 
+
+Indifference condition. Let yIP CA (t, τ ) = f N (t, τ ) + sIP CA (t, τ ) denote the nominal yield on an IPCA-linked corporate debenture, having passed inflation through the breakeven, and let 
+
+yCDI (t, τ ) = f N (t, τ )+ sCDI (t, τ ) denote the nominal yield on a CDI-linked corporate debenture. A retail investor exempt on the IPCA leg under Lei 12.431 and taxed at τP F = 0 .15 on the CDI leg is indifferent at the maturity-matched margin when after-tax nominal yields agree: 
+
+yIP CA (t, τ ) = (1 − τP F ) yCDI (t, τ ). (17) 14 Prediction for the raw spread difference (Candidate A). Expanding (17) and rearrang-ing, 
+
+sIP CA (t, τ ) − sCDI (t, τ ) = −τP F 
+
+f N (t, τ ) + sCDI (t, τ ). (18) The post-tax indifference prediction for the raw spread difference is the tax wedge τP F applied to the gross CDI corporate yield. At the 3-year sample means ( f N = 11 .13% , sCDI = 1 .82% )this evaluates to −0.15 × 12 .95% = −194 bp. 
+
+Prediction for the breakeven-adjusted wedge (Candidate B). Substituting (18) into the definition ∆( t, τ ) = sIP CA (t, τ ) − sCDI (t, τ ) − [f N (t, τ ) − f R(t, τ )] gives 
+
+τf iscal (t, τ ) = −f N (t, τ ) − f R(t, τ ) − τP F 
+
+f N (t, τ ) + sCDI (t, τ ). (19) This is the linear post-tax benchmark for the within-issuer wedge ∆. The first term is the deterministic breakeven removal that the definition of ∆ requires; the second is the behavioral tax-wedge component. At the 3-year sample means ( f N − f R = 5 .34% ), τf iscal = −534 − 194 = 
+
+−728 bp at the aggregate level and −733 bp averaged across the 15 dual-listed issuers’ durations. Equations (18) and (19) are arithmetically equivalent: each predicts the same residual η
+
+relative to its corresponding observable. Section 5.4 reports both readings of the per-issuer decomposition. 
+
+Finite-horizon correction. Equation (17) is an instantaneous-yield condition. The exact retail-investor problem applies the tax to the realized payoff over the holding period D, replacing 
+
+(1 − τP F ) yCDI in (17) with 
+
+yaf ter CDI (y, D ) = 1
+
+D ln 1 + (1 − τP F ) eyD − 1 . (20) At the per-issuer means in our sample the correction lies in the 25–45 bp range, averaging 29 bp across the 15 issuers. The exact-form analog of (19) shifts the aggregate τf iscal prediction from 
+
+−728 to approximately −699 bp, with corresponding shifts at each issuer’s duration. 
+
+Scope. The benchmark assumes the marginal IPCA + investor is retail and tax-exempt under 
+
+Lei 12.431. It does not price institutional segmentation on either leg, contractual differences between general-purpose CDI + debentures and use-of-proceeds-restricted infrastructure deben-tures, or residual liquidity premia. Section 5.4 treats those as candidates for the residual η.
+
+5.4 Decomposition of the within-issuer wedge 
+
+Section 5.3 derived the post-tax indifference benchmark τf iscal for the within-issuer wedge un-der (19) (linear) and its finite-horizon counterpart (20). Applied at each issuer’s average duration with the issuer’s time-averaged CDI + spread, the linear form averages τf iscal = −733 .2 bp across the 15 dual-listed names, against ¯∆i = −640 .4 bp; the finite-horizon form averages −698 .9 bp. The corresponding mean residuals ηi = ∆ i − τf iscal (i) are +92 .8 bp (linear, across-issuer s.e. 4.9 bp) and +58 .5 bp (exact, s.e. 4.9 bp). The exact correction narrows but does not eliminate the residual. 15 Table 3 reports the decomposition ∆i = τf iscal (i) + ηi at the issuer level. Issuer ∆i τf iscal (i) Residual Avg. dur. (yr) (bp) (bp) (bp) Eletrobras -630 -731 +101 3.7 Eneva -660 -749 +89 4.6 Energisa Mato Grosso - Distri... -626 -724 +98 3.4 Cemig Distribuicao -605 -718 +114 3.1 CTEEP -664 -741 +77 4.4 Sabesp -647 -732 +84 3.8 Energisa -638 -730 +92 3.8 BRK AMBIENTAL - PARTICIPACOES... -694 -773 +79 4.9 CCR -644 -734 +90 3.7 Algar Telecom -625 -737 +112 3.9 Coelce -608 -696 +89 2.4 Taesa - Transmissora Alianca ... -663 -738 +75 4.3 Coelba -665 -741 +76 4.2 Copel Geracao e Transmissao -642 -735 +93 4.1 AES Tiete Energia -597 -719 +123 3.2 
+
+Mean -640.4 -733.2 +92.8 3.8 Standard error (6.8) (4.3) (3.7) Table 3: Per-issuer decomposition of the within-issuer wedge into a pure retail-tax component and a residual. τf iscal computed from (19) at each issuer’s average duration; η = ∆ i − τf iscal .All values in basis points. Standard errors on the bottom row are across-issuer standard errors of the mean. The mean tax-parity prediction across the 15 issuers is −733 bp; the mean observed wedge is −640 bp; the mean residual η is +93 bp, with cross-sectional standard error of 3.7 bp. In ∆
+
+basis the retail-tax channel accounts for the sign of the wedge and most of its level, with a small positive residual. 
+
+Raw-spread companion. The ∆-basis prediction −733 bp decomposes mechanically into a deterministic breakeven removal −(f N −f R) ≈ − 534 bp at the sample 3-year mean and a behav-ioral tax-wedge component −τP F (f N + sCDI ) ≈ − 194 bp. Only the second component is a tax mechanism; the first is the unit conversion that defines ∆. In raw-spread units, the indifference condition predicts sIP CA i − sCDI i ≈ − 194 bp at the sample 3-year means, against an observed aggregate of −158 bp and a within-issuer mean of approximately −106 bp at the 15 dual-listed names’ average duration. The tax mechanism therefore over-predicts the behavioral spread gap by 50 to 80%, with the residual carrying the opposite sign of the ∆-basis residual. The two readings are arithmetically identical (the wedge ∆ is the raw spread difference minus a deter-ministic breakeven), but they differ in what the reader sees as the size of the tax channel relative to the size of the unexplained part: the retail-tax channel is the dominant mechanism behind the wedge, but it is not the sole one, and the size of the residual under the behavioral read-ing is consistent with non-trivial contributions from institutional pricing and segment-specific structural and liquidity factors discussed below. The positive ∆-basis residual fits three non-exclusive channels we cannot separate cleanly at 16 N = 15 . First, institutional investors are partly marginal on the CDI + side. Pension portfolios, credit funds, and tax-privileged investment vehicles hold a non-trivial share of CDI + debenture flow, and their pricing compresses the pre-tax yield differential that pure retail parity would require. Second, IPCA + Lei 12.431 infrastructure debentures carry contractual features that do not generally appear in same-issuer general-purpose CDI + paper: use-of-proceeds restric-tions, project ring-fencing, and covenant packages designed around long-tenor infrastructure cash flows. Sharing a legal entity does not guarantee identical claim structures, and these struc-tural differences absorb part of the residual that a pure tax-clientele model would otherwise have to attribute to marginal-investor segmentation. Third, IPCA + infrastructure debentures have lower secondary-market turnover than the CDI + core pool, so a small illiquidity discount on the IPCA + side pushes sIP CA i above the post-tax-indifference level. The cross-sectional regression 
+
+∆i = α + β τ f iscal (i) + γ (dur inf ra i − dur cdi i ) + εi (21) appears in Table 4. The univariate β is 1.39 with standard error 0.21 . Adding the duration dif-ferential gives β = 1 .30 with standard error 0.30 and a duration coefficient that is not significant at any conventional level. H0 : β = 1 is not rejected at the 5% level under the two-regressor specification ( p = 0 .34 ). R2 is 0.76 or higher in both specifications. The retail-tax channel tracks the cross-sectional dispersion of ∆i, not just the mean. With N = 15 and τf iscal (i) rang-ing across only about 50 bp (the breakeven term is shared across issuers), the regression is a sensitivity check rather than a primary identification; the mean decomposition is the headline. M1 M2 Intercept α 374 .8 323 .5(157 .1) (206 .6) 
+
+τf iscal (β) 1.385 1.302 
+
+(0 .214) (0 .302) 
+
+Duration differential (γ) — −3.26 (8 .10) 
+
+R2 0.763 0.766 
+
+Adj. R2 0.744 0.727 
+
+p-value: H0 : β = 1 0.096 0.337 
+
+N 15 15 
+
+Table 4: Cross-sectional regression of the within-issuer wedge on the theoretical retail-tax pre-diction, optionally controlling for the infra-minus-CDI duration differential per issuer. Standard errors in parentheses. The hypothesis H0 : β = 1 is the test that the retail-tax mechanism fully explains the cross-sectional variation in ∆i, against the alternative that either over- or under-sensitivity reflects additional channels. Two caveats. The 15% rate applies to debentures held longer than 720 days. All securities in our sample sit comfortably above that threshold, so the rate is uniform across issuers. Were we to extend the test to short-tenor primary issuance, the rate schedule would matter. The decomposition also treats retail as marginal on both sides. If institutional investors set CDI +
+
+prices at the margin, τf iscal overstates the pure tax channel and part of the residual ηi should be 17 reassigned to that channel rather than to a clientele or liquidity premium. Sharper identification would require ownership data from CVM/ANBIMA holdings surveys to estimate the marginal-investor share of each market segment. 
+
+# 6 Robustness 
+
+This section reports the two robustness checks that bear directly on the economic interpretation of the within-issuer wedge: stability of the wedge across the 2021–2023 BCB tightening and 2024–2026 easing regimes, and sensitivity of the wedge to duration-matching and bucketing conventions. 
+
+6.1 Sub-sample split: tightening versus easing regimes 
+
+The 2021-01 onward sample does not include the March to December 2020 COVID episode (Idex-CDI data begins 2021-01-04). The economically meaningful split is between the 2021-01 to 2023-12 BCB tightening cycle, during which the Selic rate rose from 2% to 13.75%, and the 2024-01 to 2026-02 easing phase. Table 5 recomputes the within-issuer wedge ∆i on each sub-sample separately, holding the universe of 15 dual-listed issuers fixed. Regime Mean ∆i (bp) SD across i (bp) SE (bp) N issuers Avg obs/issuer Tightening (2021-01 to 2023-12) -651.2 37.6 9.7 15 573 Easing (2024-01 to 2026-02) -629.4 26.2 6.8 15 508 Full -640.4 26.4 6.8 15 1081 Table 5: Dual-listed wedge ∆i = ¯ sIP CA i − ¯sCDI i − (f N − f R) by monetary-policy regime. The same 15 dual-listed issuers appear in all three rows, with date coverage restricted to the relevant window. The mean wedge is −651 bp in the tightening regime and −629 bp in the easing regime, a difference of 22 bp with combined standard error of about 12 bp. The regime-to-regime difference is marginally distinguishable from zero ( |z| ≈ 1.85 ) but small relative to the wedge level itself. The cross-issuer standard deviation of ∆i is larger in the tightening phase (38 bp) than in the easing phase (26 bp), reflecting greater idiosyncratic spread volatility during the hiking cycle. The retail-tax-parity prediction of Section 5.4, recomputed on each sub-sample, gives −725 bp for the tightening regime and −745 bp for the easing regime. The pure-tax prediction therefore moves in the direction opposite to the observed wedge: higher nominal yields in the easing phase imply a larger tax benefit and therefore a deeper predicted wedge, while the observed wedge is slightly shallower in easing than in tightening. The residual η = ∆ − τf iscal is larger in the easing phase ( +116 bp) than in the tightening phase ( +74 bp). A natural reading is that re-tail investors became less dominant on the CDI + side as credit-fund inflows picked up through 2024 to 2025, or that the illiquidity discount on infrastructure debentures widened around the mid-2024 stress episode. 18 6.2 Duration matching and bucketing 
+
+The headline ∆i = −640 bp is computed at the issuer level from constituent-level spread data, matching each issuer’s average duration to the nearest of the four breakeven pillars τ ∈ { 1, 2, 3, 5}
+
+years. Two sensitivities matter: whether the matching rule itself biases the wedge, and whether the duration half-widths underlying the aggregate-index curves contaminate the within-issuer test. Table 6 reruns the dual-listed test under two alternative matching schemes: linear interpo-lation of the breakeven between pillars at the issuer’s mid-duration, and separate interpolation at each side’s own duration followed by averaging of the two breakevens. The mean ∆i changes by less than 5 bp under either alternative, and the average across-scheme range within a single issuer is 11 bp. The within-issuer wedge is not an artefact of the matching rule. Matching scheme Mean ∆i (bp) SE (bp) Nearest pillar at mid-duration (baseline) -640.4 6.8 Linear interpolation of BE at mid-duration -641.6 6.3 Split-side interpolation (avg of two BEs) -635.9 4.9 Mean across-scheme range per issuer: 10.9 bp Table 6: Duration-matching sensitivity of the dual-listed wedge. All schemes operate on constituent-level data and differ only in how the breakeven forward is matched to each issuer’s average duration. The duration half-widths that define the aggregate CDI + and IPCA + index curves at pillar maturities (baseline ±0.5 yr for τ ∈ { 1, 2, 3} and ±1.0 yr for τ = 5 ) play no role in the within-issuer test, which uses constituent-level spread and duration data directly. They do affect the index-level aggregate gap ∆agg . Recomputed at τ = 3 years under tight ( ±0.25 yr) and wide (±0.75 yr) half-width specifications, the mean aggregate gap varies by less than 2 bp from the baseline. 
+
+# 7 Discussion 
+
+The data reject the shared-credit-economy null at every dual-listed issuer. A within-issuer wedge of −640 bp at the 3-year tenor, with cross-sectional standard deviation of 26 bp across 15 issuers, is too large for measurement noise and too uniform across issuers to be a name-specific credit effect. The mechanism is tax segmentation under Lei 12.431: individual investors face zero income tax on coupons and amortisation of qualifying IPCA-linked infrastructure debentures while bearing the 15% withholding rate of Lei 11.033 on comparable CDI-linked corporate paper. The exemption sustains a retail clientele whose reservation yield on the IPCA-linked side sits permanently below the institutional reservation yield on the CDI-linked side. The Brazilian wedge sits in the same structural family as the U.S. tax-exempt municipal market. Both rest on a tax-induced retail clientele that institutional investors cannot arbitrage because the exemption is investor-specific. Identification here is sharper than in the muni-versus-taxable comparison for two reasons. The wedge is computed within issuer rather than across 19 heterogeneous universes, so rating, sector, and duration composition drop out. And the triangle identity removes nominal-real rate-regime variation before the comparison, so the residual is a clean clientele-segmentation object. The retail-tax benchmark reproduces the sign and bulk of the wedge under the breakeven-adjusted reading (predicted −733 bp against observed −640 bp, residual +93 bp), and over-predicts the raw spread differential under the behavioural reading. The two readings of the decomposition are arithmetically identical; together they bracket the tax channel as the dominant mechanism while leaving room for a residual that institutional pricing on the CDI side, contractual asymmetries, and liquidity differences can plausibly explain. The Gaussian HJM specification is adequate for the rate blocks and useful for credit spreads, but spread innovations are heavier-tailed than the specification supports, and the mid-2024 credit-fund redemption episode visibly stresses the spread block. The main empirical limitation is therefore distributional, not the no-arbitrage restriction: a stochastic-volatility overlay or a jump component on the spread block would better fit stress episodes without changing the three-currency triangle. 
+
+Relation to prior Brazilian estimates. Pereira and Miterhof [2021] estimate the fiscal pass-through of Lei 12.431 from the issuer’s side, measuring the fraction of foregone federal tax revenue that transfers to project funding costs. Brand [2022] tests no-arbitrage appropriation of the same fiscal benefit between incentivised and non-incentivised debentures, finding that the secondary-market spread conforms to the no-arbitrage prediction. Both studies condition on the issuer or instrument. The within-issuer triangle test reads the wedge from the investor’s pricing side under the no-arbitrage restriction of the three-currency framework: 640 bp at the 3-year tenor with 26 bp cross-sectional standard deviation across 15 issuers. The investor-side estimate and the issuer-side fiscal-efficiency estimate are complementary lenses on the same regulatory channel. 
+
+Three limitations. First, the marginal-investor identity is inferred from the size of the resid-ual rather than estimated structurally. Separating the institutional, contractual, and liquidity contributions to the residual would require either holdings data on individual debentures (CVM aggregate ownership disclosures, for example) or a structural model of clientele formation. Sec-ond, the test is confined to the 15 dual-listed issuers with at least 800 days of joint observation, and selection into both index families is non-random; the population wedge estimate is condi-tional on this selection. Third, the Gaussian HJM specification fits rates well but understates the tail behaviour of credit-spread innovations, as the mid-2024 credit-fund redemption episode illustrates. A stochastic-volatility overlay or a jump component on the spread block would ad-dress the distributional limitation without altering the HJM drift logic; a deeper Idex-Infra panel would sharpen Model B factor identification. 
+
+Future work. The natural next step is to extend the dual-listed test as additional infrastruc-ture debentures meet the 800-day joint-observation threshold, exploiting ownership disclosures to bound the marginal-investor mix on each segment directly. A parallel calibration to the Idex-CDI Low-Rated subuniverse would test whether the within-issuer wedge logic extends to 20 a rating-quality dimension. A future regulatory revision to Lei 12.431 would create a natural-experiment opportunity: the framework handles this by calibrating before and after the policy break as separate credit-economy parameter sets. 
+
+Conclusion. The evidence supports a two-credit-economy reading of Brazilian corporate deben-ture markets. CDI + and IPCA + spreads cannot be reconciled by a single credit forward curve once breakeven inflation is removed. The remaining within-issuer wedge is large, stable, and quantitatively aligned with the retail tax exemption on infrastructure debentures. The three-currency HJM construction provides both the no-arbitrage diagnostic that makes the within-issuer comparison precise and the calibration architecture that prices each segment in its own credit economy. 
+
+# A HJM dynamics and change-of-measure derivations 
+
+This appendix develops the formal no-arbitrage conditions, the change-of-measure structure connecting the three pricing measures, and the resulting forward-rate dynamics under the nom-inal measure. The end product is the forward-rate system that the calibration of Appendix B estimates and the simulation in Section B.7 integrates. 
+
+A.1 Overview of the system under QN
+
+Under the nominal pricing measure QN , no-arbitrage between the three economies requires that the discounted values of the real and credit numeraires be martingales. With deterministic volatility loadings and the inner-product convention of Proposition 1, the forward-rate system under QN takes the form 
+
+df N (t, T ) = σN (t, T ) · AN (t, T ) d t + σN (t, T ) · dW Nt ,df R(t, T ) = σR(t, T ) · AR(t, T ) − σR(t, T ) · σI (t) dt + σR(t, T ) · dW Nt ,df C (t, T ) = σC (t, T ) · AC (t, T ) − σC (t, T ) · σJ (t) dt + σC (t, T ) · dW Nt ,
+
+(22) where Aj (t, T ) = R Tt σj (t, u ) d u. The real-curve drift correction is the Jarrow-Yildirim inflation term; the credit-curve correction is its credit-FX analogue. The rest of the appendix derives (22) formally and provides the bond-price dynamics consistent with it. 
+
+A.2 Martingale conditions and exchange-rate dynamics 
+
+A.2.1 Martingale conditions 
+
+We designate the nominal economy as “domestic.” Under QN , absence of arbitrage requires that the discounted nominal values of foreign-economy numeraires be martingales. 
+
+Proposition 5 (Martingale conditions) . The following processes are martingales under the mea-
+
+21 sures indicated: 
+
+It BRt
+
+BNt
+
+is a QN -martingale , (23) 
+
+Jt BCt
+
+BNt
+
+is a QN -martingale , (24) 
+
+Kt BCt
+
+BRt
+
+is a QR-martingale . (25) 
+
+Proof. Conditions (23) and (24) are the standard two-currency no-arbitrage requirements applied to the nominal-real and nominal-credit pairs, respectively [see Musiela and Rutkowski, 2005, Chapter 14]. For (25): define the Radon-Nikodym derivative connecting QR to QN as 
+
+dQR
+
+dQN Ft
+
+= ItBRt /B Nt
+
+I0BR 
+
+> 0
+
+/B N
+
+> 0
+
+.
+
+Under QR, the process KtBCt /B Rt equals (JtBCt /B Nt ) · (BNt /I tBRt ). Since JtBCt /B Nt is a QN -martingale and ItBRt /B Nt defines the measure change, the standard change-of-measure formula for conditional expectations [see Shreve, 2004, Sections 1.6 and 5.2] implies that KtBCt /B Rt is a QR-martingale. Thus (25) is not independent: it follows from (23) to (24) and the Girsanov change of measure. We state it explicitly to close the triangle. 
+
+A.2.2 Exchange-rate dynamics under QN
+
+We specify lognormal dynamics for the two primary exchange rates under QN .
+
+Proposition 6 (FX dynamics) . Under QN , the martingale conditions (23) to (24) uniquely determine the drift coefficients: 
+
+dI t
+
+It
+
+=  rNt − rRt
+
+ dt + σI (t) · dW Nt , (26) 
+
+dJ t
+
+Jt
+
+=  rNt − rCt
+
+ dt + σJ (t) · dW Nt , (27) 
+
+where σI (t), σ J (t) ∈ Rm are deterministic volatility vectors. Proof. We prove (26); the argument for (27) is identical with (R, I ) replaced by (C, J ).Write dI t/I t = μI (t) d t + σI (t) · dW Nt for some drift μI (t) to be determined. Consider the process Mt = ItBRt /B Nt . Since dB jt = rjt Bjt dt, an application of Itô’s product rule gives: 
+
+dM t
+
+Mt
+
+= dI t
+
+It
+
++ dB Rt
+
+BRt
+
+− dB Nt
+
+BNt
+
+= μI (t) + rRt − rNt
+
+ dt + σI (t) · dW Nt .
+
+For Mt to be a QN -martingale, the drift must vanish: 
+
+μI (t) + rRt − rNt = 0 =⇒ μI (t) = rNt − rRt .
+
+22 Proposition 7 (Cross-rate dynamics with Itô correction) . Since Kt = Jt/I t, Itô’s formula for the ratio of two semimartingales yields: 
+
+dK t
+
+Kt
+
+=
+
+
+
+rRt − rCt + σI (t) 2 − σI (t) · σJ (t)
+
+
+
+dt +  σJ (t) − σI (t) · dW Nt . (28) 
+
+Proof. Define φ(x, y ) = x/y so that Kt = φ(Jt, I t). By Itô’s formula applied to φ:
+
+dφ = 1
+
+It
+
+dJ t − Jt
+
+I2
+
+> t
+
+dI t + Jt
+
+I3
+
+> t
+
+d⟨I⟩t − 1
+
+I2
+
+> t
+
+d⟨J, I ⟩t.
+
+Dividing through by Kt = Jt/I t and substituting: 
+
+• d⟨I⟩t = I2 
+
+> t
+
+|σI (t)|2 dt,
+
+• d⟨J, I ⟩t = ItJt σI (t) · σJ (t) d t,we obtain: 
+
+dK t
+
+Kt
+
+= dJ t
+
+Jt
+
+− dI t
+
+It
+
++ |σI (t)|2 dt − σI (t) · σJ (t) d t
+
+=  rNt − rCt
+
+ dt + σJ (t) · dW Nt
+
+−  rNt − rRt
+
+ dt − σI (t) · dW Nt
+
++ |σI (t)|2 dt − σI (t) · σJ (t) d t
+
+=
+
+
+
+rRt − rCt + |σI (t)|2 − σI (t) · σJ (t)
+
+
+
+dt +  σJ (t) − σI (t) · dW Nt .
+
+The drift terms |σI |2 − σI · σJ constitute the Itô convexity correction (the Siegel paradox cor-rection) that necessarily arises in the ratio of two lognormal processes. 
+
+Remark 8 (Consistency check under QR). Under QR, the Girsanov drift adjustment is dW Rt =
+
+dW Nt − ρ σI (t) d t (Proposition 10). Substituting dW N = dW R + ρ σI dt into the diffusion of (28): 
+
+dK t
+
+Kt
+
+=
+
+
+
+rRt − rCt + |σI |2 − σI · σJ
+
+
+
+dt + ( σJ − σI ) · (dW Rt + ρ σI dt)=
+
+
+
+rRt − rCt + |σI |2 − σI · σJ + ( σJ − σI ) · σI
+
+
+
+dt + ( σJ − σI ) · dW Rt ,
+
+where the substitution uses (σJ − σI )⊤ρ σI = ( σJ − σI ) · σI = σJ · σI − | σI |2 under the inner-product convention of Proposition 1. The drift collapses to rRt − rCt , confirming that KtBCt /B Rt
+
+is a QR-martingale as required by (25). 
+
+Remark 9 (Simulation practice) . For simulation purposes, one evolves It and Jt independently via (26) to (27) and computes Kt = Jt/I t directly. The cross-rate dynamics (28) are therefore not needed for implementation but serve as a consistency check and appear in certain pricing formulae involving real-credit cross products. 23 A.3 HJM Dynamics Under the Nominal Measure 
+
+A.3.1 HJM framework within each economy 
+
+Under each economy’s own risk-neutral measure Qj , the instantaneous forward rate follows a Heath et al. [1992] specification: 
+
+df j (t, T ) = μj (t, T ) d t + σj (t, T ) · dW jt , (29) where σj (t, T ) ∈ Rm is the forward-rate volatility vector. The HJM no-arbitrage drift restriction under Qj is: 
+
+μj (t, T ) = σj (t, T ) ·
+
+Z Tt
+
+σj (t, u ) d u ≡ σj (t, T ) · Aj (t, T ), (30) where we introduce the shorthand Aj (t, T ) ≡ R Tt σj (t, u ) d u for the cumulative volatility inte-gral. 
+
+A.3.2 Measure changes: the Girsanov connections 
+
+The key to expressing foreign-curve dynamics under QN is the Girsanov relationship between each foreign Brownian motion and W Nt .
+
+Proposition 10 (Girsanov connections) . The Brownian motions under the three measures are related by: 
+
+dW Rt = dW Nt − ρ σI (t) d t, (31) 
+
+dW Ct = dW Nt − ρ σJ (t) d t. (32) 
+
+Proof. The Radon-Nikodym derivative from QN to QR is proportional to ItBRt /B Nt . By (26), the stochastic exponential driving this change of measure has volatility σI (t). The Girsanov drift correction for W N under QR is the cross-variation d⟨W N , σ I · W N ⟩t/dt = ρ σI (t), giving (31). The same argument with (R, I ) replaced by (C, J ) yields (32). Substituting either relation into an integrand σj ·dW j produces the drift correction σj ·σI (resp. σj ·σJ ) under the inner-product convention of Proposition 1. 
+
+A.3.3 Nominal forward curve under QN
+
+The nominal forward rate is “domestic”: no measure change is needed. Under QN :
+
+df N (t, T ) = σN (t, T ) · AN (t, T ) d t + σN (t, T ) · dW Nt . (33) 
+
+A.3.4 Real forward curve under QN : drift correction from inflation Proposition 11 (Real curve under QN ). The real forward rate under the nominal measure satisfies: 
+
+df R(t, T ) = 
+
+h
+
+σR(t, T ) · AR(t, T ) − σR(t, T ) · σI (t)
+
+i
+
+dt + σR(t, T ) · dW Nt . (34) 24 Proof. Under QR, the real forward rate satisfies HJM with the standard drift (30): 
+
+df R(t, T ) = σR(t, T ) · AR(t, T ) d t + σR(t, T ) · dW Rt .
+
+Substituting the Girsanov connection (31) and using the inner-product convention of Proposi-tion 1 (so that σR⊤ρ σI = σR · σI ): 
+
+df R(t, T ) = σR(t, T ) · AR(t, T ) d t + σR(t, T ) ·  dW Nt − ρ σI (t) d t
+
+=
+
+h
+
+σR(t, T ) · AR(t, T ) − σR(t, T ) · σI (t)
+
+i
+
+dt + σR(t, T ) · dW Nt .
+
+The correction term −σR(t, T ) · σI (t) is the covariation between the real forward-rate volatility and the inflation exchange-rate volatility. This is the original Jarrow and Yildirim [2003] result. 
+
+A.3.5 Credit forward curve under QN : drift correction from credit FX Proposition 12 (Credit curve under QN ). By exact analogy with Proposition 11, the credit forward rate under QN satisfies: 
+
+df C (t, T ) = 
+
+h
+
+σC (t, T ) · AC (t, T ) − σC (t, T ) · σJ (t)
+
+i
+
+dt + σC (t, T ) · dW Nt . (35) 
+
+Proof. Under QC , the credit forward rate satisfies HJM: 
+
+df C (t, T ) = σC (t, T ) · AC (t, T ) d t + σC (t, T ) · dW Ct .
+
+Substituting the Girsanov connection (32) (with σC ⊤ρ σJ = σC · σJ per Proposition 1): 
+
+df C (t, T ) = σC (t, T ) · AC (t, T ) d t + σC (t, T ) ·  dW Nt − ρ σJ (t) d t
+
+=
+
+h
+
+σC (t, T ) · AC (t, T ) − σC (t, T ) · σJ (t)
+
+i
+
+dt + σC (t, T ) · dW Nt .
+
+The correction −σC (t, T ) · σJ (t) is the credit analogue of the inflation correction in (34): it adjusts the credit-curve drift for the covariation between credit forward-rate innovations and credit-FX innovations. 
+
+A.3.6 Summary: the three-curve system 
+
+Collecting (33) to (35), the full system under QN is: 
+
+df N (t, T ) = σN (t, T ) · AN (t, T ) d t + σN (t, T ) · dW Nt ,df R(t, T ) = 
+
+h
+
+σR(t, T ) · AR(t, T ) − σR(t, T ) · σI (t)
+
+i
+
+dt + σR(t, T ) · dW Nt ,df C (t, T ) = 
+
+h
+
+σC (t, T ) · AC (t, T ) − σC (t, T ) · σJ (t)
+
+i
+
+dt + σC (t, T ) · dW Nt .
+
+(36) All three curves are driven by the same m-dimensional Brownian motion W Nt . Cross-curve 25 correlations arise through the inner products of the respective volatility vectors σN , σR, σC
+
+within Rm. The structure is symmetric: each foreign curve’s drift is its “own-measure” HJM drift minus a correction equal to the covariance of the forward-rate volatility with the relevant exchange-rate volatility. 
+
+A.4 Bond Prices and the Drift Integrals 
+
+For completeness, we record the relationship between bond prices and forward rates under the three-curve system. 
+
+Proposition 13 (Bond price dynamics under QN ). For each economy j ∈ { N, R, C }, the zero-coupon bond price satisfies: 
+
+dP j (t, T )
+
+P j (t, T ) = rjt dt − Aj (t, T ) · dW jt , (37) 
+
+under Qj . Under QN , the foreign bond prices (expressed in nominal terms) satisfy: 
+
+dItP R(t, T )
+
+ItP R(t, T ) = rNt dt +  σI (t) − AR(t, T ) · dW Nt , (38) 
+
+dJtP C (t, T )
+
+JtP C (t, T ) = rNt dt +  σJ (t) − AC (t, T ) · dW Nt . (39) 
+
+Proof. Equation (37) follows from P j (t, T ) = exp   − R Tt f j (t, u ) d u and the HJM dynamics (29) to (30) by a standard computation [see Heath et al., 1992, Proposition 2]. For (38): the nominal value of the real bond is Vt = ItP R(t, T ). Apply Itô’s product rule using (26) and the QN -dynamics of P R(t, T ). The QN -dynamics of P R are obtained from (37) by the Girsanov substitution dW Rt = dW Nt − ρ σI (t) d t:
+
+dP R(t, T )
+
+P R(t, T ) =
+
+h
+
+rRt + AR(t, T ) · σI (t)
+
+i
+
+dt − AR(t, T ) · dW Nt .
+
+Then: 
+
+dV t
+
+Vt
+
+= dI t
+
+It
+
++ dP R
+
+P R + dI t
+
+It
+
+· dP R
+
+P R
+
+= ( rNt − rRt ) d t + σI · dW Nt + rRt dt + AR · σI dt − AR · dW Nt − σI · AR dt
+
+= rNt dt + ( σI − AR) · dW Nt .
+
+The covariance terms +AR · σI and −σI · AR cancel. Equation (39) follows identically. 
+
+Remark 14 . Equations (38) to (39) confirm that ItP R(t, T )/B Nt and JtP C (t, T )/B Nt are QN -martingales, as required by the general no-arbitrage conditions. These dynamics are needed for pricing nominal instruments with foreign-economy payoffs, e.g., an inflation-protected corporate bond paying in real terms with credit risk. 26 A.5 Spread Dynamics and the Triangle Consistency Identity 
+
+# B Calibration procedure 
+
+The three-curve system of Section 2 is fully specified once a volatility architecture for the forward-rate curves and exchange rates is chosen and a procedure for estimating the parameters from market data is fixed. This appendix develops both. The volatility specification is a parsimonious shared-factor structure that admits closed-form HJM drift integrals; the calibration workflow uses only curve histories and JGP index spread data; the simulation algorithm is a discretised Musiela-grid implementation; and the model outputs are summarised at the end with diagnostic checks. 
+
+B.1 Volatility Architecture 
+
+B.1.1 Design requirements 
+
+A practical volatility specification for the three-curve system must satisfy four requirements: (R1) Realistic marginal dynamics. Each curve (nominal, real, and credit) must exhibit plausible level, slope, and curvature movements. (R2) Cross-curve co-movements. The model must reproduce the empirically observed cor-relations between nominal rate changes, real rate changes, inflation surprises, and credit spread changes. (R3) Analytic tractability. The HJM drift integrals Aj (t, T ) = R Tt σj (t, u ) d u should be available in closed form to avoid numerical quadrature at each simulation step. (R4) Calibratability from available data. In the Brazilian market, the typical data are curve histories and index spread histories. No interest-rate option prices (caps, swaptions) are reliably available for the real or credit curves. The volatility architecture must therefore be identifiable from time-series data alone. 
+
+B.1.2 Shared-factor structure 
+
+Let W Nt ∈ Rm be the m-dimensional Brownian motion under QN with correlation matrix 
+
+ρ (Proposition 1). We decompose each curve’s forward-rate volatility using a set of shared shape functions {gq(τ )}ng
+
+> q=1
+
+, where τ = T −t is time to maturity, and curve-specific amplitude matrices Aj (t) ∈ Rmj ×ng :
+
+σj (t, T ) = 
+
+> mj
+
+X
+
+> p=1
+
+ ng
+
+X
+
+> q=1
+
+Ajp,q (t) gq(T − t)
+
+
+
+e(j) 
+
+> p
+
+, j ∈ { N, R, C }, (40) where e(j) 
+
+> p
+
+denotes the p-th canonical basis vector of block j within Rm. Each row Ajp, · specifies how factor p of curve j mixes the basis shapes; the diagonal special case Ajp,q = ajp δp,q (with 
+
+ng = mj ) recovers a one-shape-per-factor specification. The shape functions are shared across curves, encoding the common maturity structure; the amplitude matrices are curve-specific. We 27 do not impose a sign restriction on Ajp,q : the sign reflects the orientation of the corresponding PCA eigenvector and is resolved by the calibration of Section B.3. 
+
+Definition 15 (Exponential volatility family) . We adopt the exponential shape functions: 
+
+g1(τ ) = 1 , g2(τ ) = e−b2τ , g3(τ ) = τ e −b3τ , (41) with decay parameters b2, b 3 > 0. These correspond loosely to: 
+
+• g1: a level factor affecting all maturities equally, 
+
+• g2: a slope factor with exponential decay, concentrated at the short end, 
+
+• g3: a curvature (hump) factor peaking at τ ∗ = 1 /b 3 and decaying thereafter. The choice of shared decay parameters b2, b 3 across curves is a deliberate parsimony con-straint: it forces the “shape” of volatility over the maturity axis to be common, while allowing the “magnitude” of each factor to differ by curve via the amplitude rows Ajp, ·. This is empiri-cally well motivated, since PCA analyses of yield-curve changes in different economies and asset classes consistently recover level/slope/curvature factors with similar decay profiles [Litterman and Scheinkman, 1991]. 
+
+Proposition 16 (Closed-form drift integrals) . For the shape functions (41) , the cumulative volatility integrals Gq(τ ) = R τ 
+
+> 0
+
+gq(s) d s are: 
+
+G1(τ ) = τ, (42) 
+
+G2(τ ) = 1 − e−b2τ
+
+b2
+
+, (43) 
+
+G3(τ ) = 1 − (1 + b3τ ) e−b3τ
+
+b23
+
+. (44) 
+
+Consequently, the cumulative volatility of curve j is Aj (t, τ ) = Pmj
+
+> p=1
+
+ P ng 
+
+> r=1
+
+Ajp,r (t) Gr(τ )e(j) 
+
+> p
+
+,and the HJM drift under the curve’s own measure is the bilinear form 
+
+μj (t, τ ) = σj (t, τ ) · Aj (t, τ ) = 
+
+> ng
+
+X
+
+> q,r =1
+
+Aj (t)⊤Aj (t) 
+
+> q,r
+
+gq(τ ) Gr(τ ), (45) 
+
+which collapses to Pmj
+
+> p=1
+
+(ajp)2 gp(τ ) Gp(τ ) in the diagonal special case. Proof. Direct integration using R τ 
+
+> 0
+
+e−bs ds = (1 − e−bτ )/b and R τ 
+
+> 0
+
+s e −bs ds = [1 − (1 + bτ )e−bτ ]/b 2
+
+yields (42) to (44). For (45), the basis vectors of block j are mutually orthogonal under 
+
+ρjj = Imj (Proposition 1), so σj · Aj = P 
+
+> p
+
+σj p Ajp where σj p(τ ) = P 
+
+> q
+
+Ajp,q gq(τ ) and Ajp(τ ) = 
+
+P 
+
+> r
+
+Ajp,r Gr(τ ). Expanding and exchanging the order of summation gives P
+
+> q,r
+
+ P  
+
+> p
+
+Ajp,q Ajp,r 
+
+gq(τ ) Gr(τ ) = 
+
+P
+
+> q,r
+
+(Aj⊤Aj )q,r gq(τ ) Gr(τ ).Requirement (R3) is therefore satisfied: no numerical quadrature is needed within each simulation time step. 28 B.1.3 Base-plus-spread decomposition 
+
+Rather than modeling the credit forward rate f C directly via (40), it is empirically more natural, and more stable, to decompose: 
+
+f C (t, T ) = f N (t, T ) + sCDI (t, T ), (46) and to assign separate factor structures to the nominal curve and the CDI+ spread process. 
+
+Definition 17 (Rate and spread factor blocks) . Partition the m-dimensional Brownian motion into three blocks of dimensions mN , mR, and mS (with m = mN + mR + mS ). With rate shape functions {gq}ng 
+
+> q=1
+
+and spread shape functions {hq}nh
+
+> q=1
+
+, the block volatility specifications are: 
+
+σN (t, T ) = 
+
+> mN
+
+X
+
+> p=1
+
+ ng
+
+X
+
+> q=1
+
+ANp,q (t) gq(T − t)
+
+
+
+ep, (47) 
+
+σR(t, T ) = 
+
+> mR
+
+X
+
+> p=1
+
+ ng
+
+X
+
+> q=1
+
+ARp,q (t) gq(T − t)
+
+
+
+emN +p, (48) 
+
+σS (t, T ) = 
+
+> mS
+
+X
+
+> p=1
+
+ nhX
+
+> q=1
+
+ASp,q (t) hq(T − t)
+
+
+
+emN +mR+p, (49) where σS is the volatility of the CDI+ spread process, the spread shapes {hq} may differ from 
+
+{gq}, and the canonical basis vectors are chosen from non-overlapping blocks. Cross-block correlations enter through the off-diagonal entries of ρ (Proposition 1 and section B.4). The credit-curve volatility is then recovered as: 
+
+σC (t, T ) = σN (t, T ) + σS (t, T ), (50) and the IPCA+ spread is implied by the triangle identity (Chapter 3, Proposition 5.2): 
+
+sIP CA (t, T ) = sCDI (t, T ) + f N (t, T ) − f R(t, T ). (51) 
+
+Remark 18 (Why not model three curves independently?) . One could in principle assign inde-pendent factor structures to f N , f R, and f C and calibrate all correlations from time-series data. The base-plus-spread decomposition has two advantages. First, it automatically enforces that the credit forward rate exceeds the nominal forward rate when spreads are positive, a constraint that independent modeling could violate under extreme scenarios. Second, the spread process 
+
+sCDI has substantially lower dimensionality and volatility than f C itself, leading to more stable PCA decompositions and parameter estimates. 
+
+Remark 19 (Spread shape functions) . For the spread factors {hk}, a natural choice mirrors the rate factors: 
+
+h1(τ ) = 1 , h2(τ ) = e−c2τ , (52) with c2 > 0. Two spread factors typically suffice: a level factor capturing parallel spread moves and a slope factor capturing steepening/flattening. A curvature factor may be added if the data 29 support it, but in practice credit spread curves are lower-dimensional than rate curves. 
+
+B.1.4 Exchange-rate volatilities 
+
+The inflation and credit exchange rates require volatility specifications compatible with the factor structure: 
+
+σI (t) = 
+
+> m
+
+X
+
+> k=1
+
+αIk(t) ek, σJ (t) = 
+
+> m
+
+X
+
+> k=1
+
+αJk (t) ek, (53) where αIk, α Jk ∈ R are scalar loadings on each Brownian factor; signs reflect the orientation of the corresponding eigenvector. We impose the following sparsity restrictions to limit dimensionality while preserving economic interpretability: (S1) σI loads primarily on the real-curve factor block (indices mN + 1 , . . . , m N + mR), so that inflation shocks are naturally correlated with the nominal-real differential. A small loading on the nominal level factor may be included. (S2) σJ loads primarily on the spread factor block (indices mN +mR +1 , . . . , m ), so that credit-FX shocks are correlated with spread movements. A small loading on the nominal level factor captures the empirical observation that spreads widen during rate rallies. (S3) All other cross-loadings are set to zero as a baseline, yielding a model with mR + 1 free parameters for σI and mS + 1 free parameters for σJ .
+
+Remark 20 (Equivalent parametrizations) . An alternative formulation replaces the canonical-basis amplitudes with a non-diagonal correlation matrix Σ among the Brownian factors and uses unit loadings. The two representations produce the same joint distribution of curve increments. We adopt the amplitude-based parametrization because it facilitates PCA-based estimation: the amplitude rows Ajp, · are directly interpretable as factor volatilities in units of basis points per square root of time, and the cross-block correlations sit explicitly in ρ (Proposition 1 and sec-tion B.4). 
+
+B.1.5 Parameter count 
+
+Table 9 summarizes the free parameters for a typical specification with mN = 3 , mR = 2 ,
+
+mS = 2 (total m = 7 Brownian factors), ng = 3 rate shape functions, and nh = 2 spread shape functions. Of these, the 19 amplitude-matrix entries (9 nominal, 6 real, 4 spread) and 3 decay parame-ters are identified from PCA followed by NLS in Section B.3, the 6 FX loadings from moment matching in Section B.5, and the correlations from direct estimation in Section B.4. The triangle identity provides out-of-sample validation throughout. In practice, many of the 15 cross-block correlations are negligibly small and may be set to zero, reducing the effective parameter count further; sparsity restrictions (S1)–(S3) also collapse most of the FX-loading dimensionality (Sec-tion B.1.4). 30 B.2 Calibration Step A: Cross-Sectional Curve Fitting 
+
+B.2.1 Inputs 
+
+At each calibration date t0, we require: (a) The nominal base curve {P N (t0, T i)}nN
+
+> i=1
+
+, obtained from the DI futures strip via standard bootstrapping. (b) The real base curve {P R(t0, T i)}nR
+
+> i=1
+
+, obtained from NTN-B (IPCA-linked government bond) yields stripped to zero-coupon form using the Svensson [1994] parametrization or cubic-spline interpolation. (c) The CDI+ spread term structure {sCDI mkt (t0, T i)} from JGP Idex-CDI index data. (d) The IPCA+ spread term structure {sIP CA mkt (t0, T i)} from JGP Idex-IPCA index data. (e) Historical time series of all four objects above, at daily or weekly frequency, over a window of length L (typically L = 1 to 3 years). Items (a) to (d) are used for cross-sectional fitting at t0; item (e) is used for time-series estimation (Sections B.3 to B.5). 
+
+B.2.2 Constructing the credit curve 
+
+The credit forward curve is constructed by adding CDI+ spreads to the nominal forwards: 
+
+f C (t0, T ) := f N (t0, T ) + sCDI mkt (t0, T ). (54) This definition is adopted rather than estimated: it is a direct consequence of identification (46). 
+
+B.2.3 Triangle consistency check 
+
+Compute the model-implied IPCA+ spread: 
+
+sIP CA impl (t0, T ) := f C (t0, T ) − f R(t0, T ) = sCDI mkt (t0, T ) + f N (t0, T ) − f R(t0, T ), (55) and assess the triangle consistency gap :
+
+∆( t0, T ) := sIP CA impl (t0, T ) − sIP CA mkt (t0, T ). (56) A non-zero ∆ may arise from several sources: (i) Base-curve mismatch. The real curve derived from NTN-B bootstrapping may differ from the IPCA base curve used internally by JGP in constructing its IPCA+ indices. Differences in interpolation method, daycount convention, or the treatment of seasonality in inflation can each contribute several basis points. 31 (ii) Index methodology differences. The CDI+ and IPCA+ JGP indices may use different eligibility screens, weighting schemes, or rebalancing frequencies, so their spread levels need not be perfectly consistent even for the same underlying credit universe. (iii) Convexity and liquidity effects. CDI-linked and IPCA-linked debentures of the same issuer may trade at different effective spreads due to convexity differences (the IPCA linker has a real-rate duration plus an inflation duration) or differential liquidity. 
+
+B.2.4 Deterministic reconciliation adjustment 
+
+When ∆( t0, T ) is structurally non-zero, we introduce a small deterministic adjustment χ(T ):
+
+f C (t0, T ) := f N (t0, T ) + sCDI mkt (t0, T ) + χ(T ), (57) where χ is calibrated by minimizing a weighted least-squares objective: 
+
+min 
+
+> χ∈C
+> n
+
+X
+
+> i=1
+
+w(Ti) ∆( t0, T i)2, (58) subject to χ ∈ C , a space of smooth functions (e.g., cubic splines with a small number of knots, or polynomials of degree ≤ 3). 
+
+Remark 21 (Interpretation and magnitude) . The adjustment χ absorbs the “residual” of the triangle identity in market data. It should be smooth, small in magnitude (typically 2 to 8 basis points), and stable across consecutive calibration dates. A large or volatile χ signals fundamental data issues, for instance, a mismatched real-curve source, that should be resolved before proceeding to time-series estimation. In production, we recommend tracking ∥χ∥∞ as a data-quality diagnostic. 
+
+B.3 Calibration Step B: Time-Series Factor Estimation 
+
+B.3.1 Computing historical changes 
+
+Over the estimation window {t1, t 2, . . . , t L} (daily or weekly dates), compute forward-rate changes at each pillar maturity Ti:
+
+∆f N (tℓ, T i) = f N (tℓ+1 , T i) − f N (tℓ, T i), (59) 
+
+∆f R(tℓ, T i) = f R(tℓ+1 , T i) − f R(tℓ, T i), (60) 
+
+∆sCDI (tℓ, T i) = sCDI (tℓ+1 , T i) − sCDI (tℓ, T i). (61) Let Xj ∈ R(L−1) ×nj denote the matrix of changes for block j ∈ { N, R, S }, where each row is a date and each column a maturity pillar. 
+
+Remark 22 (Maturity alignment) . A subtlety arises because, on successive dates, the same calendar maturity Ti corresponds to a decreasing time-to-maturity τi = Ti − tℓ. In the Musiela parametrization, forward rates are indexed by τ rather than T , and the change ∆f j (tℓ, τ i) must be computed at constant τ (constant time-to-maturity), which requires interpolation. For daily 32 data and maturities beyond one year, the difference is negligible (one business day out of ≥ 252 ), but for short maturities it should be handled explicitly. 
+
+B.3.2 Principal component analysis 
+
+For each block j, perform the eigendecomposition of the sample covariance matrix of mean-centered weekly changes: 
+
+ˆΣj = 1∆t (L − 2) ( ˜Xj )⊤ ˜Xj =
+
+> nj
+
+X
+
+> k=1
+
+λjk vjk (vjk)⊤, ˜Xjℓ,i = Xjℓ,i − ¯Xji , (62) with ¯Xji the column mean and ∆t = 1 /52 yr the weekly time step that annualizes the variance. The eigenvalues λj 
+
+> 1
+
+≥ λj 
+
+> 2
+
+≥ · · · ≥ 0 are reported in bp 2/yr and the eigenvectors vjk ∈ Rnj are unit norm. Empirical weekly increments have mean two orders of magnitude smaller than their standard deviation, so centering is a minor correction in practice; it is retained for conformance with the standard sample-covariance estimator. We retain factors by parsimony: mN = 3 , mR = 2 , mS = 2 , with the third nominal factor and second spread factor included only if each individually explains ≥ 3% of the block variance. This rule reflects the standard Litterman and Scheinkman [1991] level/slope/curvature decomposition for rate blocks and a level-plus-slope decomposition for spread blocks. The cumulative variance shares for the retained set, reported in Section 5.2, range from 82% (CDI +) to 90.5% (real). A 95% retention rule would require an additional fourth nominal factor (4.6% incremental variance) and third real factor (6.6%) without obvious term-structure interpretation; reconstruction RMSE varies monotonically with the factor count but none of the perturbations shifts OOS RMSE by more than 2 bp, so the baseline (3 , 2, 2) retention is not material for the headline wedge. The retained eigenvectors vj
+
+> 1
+
+, . . . , vjmj , evaluated at the pillar maturities {τi}, serve as em-pirical loading shapes 
+
+q
+
+λjk vjk,i that the parametric fit below maps to a curve-specific amplitude matrix Aj .
+
+B.3.3 Parametric fitting of loading shapes 
+
+Map the empirical PCA loadings to the parametric family by nonlinear least squares. For the nominal block: 
+
+min    
+
+> AN∈RmN×ng , b 2, b 3
+> mN
+
+X
+
+> p=1
+> nN
+
+X
+
+> i=1
+
+q
+
+λNp vNp,i −
+
+> ng
+
+X
+
+> q=1
+
+ANp,q gq(τi)
+
+
+
+> 2
+
+, (63) where vNp,i is the i-th component (across pillar maturities τi) of the p-th eigenvector, and 
+
+q
+
+λNp
+
+converts the unit-norm eigenvector into a volatility-scaled loading. Each row ANp, · allows factor 
+
+p to mix the ng = 3 basis shapes; the diagonal restriction ANp,q = aNp δp,q recovers the one-shape-per-factor fit but achieves R2 noticeably below the unrestricted value reported in Table 11, so the unrestricted form is adopted in the calibration. 
+
+Proposition 23 (Identification of decay parameters) . The decay parameters b2 and b3 are identified from the maturity profile of the second and third PCA loadings, respectively: 
+
+33 (i) b2 controls the rate at which the slope factor decays with maturity. If the empirical second loading has half-life τ1/2 (i.e., vN
+
+2,i reaches half its short-end value at τ1/2), then b2 ≈
+
+ln 2 /τ 1/2.(ii) b3 controls the peak location of the curvature factor: g3(τ ) peaks at τ ∗ = 1 /b 3. Matching 
+
+τ ∗ to the empirical peak of the third PCA loading identifies b3.These initial estimates serve as starting values for the joint optimization (63) .
+
+The same procedure is applied to the real curve (with possibly shared b2, b 3 if fitting quality permits) and to the spread curve (with decay parameter c2). 
+
+Remark 24 (Non-parametric alternative) . If the parametric fit is unsatisfactory, for instance, if the empirical loading shapes deviate substantially from the exponential family, the PCA loadings may be retained directly as spline-interpolated functions of τ . This forfeits the closed-form drift integrals of Proposition 16, requiring numerical integration of Aj (t, τ ) = R τ
+
+0 σj (t, u ) d u at each step. In our experience with Brazilian DI and real curves, the exponential family provides an adequate fit with mN = 3 and mR = 2 factors. 0 2 4 6 8 10                                           
+
+> Maturity (yr)
+> 50
+> 100
+> 150
+> 200
+> 250
+> 300
+> bp/  yr
+> Factor 1
+> PCA
+> Parametric
+> 0246810
+> Maturity (yr)
+> 100
+> 50
+> 0
+> 50
+> 100
+> 150
+> bp/  yr
+> Factor 2
+> PCA
+> Parametric
+> 0246810
+> Maturity (yr)
+> 150
+> 100
+> 50
+> 0
+> 50
+> 100
+> bp/  yr
+> Factor 3
+> PCA
+> Parametric
+> Nominal PCA loadings vs. parametric fit 246810
+> Maturity (yr)
+> 50
+> 100
+> 150
+> 200
+> 250
+> 300
+> bp/  yr
+> Factor 1
+> PCA
+> Parametric
+> 246810
+> Maturity (yr)
+> 100
+> 50
+> 0
+> 50
+> 100
+> bp/  yr
+> Factor 2
+> PCA
+> Parametric
+> Real PCA loadings vs. parametric fit 12345
+> Maturity (yr)
+> 40
+> 45
+> 50
+> 55
+> 60
+> bp/  yr
+> Factor 1
+> PCA
+> Parametric
+> 12345
+> Maturity (yr)
+> 20
+> 0
+> 20
+> 40
+> bp/  yr
+> Factor 2
+> PCA
+> Parametric
+> Spread-CDI PCA loadings vs. parametric fit 2.0 2.5 3.0 3.5 4.0 4.5 5.0
+> Maturity (yr)
+> 25
+> 50
+> 75
+> 100
+> 125
+> 150
+> bp/  yr
+> Factor 1
+> PCA
+> Parametric
+> 2.0 2.5 3.0 3.5 4.0 4.5 5.0
+> Maturity (yr)
+> 50
+> 40
+> 30
+> 20
+> 10
+> 0
+> 10
+> bp/  yr
+> Factor 2
+> PCA
+> Parametric
+> Spread-IPCA PCA loadings vs. parametric fit
+
+Figure 3: Empirical PCA loadings 
+
+q
+
+λjk vjk for the four factor blocks: nominal forwards (top-left), real forwards (top-right), CDI-linked credit spread (bottom-left), and IPCA-linked credit spread (bottom-right). Each panel shows the retained eigenvectors as functions of pillar maturity, after eigendecomposition of the covariance of weekly forward-rate changes over the 2021-01-04 to 2023-12-29 estimation window. Loadings are reported in bp/ √yr. The nominal and real blocks exhibit the standard level/slope/curvature shape pattern; the spread blocks decompose into a level factor and a residual short-end factor. 34 B.4 Calibration Step C: Cross-Block Correlation Estimation 
+
+B.4.1 Factor innovations 
+
+Project the historical changes onto the retained principal components to obtain factor innovation series. For each block j and date tℓ:
+
+∆Zjk(tℓ) = 
+
+> nj
+
+X
+
+> i=1
+
+vjk,i ∆Xj (tℓ, τ i), k = 1 , . . . , m j , (64) where ∆Xj (tℓ, τ i) denotes the forward-rate (or spread) change for block j at maturity τi on date 
+
+tℓ.
+
+B.4.2 Joint covariance and correlation 
+
+Stack the factor innovations into a combined vector: 
+
+Z(tℓ) = 
+
+
+
+∆ZN 
+
+> 1
+
+, . . . , ∆ZNmN , ∆ZR 
+
+> 1
+
+, . . . , ∆ZRmR , ∆ZS 
+
+> 1
+
+, . . . , ∆ZSmS
+
+⊤
+
+∈ Rm. (65) Compute the sample covariance matrix: 
+
+ˆΣ = 1
+
+L − 2
+
+> L−1
+
+X
+
+> ℓ=1
+
+Z(tℓ) Z(tℓ)⊤, (66) and extract the correlation matrix ˆρ via standardization: 
+
+ˆρij = ˆΣij 
+
+q ˆΣii ˆΣjj 
+
+. (67) 
+
+B.4.3 Positive-definiteness correction 
+
+If ˆρ is not positive definite, which can occur with short estimation windows or near-collinear factors, we apply the Higham [2002] alternating-projections algorithm to compute the nearest positive-definite correlation matrix: 
+
+ρ∗ = arg min   
+
+> ρ≻0,diag (ρ)= 1
+
+∥ρ − ˆρ∥F , (68) where ∥ · ∥ F denotes the Frobenius norm. The corrected matrix ρ∗ is used for simulation. 
+
+B.4.4 Economically important correlations 
+
+Several cross-block correlations have direct economic content and serve as sanity checks: (i) Rate-spread correlation. The correlation between the nominal level factor ∆ZN 
+
+> 1
+
+and the spread level factor ∆ZS 
+
+> 1
+
+captures the “flight to quality” effect: negative correlation indicates that spreads widen when rates fall. In the Brazilian market, this correlation is typically between −0.2 and −0.5 during stress episodes and near zero during calm periods. 35 (ii) Nominal-real correlation. The correlation between nominal and real level factors re-flects the decomposition of rate moves into real-rate and inflation components. In Brazil, this is typically high ( > 0.7) at the short end (where both curves are anchored by the Selic rate) and lower at longer maturities. (iii) Real-spread correlation. A negative correlation here implies that IPCA+ debenture spreads tighten when real rates rise, consistent with a “reaching for yield” dynamic in which investors accept lower credit compensation when real rates are attractive. 
+
+B.5 Calibration Step D: Exchange-Rate Volatility Estimation 
+
+Under the two-model framing (Chapter 3, Remark 3.5), the inflation FX σI is a shared parameter, calibrated once from the realized dynamics of the common inflation index It. The credit FX is model-specific: Model A has σAJ (associated with JA, the CDI + credit-economy exchange rate), and Model B has σBJ (associated with JB , the IPCA + credit-economy exchange rate). Neither σI nor σJ is observable directly, but each can be identified from realized volatility of an appropriate primary object. 
+
+B.5.1 Inflation FX volatility σI (shared) 
+
+Under QN , dI t/I t = ( rNt − rRt ) dt + σI · dW Nt . Because Girsanov preserves diffusion coefficients, 
+
+|σI |2 equals the instantaneous variance of d ln It under the physical measure as well. We therefore identify |σI | from realized monthly IPCA log-returns: 
+
+D1.1 Collect monthly IPCA values Iℓ from Banco Central do Brasil SGS series 433, align each observation to its reference month (correcting for the ∼15-day publication lag), and com-pute log-returns rℓ = ln(1 + πℓ).
+
+D1.2 De-seasonalize rℓ by subtracting calendar-month means. 
+
+D1.3 Annualize the variance: 
+
+|cσI |2 = 12 · dVar( rℓ, deseas ).
+
+D1.4 Identify the direction αI ∈ Rm by OLS regression of the deseasonalized monthly residuals on monthly-aggregated unit-variance factor innovations (summed weekly PC scores within each calendar month). The regression R 2 reports the fraction of realized inflation variance spanned by rate factors; the residual vol is the genuinely idiosyncratic inflation-specific component. This replaces the “breakeven residual” procedure of earlier drafts, under which σI does not appear in the diffusion of β = f N − f R: that residual does not identify |σI |2 in the model. 
+
+B.5.2 Credit FX volatility (model-specific) 
+
+Unlike σI , neither JAt nor JBt has a directly observable spot proxy, and σJ enters model observ-ables only through the drift correction −σC · σJ , which is O(∆ t) in the mean and O(∆ t2) in the covariance. σJ is therefore structurally unidentified from curve-plus-spread covariance: the 36 diffusion of ∆sCDI and ∆sIP CA is a linear combination of σN , σR, σS , none of which contains 
+
+σJ . We adopt a structural identification convention analogous to the Jarrow-Yildirim treatment of inflation: equate |σJ | to the annualized realized vol of the corresponding short-pillar spread series, 
+
+| cσAJ | := √52 · cstd  ∆sCDI (t, τ min ), | cσBJ | := √52 · cstd  ∆sIP CA (t, τ min ),
+
+with the direction αJ obtained by OLS regression of the short-pillar spread change on unit-variance factor innovations. Under (S2), most of the realized variance should load on the S-block factors, with a small residual N-factor loading capturing flight-to-quality co-movement. 
+
+Remark 25 ( σJ is set by convention, not estimated) . (53) and the convention above pin |σJ | as a model parameter, but the procedure is identification by convention, not estimation from data the model can discriminate. The numerical value affects pricing of credit-FX-sensitive contingent claims (e.g., quanto credit derivatives) but does not change the simulated f N , f R, or sCDI paths, nor the within-issuer wedge of Section 5.2: those depend only on σN , σR, σS , σ I . Should listed credit-derivative prices on JGP-universe names become available, σJ could be estimated rather than imposed; the convention places it within the bounds suggested by short-pillar realized volatility. 
+
+Remark 26 (Why not covariance-matching) . An earlier draft proposed matching the model-implied (∆ sCDI , ∆sIP CA ) covariance to its sample analog. That objective is degenerate in σJ
+
+for the reason above: the spread covariance does not contain σJ . The realized-vol convention is the only route that pins |σJ | to a finite value without invoking additional data (e.g., a CDS on a JGP-universe name). 
+
+B.6 Calibration Step E: Regularization and Stability 
+
+To prevent overfitting and ensure robust out-of-sample behavior, we impose the following regu-larization measures. 
+
+B.6.1 Dimensionality control 
+
+The total number of factors m = mN + mR + mS should be kept small, typically 5 ≤ m ≤ 8. A practical guideline is: 
+
+mN = 3 , mR = 2 , mS = 2 , (69) yielding m = 7 . The third nominal factor (curvature) and the second spread factor (spread slope) are included only if they individually explain ≥ 3% of their block’s variance; otherwise they are dropped. 
+
+B.6.2 Shared decay parameters 
+
+The decay parameters b2, b 3 are shared across the nominal and real curve blocks. This constraint is motivated by the empirical observation that level/slope/curvature factor shapes are similar across nominal and real yield curves. It reduces the parameter count by 2 and improves estima-37 tion stability, particularly for the real curve where the pillar grid {Ti} from NTN-B maturities is coarser than the DI strip. 
+
+B.6.3 Loading smoothness penalty 
+
+When the parametric fit (63) is replaced by a non-parametric (spline-interpolated) loading func-tion, we add a roughness penalty: 
+
+min X
+
+> k,i
+
+q 
+
+λjk vjk,i − ˆσjk(τi)
+
+2
+
++ η X
+
+> k
+
+Z τmax 
+
+> 0
+
+" d2 ˆσjk(τ )
+
+dτ 2
+
+#2
+
+dτ, (70) where η > 0 is a smoothness parameter chosen by leave-one-out cross-validation or the general-ized cross-validation criterion [Wahba, 1990]. 
+
+B.6.4 Out-of-sample validation via the triangle 
+
+The triangle identity provides a natural out-of-sample check. At each calibration date in a hold-out period: (i) Compute model-implied sIP CA model (t, T ) = sCDI model (t, T ) + f Nmodel (t, T ) − f Rmodel (t, T ).(ii) Compare against observed sIP CA mkt (t, T ).(iii) Track the root-mean-square error: RMSE triangle (t) = 
+
+vuut 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+sIP CA model (t, T i) − sIP CA mkt (t, T i)2. (71) A well-calibrated model should produce RMSE triangle of the same order as the deterministic adjustment χ from Step A (typically 2 to 8 basis points). Systematic deterioration signals model misspecification or parameter instability and should trigger recalibration. 
+
+B.7 Simulation Algorithm 
+
+We discretize the three-curve system on a Musiela time-to-maturity grid. Let {τ0, τ 1, . . . , τ Nτ }
+
+be the maturity grid (with τ0 = 0 corresponding to the short rate) and ∆t the simulation time step. 
+
+B.7.1 Musiela transport 
+
+In the Musiela parametrization, forward rates are functions of (t, τ ) where τ = T − t. As time advances by ∆t, each maturity point “ages”: the maturity that was at τ is now at τ − ∆t. This transport effect must be accounted for at each step by interpolating the previous curve onto the shifted grid: 
+
+f j (t, τ − ∆t) ≈ f j (t, τ ) − ∂f j
+
+∂τ (t, τ ) ∆ t, (72) or, more robustly, by linear interpolation between adjacent grid points. The transport term is the continuous-time analogue of the roll-down effect familiar to fixed-income practitioners. 38 B.7.2 Discretized dynamics 
+
+At each step t → t + ∆ t:
+
+Step 1. Generate correlated Brownian increments. 
+
+∆W N = L ξ √∆t, ξ ∼ N (0, Im), (73) where L is the Cholesky factor of the correlation matrix: ρ∗ = LL ⊤.
+
+Step 2. Update nominal forward rates. For each maturity grid point τi:
+
+f N (t + ∆ t, τ i) = f N(t, τ i + ∆ t) + μN (t, τ i) ∆ t + σN (t, τ i) · ∆W N , (74) where μN (t, τ i) = Png
+
+> q,r =1
+
+(AN ⊤AN )q,r gq(τi) Gr(τi) from (45), and f N(t, τ i + ∆ t) is obtained by interpolation (the Musiela transport term). 
+
+Step 3. Update real forward rates (with inflation drift correction). 
+
+f R(t + ∆ t, τ i) = f R(t, τ i + ∆ t) + 
+
+h
+
+μR(t, τ i) − σR(t, τ i) · σI (t)
+
+i
+
+∆t + σR(t, τ i) · ∆W N , (75) where μR(t, τ i) = Png
+
+> q,r =1
+
+(AR⊤AR)q,r gq(τi) Gr(τi).
+
+Step 4. Update credit spread. 
+
+If using the base-plus-spread decomposition: 
+
+sCDI (t + ∆ t, τ i) = sCDI (t, τ i + ∆ t) + μS (t, τ i) ∆ t + σS (t, τ i) · ∆W N , (76) where μS is the spread drift derived in Section D.2, eq. (92) (it includes the within-block term 
+
+σS · AS , the cross-block terms σN · AS + σS · AN proportional to ρN S , and the credit-FX correction −σC · σJ ). The credit forward rate is then: 
+
+f C (t + ∆ t, τ i) = f N (t + ∆ t, τ i) + sCDI (t + ∆ t, τ i). (77) 
+
+Step 5. Update exchange rates (frozen-rate exponential step). 
+
+It+∆ t = It exp 
+
+h 
+
+rNt − rRt − 12 |σI (t)|2
+
+∆t + σI (t) · ∆W N i
+
+, (78) 
+
+Jt+∆ t = Jt exp 
+
+h 
+
+rNt − rCt − 12 |σJ (t)|2
+
+∆t + σJ (t) · ∆W N i
+
+, (79) 
+
+Kt+∆ t = Jt+∆ t
+
+It+∆ t
+
+. (80) Equations (78)–(79) replace the integrated short-rate differential R t+∆ tt (rNs − rRs ) ds with its frozen-coefficient evaluation (rNt − rRt )∆ t; the step is exact in the lognormal sense conditional on this freezing, and preserves positivity of the exchange rates without the discretization bias of a direct Euler–Maruyama scheme on It and Jt.39 Step 6. Extract short rates and implied spreads. 
+
+rjt = f j (t, 0) , j ∈ { N, R, C }, (81) 
+
+sIP CA (t, τ i) = f C (t, τ i) − f R(t, τ i) = sCDI (t, τ i) + f N (t, τ i) − f R(t, τ i). (82) 
+
+B.7.3 Pseudocode 
+
+Algorithm 1 presents the complete simulation loop in pseudocode. 
+
+Algorithm 1 Three-Currency HJM Simulation 
+
+Require: Initial curves f N 
+
+> 0
+
+(τ ), f R 
+
+> 0
+
+(τ ), s CDI  
+
+> 0
+
+(τ ); initial FX I0, J 0
+
+Require: Amplitude matrices AN , A R, A S ; decay parameters b2, b 3, c 2; FX loadings σI , σ J
+
+Require: Correlation Cholesky factor L with LL ⊤ = ρ; time step ∆t; horizon Tsim 
+
+Ensure: Paths of {f N , f R, f C , s CDI , s IP CA , I, J, K } 
+
+> 1:
+
+Nsteps ← Tsim /∆t 
+
+> 2:
+
+for n = 0 to Nsteps − 1 do  
+
+> 3:
+
+t ← n ∆t 
+
+> 4:
+
+rNn ← f Nn (0) , rRn ← f Rn (0) , rCn ← f Nn (0) + sCDI n (0) ▷ Pre-step short rates  
+
+> 5:
+
+Draw ξ ∼ N (0, Im) 
+
+> 6:
+
+∆W ← L ξ √∆t ▷ Correlated increments, Cov(∆ W ) = ρ ∆t 
+
+> 7:
+
+for each maturity τi in grid do  
+
+> 8:
+
+f Nn+1 (τi) ← Transport (f Nn , τ i, ∆t) + μN (τi) ∆ t + σN (τi) · ∆W 
+
+> 9:
+
+f Rn+1 (τi) ← Transport (f Rn , τ i, ∆t) + [ μR(τi) − σR(τi) · σI ] ∆ t + σR(τi) · ∆W 
+
+> 10:
+
+sCDI n+1 (τi) ← Transport (sCDI n , τ i, ∆t) + μS (τi) ∆ t + σS (τi) · ∆W 
+
+> 11:
+
+end for  
+
+> 12:
+
+f Cn+1 ← f Nn+1 + sCDI n+1 ▷ Recover credit curve  
+
+> 13:
+
+In+1 ← In exp (rNn − rRn − 12 |σI |2)∆ t + σI · ∆W  
+
+> 14:
+
+Jn+1 ← Jn exp (rNn − rCn − 12 |σJ |2)∆ t + σJ · ∆W  
+
+> 15:
+
+Kn+1 ← Jn+1 /I n+1  
+
+> 16:
+
+sIP CA n+1 ← sCDI n+1 + f Nn+1 − f Rn+1 ▷ Triangle identity  
+
+> 17:
+
+end for 
+
+B.8 Model Outputs and Diagnostics 
+
+A single run of Algorithm 1 produces, at each simulated date, the following objects: (i) Nominal forward-rate curve f N (t, τ ) and the corresponding zero-coupon curve P N (t, T ).(ii) Real forward-rate curve f R(t, τ ) and the corresponding real zero-coupon curve P R(t, T ).(iii) Inflation index It, from which period-over-period inflation rates can be computed. (iv) Corporate credit forward-rate curve f C (t, τ ) and the credit zero-coupon curve P C (t, T ).(v) CDI+ credit spread curve sCDI (t, τ ) = f C (t, τ ) − f N (t, τ ).(vi) IPCA+ credit spread curve sIP CA (t, τ ) = f C (t, τ ) − f R(t, τ ).(vii) Credit FX Jt and the cross rate Kt = Jt/I t.40 B.8.1 Diagnostic checks 
+
+We recommend the following diagnostics to validate simulation quality: 
+
+D1. Initial curve reproduction. At t = 0 , the simulated curves must exactly equal the calibrated initial curves. This is guaranteed by construction of the HJM framework but should be verified numerically to catch implementation errors. 
+
+D2. Triangle consistency. At every simulated step and maturity, verify: 
+
+sIP CA (t, τ ) − sCDI (t, τ ) − f N (t, τ ) − f R(t, τ ) < ϵ, (83) for a tight numerical tolerance ϵ (e.g., 10 −10 in continuous-compounding terms). Any violation indicates a coding error, since the triangle is enforced algebraically by (82). 
+
+D3. Martingale test. Verify that the deflated foreign numeraires are martingales. For a set of 
+
+Nsim simulation paths, the sample mean of IT BRT /B NT at each horizon T should be statistically indistinguishable from I0:
+
+1
+
+Nsim Nsim X
+
+> n=1
+
+I(n) 
+
+> T
+
+BR, (n)
+
+> T
+
+BN, (n)
+
+> T
+
+− I0 ≤ zα/ 2
+
+ˆσ
+
+√Nsim 
+
+, (84) where zα/ 2 is the standard normal critical value and ˆσ is the sample standard deviation across paths. The analogous test applies to JT BCT /B NT .
+
+D4. Marginal statistics. Compare simulated marginal distributions against historical data: (a) Annualized volatility of forward-rate changes at key maturities (1y, 3y, 5y, 10y) for each curve. (b) Annualized volatility of CDI+ and IPCA+ spread changes. (c) Cross-correlations between rate and spread factor innovations. (d) Distribution of simulated inflation rates versus historical CPI data. 
+
+D5. Term structure smoothness. At each simulated date, the forward-rate curves and spread curves should be smooth functions of maturity. Excessive oscillation, particularly at the long end of the grid, signals numerical instability in the Musiela transport step and may require grid refinement or smoothing. 
+
+B.8.2 Computational considerations 
+
+The per-step computational cost is O(m N τ ): for each of the Nτ maturity grid points, we compute m factor contributions (each involving a closed-form gk(τ ) Gk(τ ) evaluation) and m
+
+Brownian increments. The Cholesky factorization of ρ∗ is performed once and costs O(m3). For 
+
+m = 7 and Nτ = 50 , the per-step cost is negligible; a 10-year daily simulation ( ≈ 2,520 steps) with 10 ,000 paths completes in seconds on commodity hardware. 41 Memory requirements are modest: each path stores 3 × Nτ forward-rate values plus 3
+
+exchange-rate values at each step, totaling O(Nsteps × Nτ ) per path. For the baseline pa-rameters, a single path occupies approximately 4 MB of double-precision storage over a 10-year horizon. 42 C Out-of-sample diagnostics 
+
+All diagnostics use the out-of-sample window (2024-01-02 to 2026-02-05, 110 weekly observa-tions), which was excluded from parameter estimation. Under the two-model framing the within-model triangle identity holds by construction at every simulation step, so there is no “triangle RMSE” to track. The diagnostics instead evaluate whether calibrated volatilities match OOS re-alized changes, whether in-sample correlations persist, and whether the 90% Gaussian prediction intervals achieve their nominal coverage. 
+
+C.1 Volatility reproduction 
+
+The rate blocks reproduce OOS realized volatility reasonably well: nominal is 80 to 90% of model magnitude at short/medium maturities and real is within 10% at all tenors, reflecting that the OOS window (2024-01 onward) was indeed calmer than the estimation window (which straddled the Selic peak). CDI + spread vol at the 1-year pillar underpredicts the OOS realization by 30%, traceable to the 2024 credit-fund redemption episode discussed below, while the 3- and 5-year pillars are in line with model. 
+
+C.2 Correlation reproduction 
+
+The rate-block correlations are stable out-of-sample (difference ≤ 0.02 ). The rate-spread corre-lation flips sign (from weakly negative to weakly positive) without changing magnitude mean-ingfully. The only large drift is in the within-spread level-slope correlation, which jumps from essentially zero in-sample to +0 .37 OOS, driven by the 2024 event where CDI + short spreads widened sharply while long spreads remained stable, creating a temporarily steep curve shift. This is a known regime-specific pattern around credit-fund redemption episodes. 
+
+C.3 One-week-ahead coverage rates 
+
+For each out-of-sample date, we compute the model-implied 90% prediction interval for the 1-week-ahead change in each variable and check whether the realization falls inside. Table 7: Empirical coverage of 90% Gaussian prediction intervals (weekly horizon, out-of-sample, 
+
+n = 110 ). Nominal target is 90%. Values in the 85 to 95% band are consistent with Gaussian null at conventional levels. 
+
+τ = 1 y τ = 3 y τ = 5 y τ = 7 y
+
+∆f N 94.5% 98.2% 92.7% 90.9% 
+
+∆f R 91.8% 94.5% 75.5% 69.1% 
+
+∆sCDI 85.5% 92.7% 90.9% n/a Nominal-curve coverage is on target across maturities. Real-curve coverage is good at short maturities but drops sharply at τ ≥ 5 y; the model underpredicts the OOS volatility there because 2024 to 2026 long-end NTN-B moves were larger than those in the estimation window. CDI + spread coverage is close to 90% across the term structure. The distributional-statistics diagnostic attributes most of the coverage shortfall to heavy tails rather than bias. 43 Rates are close to Gaussian ( < 2 excess kurtosis). Credit spreads are heavier-tailed, with CDI + excess kurtosis ranging from 4 to 10. This is the main driver of residual coverage failure at the spread level and motivates stochastic-volatility or jump extensions to σS .
+
+C.3.1 Extreme-event analysis 
+
+Rather than enumerate individual dates, we summarize the extreme-event diagnostic via the realized-to-model vol ratio at the 1-year CDI + pillar, which is the canonical "credit stress" measure: σOOS realized /σ in -sample model = 115 .1/81 .1 = 1 .42 . The OOS realization is therefore 42% more volatile than the in-sample calibration predicts at the 1-year CDI + pillar, a large but not catas-trophic miss concentrated entirely in the mid-2024 credit-fund redemption episode. At the 3-and 5-year CDI + pillars, model and realized vol agree to within 10%. 
+
+C.3.2 Simulation diagnostics (D3 martingale test, D5 smoothness) 
+
+We report numerical realizations of the D3 and D5 diagnostics defined in Section B.8.1. The simulation is initialized at the last in-sample business day (2023-12-28) from the calibrated Model A parameters, run weekly for five years with Nsim = 2000 paths under QN , with χ(τ ) ≡ 0,absorbing the Step A reconciliation into the initial f C curve, which has no effect on either martingale test. 
+
+D3. Martingale test. Table 8 reports sample means of the deflated foreign numeraires 
+
+IT BRT /B NT and JT BCT /B NT against their t = 0 values of unity, at horizons T ∈ { 0.25 , 0.5, 1, 2, 3, 5}
+
+years. Biases are reported in basis points of relative deviation; z-scores use the Monte Carlo standard error. All |z| values are well below the 1.96 threshold for a two-sided 5% test, with the maximum across both ratios and all horizons being |z|max = 0 .90 . The simulation discretization (exponential update for I, J ; Euler-left-endpoint accumulation of the money-market integrals) therefore preserves the martingale property to within Monte Carlo noise, confirming that the Girsanov-drift corrections in the HJM system are implemented consistently. 
+
+D5. Term-structure smoothness. As a scale-invariant measure of oscillation, we compute the normalized discrete second difference |∆2f j (t, τ i)|/(∆ τ 2 
+
+> i
+
+·max τ |f j (t, τ )|) at each interior grid point, across all simulated (path, date) pairs after t0, where ∆τ 2 
+
+> i
+
+= ( τi+1 − τi)( τi − τi−1). The diagnostic compares simulated curvature with the curvature already present in the initial curve. In our run the long-end ( τ ∈ (2 , 10] yr) ratio remains below 2 for all five curves and below 1 for 
+
+f N , f R, and sCDI ; the short-end amplification of 2 to 3.5 is consistent with stochastic diffusion of the parametric loading shapes. The long end ( τ ∈ (2 , 10] yr), where Musiela-transport instability would first appear, has a ratio of simulated p95 to initial baseline below 2 for all five curves and below 1 for f N , f R, and 
+
+sCDI . The short end ( τ ∈ [0 .25 , 2] yr) shows ratios of 2 to 3.5, which is consistent with ordinary stochastic amplification. Extreme values reach at most ∼ 7 for f R and sIP CA in the short-end window; none represent numerical instability. Both D3 and D5 are within the stated numerical tolerances. 44 T (yr) sample mean bias (bp) MC s.e. (bp) z
+
+Inflation: IT BRT /B NT , I0 = 1 
+
+0.25 1.000031 +0.31 0.77 +0.40 0.50 1.000030 +0.30 1.09 +0.27 1.00 0.999992 -0.08 1.54 -0.05 2.00 1.000065 +0.65 2.18 +0.30 3.00 0.999856 -1.44 2.68 -0.54 5.00 0.999951 -0.49 3.50 -0.14 
+
+Credit: JT BCT /B NT , J0 = 1 
+
+0.25 1.000068 +0.68 0.91 +0.75 0.50 1.000114 +1.14 1.26 +0.90 1.00 1.000143 +1.43 1.81 +0.79 2.00 1.000161 +1.61 2.63 +0.61 3.00 1.000096 +0.96 3.27 +0.29 5.00 1.000063 +0.63 4.23 +0.15 Table 8: D3 martingale test. Sample means of IT BRT /B NT and JT BCT /B NT under QN , compared with t = 0 values of unity. Biases in basis points; z = bias /s.e. Nsim = 2000 paths over five years with weekly time steps. 
+
+# D Detailed parameter tables 
+
+This appendix collects three sets of supporting material: the closed-form HJM drift integrals under the exponential volatility family of Proposition 15, the spread-curve drift correction under the base-plus-spread decomposition used in simulation, and the detailed calibrated parameter tables referenced throughout the paper. 
+
+D.1 Closed-Form Drift Integrals 
+
+For a volatility architecture based on the exponential shape functions 
+
+g1(τ ) = 1 , g2(τ ) = e−b2τ , g3(τ ) = τ e −b3τ ,
+
+the cumulative volatility integrals Gk(τ ) = R τ 
+
+> 0
+
+gk(s) d s are: 
+
+G1(τ ) = τ, (85) 
+
+G2(τ ) = 1 − e−b2τ
+
+b2
+
+, (86) 
+
+G3(τ ) = 1 − (1 + b3τ ) e−b3τ
+
+b23
+
+. (87) For a curve j with amplitude matrix Aj ∈ Rmj ×ng , the within-block HJM drift is the bilinear form 
+
+μj (t, τ ) = σj (t, τ ) · Aj (t, τ ) = 
+
+> ng
+
+X
+
+> q,r =1
+
+Aj (t)⊤Aj (t) 
+
+> q,r
+
+gq(τ ) Gr(τ ), (88) which collapses to P
+
+> p
+
+(ajp)2gp(τ )Gp(τ ) in the diagonal special case Ajp,q = ajp δp,q . The foreign-45 curve correction picks up the FX loading αI ∈ Rm through the inner-product convention of Proposition 1; for the real curve, 
+
+σR(t, τ ) · σI (t) = 
+
+> mR
+
+X
+
+> p=1
+
+ ng
+
+X
+
+> q=1
+
+ARp,q gq(τ )
+
+
+
+αImN +p + (cross-block ρ corrections) , (89) where the cross-block term is non-zero only if σI has loadings outside the R-block. These closed-form expressions remove the need for numerical quadrature within each simulation time step. 
+
+D.2 Spread Drift Under the Base-Plus-Spread Decomposition 
+
+When modeling sCDI directly (rather than f C ), the HJM drift of the spread process must be derived from the drifts of f C and f N under QN .From the system (22): 
+
+df C =
+
+h
+
+σC · AC − σC · σJ
+
+i
+
+dt + σC · dW N ,df N = σN · AN dt + σN · dW N .
+
+With σC = σN + σS , the credit-curve drift integral becomes: 
+
+AC (t, τ ) = 
+
+Z τ
+
+> 0
+
+σC (t, u ) d u = AN (t, τ ) + AS (t, τ ), (90) where AS (t, τ ) = R τ 
+
+> 0
+
+σS (t, u ) d u. Therefore: 
+
+σC · AC = ( σN + σS ) · (AN + AS )= σN · AN + σN · AS + σS · AN + σS · AS . (91) The spread drift is ds CDI = df C − df N , so: 
+
+μS (t, τ ) = σN (t, τ ) · AS (t, τ ) + σS (t, τ ) · AN (t, τ )+ σS (t, τ ) · AS (t, τ ) − σC (t, τ ) · σJ (t). (92) The first three terms are the “HJM drift of the spread,” arising from the no-arbitrage require-ment on the credit curve. The fourth is the credit-FX correction. The canonical-basis decom-position assigns nominal and spread factors to non-overlapping blocks of Rm, so the cross-block products σN · AS and σS · AN reduce to σN ⊤ρN S AS and σS ⊤ρSN AN under the inner-product convention of Proposition 1. They vanish identically only if ρN S = 0, which is not the case em-pirically. With the calibrated AN , AS and ρ of Model A, the cross-block sum |σN ·AS +σS ·AN |
+
+is small at the very short end (around 3% of the within-block term at τ = 0 .5 yr), grows through the medium maturities (cross-block magnitude exceeds within-block by factors of ∼ 4–5 over 
+
+τ ∈ [2 , 5] yr because the within-block term passes through near-cancellations between the h1
+
+and h2 shape contributions while the cross-block picks up the much larger nominal amplitudes 
+
+AN ), and recedes to under 25% for τ ≥ 7 yr. At τ = 3 yr in the calibrated model, dropping the 46 cross-block terms would flip the sign of μS . The simulation engine therefore evaluates (92) in full; the within-block-only form 
+
+μS (t, τ ) ?
+
+≈ σS (t, τ ) · AS (t, τ ) − σC (t, τ ) · σJ (t) (93) is shown only to make the structure of the four contributions explicit; it is not adopted numeri-cally and does not constitute a valid approximation in this calibration. With the parametric spread shape functions h1(τ ) = 1 and h2(τ ) = e−c2τ and closed-form integrals 
+
+H1(τ ) = τ, H2(τ ) = 1 − e−c2τ
+
+c2
+
+, (94) the within-block spread drift becomes the bilinear form 
+
+σS · AS =
+
+> nh
+
+X
+
+> q,r =1
+
+AS⊤AS  
+
+> q,r
+
+hq(τ ) Hr(τ ), (95) which collapses to P
+
+> p
+
+(aSp )2hp(τ )Hp(τ ) in the diagonal special case. The cross-block terms 
+
+σN · AS and σS · AN in (92) are computed analogously, with ρN S inserted between the rate and spread amplitude rows. The credit-FX correction [σN +σS ]·σJ uses the sparsity structure of σJ :if σJ loads only on the spread block and the nominal level factor, only those terms contribute. 
+
+D.3 Calibrated Parameters: Detailed Tables 
+
+This appendix collects the per-block PCA decomposition, parametric loading fits, cross-block factor correlations, exchange-rate volatility identification, and the out-of-sample volatility and correlation comparisons that are summarized in the body. Table 9: Parameter count for the baseline specification ( mN = 3 , mR = 2 , mS = 2 , ng = 3 rate shapes, nh = 2 spread shapes). 
+
+Parameter block Symbol Count 
+
+Nominal amplitude matrix AN ∈ RmN ×ng 9Real amplitude matrix AR ∈ RmR×ng 6Spread amplitude matrix AS ∈ RmS ×nh 4Rate decay parameters b2, b 3 2Spread decay parameter c2 1Inflation FX loadings αIk (sparse) 3Credit FX loadings αJk (sparse) 3Cross-block correlations ρij off-diagonal ≤ 15 
+
+Total ≤ 43 
+
+47 Table 10: Nominal curve PCA: eigenvalues (bp 2/yr) and variance explained, 8 pillars ∈{0.25 , 0.5, 1, 2, 3, 5, 7, 10 } years. 
+
+Factor Eigenvalue % Variance Cumulative % 
+
+N1 (level) 362,589 63.5% 63.5% 
+
+N2 (slope) 77,330 13.5% 77.0% 
+
+N3 (curvature) 41,972 7.3% 84.3% 
+
+N4 26,305 4.6% 88.9% Table 11: Estimated nominal-block parameters. Amplitudes in bp/ √yr; decays in yr −1. Shared decays with the real block.                                
+
+> Factor ANk, 1(g1)ANk, 2(g2)ANk, 3(g3)Interpretation
+> k= 1 188.1 509.4 −4902 .6level-dominated
+> k= 2 −89 .2494.2 −1671 .5slope-dominated
+> k= 3 46.3 −512 .24164.4 curvature-dominated Shared decays b2= 0 .730 yr −1,b3= 3 .436 yr −1(half-life 0.95 yr; curvature peak at 0.29 yr) Parametric fit R288.2%
+
+Table 12: Real curve PCA: eigenvalues (bp 2/yr) and variance explained. Restricted to pillars 
+
+{1, 2, 3, 5, 7, 10 } years after the short-end maturity filter. 
+
+Factor Eigenvalue % Variance Cumulative % 
+
+R1 (level) 137,979 68.9% 68.9% 
+
+R2 (slope) 43,460 21.7% 90.5% 
+
+R3 13,264 6.6% 97.2% Table 13: Estimated real factor loadings (shared b2, b 3). 
+
+## Factor ARk, 1 (g1) ARk, 2 (g2) ARk, 3 (g3) Interpretation 
+
+## k = 1 35.1 387.9 3375.6 level-dominated 
+
+## k = 2 −47 .0 −454 .1 11125.9 slope-dominated Parametric fit R2 99.5% (shared b2, b 3 with nominal) 
+
+Table 14: Spread PCAs: eigenvalues (bp 2/yr) and variance explained, by credit-economy model. Model A uses pillars {1, 2, 3, 5} yr; Model B uses {2, 3, 5} yr because the 1-year IPCA + vertex is structurally sparse (Section 4.1.3), which would otherwise collapse the joint estimation panel to fewer than 30 weeks. 
+
+Model A (CDI +) Model B (IPCA +)
+
+Factor Eigenvalue % Var Cum. % Eigenvalue % Var Cum. % 
+
+S1 (level) 10,748 59.5% 59.5% 28,781 86.7% 86.7% 
+
+S2 (slope) 4,118 22.8% 82.4% 3,046 9.2% 95.9% 
+
+S3 2,550 14.1% 96.5% 1,358 4.1% 100.0% 
+
+48 Table 15: Estimated spread-block parameters. Model A is fitted to the two-factor basis 
+
+{h1(τ ), h 2(τ )} = {1, e −c2τ }. Model B is reported as empirical PCA loadings 
+
+q
+
+λS,B k vS,B k (τ )
+
+at each pillar; we do not impose a parametric exponential decay because at the available pillar set {2, 3, 5} yr the basis {1, e −c2τ } degenerates as c2 rises (the search drives c2 to the feasibility upper bound). The empirical loadings are used directly in the simulation, with linear interpola-tion between vertices.                                  
+
+> Model A (CDI +)Model B (IPCA +), empirical
+> Factor AS,A k, 1(h1)AS,A k, 2(h2)loading at τ= 2 loading at τ= 3 loading at τ= 5
+> k= 1 46.5 732.0 164.8 12.5 38.4
+> k= 2 −23 .13128.5 9.7 −47 .7−26 .0
+> Shape parameter cA
+> 2= 3 .75 yr −1(no parametric fit, see caption) Parametric fit R297.9% —
+
+Table 16: Factor correlation matrix ˆρA for Model A (CDI +). Lower triangle; upper triangle omitted. Minimum eigenvalue: 0.198 (positive definite; no Higham correction required). Block-bootstrap standard errors (B=500, block size 4 weeks) for selected cross-block entries reported in Table 18. 
+
+## N1 N2 N3 R1 R2 SCDI 
+
+1 SCDI 
+
+2
+
+## N1 1.00 
+
+## N2 −0.05 1.00 
+
+## N3 −0.06 −0.11 1.00 
+
+## R1 0.54 0.24 −0.08 1.00 
+
+## R2 −0.56 0.27 0.17 0.00 1.00 
+
+## SCDI 
+
+1 −0.06 −0.03 0.10 −0.23 0.01 1.00 
+
+## SCDI 
+
+2 0.10 0.01 −0.02 0.18 −0.09 0.00 1.00 
+
+Table 17: Factor correlation matrix ˆρB for Model B (IPCA +). Lower triangle; upper triangle omitted. Minimum eigenvalue: 0.170 (positive definite; no Higham correction required). Model B uses spread pillars {2, 3, 5} yr (1-year vertex dropped because its 27-week coverage would otherwise reduce the joint innovation panel below 30 weeks); the joint panel here is 66 weeks. 
+
+## N1 N2 N3 R1 R2 SIP CA 
+
+1 SIP CA 
+
+2
+
+## N1 1.00 
+
+## N2 −0.22 1.00 
+
+## N3 −0.14 −0.32 1.00 
+
+## R1 0.67 −0.22 −0.09 1.00 
+
+## R2 −0.63 0.19 0.13 −0.21 1.00 
+
+## SIP CA 
+
+1 0.05 0.07 −0.04 0.00 −0.08 1.00 
+
+## SIP CA 
+
+2 −0.02 −0.06 −0.04 0.02 −0.06 0.00 1.00 
+
+49 Table 18: Block-bootstrap standard errors and 95% percentile intervals for key calibrated quan-tities (Model A unless noted). B = 500 resamples, block length 4 weeks. Eigenvalues reported as √λk in bp/ √yr (sign-invariant amplitude); decays in yr −1; σI and σJ from realized vol; cor-relations from the bootstrap factor-projection matrix. 
+
+# Quantity Point SE 2.5% 97.5% 
+
+# q
+
+# λN
+
+## 1 (level) 602.2 55.2 506.2 714.6 
+
+# q
+
+# λN
+
+## 2 (slope) 278.1 25.5 238.3 337.4 
+
+# q
+
+# λN
+
+## 3 (curvature) 204.9 25.0 164.3 256.6 
+
+# q
+
+# λR
+
+## 1 371.5 41.5 298.3 457.7 
+
+# q
+
+# λR
+
+## 2 208.5 12.7 179.2 230.7 
+
+# q
+
+# λS,A 
+
+## 1 103.7 20.2 65.8 144.9 
+
+# q
+
+# λS,A 
+
+## 2 64.2 9.1 44.8 80.3 
+
+# q
+
+# λS,B 
+
+## 1 ({2, 3, 5}y) 169.6 64.3 74.6 278.2 
+
+# q
+
+# λS,B 
+
+## 2 ({2, 3, 5}y) 55.2 6.4 39.9 64.5 
+
+# b2 0.73 0.66 0.51 2.07 
+
+# b3 3.44 1.14 0.88 4.32 
+
+# cA
+
+## 2 3.75 1.80 0.58 5.00 
+
+# |σAJ | 80.7 12.6 55.6 103.1 
+
+# |σBJ | 75.9 9.2 57.4 93.4 
+
+# ˆρN1,R 1 0.54 0.11 0.36 0.76 
+
+# ˆρN2,R 2 0.27 0.12 0.02 0.47 
+
+# ˆρN1,S CDI 
+
+1
+
+# −0.06 0.08 −0.21 0.09 
+
+# ˆρR1,S CDI 
+
+1
+
+# −0.23 0.11 −0.37 0.02 
+
+> 50
+
+Table 19: Inflation-FX identification from monthly IPCA realized variance. Quantity Estimate 
+
+|cσI | (total, annualized) 135.1 bp/ √yr spanned by rate factors ( ∥αI ∥) 86.1 bp/ √yr idiosyncratic residual 107.9 bp/ √yr Rate-factor regression R2 0.33 Monthly observations 35 Table 20: Credit-FX volatility, by credit-economy model. Residual vol is the OLS residual after regressing the short-pillar spread change on unit-variance factor innovations.                    
+
+> Quantity Model A (CDI +)Model B (IPCA +)Reference pillar τmin 1 yr 3 yr
+> |cσJ|(bp/ √yr) 80.7 75.9 Residual vol (bp/ √yr) 3.3 16.3 Factor-regression R20.998 0.902 Non-missing weekly obs 153 122; 66 after full-row intersection (Model B uses {2,3,5}y)
+
+Table 21: Annualized volatility of weekly changes (bp/ √yr): model-implied (calibrated in-sample) vs. realized in the out-of-sample window. Model vol for the rate blocks is 
+
+qP
+
+> k
+
+[σjk(τi)] 2
+
+at the pillar; for CDI + spreads it is the corresponding Model A quantity. IPCA + realized vol is reported as a diagnostic because Model B’s short-pillar coverage is sparse. 
+
+# Model Realized (OOS) 
+
+# 1y 3y 5y 1y 3y 5y 
+
+# ∆f N 286 294 238 226 193 191 
+
+# ∆f R 343 135 74 324 118 105 
+
+# ∆sCDI 81 52 42 115 47 43 
+
+# ∆sIP CA n/a n/a n/a 154 99 57 
+
+Table 22: Key factor-score correlations: in-sample (Model A estimate) vs. out-of-sample (real-ized). The in-sample values reported here are the same objects as the corresponding off-diagonal entries of the full 7 × 7 correlation matrix in Table 16, restricted to the four pairs of economic interest. 
+
+# Pair In-sample OOS Diff. 
+
+# (ZN
+
+1 , Z R
+
+1 ) (level-level) +0 .54 +0 .56 +0 .02 (ZN
+
+2 , Z R
+
+2 ) (slope-slope) +0 .27 +0 .28 +0 .01 (ZN
+
+1 , Z S,CDI 
+
+1 ) (rate-spread) −0.06 +0 .03 +0 .09 (ZS,CDI 
+
+1 , Z S,CDI 
+
+2 ) (level-slope) +0 .00 +0 .37 +0 .37 
+
+51 References 
+
+ANBIMA. Taxas de títulos públicos and estrutura a termo das taxas de juros: Metodolo-gia. ANBIMA public documentation, 2021. Available at https://www.anbima.com. br/pt_br/informar/ferramenta/precos-e-indices/taxas-titulos-publicos.htm and 
+
+https://www.anbima.com.br/data/files/9A/F4/E3/1F/4805B710B0F024B7882BA2A8/ est-termo_metodologia_v2021.pdf . Accessed on May 13, 2026. B3. Di1 futures: Contract specifications. B3 Public Documentation, 2026. Available at https://www.b3.com.br/pt_br/produtos-e-servicos/negociacao/juros/ futuro-de-taxa-media-de-depositos-interfinanceiros-de-um-dia.htm . Accessed on May 13, 2026. Tomasz R. Bielecki and Marek Rutkowski. Credit Risk: Modeling, Valuation and Hedging .Springer, Berlin Heidelberg, 2002. Filipe Brand. Debêntures incentivadas e apropriação de benefícios fiscais. Cadernos de Finanças Públicas , 22(3), 2022. doi: 10.55532/1806-8944.2022.190. Brazilian Federal Government. Lei no. 11.033, de 21 de dezembro de 2004, 2004. Available at https://www.planalto.gov.br/ccivil_03/_Ato2004-2006/2004/Lei/L11033.htm . Ac-cessed on May 13, 2026. Brazilian Federal Government. Lei no. 12.431, de 24 de junho de 2011 (tax exemption for infrastructure debentures), 2011. Official summary available at https://www.gov.br/ transportes/pt-br/assuntos/incentivos/debentures-incentivadas . Accessed on May 13, 2026. Darrell Duffie and Kenneth J. Singleton. Modeling term structures of defaultable bonds. Review of Financial Studies , 12(4):687–720, 1999. Ernst Eberlein and Fehmi Özkan. The defaultable Lévy term structure: Ratings and restruc-turing. Mathematical Finance , 13(2):277–300, 2003. David Heath, Robert Jarrow, and Andrew Morton. Bond pricing and the term structure of interest rates: A new methodology for contingent claims valuation. Econometrica , 60(1): 77–105, 1992. Nicholas J. Higham. Computing the nearest correlation matrix: a problem from finance. IMA Journal of Numerical Analysis , 22(3):329–343, 2002. Robert Jarrow and Yildiray Yildirim. Pricing treasury inflation protected securities and related derivatives using an HJM model. Journal of Financial and Quantitative Analysis , 38(2): 337–358, 2003. JGP Asset Management. Idex-CDI core. JGP public index page and methodology documenta-tion, 2026a. Available at https://idex.jgp.com.br/idex-cdi-core/ . Accessed on May 13, 2026. 52 JGP Asset Management. Idex-Infra core. JGP public index page and methodology documenta-tion, 2026b. Available at https://idex.jgp.com.br/idex-infra-core/ . Accessed on May 13, 2026. Robert Litterman and José Scheinkman. Common factors affecting bond returns. Journal of Fixed Income , 1(1):54–61, 1991. Fabio Mercurio. Interest rates and the credit crunch: New formulas and market models. 
+
+Bloomberg Portfolio Research Paper , (2010-01-FRONTIERS), 2010. Marek Musiela and Marek Rutkowski. Martingale Methods in Financial Modelling . Springer, 2nd edition, 2005. Charles R. Nelson and Andrew F. Siegel. Parsimonious modeling of yield curves. Journal of Business , 60(4):473–489, 1987. Thiago Rabelo Pereira and Marcelo Trindade Miterhof. Uma nota sobre a eficiência fiscal das debêntures incentivadas em infraestrutura no Brasil. Revista Brasileira de Economia , 75(2): 245–278, 2021. doi: 10.5935/0034-7140.20210011. Philipp J. Schönbucher. A LIBOR market model with default risk. Bonn Econ Discussion Paper 15/2001, University of Bonn, Bonn Graduate School of Economics, 2000. Available at 
+
+https://ideas.repec.org/p/zbw/bonedp/152001.html . Accessed on May 13, 2026. Hsia Hua Sheng and Richard Saito. Determinantes de spread das debêntures no mercado brasileiro. Revista de Administração (RAUSP) , 40(2):193–205, 2005. Steven E. Shreve. Stochastic Calculus for Finance II: Continuous-Time Models . Springer, 2004. Lars E. O. Svensson. Estimating and interpreting forward interest rates: Sweden 1992–1994. Working Paper 4871, NBER, 1994. Available at https://www.nber.org/papers/w4871 . Ac-cessed on May 13, 2026. Gyorgy Varga. Teste de modelos estatísticos para a estrutura a termo no Brasil. Revista Brasileira de Economia , 63(4):361–394, 2009. Available at https://ideas.repec.org/a/ fgv/epgrbe/v63y2009i4a1199.html . Accessed on May 13, 2026. Grace Wahba. Spline Models for Observational Data . SIAM, 1990. 53

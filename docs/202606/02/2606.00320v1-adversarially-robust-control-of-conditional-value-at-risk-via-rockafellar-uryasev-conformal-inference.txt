@@ -1,0 +1,2184 @@
+Title: Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference
+
+URL Source: https://arxiv.org/pdf/2606.00320v1
+
+Published Time: Tue, 02 Jun 2026 00:29:38 GMT
+
+Number of Pages: 28
+
+Markdown Content:
+# Adversarially Robust Control of Conditional Value-at-Risk Via Rockafellar-Uryasev Conformal Inference 
+
+Catherine Chen 1 Jingyan Shen 2 Zhun Deng 3 Lihua Lei 4
+
+# Abstract 
+
+We present an online, distribution-free frame-work for controlling the Conditional Value-at-Risk ( CVaR ), extending conformal tail risk con-trol to non-stationary and adversarial environ-ments. Unlike classical risk control methods, which rely on stationarity or linearity of expecta-tion, our approach provides provable safety guar-antees for a nonlinear tail risk functional under 
+
+arbitrary data-generating processes that may drift or shift strategically over time . By leveraging deep connections between conformal tail risk con-trol, online learning, and the variational repre-sentation of CVaR introduced by Rockafellar & Uryasev (2000), we develop a novel procedure for online CVaR control with adversarial regret guar-antees. The proposed method operates without assumptions on the underlying data-generating process, making it broadly applicable in mod-ern high-stakes deployment settings. We prove that the realized empirical CVaR is asymptoti-cally controlled at the target level, and that the resulting control is asymptotically tight up to a finite-sample O(1 /√T ) conservatism gap. We demonstrate the effectiveness of our approach on portfolio risk management and toxicity mitigation for Large Language Models (LLMs), where rare but catastrophic failures dominate system risk. 
+
+# 1. Introduction 
+
+Modern machine learning systems are increasingly deployed in high-stakes and safety-critical settings, including finan-cial decision-making, automated content moderation, and 
+
+> 1
+
+Institute for Computational and Mathematical Engineering, Stanford University 2Department of Computer Science, New York University 3Department of Computer Science, University of North Carolina at Chapel Hill 4School of Business and Department of Statistics (by courtesy), Stanford University. Correspondence to: Catherine Chen <cyc2152@stanford.edu >.
+
+Proceedings of the 43 rd International Conference on Machine Learning , Seoul, South Korea. PMLR 306, 2026. Copyright 2026 by the author(s). 
+
+Figure 1. Online CVaR control via Rockafellar-Uryasev Con-formal inference. Left: Uncontrolled tail risk in adversarial or non-stationary environments leads to catastrophic failures. Middle: Our method combines Conformal Decision Theory with AdaGrad-FTRL. Right: The resulting controller provably enforces the target 
+
+CVaR level with adversarial guarantees. 
+
+large language model (LLM) alignment. In such applica-tions, controlling the average risk is not enough to ensure system reliability, where a single catastrophic error can dom-inate operational, legal, or reputational risk. This has led to growing interest in tail risk control (Snell et al., 2022; Zollo et al., 2024b; Chen et al., 2025), where the goal is to design learning and decision-making systems whose worst-case outcomes remain within acceptable limits. Conditional Value-at-Risk ( CVaR β ) is a canonical and widely adopted measure of tail risk, capturing the expected loss conditioned on the worst 100(1 − β)% of outcomes (Rockafellar & Uryasev, 2000). Unlike average risk mea-sures, CVaR explicitly focuses on rare but catastrophic events, making it suitable for high-stakes, adversarial, and non-stationary environments in which failures could be costly and strategically induced. For instance, in finance, 
+
+CVaR is a fundamental concept in portfolio optimization and regulatory risk management. In modern machine learning systems, an analogous notion arises naturally. For instance, in LLM deployment, CVaR 
+
+measures the expected severity of the most harmful gen-erations. Critically, many deployment environments for LLMs are inherently non-stationary . Therefore, the ability to control CVaR in an online manner is essential. Overall, 1
+
+> arXiv:2606.00320v1 [cs.LG] 29 May 2026 Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference
+
+CVaR β provides a principled objective for stress testing and red-teaming, as demonstrated in existing work on ad-versarial prompting and automated test-case generation for uncovering model vulnerabilities (Perez et al., 2022). In this work, we address whether CVaR β can be controlled in an online and adversarial environment. Unlike expected loss, CVaR β is a nonlinear, tail-sensitive risk functional that depends on the extreme quantiles of the loss distribu-tion. Guarding against the rare but catastrophic outcomes renders tail risk control fundamentally costly, as the events that characterize CVaR β are precisely those that are least frequently observed. To date, existing online risk control and conformal cali-bration methods fail to tackle the intrinsic nonlinearity of 
+
+CVaR β (Gibbs & Candes, 2021; Yang et al., 2024; Lekeu-fack et al., 2024). In particular, widely used procedures such as Adaptive Conformal Inference (ACI) (Gibbs & Candes, 2021), Bellman Conformal Inference (BCI) (Yang et al., 2024), and Conformal Decision Theory (CDT) (Lekeufack et al., 2024) fundamentally rely on linearity of expecta-tion and therefore break down for CVaR β . While recent conformal tail risk control methods can provide statistical guarantees for CVaR β via L-statistics and uniform bounds (Chen et al., 2025; Snell et al., 2022; Deng et al., 2023; Zollo et al., 2024a; Deng et al., 2025), these guarantees do not extend to online, non-stationary, or adversarial regimes. Overcoming these limitations requires new techniques that explicitly exploit the variational structure of CVaR β .In this work, we develop an online, distribution-free frame-work for tail risk control that provides provable safety guar-antees under non-stationary and adversarial data. Our ap-proach builds on the Rockafellar-Uryasev (RU) variational representation of CVaR (Rockafellar & Uryasev, 2000) and reduces online tail risk control to a two-level online opti-mization problem, combining Conformal Decision Theory (Lekeufack et al., 2024) with AdaGrad-Follow the Regu-larized Leader (AdaGrad-FTRL) (McMahan, 2011). The resulting procedure requires no distributional assumptions, and provably controls the realized empirical CVaR at the target level, with a vanishing tightness gap. 
+
+Contributions. We summarize our main contributions as follows: • We formulate the problem of online CVaR control 
+
+under non-stationary and adversarial data, extending existing conformal and risk calibration methods that rely on stationarity or linearity of expectation. • We show that the RU variational representation enables a principled reduction of nonlinear tail risk control to an online regret minimization problem over an auxil-iary threshold parameter. • We provide a provable safety guarantee : the empirical 
+
+CVaR of the realized sequence is asymptotically con-trolled at the target level, even under adversarial data. Moreover, the resulting control is asymptotically tight up to a finite-sample O(1 /√T ) conservatism gap. • We demonstrate the practical effectiveness of our method on LLM toxicity control and portfolio manage-ment under distribution shift. 
+
+1.1. Related Work Rockafellar-Uryasev (RU) Representation. In Rockafel-lar & Uryasev (2000), Rockafellar and Uryasev introduce a variational representation of CVaR β that has become the foundation for risk-sensitive optimization, transforming a tail risk objective into a tractable optimization problem over an auxiliary threshold parameter. Several recent works have highlighted the central role of this variational form in offline robust decision-making under distribution shift and data bias (Sahoo et al., 2025; Lei et al., 2023). In contrast, our setting is fundamentally online as data arrives sequentially, distributions may drift, or be chosen adaptively, and the goal is not merely to optimize a static CVaR objective, but to dynamically control tail risk over time. Our results there-fore complement and extend this line of work by bringing 
+
+CVaR -based risk control into the sequential, adversarial regime. 
+
+Conformal Decision Theory. In Conformal Decision The-ory (CDT) (Lekeufack et al., 2024), a single calibration parameter suffices to control the expected loss of a broad class of decisions, provided a suitable “safeguard” action is available. Similar to conformal risk control (Bates et al., 2021; Angelopoulos et al., 2025a;b), their technique does not work for nonlinear risk functionals like CVaR. In con-trast, our work exploits a fundamentally different strategy than CDT. 
+
+Gradient Equilibrium. Angelopoulos et al. (2025c) argue that the standard notion of regret is not directly relevant to online uncertainty quantification or risk control problems and propose gradient equilibrium as an alternative. By con-trast, in our setting, while regret is not the final objective, it plays a crucial role. We demonstrate that by minimizing a carefully chosen regret objective, one can provably control 
+
+CVaR β at a desired level in adversarial and non-stationary environments. This deepens the connection between online learning and online risk control. 
+
+Adaptive FTRL (AdaGrad–FTRL). A central challenge presented by CVaR control is a secondary online convex optimization problem over the RU threshold variable (ct).While many no-regret online optimization algorithms are available, we seek a method that is stable, compatible with constrained continuous action variables, and does not re-2Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference 
+
+quire manual tuning of a learning rate for the threshold update. To this end, we adopt an adaptive Follow the Reg-ularized Leader (FTRL) update with AdaGrad-style scal-ing (McMahan, 2011; Shalev-Shwartz, 2012; Duchi et al., 2011). At each round, the threshold variable is selected by minimizing the cumulative surrogate loss with a quadratic regularization. This adaptive scaling automatically adjusts the effective step size based on observed loss behavior, yield-ing a stable and self-tuning update rule while preserving standard no-regret guarantees. 
+
+# 2. Rockafellar-Uryasev Conformal Inference 
+
+We present our two-level online learning procedure for con-trolling CVaR β . Section 2.1 discusses the online setting in which our algorithm operates. In Section 2.2, we develop the connection between online CVaR control and online regret minimization for an extended game by leveraging the RU representation (Rockafellar & Uryasev, 2000). We discuss the AdaGrad-FTRL method in Section 2.3, followed by the main theoretical guarantee. In Sections 2.4 and 2.5, we analyze the outer and inner updates of the algorithm and discuss their theoretical properties. 
+
+2.1. Setting 
+
+We consider an online setting indexed by time t =1, 2, . . . , T . At each time point t, the decision-maker chooses a calibration parameter λt and Nature follows by choosing a loss function Rt(λ). We assume that all functions Rt map [λmin , λ max ] to [Rmin , R max ] for some 
+
+−∞ < λmin < λmax < ∞ and −∞ < Rmin <Rmax < ∞. The decision-maker’s choice can rely on 
+
+(Rt−1(·), λ t−1, R t−2(·), λ t−2, . . . ) and Nature’s choice can depend on the decision-maker’s information set at time t
+
+together with λt. The realized loss for the decision-maker occurred at the end of time t is given by Rt(λt), where we extend the domain of Rt(λt) In Section 3 to the entire real line with 
+
+Rt(λ) = 
+
+(
+
+Rmin , λ < λ min ,Rmax , λ > λ max .
+
+we consider two applications in portfolio management and toxicity control for LLMs. In both examples, λt is a scalar in [0 , 1] and thus the decision-maker just needs to choose a scalar in each round. 
+
+2.2. Bounding CVaR by Regret 
+
+Unlike expectation, CVaR β is a nonlinear functional of the loss distribution and cannot be written as a simple average of per-round losses. As a consequence, classical notions of regret based on summing per-round losses do not apply directly. Given a sequence of realized losses R1, . . . , R T , we de-fine the empirical CVaR through the Rockafellar–Uryasev variational representation: 
+
+\CVaR β (R1: T ) := min 
+
+> c∈R
+
+(
+
+c + 11 − β · 1
+
+T
+
+> T
+
+X
+
+> t=1
+
+(Rt − c)+
+
+)
+
+.
+
+Since the losses are bounded in [Rmin , R max ], the minimiza-tion may equivalently be restricted to c ∈ [Rmin , R max ].In the absence of ties, \CVaR β (R1: T ) can be approximated by the average of losses among the top 100(1 − β)% of losses, i.e., 
+
+\CVaR β (R1: T ) = 1
+
+⌊T (1 − β)⌋
+
+X
+
+> i> ⌈T β ⌉
+
+R(i) + O
+
+ 1
+
+T
+
+
+
+where R(1) ≤ R(2) ≤ . . . ≤ R(T ) are the ordered statistics. The remainder term O(1 /T ) goes away when T β is an integer. With the definition of empirical CVaR, we say the decision-maker achieves an online CVaR control at some target level 
+
+α ∈ (Rmin , R max ) iff 
+
+\CVaR β (R1(λ1), . . . , R T (λT )) ≤ α + o(1) . (1) In contrast to standard cumulative loss, \CVaR β (R1: T ) de-pends on the entire loss sequence in a non-additive manner. In particular, changing a single large loss can alter both the quantile threshold and the set of points entering the tail average. Using the Rockafellar-Uryasev representation of 
+
+CVaR β (Rockafellar & Uryasev, 2000) we can reformulate the criterion (1) as follows: 
+
+min 
+
+> c∈[Rmin ,R max ]
+
+1
+
+T
+
+> T
+
+X
+
+> t=1
+
+
+
+c + 11 − β (Rt − c)+
+
+
+
+≤ α
+
+This representation suggests an extended game between the decision-maker and Nature. At time t, the decision-maker chooses an auxiliary variable ct in addition to λt
+
+in each round t and Nature chooses Rt(λ) as before. The cumulative realized loss is given by 
+
+1
+
+T
+
+> T
+
+X
+
+> t=1
+
+
+
+ct + 11 − β (Rt(λt) − ct)+
+
+
+
+.
+
+For this extended game, we can define the regret as usual: 
+
+Reg T (c) = 
+
+> T
+
+X
+
+> t=1
+
+
+
+ct + 11 − β (Rt(λt) − ct)+
+
+
+
+−
+
+> T
+
+X
+
+> t=1
+
+
+
+c + 11 − β (Rt(λt) − c)+
+
+
+
+. (2) 3Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference 
+
+This regret definition is consistent with the typical objective of no-regret online learning optimization, where the first term tracks the average loss accumulated by the controller, and the second term is the best fixed action in hindsight. With this regret, we can turn the CVaR control problem into an expected risk control problem. 
+
+Proposition 2.1. If the decision-maker can choose (λt, c t)
+
+such that 
+
+max  
+
+> c∈[Rmin ,R max ]
+
+Reg T (c) = o(T ), (3) 
+
+and 
+
+1
+
+T
+
+> T
+
+X
+
+> t=1
+
+
+
+ct + 11 − β (Rt(λt) − ct)+
+
+
+
+≤ α + o(1) , (4) 
+
+then (1) holds. 
+
+Proposition 2.1 implies that it remains to achieve (3) and (4) .In the following, we will apply an AdaGrad-FTRL algorithm for (3) and a CDT-style algorithm to achieve (4) . Notably, (3) requires bounding the regret max c Reg T (c) from both above and below. As we will see in the proofs, the upper bound is crucial to prove (4) while the lower bound is used to conclude CVaR control from (4). 
+
+2.3. Rockafellar–Uryasev Conformal Inference and Regret Bound 
+
+Our algorithm, shown in Algorithm 1, has a two-level opti-mization structure. The outer level performs updates on a control parameter λt to enforce the CVaR β constraint using CDT (or ACI/BCI-style) update (Lekeufack et al., 2024; Gibbs & Candes, 2021; Yang et al., 2024). Meanwhile, the inner level solves a one-dimensional convex optimization problem induced by the Rockafellar–Uryasev representation, in an online manner. Using AdaGrad-FTRL updates (McMa-han, 2011; Duchi et al., 2011), the inner level adaptively learns the optimal quantile threshold ct, yielding adversarial regret guarantees without step-size tuning. We first present our main regret bound in Theorem 2.2. 
+
+Theorem 2.2. Assume the loss Rt(λ) is uniformly bounded for all t and λ. Then the proposed algorithm guarantees 
+
+\CVaR β (R1: T ) ≤ α + CT −1/2,
+
+for some constant C that only depends on β, α, γ, λmin ,
+
+λmax , Rmin , Rmax .Remark 2.3 (Price of nonlinearity) . In classical online con-trol of expected loss, analogous guarantees typically achieve a O(1 /T ) convergence rate due to the linearity of the ob-jective (Lekeufack et al., 2024). In contrast, CVaR β is a nonlinear functional that depends on the extreme tail of the 
+
+Algorithm 1 RU Conformal Inference 
+
+Input: CVaR level β, target risk level α, outer rela-tive step size γ0, effective domain [λmin , λ max ], range 
+
+[Rmin , R max ], initial λ1.
+
+Procedure: 
+
+c1 ← (Rmin + Rmax )/2.
+
+q0 ← max {1, β/ (1 − β)}2.
+
+γ ← γ0(λmax − λmin ).
+
+for t = 1 , . . . , T do Nature move: 
+
+Observe loss function Rt(·)
+
+Extend the loss function: 
+
+Extend Rt with Rt(λ) ←
+
+(
+
+Rmin , λ < λ min ,Rmax , λ > λ max .
+
+Construct RU surrogate: 
+
+ℓRU t ← ct + 11 − β (Rt(λt) − ct)+.
+
+Outer-level CDT update: λt+1 ← λt − γ(ℓRU t − α).
+
+Inner-level AdaGrad–FTRL update: 
+
+gt ← 1 − 11 − β · 1{Rt(λt) > c t}.qt ← qt−1 + g2 
+
+> t
+
+, ηt ← 12√qt
+
+.ct+1 ← arg min 
+
+> c∈[Rmin ,R max ]
+
+(
+
+12ηt
+
+
+
+c − Rmin + Rmax 
+
+2
+
+2
+
++
+
+> t
+
+X
+
+> s=1
+
+
+
+c + 11 − β
+
+ Rs(λs) − c
+
+> +
+
+ )
+
+.
+
+end for 
+
+loss distribution. As a result, our guarantee incurs a slower 
+
+O(1 /√T ) rate, reflecting the statistical and algorithmic cost of learning and controlling tail risk from rare events. In the next two subsections, we walk through the proof of Theorem 2.2 by studying the theoretical properties of the inner- and outer-level updates. 
+
+2.4. Achieving (3) Via Inner-level Update 
+
+In this and next subsections, to simplify exposition, we as-sume λmin = Rmin = 0 and λmax = Rmax = 1 . In general, this can be achieved by replacing α, R (λ) by ˜α, ˜R(˜λ) where 
+
+˜α = α − Rmin 
+
+Rmax − Rmin 
+
+, ˜λ = λ − λmin 
+
+λmax − λmin 
+
+, (5) and 
+
+˜R(˜λ) = R(λmin + ( λmax − λmin )˜λ) − Rmin 
+
+Rmax − Rmin 
+
+. (6) 4Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference 
+
+Fixing the sequence λ1, λ 2, . . . , the incremental loss func-tion in the extended game is expressed as 
+
+ft(c) = c + 11 − β
+
+ Rt(λt) − c
+
+> +
+
+, (7) which is convex and G-Lipschitz on [0 , 1] , where one valid subgradient of ft at c is 
+
+gt(c) ∈ ∂f t(c) = 1 − 11 − β 1{Rt(λt) > c },
+
+and hence 
+
+gt(c) ∈
+
+
+
+1, − β
+
+1 − β
+
+
+
+, G = max 
+
+
+
+1, β
+
+1 − β
+
+
+
+.
+
+Our goal is to choose c1, . . . , c T in an online manner to minimize the regret with respect to a fixed single decision c:
+
+Reg T (c) = 
+
+> T
+
+X
+
+> t=1
+
+ft(ct) −
+
+> T
+
+X
+
+> t=1
+
+ft(c).
+
+A major practical challenge in online learning is that the optimal learning rate can vary dramatically across regimes. In benign or stationary environments, aggressive updates can significantly accelerate convergence. Conversely, in noisy, heavy-tailed, or adversarial settings, large step sizes can lead to instability and erratic behavior. To avoid tuning a learning rate for ct while maintaining adversarial guarantees, we use an AdaGrad-FTRL algorithm. Let gt be a chosen subgradient at the current iterate. The update rule of AdaGrad-FTRL then reduces to 
+
+ct+1 ← arg min 
+
+> c∈[0 ,1]
+
+12ηt
+
+(c − 1/2) 2
+
++
+
+> t
+
+X
+
+> s=1
+
+
+
+c + 11 − β (Rs(λs) − c)+
+
+
+
+,
+
+where the adaptive step size is set to be 
+
+ηt = 12√qt
+
+, qt = qt−1 +g2 
+
+> t
+
+, q0 = max 
+
+
+
+1, β
+
+1 − β
+
+2
+
+.
+
+Theorem 2.4. For every adaptive or adversarial sequence 
+
+R1(·), . . . , R T (·) : [0 , 1] 7 → [0 , 1] , the iterates above satisfy 
+
+− 14
+
+√qT ≤ max  
+
+> c∈[0 ,1]
+
+Reg T (c) ≤ 34
+
+√qT .
+
+In particular, 
+
+max  
+
+> c∈[0 ,1]
+
+Reg T (c) ≤ 34 max 
+
+
+
+1, β
+
+1 − β
+
+ √T + 1 .
+
+We can show that the leading term is optimal in terms of the rate in T and the constant is looser by a constant factor. The proof is presented in Appendix B.4. 
+
+Theorem 2.5. For every T ≥ 1 and every online learning algorithm, possibly randomized, there exists a sequence 
+
+R1(·), . . . , R T (·) : [0 , 1] 7 → [0 , 1] , such that 
+
+E
+
+
+
+max  
+
+> c∈[0 ,1]
+
+Reg T (c)
+
+
+
+≥ 1
+
+√2π
+
+s
+
+β
+
+1 − β
+
+√T · (1 + o(1)) ,
+
+where the expectation is only over the algorithmic random-ization. For deterministic algorithms, the expectation may be omitted. 
+
+When β > 1/2, the constant gap can be closed by allowing the tuning parameter to depend on T . We present the algo-rithm and its regret upper bound in Appendix B.5. Never-theless, we prefer the AdaGrad-FTRL algorithm in practice that is agnostic to the horizon T .
+
+2.5. Achieving (4) Via Outer-level Updates 
+
+Fixing the sequence c1, c 2, . . . , (4) becomes the same ob-jective for CDT with additive cumulative losses. When 
+
+Rt(λ) is bounded, we can prove the risk control up to an 
+
+O(1 /√T ) factor. The proof is substantially more compli-cated than the argument in Lekeufack et al. (2024) because the sequence {ct} can be arbitrary and the minimal loss at time t may exceed α when ct > α . To prove boundedness of the sequence λt, we need to apply the regret bound on the AdaGrad-FTRL algorithm. The proof is presented in Appendix B.6. 
+
+Theorem 2.6. Given any sequence of R1(·), . . . , R T (·) : [0 , 1] 7 → [0 , 1] , let {ct}Tt=1 denote the inner-level update given by the AdaGrad-FTRL algorithm. The outer-level update in Algorithm 1 guarantees that 
+
+1
+
+T
+
+> T
+
+X
+
+> t=1
+
+
+
+ct + 11 − β (Rt(λt) − ct)+
+
+
+
+≤ α +
+
+√T + 1 
+
+T C1 + 1
+
+T C2,
+
+where 
+
+C1 = max 
+
+
+
+1, β
+
+1 − β
+
+  34 + 14(1 − β)
+
+
+
+,
+
+and 
+
+C2 = λ1/γ + (1 − β)−1 − α
+
+1 − β .
+
+Importantly, this guarantee holds regardless of the quality of the threshold sequence {ct}. However, the choice of {ct}
+
+directly determines the tightness of the bound: if ct is far from the optimal threshold c∗, the surrogate objective may 5Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference 
+
+be much larger than the true CVaR β , leading to conser-vative behavior. Thus, while the outer CDT-level ensures validity, the role of the inner-level AdaGrad-FTRL update is to adaptively learn thresholds ct to avoid being overly conservative, as described in the previous section. 
+
+Remark 2.7 . (Range of λt.) The update for λt is intention-ally unprojected. The interval [λmin , λ max ] is the natural range used for scaling and interpretation, while the theoreti-cal analysis extends the loss outside this range. Theorem 2.6 shows that this extension does not lead to uncontrolled drift of the iterates. 
+
+# 3. Experiments 
+
+We evaluate the proposed RU Conformal CVaR control framework on two sequential decision-making problems: (i) toxicity control for LLM outputs and (ii) portfolio manage-ment under market distribution shift. Across both experiments, we discard the first 100 rounds as a burn-in period. We report results on (i) realized \CVaR β
+
+control, and (ii) the dynamics of the learned threshold λt.
+
+3.1. Toxicity Control for LLM Outputs Experiment Environment. We consider a pool of prompts {xi}, each paired with multiple candidate LLM-generated responses 
+
+{yji }Kj=1 . Each response is annotated with: (i) a machine toxicity score rjm,i ∈ [0 , 1] produced by a toxicity classifier, and (ii) a human toxicity score rji ∈ [0 , 1] , which we treat as the ground-truth loss. At each round t, one prompt is selected and K candidate responses are sampled according to a time-varying sam-pling distribution (described below). The realized loss is the maximum human toxicity score among accepted responses after filtering out responses whose machine toxicity score exceeds λt. Note that this convention corresponds to the LLM abstaining from returning a response when all candi-dates are filtered out; if no response is shown, the toxicity loss is zero. 
+
+Action parameter. The controller selects a threshold λt ∈
+
+[0 , 1] and rejects all candidate responses whose machine toxicity score exceeds λt. This follows the same deployment protocol as in Chen et al. (2025). 
+
+Models and datasets. Following Chen et al. (2025), we create an inexpensive semi-synthetic benchmark using an ex-isting machine scoring model as the “human annotator,” and a biased scoring model as the “machine assessor.” Specif-ically, we use the Detoxify model (Hanu & Unitary team, 2020) for r(·) and retrain the Detoxify model for rm(·) on a biased subset of the Jigsaw Unintended Bias in Toxicity Classification dataset (cjadams et al., 2019) that consists of the 15% most and least toxic instances. We conduct experiments using Llama 3.2-3B (Meta AI, 2024). We draw prompts from the R EAL TOXICI -
+
+> TY
+
+PROMPTS dataset (Gehman et al., 2020) using the sam-pling regimes described in the next section. 
+
+Synthetic distribution shift via tail thickening. To simu-late controlled non-stationary and adversarial shifts in the tail behavior, we generate responses using a time-varying tail-severity parameter. At each time t, we sample a quantile level 
+
+pt ∼ Beta( at, b t),
+
+which controls how extreme the selected response is within the candidate pool. Given K candidate responses for the current prompt, we sort them by machine toxicity score and select the response with rank 
+
+kt = min {K, max {1, ⌈K p t⌉}} .
+
+Thus, small values of pt select benign responses, while values of pt near 1 select highly toxic responses. We consider three Beta distribution sampling regimes: (i) 
+
+uniform regime, with at = bt = 1 , (ii) adversarial/non-stationary regime with time-varying at and fixed bt = 1 ,and (iii) adversarial- jumps regime, where bt = 1 , and 
+
+at ∈ [0 .5, 5] changes over time with random spikes and dips throughout the sampling window. Our adversarial construc-tions allow the sampling distribution to gradually concen-trate more mass near 1 as time passes, thereby increasingly selecting high machine-toxicity responses over time and inducing a controlled tail-thickening distribution shift in regime (ii), and a volatile shift in regime (iii). Visualizations of the sampling distributions of both regimes can be found in Appendix C. 
+
+3.2. Results for Toxicity Control for LLM Outputs 
+
+We evaluate the proposed RU Conformal CVaR (RUCC) controller in the three sampling regimes: uniform , adver-sarial , and adversarial-jump . In all three settings, the tar-get risk level is set to α = 0 .1 with γ = 0 .05 , and we report results for β = 0 .85 in Figure 2. For results of 
+
+β ∈ { 0.75 , 0.8, 0.85 , 0.9}, see Appendix C. 
+
+Evolution of the empirical CVaR β . The top row of Fig-ure 2 displays the per-step realized empirical CVaR β tra-jectories of our RUCC controller (blue line), with the corre-sponding average realized CVaR β (orange dotted line) and the target risk level (red dashed line). Results are shown for the uniform regime (left panel), adversarial regime (middle panel), and adversarial-jump regime (right panel). 6Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference                   
+
+> Figure 2. LLM Toxicity Control Experiment. Realized empirical CVaR βand evolution of λtfor β= 0 .85 with target α= 0 .1,step size γ= 0 .05 , and 100 steps of burn-in for the Uniform regime in the first column, Adversarial regime in middle column, and
+> Adversarial-Jump regime in the right column.
+
+We compare RUCC against a static baseline with a fixed 
+
+λ throughout the experiment. Specifically, we estimate a constant threshold ˆλ using distortion risk control via L-statistics calibrated on the first 1000 samples in our sample set (Chen et al., 2025). For this baseline, we report the realized empirical CVaR β trajectory (purple dashed line) and its average realized CVaR β (purple dotted line). From the top panel of Figure 2, we observe that the RUCC controller rapidly stabilizes the realized empirical CVaR β ,keeping it close to the target level across all three settings. In the uniform regime, the trajectory settles relatively smoothly near the target. In contrast, the adversarial and adversarial-jump regimes exhibit more stochastic fluctuations, reflecting the greater difficulty of controlling tail risk when the data-generating process changes over time. The figure also highlights the limitation of the baseline which selects a very small fixed value of ˆλ that keeps 
+
+CVaR β well below the target, making the LLM severely overly conservative. By contrast, RUCC adjusts λt over time to maintain tail risk control while avoiding excessive conservatism. 
+
+Evolution of λt. Next, we examine the evolution of λt in the LLM toxicity control task under the uniformly sampled prompt stream and the adversarially sampled streams, shown in the bottom panel of Figure 2. In the uniform regime, λt remains relatively stable through-out the trajectory, exhibiting only mild fluctuations. This behavior is consistent with the underlying loss distribution being comparatively stationary, so the algorithm does not need to adapt the threshold aggressively in order to maintain the target CVaR β level. In contrast, under the adversarial and adversarial-jump regimes, λt decreases substantially over time and exhibits noticeably larger fluctuations than in the uniform setting. This reflects the increased difficulty of the control problem under distribution shift, where the underlying loss distribu-tion changes over time. Nevertheless, despite these non-stationary environments, RUCC continues to adapt effec-tively and maintains robust control of the realized CVaR β .
+
+3.3. Portfolio Management under Distribution Shift Experiment Environment. We consider a two-asset portfolio consist-ing of (i) a risk-free asset (10-Year Treasury total-return index), and (ii) a risky asset (S&P 500 index). 
+
+Action parameter. Let Pt denote the asset price at time t.We define the h = 1 log-return as follows, 
+
+r(1)  
+
+> t
+
+= log Pt
+
+Pt−1
+
+.
+
+At each time t, the controller selects a portfolio weight 
+
+λt ∈ [0 , 1] , representing the fraction invested in the risky asset. The portfolio return is then, 
+
+rpt (λt) = λtrrisky  
+
+> t
+
++ (1 − λt)rrisk-free  
+
+> t
+
+,
+
+and the loss is defined as 
+
+Rt(λt) = −rpt (λt),
+
+7Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference              
+
+> Figure 3. Portfolio Management Experiment. Realized empirical 180-day rolling CVaR β(top row) and evolution of λt(bottom row) for β= 0 .85 , γ = 0 .05 with target α= 0 .01 and burn-in period of 100 days during 1991–2001 in the first column, 2009–2018 in second column, 1991–2025 in the third column.
+
+where rrisky  
+
+> t
+
+and rrisk-free  
+
+> t
+
+denote the return of the risky asset and the return of the risk-free asset, respectively. 
+
+Distribution shift. We evaluate performance across mar-ket regimes from 1991 to 2025, covering both periods of economic stability and multiple market shocks including the dot-com crash, the 2008 financial crisis, COVID-19, and the subsequent high-inflation period. 
+
+Datasets. For our risky asset, we use historical S&P 500 index data via the yfinance API (Aroussi, 2020), which retrieves data from Yahoo Finance. For our risk-free asset, we use the 10-Year Treasury total-return index from the Federal Reserve Economic Data (FRED) database (Federal Reserve Bank of St. Louis, 2024). 
+
+3.4. Results for Portfolio Management Experiment 
+
+We evaluate the proposed RU Conformal CVaR controller on the portfolio management task across three time horizons: 1991–2001, 2009–2018, and 1991–2025. The 1991–2001 period corresponds to a relatively stable economic envi-ronment, while 2009–2018 captures a substantially more volatile regime that includes the global financial crisis and its aftermath. The full 1991–2025 horizon evaluates the long-term robustness of our proposed method across multi-ple market conditions. Figure 3 reports the realized empirical 180-day rolling 
+
+CVaR β (top row) and the corresponding control parameter 
+
+λt (bottom row), for β = 0 .85 , target risk level α = 0 .01 ,and step size γ = 0 .05 . The rolling-window CVaR is in-cluded as a diagnostic for the local behavior of the con-troller.Additional results for β ∈ { 0.75 , 0.80 , 0.85 , 0.90 }
+
+are provided in Appendix D. 
+
+Evolution of the rolling empirical CVaR β . The top row of Figure 3 displays the 180-day rolling realized empiri-cal CVaR β trajectories produced by the RUCC controller (blue line), together with the corresponding average realized 
+
+CVaR β (orange dotted line) and the target risk level (red dashed line) for β = 0 .85 .We compare RUCC against a static baseline in which the control parameter λ is fixed throughout the experiment. Specifically, we tune λ over a grid of candidate values and select a fixed ˆλ that controls the realized empirical CVaR β
+
+over the first 1000 days of the sample period. For this base-line, we report both the 180-day rolling realized empirical 
+
+CVaR β trajectory (purple dashed line) and its average real-ized CVaR β (purple dotted line). The three evaluation windows: 1991–2001, 2009–2018, and 1991–2025, are shown in the left, middle, and right panels of the top row of Figure 3, respectively. Across all three periods, the RUCC controller consistently maintains the realized empirical CVaR β close to the target level, whereas the static baseline exhibits substantially different behavior across market regimes. During both the relatively stable 1991–2001 period, and the more volatile 2009–2018 period, the baseline is overly conservative, producing realized CVaR β values substan-8Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference 
+
+tially below the target level. These results illustrate the difficulty of selecting a single fixed value of λ that performs well across changing market conditions. By contrast, the RUCC controller adaptively adjusts λt over time and is able to maintain stable tail-risk control across both stable and volatile environments. Moreover, over the full 1991–2025 horizon, the method remains robust through multiple periods of economic stress. Although the realized CVaR β increases modestly during episodes such as the dot-com bubble, the 2008 financial crisis, and the post-COVID market turbulence beginning in 2020, the rolling average empirical CVaR β remains close to the target risk level throughout the sample period. 
+
+Evolution of λt. The bottom row of Figure 3 shows the evolution of λt, which represents the fraction of wealth allo-cated to the risky asset. During the 1991–2001 period, λt
+
+exhibits a gradual long-term decline, indicating that the con-troller progressively reduces exposure to the risky asset over time while still maintaining moderate market participation. In the 2009–2018 period, the controller initially maintains a relatively low value of λt after the 2008 financial crisis and subsequently increases exposure as market conditions sta-bilize and the economy recovers. Over the full 1991–2025 horizon, the largest downward movements in λt coincide with major episodes of market stress, including the 2008 financial crisis and the post-COVID turbulence beginning in 2020. This behavior illustrates that the controller dynam-ically responds to elevated tail-risk realizations by reducing risky exposure during periods of heightened uncertainty. Note that the update for λt is unconstrained, so λt may temporarily leave the range [0 , 1] . When evaluating portfo-lio decisions, we clip the realized allocation to the corre-sponding boundary value, so λt < 0 means zero risky-asset exposure and λt > 1 means maximal exposure. Thus, the realized portfolio allocation remains feasible. Theorem 2.6 shows that this unconstrained update cannot drift too far in aggregate, i.e., the cumulative excess over the target is only 
+
+O(√T ).Overall, these experiments demonstrate that our method is capable of maintaining tail-risk control over multi-decade horizons spanning multiple crisis regimes while adaptively adjusting portfolio exposure over time. The results provide strong empirical evidence that the algorithm is robust to severe non-stationarity in the long run, achieving tight em-pirical CVaR β control in realistic financial environments. 
+
+# 4. Discussion and Extensions 
+
+A key lever in our approach is the RU variational representa-tion of CVaR β , which allows tail risk control to be reduced to online optimization over an auxiliary parameter. This idea is not unique to CVaR . Many classical and modern risk measures admit similar variational representations, sug-gesting that our framework extends beyond tail risks. We describe illustrative examples below. 
+
+4.1. Optimized Certainty Equivalent (OCE) Risk Measures 
+
+A large class of risk measures known as optimized certainty equivalents (OCEs) (Ben-Tal & Teboulle, 2007) admit rep-resentations of the form 
+
+R(X) = inf  
+
+> c∈R
+
+c + Eϕ(X − c)
+
+for a suitable convex loss ϕ. Recent work has shown how to control such risk measures using conformal methods in stationary, offline, and i.i.d. settings (Yeh et al., 2025). Our results suggest a clear extension to these guarantees in 
+
+online, non-stationary, and adversarial environments .
+
+4.2. Variational Risk Representations 
+
+The variance admits a well-known representation 
+
+Var( X) = E(X − E[X]) 2 = min  
+
+> a∈R
+
+E(X − a)2,
+
+which is widely used in quality control and robust esti-mation. This shows that variance control can likewise be interpreted as controlling the expectation of a surrogate loss indexed by an auxiliary parameter, making it amenable to our optimization framework. 
+
+# Impact Statement 
+
+This work contributes to the development of machine learn-ing frameworks with increased safety and reliability by pro-viding a distribution-free method for controlling tail risk in non-stationary and adversarial environments. By enabling online control of the Conditional Value-at-Risk ( CVaR ), the proposed framework helps reduce the likelihood of rare but catastrophic failures in safety-critical applications such as financial decision-making and large language model deploy-ment. Beyond CVaR , the framework provides a general template for controlling a broad class of nonlinear risk measures that admit a variational representation. We expect this contribu-tion to help facilitate the design of more robust and trustwor-thy learning systems in environments subject to distribution shifts and strategic manipulation. We do not foresee neg-ative societal impacts arising from this work; instead, its primary effect is to improve the safety and reliability of deployed machine learning systems. 9Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference 
+
+# References 
+
+Angelopoulos, A. N., Bates, S., Cand `es, E. J., Jordan, M. I., and Lei, L. Learn then test: Calibrating predictive al-gorithms to achieve risk control. The Annals of Applied Statistics , 19(2):1641–1662, 2025a. Angelopoulos, A. N., Bates, S., Fisch, A., Lei, L., and Schuster, T. Conformal risk control. In The Twelfth International Conference on Learning Representations ,2025b. Angelopoulos, A. N., Jordan, M. I., and Tibshirani, R. J. Gradient equilibrium in online learning: Theory and ap-plications, 2025c. URL https://arxiv.org/abs/ 2501.08330 .Aroussi, R. yfinance: Yahoo! finance market data downloader. https://pypi.org/project/ yfinance/ , 2020. Version used: 1.1.0. Bates, S., Angelopoulos, A., Lei, L., Malik, J., and Jor-dan, M. Distribution-free, risk-controlling prediction sets. 
+
+Journal of the ACM (JACM) , 68(6):1–34, 2021. Ben-Tal, A. and Teboulle, M. An old–new concept of convex risk measures: The optimized certainty equiv-alent. Mathematical Finance , 17(3):439–476, 2007. ISSN 1467-9965. doi: 10.1111/j.1467-9965.2007.00311. x. URL https://onlinelibrary.wiley.com/ doi/10.1111/j.1467-9965.2007.00311.x .Chen, C. Y.-C., Shen, J., Deng, Z., and Lei, L. Conformal tail risk control for large language model alignment, 2025. URL https://arxiv.org/abs/2502.20285 .cjadams, andinversion, D. B., Sorensen, J., Dixon, L., Vasserman, L., and nithum. Jigsaw unintended bias in toxicity classification, 2019. Deng, Z., Zollo, T., Snell, J., Pitassi, T., and Zemel, R. Distribution-free statistical dispersion control for societal applications. Advances in Neural Information Processing Systems , 36:40342–40366, 2023. Deng, Z., Zollo, T. P., Eyre, B., Inamdar, A., Madras, D., and Zemel, R. Quest: Enhancing estimates of quantile-based distributional measures using model predictions. 
+
+arXiv preprint arXiv:2507.05220 , 2025. Duchi, J., Hazan, E., and Singer, Y. Adaptive subgradient methods for online learning and stochastic optimization. 
+
+Journal of Machine Learning Research , 12:2121–2159, 2011. Federal Reserve Bank of St. Louis. Federal reserve eco-nomic data (fred). https://fred.stlouisfed. org/ , 2024. Accessed via public API. Gehman, S., Gururangan, S., Sap, M., Choi, Y., and Smith, N. A. Realtoxicityprompts: Evaluating neural toxic degeneration in language models. arXiv preprint arXiv:2009.11462 , 2020. Gibbs, I. and Candes, E. Adaptive conformal inference under distribution shift. Advances in Neural Information Processing Systems , 34:1660–1672, 2021. Hanu, L. and Unitary team. Detoxify. Github. https://github.com/unitaryai/detoxify, 2020. Langley, P. Crafting papers on machine learning. In Langley, P. (ed.), Proceedings of the 17th International Conference on Machine Learning (ICML 2000) , pp. 1207–1216, Stan-ford, CA, 2000. Morgan Kaufmann. Lei, L., Sahoo, R., and Wager, S. Policy learning under bi-ased sample selection. arXiv preprint arXiv:2304.11735 ,2023. Lekeufack, J., Angelopoulos, A. N., Bajcsy, A., Jordan, M. I., and Malik, J. Conformal decision theory: Safe autonomous decisions from imperfect predictions, 2024. URL https://arxiv.org/abs/2310.05921 .McMahan, H. B. Follow-the-regularized-leader and mirror descent: Equivalence theorems and l1 regularization. In 
+
+Proceedings of the 14th International Conference on Arti-ficial Intelligence and Statistics (AISTATS) , volume 15 of 
+
+JMLR Workshop and Conference Proceedings , pp. 525– 533, 2011. Meta AI. The Llama 3 herd of models. https:// ai.meta.com/blog/meta-llama-3/ , 2024. Ac-cessed for Llama 3.2-3B. Perez, E., Huang, S., Song, F., Cai, T., Ring, R., Aslanides, J., Glaese, A., McAleese, N., and Irving, G. Red teaming language models with language models, 2022. URL 
+
+https://arxiv.org/abs/2202.03286 .Rockafellar, R. T. and Uryasev, S. Optimization of conditional value-at-risk. Journal of Risk , 2(3):21–42, 2000. doi: 10.21314/JOR.2000.038. URL https: //www.risk.net/journal-risk/2161159/ optimization-conditional-value-risk .Sahoo, R., Lei, L., and Wager, S. Learning from a biased sample, 2025. URL https://arxiv.org/abs/ 2209.01754 .Shalev-Shwartz, S. Online learning and online convex opti-mization. Foundations and Trends in Machine Learning ,4(2):107–194, 2012. Snell, J. C., Zollo, T. P., Deng, Z., Pitassi, T., and Zemel, R. Quantile risk control: A flexible framework for bound-ing the probability of high-loss predictions, 2022. URL 
+
+https://arxiv.org/abs/2212.13629 .10 Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference 
+
+Yang, Z., Cand `es, E., and Lei, L. Bellman conformal inference: Calibrating prediction intervals for time se-ries, 2024. URL https://arxiv.org/abs/2402. 05203 .Yeh, C., Christianson, N., Wierman, A., and Yue, Y. Con-formal risk training: End-to-end optimization of confor-mal risk control, 2025. URL https://arxiv.org/ abs/2510.08748 .Zollo, T., Morrill, T., Deng, Z., Snell, J., Pitassi, T., and Zemel, R. Prompt risk control: A rigorous framework for responsible deployment of large language models. In 
+
+International Conference on Learning Representations ,volume 2024, pp. 4045–4067, 2024a. Zollo, T. P., Morrill, T., Deng, Z., Snell, J. C., Pitassi, T., and Zemel, R. Prompt risk control: A rigorous framework for responsible deployment of large language models, 2024b. URL https://arxiv.org/abs/2311.13628 .11 Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference 
+
+Table 1. Summary of notation used throughout the paper. 
+
+Symbol Meaning 
+
+t = 1 , . . . , T Time index and total horizon 
+
+Rt(·) Loss function revealed at round tRt = Rt(λt) Realized loss at round tR1: T Sequence of realized losses (R1, . . . , R T )
+
+β ∈ (0 , 1) CVaR level confidence level 
+
+α Target CVaR risk level 
+
+λt Outer-update decision parameter (controls system action) 
+
+γ Step size for outer-update (CDT-style) 
+
+ct Inner-update threshold parameter at round tc∗ Optimal threshold in hindsight (RU minimizer) 
+
+ft(c) RU surrogate loss: c + 11−β (Rt − c)+
+
+FT (c) Empirical RU objective: 1
+
+> T
+
+PTt=1 ft(c)
+
+\CVaR β (R1: T ) Empirical CVaR of realized sequence 
+
+ˆqβ (R) Empirical β-quantile of {R1, . . . , R T }
+
+bET [·] Empirical average over t = 1 , . . . , T 
+
+(x)+ Positive part: max {x, 0}
+
+Reg T (c) Cumulative RU regret of inner update 
+
+gt Subgradient of ft at ct
+
+1{·} Indicator function 
+
+# A. Appendix 
+
+A.1. Notation 
+
+For convenience, we summarize all notation used throughout the paper in Table 1. All quantities with a hat denote empirical (finite-sample) versions. Unless stated otherwise, all sequences {Rt}Tt=1 may be non-stationary, or adversarial. 
+
+# B. Proofs 
+
+As discussed at the beginning of Section 2.4, we can transform λ and R(·) by (5) and (6), and assume 
+
+λmin = 0 , λmax = 1 , Rmin = 0 , Rmax = 1 , α ∈ (0 , 1) .
+
+B.1. Proof of Proposition 2.1 
+
+Define the RU objective 
+
+ft(c) = c + 11 − β (Rt − c)+, FT (c) = 1
+
+T
+
+> T
+
+X
+
+> t=1
+
+ft(c).
+
+By the RU variational representation (applied to the realized sequence R1: T ), 
+
+\CVaR β (R1: T ) = min  
+
+> c∈R
+
+FT (c).
+
+Since Rt ∈ [0 , 1] , ft is decreasing on (−∞ , 0] and increasing on [1 , ∞). Thus, 
+
+\CVaR β (R1: T ) = min  
+
+> c∈[0 ,1]
+
+FT (c). (8) 12 Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference 
+
+By the regret definition, 
+
+1
+
+T
+
+> T
+
+X
+
+> t=1
+
+ft(ct) = min  
+
+> c∈[0 ,1]
+
+FT (c) + max c∈[0 ,1] Reg T (c)
+
+T (9) 
+
+= \CVaR β (R1: T ) + max c∈[0 ,1] Reg T (c)
+
+T . (10) Under (4), 
+
+1
+
+T
+
+> T
+
+X
+
+> t=1
+
+ft(ct) ≤ α + o(1) . (11) Combining (9) and (11) yields 
+
+\CVaR β (R1: T ) ≤ α + o(1) − max c∈[0 ,1] Reg T (c)
+
+T .
+
+By assumption (3), uniformly over c ∈ [0 , 1] ,
+
+| max c∈[0 ,1] Reg T (c)|
+
+T = o(1) .
+
+Hence 
+
+\CVaR β (R1: T ) ≤ α + o(1) ,
+
+which proves (1). 
+
+B.2. Proof of Theorem 2.2 
+
+By (9), 
+
+\CVaR β (R1: T ) ≤ α + 1
+
+T
+
+> T
+
+X
+
+> t=1
+
+ft(ct) − α
+
+!
+
++ | max c∈[0 ,1] Reg T (c)|
+
+T .
+
+The proof is then completed by applying Theorems 2.4 and 2.6. 
+
+B.3. Proof of Theorem 2.4 
+
+We prove a slightly more general version that only requires q0 ≥ max {1, β/ (1 − β)}2. Let 
+
+Ft(c) = 
+
+> t
+
+X
+
+> s=1
+
+fs(c), ψt(c) = 12ηt
+
+
+
+c − 12
+
+2
+
+, Mt = min 
+
+> c∈[0 ,1]
+
+{Ft(c) + ψt(c)}.
+
+Then ct+1 minimizes Ft + ψt, and M0 = 0 .We first prove the lower bound. Since ct minimizes Ft−1 + ψt−1,
+
+Mt ≤ Ft(ct) + ψt(ct)= Mt−1 + ft(ct) + ψt(ct) − ψt−1(ct).
+
+The sequence (ηt) is nonincreasing and |ct − 1/2| ≤ 1/2, so 
+
+ψt(ct) − ψt−1(ct) ≤ 18
+
+ 1
+
+ηt
+
+− 1
+
+ηt−1
+
+
+
+.
+
+Thus 
+
+ft(ct) ≥ Mt − Mt−1 − 18
+
+ 1
+
+ηt
+
+− 1
+
+ηt−1
+
+
+
+.
+
+13 Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference 
+
+Summing over t and using MT ≥ min c∈[0 ,1] FT (c) gives 
+
+> T
+
+X
+
+> t=1
+
+ft(ct) ≥ min  
+
+> c∈[0 ,1]
+
+FT (c) − 18
+
+ 1
+
+ηT
+
+− 1
+
+η0
+
+
+
+= min 
+
+> c∈[0 ,1]
+> T
+
+X
+
+> t=1
+
+ft(c) −√qT − √q0
+
+4 .
+
+We now prove the upper bound. The function Ft−1 + ψt−1 is 1/η t−1-strongly convex and is minimized at ct. Hence, for every c ∈ [0 , 1] ,
+
+Ft−1(c) + ψt−1(c) ≥ Mt−1 + 12ηt−1
+
+(c − ct)2.
+
+By convexity of ft,
+
+ft(c) ≥ ft(ct) + gt(c − ct).
+
+Since ψt ≥ ψt−1, we obtain 
+
+Mt = min 
+
+> c∈[0 ,1]
+
+{Ft−1(c) + ψt−1(c) + ft(c) + ψt(c) − ψt−1(c)}≥ Mt−1 + ft(ct) + min 
+
+> c∈[0 ,1]
+
+ 12ηt−1
+
+(c − ct)2 + gt(c − ct)
+
+
+
+≥ Mt−1 + ft(ct) − ηt−1
+
+2 g2 
+
+> t
+
+.
+
+Therefore 
+
+ft(ct) ≤ Mt − Mt−1 + ηt−1
+
+2 g2 
+
+> t
+
+.
+
+After summing, TX
+
+> t=1
+
+ft(ct) ≤ MT + 12
+
+> T
+
+X
+
+> t=1
+
+ηt−1g2 
+
+> t
+
+.
+
+Let u ∈ arg min c∈[0 ,1] FT (c). Since |u − 1/2| ≤ 1/2,
+
+MT ≤ FT (u) + ψT (u) ≤ min  
+
+> c∈[0 ,1]
+
+FT (c) + 18ηT
+
+= min 
+
+> c∈[0 ,1]
+> T
+
+X
+
+> t=1
+
+ft(c) + 
+
+√qT
+
+4 .
+
+It remains to bound the AdaGrad sum more sharply. For x = qt−1 and a = g2 
+
+> t
+
+,
+
+a
+
+√x = 2  √x + a − √x + √x
+
+r 
+
+1 + ax − 1
+
+2
+
+.
+
+Let s = p1 + a/x . Since a ≤ q0 ≤ x,
+
+xs (s − 1) = x + a − px(x + a) ≤ a ≤ q0.
+
+Rearranging it implies 
+
+√x
+
+r 
+
+1 + ax − 1
+
+2
+
+≤ q0
+
+ 1
+
+√x − 1
+
+√x + a
+
+
+
+.
+
+Consequently, 
+
+g2
+
+> t
+
+√qt−1
+
+≤ 2 √qt − √qt−1
+
+ + q0
+
+ 1
+
+√qt−1
+
+− 1
+
+√qt
+
+
+
+.
+
+Summing over t gives TX
+
+> t=1
+
+g2
+
+> t
+
+√qt−1
+
+≤ 2 √qT − √q0
+
+ + q0
+
+ 1
+
+√q0
+
+− 1
+
+√qT
+
+
+
+= 2 √qT − √q0 − q0
+
+√qT
+
+.
+
+14 Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference 
+
+Since ηt−1 = 1 /(2 √qt−1),
+
+12
+
+> T
+
+X
+
+> t=1
+
+ηt−1g2 
+
+> t
+
+= 14
+
+> T
+
+X
+
+> t=1
+
+g2
+
+> t
+
+√qt−1
+
+≤ 12
+
+√qT − 14
+
+√q0 − q0
+
+4√qT
+
+.
+
+Combining the preceding displays yields 
+
+> T
+
+X
+
+> t=1
+
+ft(ct) − min 
+
+> c∈[0 ,1]
+> T
+
+X
+
+> t=1
+
+ft(c) ≤ 34
+
+√qT − 14
+
+√q0 − q0
+
+4√qT
+
+≤ 34
+
+√qT , (12) which is the claimed upper bound. Let 
+
+N+(T ) = # {t : gt = 1 }, N−(T ) = # 
+
+
+
+t : gt = − β
+
+1 − β
+
+
+
+,
+
+then 
+
+qT = q0 + N+(T ) + 
+
+ β
+
+1 − β
+
+2
+
+N−(T )
+
+≤ max 
+
+(
+
+1,
+
+ β
+
+1 − β
+
+2)
+
+(1 + N+(T ) + N−(T )) = max 
+
+(
+
+1,
+
+ β
+
+1 − β
+
+2)
+
+(T + 1) .
+
+B.4. Proof of Theorem 2.5 
+
+Proof. Let Rt be independent with 
+
+P(Rt = 0) = β, P(Rt = 1) = 1 − β. 
+
+For c ∈ [0 , 1] and b = β 
+
+> 1−β
+
+,
+
+ft(c) = c if Rt = 0 , ft(c) = 11 − β − bc if Rt = 1 .
+
+Thus the additive constants cancel in comparison with a fixed threshold. Define 
+
+gt := 
+
+(
+
+1, Rt = 0 ,
+
+−b, Rt = 1 .
+
+Then 
+
+ft(c) = constant + gtc, 
+
+and 
+
+max  
+
+> c∈[0 ,1]
+
+Reg T (c) = 
+
+> T
+
+X
+
+> t=1
+
+gtct + −
+
+> T
+
+X
+
+> t=1
+
+gt
+
+!
+
+> +
+
+.
+
+where the independent slopes satisfy 
+
+P(gt = 1) = β, P(gt = −b) = 1 − β. 
+
+They have mean zero. Since ct is chosen before Rt is drawn, 
+
+E[gtct] = 0 .
+
+15 Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference 
+
+Therefore 
+
+E max  
+
+> c∈[0 ,1]
+
+Reg T (c) = E
+
+"
+
+−
+
+> T
+
+X
+
+> t=1
+
+gt
+
+!
+
+> +
+
+#
+
+.
+
+If NT = # {t : gt = 1 }, then NT ∼ Binomial( T, β ) and 
+
+> T
+
+X
+
+> t=1
+
+gt = NT − b(T − NT ) = NT − βT 
+
+1 − β .
+
+Hence 
+
+E max  
+
+> c∈[0 ,1]
+
+[Reg T (c)] = E
+
+"
+
+− NT − βT 
+
+1 − β
+
+
+
+> +
+
+#
+
+.
+
+Thus, there exists a realization of (Rt)Tt=1 such that 
+
+max  
+
+> c∈[0 ,1]
+
+Reg T (c) ≥ E
+
+"
+
+− NT − βT 
+
+1 − β
+
+
+
+> +
+
+#
+
+.
+
+Finally, 
+
+NT − βT 
+
+pT β (1 − β) ⇒ Z, Z ∼ N (0 , 1) ,
+
+and the normalized variables are uniformly integrable because their second moments are bounded. Thus 
+
+1
+
+√T E
+
+"
+
+− NT − βT 
+
+1 − β
+
+
+
+> +
+
+#
+
+→
+
+pβ(1 − β)1 − β E[( −Z)+] = 1
+
+√2π
+
+s
+
+β
+
+1 − β .
+
+B.5. Matching the lower bound with knowledge of T
+
+Theorem B.1. For every T ≥ 1, there is a deterministic online learning algorithm with the knowledge of T , such that 
+
+max  
+
+> c∈[0 ,1]
+
+Reg T (c) ≤ 1
+
+√2π
+
+s
+
+β
+
+1 − β
+
+√T · (1 + o(1)) ,
+
+for every sequence R1, . . . , R T ∈ [0 , 1] .Proof. Let g1, g 2, . . . be independent with 
+
+P(gj = 1) = β, P(gj = −b) = 1 − β, 
+
+and define, for n ≥ 0,
+
+Φn(s) = E
+
+−s −
+
+> n
+
+X
+
+> j=1
+
+gj
+
+
+
+> +
+
+ .
+
+Set S0 = 0 . At round t, play 
+
+ct = ΦT −t(St−1 − b) − ΦT −t(St−1 + 1) 1 + b .
+
+After observing Rt, set 
+
+gt = 1 − 11 − β 1{Rt > c t} ∈ { 1, −b} ,
+
+The choice gt = 1 at Rt = ct is a valid subgradient because ∂f t(ct) = [ −b, 1] at the kink. 16 Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference 
+
+The function Φn is nonincreasing and 1-Lipschitz. Since St−1 − b ≤ St−1 + 1 , the numerator defining ct is nonnegative and at most 1 + b. Hence ct ∈ [0 , 1] . Also, since β = b/ (1 + b),
+
+Φn+1 (s) = bΦn(s + 1) + Φ n(s − b)1 + b .
+
+The definition of ct gives, for either g ∈ { 1, −b},
+
+gc t + Φ T −t(St−1 + g) = Φ T −t+1 (St−1).
+
+With g = gt, this telescopes to TX
+
+> t=1
+
+gtct + ( −ST )+ = Φ T (0) .
+
+For every fixed c ∈ [0 , 1] , convexity gives 
+
+ft(ct) − ft(c) ≤ gt(ct − c).
+
+Taking the maximum over c ∈ [0 , 1] ,
+
+max  
+
+> c∈[0 ,1]
+
+Reg T (c) ≤
+
+> T
+
+X
+
+> t=1
+
+gtct − min  
+
+> c∈[0 ,1]
+
+c
+
+> T
+
+X
+
+> t=1
+
+gt
+
+=
+
+> T
+
+X
+
+> t=1
+
+gtct + ( −ST )+
+
+= Φ T (0) = E
+
+"
+
+−
+
+> T
+
+X
+
+> t=1
+
+gt
+
+!
+
+> +
+
+#
+
+.
+
+The upper bound follows from the same calculation in the proof of Theorem 2.5. 
+
+B.6. Proof of Theorem 2.6 
+
+Recall that Rt is extended outside of [0 , 1] with 
+
+Rt(λ) = 
+
+(
+
+0, λ < 0,
+
+1, λ > 1,
+
+and the definition of ft in (7): 
+
+ft(c) = c + 11 − β
+
+ Rt(λt) − c
+
+> +
+
+.
+
+We start by proving a lemma. 
+
+Lemma B.2. Let x1, . . . , x s ∈ [0 , 1] and xτ = 0 for τ ≥ s + 1 . Then, for every t ≥ s,
+
+min 
+
+> c∈[0 ,1]
+> t
+
+X
+
+> i=1
+
+
+
+c + (xi − c)+
+
+1 − β
+
+
+
+− αt ≤ 11 − β min 
+
+> c∈[0 ,1]
+> s
+
+X
+
+> i=1
+
+
+
+c + (xi − c)+
+
+1 − β
+
+
+
+− αs 
+
+!
+
+> +
+
+.
+
+Proof. Let 
+
+Vt = 1
+
+t min 
+
+> c∈[0 ,1]
+> t
+
+X
+
+> i=1
+
+
+
+c + (xi − c)+
+
+1 − β
+
+
+
+.
+
+For any i ≤ s and j > s 
+
+c + (xi − c)+
+
+1 − β
+
+
+
+≥ c =
+
+
+
+c + (xj − c)+
+
+1 − β
+
+
+
+.
+
+17 Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference 
+
+Then we are left to prove 
+
+t(Vt − α) ≤ s
+
+1 − β (Vs − α)+. (13) Thus, Vt is nonincreasing in t for t ≥ s. In particular, 
+
+Vt ≤ Vs, ∀t ≥ s. 
+
+First suppose (1 − β)t ≤ s. If Vs ≤ α, then Vt ≤ α and (13) follows because the LHS is t(Vt − α) ≤ 0 while the RHS is 
+
+s/ (1 − β)( Vs − α)+ = 0 . Otherwise, because (1 − β)t ≤ s,
+
+t(Vt − α) ≤ s
+
+1 − β (Vs − α) = s
+
+1 − β (Vs − α)+.
+
+This proves the claim in the first case. Now suppose (1 − β)t > s . Let 
+
+c∗ 
+
+> t
+
+= argmin c∈[0 ,1] 
+
+> t
+
+X
+
+> i=1
+
+
+
+c + (xi − c)+
+
+1 − β
+
+
+
+.
+
+The first-order condition implies 
+
+0 ∈ t + 11 − β
+
+> t
+
+X
+
+> i=1
+
+∂c(xi − c∗ 
+
+> t
+
+)+.
+
+If c∗ 
+
+> t
+
+> 0, then ∂c(xi − c∗ 
+
+> t
+
+)+ = 0 for all t > s . Then 
+
+t + 11 − β
+
+> t
+
+X
+
+> i=1
+
+∂c(xi − c∗ 
+
+> t
+
+)+ = t + 11 − β
+
+> s
+
+X
+
+> i=1
+
+∂c(xi − c∗ 
+
+> t
+
+)+ ≥ t − s
+
+1 − β > 0.
+
+By contradiction, we conclude that c∗ 
+
+> t
+
+= 0 . Therefore, 
+
+tV t = 11 − β
+
+> t
+
+X
+
+> i=1
+
+xi = 11 − β
+
+> s
+
+X
+
+> i=1
+
+xi.
+
+Thus, 
+
+t(Vt − α) = 11 − β
+
+> s
+
+X
+
+> i=1
+
+xi − αt < 11 − β
+
+( sX
+
+> i=1
+
+xi − αs 
+
+)
+
+≤ 11 − β
+
+( sX
+
+> i=1
+
+
+
+c + (xi − c)+
+
+1 − β
+
+
+
+− αs 
+
+)
+
+= s
+
+1 − β (Vs − α).
+
+Therefore the same bound follows in the second case. This proves the lemma. 
+
+Proof of Theorem 2.6. We now prove the theorem. If λT +1 ≥ 0, then the outer update gives 
+
+> T
+
+X
+
+> t=1
+
+ft(ct) − αT = λ1 − λT +1 
+
+γ ≤ λ1
+
+γ
+
+which is already stronger than the claimed bound. It remains to consider the case λT +1 < 0. Let s ≤ T be last time before T + 1 at which λs ≥ 0, i.e., 
+
+λs ≥ 0, λs+1 , λ s+2 , . . . , λ T +1 < 0.
+
+Such an s must exist as λ1 ≥ 0. At time s, 0 ≤ fs(cs) ≤ (1 − β)−1. Therefore 
+
+λs+1 = λs − γ(fs(cs) − α) ≥ − γ (1 − β)−1 − α.
+
+Telescoping the outer update to time s gives 
+
+> s
+
+X 
+
+> τ=1
+
+fτ (cτ ) − αs = λ1 − λs+1 
+
+γ ≤ λ1
+
+γ + (1 − β)−1 − α. 
+
+18 Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference 
+
+Let 
+
+Cβ = 34 max 
+
+
+
+1, β
+
+1 − β
+
+
+
+.
+
+Using the lower bound for max c∈[0 ,1] Reg T (c) in Theorem 2.4 to the first s periods, 
+
+min 
+
+> c∈[0 ,1]
+> s
+
+X 
+
+> τ=1
+
+fτ (c) − αs ≤ λ1
+
+γ + (1 − β)−1 − α + Cβ
+
+3
+
+√T + 1 . (14) For every t = s + 1 , . . . , T , we have λt < 0, hence Rt(λt) = 0 . Thus the realized losses after time s are zeros. By Lemma B.2, 
+
+min 
+
+> c∈[0 ,1]
+> T
+
+X 
+
+> τ=1
+
+fτ (c) − αT ≤ λ1/γ + (1 − β)−1 − α + Cβ
+
+√T + 1 1 − β .
+
+Finally, using the upper bound on max c∈[0 ,1] Reg T (c) in Theorem 2.4, 
+
+> T
+
+X
+
+> t=1
+
+ft(ct) − αT ≤ min 
+
+> c∈[0 ,1]
+> T
+
+X
+
+> t=1
+
+ft(c) − αT + Cβ
+
+√T + 1 
+
+≤ λ1/γ + (1 − β)−1 − α
+
+1 − β + Cβ
+
+
+
+1 + 13(1 − β)
+
+ √T + 1 .
+
+Dividing by T proves the theorem. 19 Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference      
+
+> (a) Uniform setting.
+> (b) Adversarial setting (time-varying Beta distribution).
+> (c) Adversarial-jump setting (time-varying Beta distribution).
+> Figure 4. LLM Toxicity Control Experiment. Dataset toxicity distributions under different sampling regimes. (Top) Stationary uniform sampling. (Middle) Adversarial setting with progressively tail-thickening sampling. (Bottom) Adversarial-jump setting.
+
+# C. Additional Results for Experiment 1: Large Language Model Toxicity Control 
+
+Figures 4a, 4b, and 4c visualize the empirical distribution of human toxicity scores for different values of the Beta sampling parameter a under the uniform, adversarial, and adversarial-jump sampling regimes, respectively, and keeping b fixed. 
+
+C.1. Distributional Effects of the Sampling Parameter Uniform regime. Figure 4a shows the corresponding distributions when at = bt = 1 . In this case, the toxicity distribution remains stable over time as the overall shape exhibits no systematic drift in either its center or tail behavior. 
+
+Adversarial and adversarial-jump regime. Figure 4b and 4c show the empirical toxicity distribution for several values of the Beta shape parameter at, with bt = 1 . As at increases, the Beta distribution ct ∼ Beta( at, b t) concentrates more mass near 1, causing the sampling procedure to increasingly select more toxic responses. This results in a pronounced rightward shift and thickening of the upper tail of the toxicity distribution. Figure 5 illustrates the evolution of at as a function of the time step for the adversarial and adversarial-jump sampling regime in the left and right panel, respectively. 20 Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference        
+
+> (a) Adversarial setting. (b) Adversarial-jump setting.
+> Figure 5. LLM Toxicity Control Experiment. Evolution of atparameter in Beta distribution under different sampling regimes: adversarial setting (left), adversarial-jump setting (right).
+
+From the figures, it can be observed that at is increasing overall across time for both regimes, while spontaneous shocks are injected to the adversarial-jump regime, where at can take values as low as 0.5, or as high as 5. 
+
+C.2. Additional Experiment Results 
+
+We evaluate the proposed RUCC controller under uniform, adversarial, and adversarial-jump sampling regimes, for tail levels β ∈ { 0.75 , 0.8, 0.85 , 0.9} with target risk level α = 0 .1. In all experiments, we use step size γ = 0 .05 and discard the first 100 rounds as a burn-in period. 
+
+Evolution of the empirical CVaR β . The left panel of Figures 6, 7, and 8 show the evolution of the realized empirical 
+
+CVaR β under the uniform, adversarial, and adversarial-jump regimes, respectively. In the uniform setting (Figure 6), all curves exhibit a clear decay toward the target level α = 0 .1. Higher β values (more risk-averse tail control) start from larger initial CVaR β values but converge at a comparable rate. After sufficient time, the realized CVaR β for all β stabilizes tightly around the target level, demonstrating that the method can achieve tight, non-conservative control. In the adversarial setting (Figure 7), and adversarial-jump setting (Figure 8), the controller adapts and drives the realized 
+
+CVaR β downward for all β, eventually stabilizing near the target level. The convergence is slower and exhibits more fluctuation than in the uniform case, reflecting the intrinsic difficulty of controlling tail risk under adversarial distribution shift. In all three settings, the RUCC controller is able to maintain tail risk control through adaptive λt updates while avoiding overconservative behavior–which is demonstrated by the baseline realized CVaR β that selects a static λt.
+
+Remark C.1 . (Effect of the tail level β.) Across both regimes, larger β values (corresponding to more extreme tail sensitivity) lead to systematically higher CVaR β trajectories, especially in the early stages. However, for all values of β, the empirical 
+
+CVaR β eventually achieves stable control near α.
+
+Evolution of the control parameter λt. The right panel of Figures 6, 7, and 8 show the evolution of the control parameter 
+
+λt in the uniform, adversarial, and adversarial-jump regimes, respectively. In the uniform setting (Figure 6), λt evolves within a comparatively constrained band, indicating a relatively stable environment. It can also be observed that the range of the band depends on β in an increasing manner, demonstrating the inherent increase in difficulty of controlling risks at higher tails. In the adversarial setting (Figure 7) and the adversarial-jump setting (Figure 8), λt exhibits a clear decreasing trend over time for all β. Initially, λt remains large, corresponding to less aggressive filtering. As the controller accumulates evidence and adapts to the realized tail distribution, λt is gradually reduced, reflecting an increasingly strict control of the risky region. Larger β values lead to systematically smaller λt, as expected for more stringent tail-risk control. Furthermore, in the adversarial-jump setting (Figure 8), in addition to the decreasing trend in λt, there are sporadic spikes in λt that correspond to the dips in at of the Beta sampling distribution, and the analogous dips in λt that correspond to the jumps in 
+
+at, demonstrating the robustness of the RUCC controller and its ability to adapt to sudden distributional changes, as well as general distribution drifts. 21 Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference 
+
+(a) Realized CVaR β (β = 0 .75 ) (b) Evolution of λt (β = 0 .75 )
+
+(c) Realized CVaR β (β = 0 .80 ) (d) Evolution of λt (β = 0 .80 )
+
+(e) Realized CVaR β (β = 0 .85 ) (f) Evolution of λt (β = 0 .85 )
+
+(g) Realized CVaR β (β = 0 .90 ) (h) Evolution of λt (β = 0 .90 )
+
+Figure 6. LLM Toxicity Control Experiment. Realized empirical CVaR β and evolution of λt with γ = 0 .05 , and target α = 0 .1 for the uniform regime 
+
+22 Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference 
+
+(a) Realized CVaR β (β = 0 .75 ) (b) Evolution of λt (β = 0 .75 )
+
+(c) Realized CVaR β (β = 0 .80 ) (d) Evolution of λt (β = 0 .80 )
+
+(e) Realized CVaR β (β = 0 .85 ) (f) Evolution of λt (β = 0 .85 )
+
+(g) Realized CVaR β (β = 0 .90 ) (h) Evolution of λt (β = 0 .90 )
+
+Figure 7. LLM Toxicity Control Experiment. Realized empirical CVaR β and evolution of λt with γ = 0 .05 , and target α = 0 .1 for the adversarial regime 
+
+23 Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference 
+
+(a) Realized CVaR β (β = 0 .75 ) (b) Evolution of λt (β = 0 .75 )
+
+(c) Realized CVaR β (β = 0 .80 ) (d) Evolution of λt (β = 0 .80 )
+
+(e) Realized CVaR β (β = 0 .85 ) (f) Evolution of λt (β = 0 .85 )
+
+(g) Realized CVaR β (β = 0 .90 ) (h) Evolution of λt (β = 0 .90 )
+
+Figure 8. LLM Toxicity Control Experiment. Realized empirical CVaR β and evolution of λt with γ = 0 .05 , and target α = 0 .1 for the adversarial-jump regime 
+
+24 Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference 
+
+# D. Additional Results for Experiment 2: Portfolio Management 
+
+We evaluate the proposed RU Conformal CVaR controller on various horizons of real-market portfolio management tasks covering the period 1991–2001, 2009–2018, and the full period 1991–2026. We set the target risk level to α = 0 .01 , and report results for β ∈ { 0.75 , 0.8, 0.85 , 0.9}, with γ = 0 .05 , and remove the first 100 points as burn-in. 
+
+Evolution of the rolling empirical CVaR β . The left panel of Figures 9, 10, and 11 show the evolution of the 180-day rolling realized empirical CVaR β for different β during 1991–2001, 2009–2018, and the full period 1991–2025, respectively. During 1991–2001, we observe that the CVaR β of the baseline controller grows over time with a static λt that eventually exceeds the target level. This phenomenon can be explained by the fact that 1991–2001 is an economically stable period with steady growth that ended with the dot-com crash in 2001. Accordingly, as the baseline controller has a fixed λt, its associated realized CVaR β grows beyond the target level over time. In contrast, the realized tail risk of the RUCC controller initially starts below the target level and steadily increases over time as the controller adapts, and moves tightly around the target level as time passes. During 2009–2018, we observe that the CVaR β of the baseline controller decreases overtime with a static λt that eventually falls well below the target level. This observation can be explained by the fact that 2009–2018 is the post-financial crisis period in which the economy is slowly improving over time (with decreasing risks). As the baseline controller has a fixed λt,its associated realized CVaR β falls below the target level over time. In contrast, the realized tail risk of the RUCC controller initially starts below the target level (as a response to the financial crisis) and steadily increases over time as the controller adapts to the improving economic environment, to be close to the target tail risk level. Finally, by observing the full-period 1991–2025, we can highlight the robust adaptability of the RUCC controller. While the realized tail risk of the baseline controller rises and falls drastically in response to the changing economic environment, including dramatic rises during the 2008 financial crisis and post-COVID period, the tail risk associated with the RUCC controller moves tightly around the target level with moderate fluctuations during the same economically tumultuous times. In all cases, the final realized tail risk values are close to the target level (approximately 0.01 ), demonstrating that the method achieves tight long-run tail risk control without persistent conservatism. Higher β values (corresponding to more extreme tail control) exhibit slightly slower convergence, as expected, but still reach the target level within the time horizon. 
+
+Evolution of the control parameter λt. The right panel of Figures 9, 10, and 11 shows the evolution of the control parameter λt for different β.During 1991–2001, we observe that the RUCC λt grows then falls over time, indicating that the controller first increases then reduces exposure to the risky asset as tail risks accumulate. The initial increase in λt is consistent with the economic growth during the period, the later decrease in λt is consistent with the dot-com crash in 2000, that requires more stringent risk management to control the tail risk at the target level. On the other hand, the baseline fixed λ stays at a comparatively low level causing it to be overly conservative. In contrast, during 2009–2018, we observe that the RUCC λt grows over time, indicating that the controller increases exposure to the risky asset as tail risks decrease. The growth in λt over time is consistent with the growing stability of the economy after the 2008 financial crisis, allowing for more lenient risk management to control the tail risk at the desired target level. Conversely, the baseline fixed λ stays at a consistently low level due to the financial crisis, and fails to adapt to the changing economic environment. Finally, during 1991–2025, we observe that the RUCC λt grows and falls over time, where λt peaks during economically stable periods, such as pre-dot-com crash, pre-financial crisis, and pre-COVID. The larger values of λt encourage investment in the risky asset while controlling the tail risk at the target level. On the other hand, λt accordingly drops during economically tumultuous periods, such as post-dot-com crash, post-financial crisis, and post-COVID periods. The smaller values of λt allow for less aggressive investment in the risky asset to avoid the burden of tail risks. Note that in every time period for larger β, λt shrinks accordingly as the algorithm must be more conservative in order to control more extreme tail events. Overall, these results demonstrate that our proposed RU conformal inference controller successfully enforces long-run 
+
+CVaR β control on real financial data over a 25-year horizon, including multiple crisis periods (e.g., the dot-com crash, 2008 financial crisis, and COVID-19). 25 Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference 
+
+(a) Realized CVaR β (β = 0 .75 ) (b) Evolution of λt (β = 0 .75 )
+
+(c) Realized CVaR β (β = 0 .80 ) (d) Evolution of λt (β = 0 .80 )
+
+(e) Realized CVaR β (β = 0 .85 ) (f) Evolution of λt (β = 0 .85 )
+
+(g) Realized CVaR β (β = 0 .90 ) (h) Evolution of λt (β = 0 .90 )
+
+Figure 9. Portfolio Management Experiment. Realized empirical CVaR β and evolution of λt for γ = 0 .05 with target α = 0 .01 
+
+during 1991–2000. 
+
+26 Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference 
+
+(a) Realized CVaR β (β = 0 .75 ) (b) Evolution of λt (β = 0 .75 )
+
+(c) Realized CVaR β (β = 0 .80 ) (d) Evolution of λt (β = 0 .80 )
+
+(e) Realized CVaR β (β = 0 .85 ) (f) Evolution of λt (β = 0 .85 )
+
+(g) Realized CVaR β (β = 0 .90 ) (h) Evolution of λt (β = 0 .90 )
+
+Figure 10. Portfolio Management Experiment. Realized empirical CVaR β and evolution of λt for γ = 0 .05 with target α = 0 .01 
+
+during 2009–2018. 
+
+27 Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference 
+
+(a) Realized CVaR β (β = 0 .75 ) (b) Evolution of λt (β = 0 .75 )
+
+(c) Realized CVaR β (β = 0 .80 ) (d) Evolution of λt (β = 0 .80 )
+
+(e) Realized CVaR β (β = 0 .85 ) (f) Evolution of λt (β = 0 .85 )
+
+(g) Realized CVaR β (β = 0 .90 ) (h) Evolution of λt (β = 0 .90 )
+
+Figure 11. Portfolio Management Experiment. Realized empirical CVaR β and evolution of λt for γ = 0 .05 with target α = 0 .01 
+
+during 1991–2025. 
+
+28

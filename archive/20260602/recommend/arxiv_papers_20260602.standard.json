@@ -1,0 +1,1192 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-02T23:06:21.471925+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 5,
+    "deep_divecandidates": 28,
+    "deep_cap": 10,
+    "deep_selected": 11,
+    "quick_candidates": 43,
+    "quick_skim_target": 15,
+    "quick_selected": 15
+  },
+  "deep_dive": [
+    {
+      "id": "2605.27474v1",
+      "source": "arxiv",
+      "title": "Stop Suppressing the Tail: Causal Inference for Extreme Events",
+      "abstract": "Estimating how an outcome responds to a continuous treatment (the Average Dose-Response Function, or ADRF) is a core causal-inference primitive. However, when outcomes possess heavy tails, standard robust double machine learning (DML) deliberately suppresses these extremes to stabilize the bulk average. In high-stakes settings, such as financial returns or climate losses, this omitted 1-in-1000 extreme event is the actual target quantity. Furthermore, current methods that read the tail from a model's residuals suffer from circular dependence, causing tail shape inferences to shift drastically based solely on whether the core estimator is switched between Huber and Welsch.The research proposes an ADRF estimator that emits a structured tail-shape output alongside the standard point estimate. Its tail diagnostic (PDHTE+JK) evaluates the per-treatment tail shape from the outcome centered by a pilot median, successfully breaking the circular dependence and rendering the diagnostic invariant to the choice of core method. The output encompasses four treatment-conditional quantities: tail shape $\\hatξ(t)$, deep-tail return levels $\\hat{Q}_α(t)$, conditional shortfalls $\\hat{S}_α(t)$, the recovered mean ADRF, and an explicit refusal mechanism that declines extrapolation when extreme-value modeling is unsupported by the data. Compared to kernel-weighted quantile regression (QR), the proposed estimator reduces deep-tail ($α=0.001$) return-level MAE by 11% and conditional-shortfall MAE by 25.5% across a heavy-tailed panel. It also achieves a 20-29% MAE reduction in sample-scarce regimes ($n\\le2000$). On freMTPL2 motor-insurance claims, it successfully triggered an explicit extrapolation refusal on the log-claim scale, which neither QR nor loss-only DML can produce.",
+      "authors": [
+        "Eichi Uehara"
+      ],
+      "primary_category": "stat.ML",
+      "categories": [
+        "stat.ML",
+        "cs.LG"
+      ],
+      "published": "2026-05-26T11:38:12+00:00",
+      "link": "https://arxiv.org/pdf/2605.27474v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "causal inference for heavy-tailed extreme events",
+      "llm_evidence_cn": "针对重尾极端事件的因果推断",
+      "llm_evidence": "针对重尾极端事件的因果推断",
+      "canonical_evidence": "针对重尾极端事件的因果推断",
+      "llm_tldr_en": "Develops an ADRF estimator that handles heavy-tailed outcomes, specifically targeting extreme events in high-stakes settings like finance and climate.",
+      "llm_tldr_cn": "该论文指出标准因果推断方法会抑制重尾数据中的极端事件，但极端事件往往是高风险场景（如金融收益、气候损失）的关键目标。为此提出一种平均剂量响应函数（ADRF）估计器，能够同时输出结构化的尾部形状信息，避免了传统方法因估计器切换导致的尾部推断不稳定问题。",
+      "llm_tldr": "该论文指出标准因果推断方法会抑制重尾数据中的极端事件，但极端事件往往是高风险场景（如金融收益、气候损失）的关键目标。为此提出一种平均剂量响应函数（ADRF）估计器，能够同时输出结构化的尾部形状信息，避免了传统方法因估计器切换导致的尾部推断不稳定问题。",
+      "llm_tags": [
+        "query:etr"
+      ],
+      "matched_query_tag": "query:etr",
+      "matched_query_text": "economic tail risk measurement and modeling",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2605.25766v1",
+      "source": "arxiv",
+      "title": "Measuring multivariate maximal tail dependence",
+      "abstract": "The classical tail dependence coefficient (TDC) may fail to capture non-exchangeable features of bivariate tail dependence since it evaluates the underlying copula only along the diagonal. To address this limitation, several measures of strongest manifestation of tail dependence have been proposed in the bivariate case, including a measure based on the tail copula of the underlying bivariate copula. This paper introduces and investigates the multivariate maximal tail concordance measure (MTCM) which extends the bivariate measure to the multivariate case. The MTCM quantifies the largest tail mass over lower hyperrectangles of common unit volume, while the associated maximizer identifies the direction of maximal tail probability. We establish fundamental properties of the MTCM in the multivariate case, including existence of an optimal direction. We also derive analytical representations for several important model classes. Closed-form expressions are further obtained for survival Marshall-Olkin copulas, Archimax and nested Archimedean copulas with regularly varying Archimedean generators. An application to trivariate annual sea-level maxima in England shows that the MTCM can reveal off-diagonal stress directions and substantial differences in the underlying extremal dependence not detected by likelihood- or TDC-based comparisons.",
+      "authors": [
+        "Takaaki Koike",
+        "Marius Hofert",
+        "Haruki Tsunekawa"
+      ],
+      "primary_category": "math.ST",
+      "categories": [
+        "math.ST",
+        "q-fin.RM"
+      ],
+      "published": "2026-05-25T12:19:02+00:00",
+      "link": "https://arxiv.org/pdf/2605.25766v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "multivariate tail dependence measurement",
+      "llm_evidence_cn": "多元尾部依赖测量",
+      "llm_evidence": "多元尾部依赖测量",
+      "canonical_evidence": "多元尾部依赖测量",
+      "llm_tldr_en": "Extends bivariate tail dependence measures to multivariate case using maximal tail concordance measure, quantifying largest tail mass over hyperrectangles.",
+      "llm_tldr_cn": "针对经典尾部依赖系数无法捕捉多元非交换结构的局限，本文提出了多元最大尾部协调测度（MTCM），将其从二元推广至多元情形。该方法量化了超矩形上最大的尾部质量，并识别最大尾部概率方向。建立了MTCM的基本性质，为经济尾部风险测量提供了新工具。",
+      "llm_tldr": "针对经典尾部依赖系数无法捕捉多元非交换结构的局限，本文提出了多元最大尾部协调测度（MTCM），将其从二元推广至多元情形。该方法量化了超矩形上最大的尾部质量，并识别最大尾部概率方向。建立了MTCM的基本性质，为经济尾部风险测量提供了新工具。",
+      "llm_tags": [
+        "query:etr"
+      ],
+      "matched_query_tag": "query:etr",
+      "matched_query_text": "economic tail risk measurement and modeling",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2605.27694v1",
+      "source": "arxiv",
+      "title": "Likelihood-Free Inference for Multivariate Generalized Pareto Models",
+      "abstract": "Likelihood-based inference for multivariate extreme-value models is often unreliable or infeasible when likelihoods are intractable or supports are discrete. This challenge is particularly acute for multivariate discrete generalized Pareto models, where both marginal tail behavior and dependence must be inferred from sparse exceedance samples. We propose a two-stage likelihood-free inference procedure, termed AW--NBE (Adaptive Wasserstein Neural Bayes Estimator), that combines neural Bayes estimation with a targeted optimal transport refinement step based on the Sinkhorn discrepancy. In the first stage, a neural Bayes estimator trained on simulated data provides fast and stable initial parameter estimates. In the second stage, these estimates are locally refined by minimizing the Sinkhorn divergence between the empirical distributions of observed and simulated exceedances. This refinement reduces the Sinkhorn discrepancy between the empirical distributions of observed and simulated exceedances, while preserving dependence features learned by the neural estimator. Model adequacy is assessed using new optimal transport based multivariate Q--Q and potential diagnostics. Applications to financial log-returns and Swiss dry spell exceedances suggest that AW--NBE can improve parameter inferences compared to estimation using solely, either the Sinkhorn discrepancy, or the standard neural Bayes estimators and censored likelihood estimation.",
+      "authors": [
+        "Samira Aka",
+        "Marie Kratz",
+        "Philippe Naveau"
+      ],
+      "primary_category": "stat.AP",
+      "categories": [
+        "stat.AP"
+      ],
+      "published": "2026-05-26T21:13:50+00:00",
+      "link": "https://arxiv.org/pdf/2605.27694v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "multivariate extreme-value models for tail risk inference",
+      "llm_evidence_cn": "多元极端值模型用于尾部风险推断",
+      "llm_evidence": "多元极端值模型用于尾部风险推断",
+      "canonical_evidence": "多元极端值模型用于尾部风险推断",
+      "llm_tldr_en": "Proposes AW-NBE, a likelihood-free inference method for multivariate generalized Pareto models, enabling robust tail risk estimation from sparse exceedance samples via neural Bayes and optimal transport refinement.",
+      "llm_tldr_cn": "针对多元离散广义帕累托模型在似然不可解时的推断困难，本文提出两阶段似然自由推断方法AW-NBE。第一阶段用神经贝叶斯估计器基于模拟数据快速得到初始参数；第二阶段利用Sinkhorn散度进行最优传输局部精化。实验表明该方法在稀疏超阈值样本下能准确估计边际尾部行为和依赖结构。该工作为经济尾部风险建模提供了可靠的计算工具。",
+      "llm_tldr": "针对多元离散广义帕累托模型在似然不可解时的推断困难，本文提出两阶段似然自由推断方法AW-NBE。第一阶段用神经贝叶斯估计器基于模拟数据快速得到初始参数；第二阶段利用Sinkhorn散度进行最优传输局部精化。实验表明该方法在稀疏超阈值样本下能准确估计边际尾部行为和依赖结构。该工作为经济尾部风险建模提供了可靠的计算工具。",
+      "llm_tags": [
+        "query:etr"
+      ],
+      "matched_query_tag": "query:etr",
+      "matched_query_text": "economic tail risk measurement and modeling",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2605.28749v1",
+      "source": "arxiv",
+      "title": "IV regression with distribution-valued outcomes",
+      "abstract": "We develop IV Fréchet regression (IVFR), an instrumental-variable (IV) method for settings where the outcome is an entire distribution. Framing the problem as an IV regression in 2-Wasserstein space, IVFR extends global Fréchet regression to the case with endogenous covariates. IVFR projects IV-weighted quantile curves onto the space of valid distributions and then recovers the corresponding regression coefficient functions. The projection provably reduces the estimation error in finite samples and guarantees valid fitted distributions. We show that the IVFR estimator converges weakly to a mean-zero Gaussian process and establish the validity of a multiplier bootstrap procedure for uniform inference. In simulations, the projection reduces the integrated mean squared error (IMSE) by up to 63% relative to existing methods. Revisiting the effects of Chinese import competition on the wage distribution within commuting zones, the proposed method produces 9-10% narrower confidence bands than existing methods. Using our novel uniform confidence bands, we find no evidence that import competition reduced wages at the very bottom of the distribution, but only between the 10th and 35th quantile. We also revisit the effect of county food stamp programs on the county's birth weight distribution and find no significant effects.",
+      "authors": [
+        "David Van Dijcke",
+        "Kaspar Wüthrich"
+      ],
+      "primary_category": "econ.EM",
+      "categories": [
+        "econ.EM",
+        "math.ST",
+        "stat.ME"
+      ],
+      "published": "2026-05-27T17:07:47+00:00",
+      "link": "https://arxiv.org/pdf/2605.28749v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "IV regression for distributional outcomes, applicable to causal policy evaluation",
+      "llm_evidence_cn": "分布值结果的IV回归，可应用于因果政策评估",
+      "llm_evidence": "分布值结果的IV回归，可应用于因果政策评估",
+      "canonical_evidence": "分布值结果的IV回归，可应用于因果政策评估",
+      "llm_tldr_en": "Develops IV Frechet regression for distribution-valued outcomes with endogenous covariates, providing a causal method for evaluating macroeconomic policy effects on entire outcome distributions.",
+      "llm_tldr_cn": "针对内生协变量下结果变量为整个分布的情形，本文提出IV Fréchet回归（IVFR）。该方法在2-Wasserstein空间中构建IV回归，通过投影IV加权的分位曲线恢复回归系数函数。理论证明该投影能减少有限样本误差，并建立了弱收敛与bootstrap推断。模拟实验显示其降低了积分均方误差。为宏观经济政策对分布的影响评估提供了因果工具。",
+      "llm_tldr": "针对内生协变量下结果变量为整个分布的情形，本文提出IV Fréchet回归（IVFR）。该方法在2-Wasserstein空间中构建IV回归，通过投影IV加权的分位曲线恢复回归系数函数。理论证明该投影能减少有限样本误差，并建立了弱收敛与bootstrap推断。模拟实验显示其降低了积分均方误差。为宏观经济政策对分布的影响评估提供了因果工具。",
+      "llm_tags": [
+        "query:pe"
+      ],
+      "matched_query_tag": "query:pe",
+      "matched_query_text": "causal inference and policy evaluation methods",
+      "matched_requirement_id": "req-28",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2605.29961v1",
+      "source": "arxiv",
+      "title": "Modifying causal models to distinguish between transient and lasting causal effects",
+      "abstract": "This paper considers how to classify the effects of interventions in causal models for outcomes and exposures observed over time. First, we demonstrate the limitations of the most common uses of potential outcomes and causal directed acyclic graphs for capturing all possible interventions in a time varying framework, particularly in problems where the key question concerns interventions to maintain or change equilibrium behaviour. Second, we adopt a system and state based approach rather than a measurement-based approach to identify the causal parameters. In particular, we discuss how assumptions about the system's equilibrium and the effects of interventions on that equilibrium can allow for more specific causal interpretations and clarify the goals of design and analysis. Third, we show how the ability to identify the the causal parameters of a time varying system depends on the selection of timepoints for measuring the system's states. We address this by proposing a novel version of the null effect, which is designed to distinguish between transient and lasting causal effects.",
+      "authors": [
+        "Russell Steele",
+        "Naftali Weinberger",
+        "Tess Baker",
+        "Ian Shrier"
+      ],
+      "primary_category": "stat.ME",
+      "categories": [
+        "stat.ME"
+      ],
+      "published": "2026-05-28T14:02:08+00:00",
+      "link": "https://arxiv.org/pdf/2605.29961v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "causal model modification to distinguish transient vs lasting effects for policy evaluation",
+      "llm_evidence_cn": "修改因果模型以区分瞬时与持久效应，用于政策评估",
+      "llm_evidence": "修改因果模型以区分瞬时与持久效应，用于政策评估",
+      "canonical_evidence": "修改因果模型以区分瞬时与持久效应，用于政策评估",
+      "llm_tldr_en": "Proposes a system-state approach to distinguish transient and lasting causal effects, addressing limitations of potential outcomes and DAGs for equilibrium interventions, directly applicable to macroeconomic policy evaluation.",
+      "llm_tldr_cn": "本文指出标准因果模型在时变框架下区分瞬时与持久效应的局限，提出基于系统与状态的方法替代基于测量的方法。通过引入平衡假设，能够更准确地识别干预对平衡状态的因果效应。该方法为宏观经济政策（如货币政策）的持久效果评估提供了新的识别策略。",
+      "llm_tldr": "本文指出标准因果模型在时变框架下区分瞬时与持久效应的局限，提出基于系统与状态的方法替代基于测量的方法。通过引入平衡假设，能够更准确地识别干预对平衡状态的因果效应。该方法为宏观经济政策（如货币政策）的持久效果评估提供了新的识别策略。",
+      "llm_tags": [
+        "query:pe"
+      ],
+      "matched_query_tag": "query:pe",
+      "matched_query_text": "causal inference and policy evaluation methods",
+      "matched_requirement_id": "req-28",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.00265v1",
+      "source": "arxiv",
+      "title": "Out-of-Distribution generalization of quantile regression with heavy tailed inputs: an SVM approach",
+      "abstract": "We study quantile regression in an extrapolation regime where the covariate takes unusually large values. Under regular variation assumptions, extreme observations can be effectively characterized through their angular components, enabling learning strategies that focus on the angle of the most extreme observations. This approach is formalized through the minimization of an asymptotic conditional risk that localizes learning in the tail of the covariate distribution.   We propose a novel Support Vector Machine (SVM) framework for extreme quantile regression, leveraging reproducing kernel Hilbert spaces to handle high-dimensional and nonlinear settings. Our method also accommodates unbounded response variables and avoids restrictive transformations. We establish finite-sample learning guarantees under mild regularity assumptions.   The proposed framework unifies ideas from statistical learning and multivariate extremes, providing a tractable and theoretically grounded approach to extrapolation. We complement our theoretical findings with an empirical study on river flow data from the Danube, demonstrating the practical relevance of our methods.",
+      "authors": [
+        "Baptiste Leroux",
+        "Clément Dombry",
+        "Anne Sabourin"
+      ],
+      "primary_category": "stat.ML",
+      "categories": [
+        "stat.ML",
+        "cs.LG"
+      ],
+      "published": "2026-05-29T18:52:13+00:00",
+      "link": "https://arxiv.org/pdf/2606.00265v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "extreme quantile regression for heavy-tailed data",
+      "llm_evidence_cn": "重尾数据的极端分位数回归",
+      "llm_evidence": "重尾数据的极端分位数回归",
+      "canonical_evidence": "重尾数据的极端分位数回归",
+      "llm_tldr_en": "Studies quantile regression in extrapolation regime with heavy-tailed covariates, proposing an SVM framework for extreme quantile regression using angular components.",
+      "llm_tldr_cn": "该文研究了协变量取极端值时（重尾分布）的分位数回归问题。提出一种基于支持向量机（SVM）的框架，利用角度分量将学习聚焦于尾部，结合再生核希尔伯特空间处理高维非线性设定。方法适用于经济尾部风险的极端分位数建模，如增长-at-risk中的极端情景预测。",
+      "llm_tldr": "该文研究了协变量取极端值时（重尾分布）的分位数回归问题。提出一种基于支持向量机（SVM）的框架，利用角度分量将学习聚焦于尾部，结合再生核希尔伯特空间处理高维非线性设定。方法适用于经济尾部风险的极端分位数建模，如增长-at-risk中的极端情景预测。",
+      "llm_tags": [
+        "query:etr"
+      ],
+      "matched_query_tag": "query:etr",
+      "matched_query_text": "methods for measuring and predicting economic tail risks",
+      "matched_requirement_id": "req-16",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.00320v1",
+      "source": "arxiv",
+      "title": "Adversarially Robust Control of Conditional Value-at-Risk via Rockafellar-Uryasev Conformal Inference",
+      "abstract": "We present an online, distribution-free framework for controlling the Conditional Value-at-Risk (CVaR), extending conformal tail risk control to non-stationary and adversarial environments. Unlike classical risk control methods, which rely on stationarity or linearity of expectation, our approach provides provable safety guarantees for a nonlinear tail risk functional under arbitrary data-generating processes that may drift or shift strategically over time. By leveraging deep connections between conformal tail risk control, online learning, and the variational representation of CVaR introduced by Rockafellar and Uryasev, we develop a novel procedure for online CVaR control with adversarial regret guarantees. The proposed method operates without assumptions on the underlying data-generating process, making it broadly applicable in modern high-stakes deployment settings. We prove that the realized empirical CVaR is asymptotically controlled at the target level, and that the resulting control is asymptotically tight up to a finite-sample conservatism gap. We demonstrate the effectiveness of our approach on portfolio risk management and toxicity mitigation for Large Language Models (LLMs), where rare but catastrophic failures dominate system risk.",
+      "authors": [
+        "Catherine Chen",
+        "Jingyan Shen",
+        "Zhun Deng",
+        "Lihua Lei"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-05-29T19:52:36+00:00",
+      "link": "https://arxiv.org/pdf/2606.00320v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "distribution-free online CVaR control for tail risk",
+      "llm_evidence_cn": "分布自由的在线CVaR控制用于尾部风险",
+      "llm_evidence": "分布自由的在线CVaR控制用于尾部风险",
+      "canonical_evidence": "分布自由的在线CVaR控制用于尾部风险",
+      "llm_tldr_en": "Provides an online, distribution-free framework to control CVaR under adversarial non-stationarity, directly addressing economic tail risk measurement and modeling.",
+      "llm_tldr_cn": "该论文提出一个在线、分布自由的框架，用于在非平稳和对抗性环境中控制条件风险价值（CVaR）。通过结合共形尾部风险控制、在线学习与Rockafellar-Uryasev变分表示，该框架能为非线性尾部风险泛函提供可证明的安全保障。方法不依赖平稳性或线性期望，适用于经济尾部风险的实时监测与风险敞口控制，是尾部风险测量与建模的先进工具。",
+      "llm_tldr": "该论文提出一个在线、分布自由的框架，用于在非平稳和对抗性环境中控制条件风险价值（CVaR）。通过结合共形尾部风险控制、在线学习与Rockafellar-Uryasev变分表示，该框架能为非线性尾部风险泛函提供可证明的安全保障。方法不依赖平稳性或线性期望，适用于经济尾部风险的实时监测与风险敞口控制，是尾部风险测量与建模的先进工具。",
+      "llm_tags": [
+        "query:etr"
+      ],
+      "matched_query_tag": "query:etr",
+      "matched_query_text": "economic tail risk measurement and modeling",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.00948v1",
+      "source": "arxiv",
+      "title": "Recession Detection in Japan using Labor Market Data",
+      "abstract": "Recession indicators are often viewed as U.S. specific, raising the question of whether labor market-based rules such as the Sahm Rule and the Michez Rule can reliably detect recessions in other countries. To answer this, we evaluate whether such rules can be adapted to Japan by calibrating thresholds and smoothing parameters to Japanese labor market data. We construct a large set of 95,832 recession indicators combining unemployment and vacancy data. The selected classifiers are statistically perfect as they identify all 11 historical recessions in the 1970-2021 training period without generating any false positives. Among these, 193 classifiers lie on the anticipation-precision frontier. Restricting attention to the high-precision segment yields six classifiers with a standard deviation of detection errors below 3 months. The selected classifier ensemble signals recessions, on average, 0.06 months after their true onset. Overall, these findings suggest that slack-based labor market rules provide a general framework for improving real-time recession detection across countries.",
+      "authors": [
+        "Neha Sikand",
+        "Rongjin Zhang"
+      ],
+      "primary_category": "econ.GN",
+      "categories": [
+        "econ.GN"
+      ],
+      "published": "2026-05-31T01:53:20+00:00",
+      "link": "https://arxiv.org/pdf/2606.00948v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "recession detection using labor market data for Japan",
+      "llm_evidence_cn": "使用日本劳动力市场数据检测衰退",
+      "llm_evidence": "使用日本劳动力市场数据检测衰退",
+      "canonical_evidence": "使用日本劳动力市场数据检测衰退",
+      "llm_tldr_en": "This paper adapts labor-market-based recession rules to Japan, constructing 95,832 indicators that perfectly identify all 11 historical recessions without false positives, with 193 classifiers on the anticipation-precision frontier.",
+      "llm_tldr_cn": "该论文探讨劳动力市场规则（如萨姆规则）是否适用于日本，通过校准阈值和平滑参数构建大量衰退指标，发现所选分类器能完美识别1970-2021年所有11次日本衰退且无假阳性。其中193个分类器位于预警-精确前沿，高精度分类器检测误差更小，证明劳动力市场规则可跨国适用。",
+      "llm_tldr": "该论文探讨劳动力市场规则（如萨姆规则）是否适用于日本，通过校准阈值和平滑参数构建大量衰退指标，发现所选分类器能完美识别1970-2021年所有11次日本衰退且无假阳性。其中193个分类器位于预警-精确前沿，高精度分类器检测误差更小，证明劳动力市场规则可跨国适用。",
+      "llm_tags": [
+        "query:etr"
+      ],
+      "matched_query_tag": "query:etr",
+      "matched_query_text": "downside risk to economic growth and recession probability",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.00989v1",
+      "source": "arxiv",
+      "title": "Recession Detection Using Real Time GDP Data",
+      "abstract": "This paper examines whether real-time GDP announcements can reliably identify business-cycle turning points. Using U.S. real-time GDP vintages from 1947 to 2021, we construct 4,356 recession indicators based on alternative smoothing methods and scaling variations. We then combine these indicators with alternative thresholds to generate 137,457 perfect recession classifiers. The selected classifiers identify all 12 historical recessions without generating false positives or false negatives. Restricting attention to the high-precision segment yields two classifiers with a standard deviation of detection errors below three months, while the selected ensemble signals recessions, on average, 3.04 months after their official onset. The framework accurately identifies recession episodes across vintages, suggesting that discrepancies in prior work may reflect limitations of traditional dating methods in addition to data revisions. Overall, the results indicate that real-time GDP announcements provide a practical proxy for NBER-style recession dating.",
+      "authors": [
+        "Neha Sikand",
+        "Rongjin Zhang"
+      ],
+      "primary_category": "econ.GN",
+      "categories": [
+        "econ.GN"
+      ],
+      "published": "2026-05-31T04:04:41+00:00",
+      "link": "https://arxiv.org/pdf/2606.00989v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "recession detection using real-time GDP data",
+      "llm_evidence_cn": "使用实时GDP数据检测衰退",
+      "llm_evidence": "使用实时GDP数据检测衰退",
+      "canonical_evidence": "使用实时GDP数据检测衰退",
+      "llm_tldr_en": "This paper uses real-time GDP vintages to construct perfect recession classifiers that identify all 12 historical U.S. recessions without false positives, signaling downturns on average 3.04 months after onset.",
+      "llm_tldr_cn": "该论文针对实时GDP数据能否可靠识别商业周期转折点的问题，构建了海量衰退分类器，发现所选分类器能完美识别美国历史上全部12次衰退且无假阳性，高精度分类器检测误差标准差低于三个月。该框架为衰退预警提供了新方法，有助于及时识别经济下行风险。",
+      "llm_tldr": "该论文针对实时GDP数据能否可靠识别商业周期转折点的问题，构建了海量衰退分类器，发现所选分类器能完美识别美国历史上全部12次衰退且无假阳性，高精度分类器检测误差标准差低于三个月。该框架为衰退预警提供了新方法，有助于及时识别经济下行风险。",
+      "llm_tags": [
+        "query:etr"
+      ],
+      "matched_query_tag": "query:etr",
+      "matched_query_text": "downside risk to economic growth and recession probability",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.01659v1",
+      "source": "arxiv",
+      "title": "Data-Automated Policy Learning for Nonlinear Welfare",
+      "abstract": "This paper explores policy learning from observational data, focusing on a nonlinear welfare criterion in a binary treatment setting. The nonlinear criterion is inspired by scenarios where policymakers prioritize specific population segments. We model this criterion using a utility function that encompasses potential outcomes and intermediate parameters, with the latter capturing higher moments of the outcome distributions. When formulated in the context of observational data, both the intermediate parameters and the welfare criterion depend on the propensity score, which we estimate using machine-learning techniques. To address bias in machine learning estimates, we introduce a novel reweighting-based debiasing approach that offers a promising alternative to traditional orthogonality-based methods. To tackle the complexities of infinite-dimensional policy spaces, we employ sieve approximations and $K$-fold cross-validation for model selection, thereby fully automating the policy-learning process. Despite these complexities, we demonstrate that both the welfare regret and the average welfare regret of our proposed policy learning method satisfy an oracle inequality, thereby providing theoretical guarantees on the performance of the estimated policy relative to the best possible policy. This finding extends the existing results from linear to nonlinear welfare criteria, from finite-dimensional to infinite-dimensional policy spaces, and from a known propensity score to a machine-learned one.",
+      "authors": [
+        "Chunrong Ai",
+        "Zeqi Wu",
+        "Zheng Zhang"
+      ],
+      "primary_category": "econ.EM",
+      "categories": [
+        "econ.EM",
+        "stat.ME",
+        "stat.ML"
+      ],
+      "published": "2026-06-01T04:13:49+00:00",
+      "link": "https://arxiv.org/pdf/2606.01659v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "causal policy learning with nonlinear welfare",
+      "llm_evidence_cn": "非线性福利的因果政策学习",
+      "llm_evidence": "非线性福利的因果政策学习",
+      "canonical_evidence": "非线性福利的因果政策学习",
+      "llm_tldr_en": "Proposes a data-automated policy learning method for nonlinear welfare using reweighting-based debiasing, enabling robust policy evaluation.",
+      "llm_tldr_cn": "论文探索从观测数据中进行政策学习，聚焦于非线性福利准则（如优先特定群体）。通过效用函数整合潜在结果与高阶矩，并利用机器学习估计倾向得分。为解决偏差问题，提出了基于重加权的去偏方法，为因果推断与政策评估提供了一种稳健且数据驱动的替代方案。",
+      "llm_tldr": "论文探索从观测数据中进行政策学习，聚焦于非线性福利准则（如优先特定群体）。通过效用函数整合潜在结果与高阶矩，并利用机器学习估计倾向得分。为解决偏差问题，提出了基于重加权的去偏方法，为因果推断与政策评估提供了一种稳健且数据驱动的替代方案。",
+      "llm_tags": [
+        "query:pe"
+      ],
+      "matched_query_tag": "query:pe",
+      "matched_query_text": "causal inference and policy evaluation methods",
+      "matched_requirement_id": "req-28",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.01674v1",
+      "source": "arxiv",
+      "title": "Higher-Order Efficient Estimators: A Review and Simulation-Based Benchmark Study",
+      "abstract": "Higher-order efficient estimators extend standard first-order semiparametric estimators by replacing second-order residuals with third- or higher-order terms, potentially enabling asymptotic efficiency under slower nuisance function convergence rates and improving finite-sample performance. Existing methods achieve higher-order expansions through structurally different approximation strategies, including basis truncation, kernel smoothing, and highly adaptive lasso (HAL) representations, making direct theoretical and practical comparison difficult. In this manuscript, we provide a focused review and a simulation-based empirical benchmark for second-order efficient estimators, using treatment-specific mean estimation as a canonical causal inference and missing data problem. We compare how higher-order influence function (HOIF) estimators, kernel-based higher-order targeted minimum loss-based estimator (HOTMLE), and HAL-based HOTMLE construct higher-order expansions and the approximation or regularization burdens they introduce. The asymptotic and numerical study evaluates first-order and empirical second-order estimators under controlled nuisance errors with constant or increasing sectional variation complexity. Results show that higher-order debiasing can substantially reduce first-order estimation bias; however, gains depend strongly on stability of the approximation or regularization required for higher-order correction. Empirical HAL-based HOTMLE shows relatively stable performance, while empirical HOIF remains sensitive to basis truncation and tuning choices. Overall, this manuscript clarifies when higher-order asymptotic improvements are attained in theory, when they may be practically visible, and when implementation instability may offset theoretical advantages.",
+      "authors": [
+        "Zeyi Wang",
+        "Mark J. van der Laan"
+      ],
+      "primary_category": "stat.ME",
+      "categories": [
+        "stat.ME"
+      ],
+      "published": "2026-06-01T04:30:19+00:00",
+      "link": "https://arxiv.org/pdf/2606.01674v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "simulation benchmark of higher-order efficient estimators for causal inference",
+      "llm_evidence_cn": "高阶有效估计量的因果推断基准",
+      "llm_evidence": "高阶有效估计量的因果推断基准",
+      "canonical_evidence": "高阶有效估计量的因果推断基准",
+      "llm_tldr_en": "Reviews and benchmarks higher-order efficient semiparametric estimators for causal inference, showing improved finite-sample performance.",
+      "llm_tldr_cn": "高阶有效估计量通过替换二阶残差为三阶以上项，能在慢收敛率下实现渐近效率并改善有限样本性能。本文对二阶有效估计量进行了系统综述和仿真基准测试，以治疗效应估计为例，为政策效应评估提供了更精确的因果推断工具。",
+      "llm_tldr": "高阶有效估计量通过替换二阶残差为三阶以上项，能在慢收敛率下实现渐近效率并改善有限样本性能。本文对二阶有效估计量进行了系统综述和仿真基准测试，以治疗效应估计为例，为政策效应评估提供了更精确的因果推断工具。",
+      "llm_tags": [
+        "query:pe"
+      ],
+      "matched_query_tag": "query:pe",
+      "matched_query_text": "causal inference and policy evaluation methods",
+      "matched_requirement_id": "req-28",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2605.25496v1",
+      "source": "arxiv",
+      "title": "Estimation of Directed Acyclic Graphs by Frequentist Model Averaging",
+      "abstract": "Directed acyclic graphs provide a fundamental tool for representing directed dependence structures in multivariate network data, and are widely used to model financial and economic networks. However, accurate and interpretable estimation remains challenging under graph structural uncertainty. We propose an optimal model averaging method for directed acyclic Gaussian graphs. With a set of candidate models varying by graph structures, we average estimates from candidate models using weights that minimize a penalized negative log-likelihood criterion. In contrast to existing approaches, we not only establish the asymptotic optimality, weight consistency, and parameter consistency of the proposed method, but also explicitly characterize how different candidate models affect the convergence rate. Moreover, we prove parameter consistency even when all candidate graph models are misspecified. Results from simulation studies and a real-data analysis on the banks' international liability data show the promise of the proposed method.",
+      "authors": [
+        "Huihang Liu",
+        "Wenhui Li",
+        "Xinyu Zhang"
+      ],
+      "primary_category": "stat.ME",
+      "categories": [
+        "stat.ME"
+      ],
+      "published": "2026-05-25T06:57:18+00:00",
+      "link": "https://arxiv.org/pdf/2605.25496v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "DAG estimation for economic networks",
+      "llm_evidence_cn": "经济网络的有向无环图估计",
+      "llm_evidence": "经济网络的有向无环图估计",
+      "canonical_evidence": "经济网络的有向无环图估计",
+      "llm_tldr_en": "Proposes optimal model averaging for DAG estimation, providing asymptotic optimality and consistency for network structure inference.",
+      "llm_tldr_cn": "论文提出了一种最优模型平均方法来估计有向无环图（DAG），适用于金融和经济网络数据。方法通过最小化惩罚负对数似然准则对候选图结构模型进行加权平均，并证明了渐近最优性、权重一致性和参数一致性。该工作为生产网络结构推断和冲击传导分析提供了严谨的统计学工具。",
+      "llm_tldr": "论文提出了一种最优模型平均方法来估计有向无环图（DAG），适用于金融和经济网络数据。方法通过最小化惩罚负对数似然准则对候选图结构模型进行加权平均，并证明了渐近最优性、权重一致性和参数一致性。该工作为生产网络结构推断和冲击传导分析提供了严谨的统计学工具。",
+      "llm_tags": [
+        "query:pn:composite"
+      ],
+      "matched_query_tag": "query:pn:composite",
+      "matched_query_text": "Papers central to 生产网络, especially work that connects or combines: inter-industry production networks and input-output linkages; supply chain networks and shock propagation; input-output models and sectoral interdependencies; network effects and amplification of economic shocks; granular origins of aggregate fluctuations through production networks; vertical integration and firm boundaries in production networks; how production network structure amplifies economic shocks; role of key sectors and firms in production networks; production network models and general equilibrium.",
+      "matched_requirement_id": "req-composite-pn",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2605.26823v1",
+      "source": "arxiv",
+      "title": "Generating Logically Consistent Synthetic Supply Chain Data with LLM-Driven Knowledge Graph Reasoning",
+      "abstract": "Synthetic data offers a promising solution to two persistent barriers in supply chain analytics: data scarcity and data privacy. However, for synthetic data to support operational simulation and decision-making, it must do more than reproduce the statistical distributions of real records, and also preserve the \\emph{operational logic} that governs supply chain processes, including the temporal orderings, mathematical dependencies, hierarchical taxonomies, and conditional rules that make a record operationally plausible. We consider this logic as the ``physics'' of supply chain data. Existing tabular generative models are primarily optimized for distributional fidelity and downstream predictive utility, and therefore often generate records that appear statistically realistic but violate fundamental operational constraints. This paper introduces \\textbf{\\textit{TabKG}}, a knowledge-graph-guided framework for logically consistent synthetic supply chain tabular data generation. TabKG constructs a \\textbf{\\textit{Column Relationship Knowledge Graph (CR-KG)}} to represent data operational dependencies. It uses a multi-LLM ensemble with majority voting to propose candidate relationships from column metadata, validates these relationships against real data to remove hallucinated or unsupported edges, and then uses the validated CR-KG to guide generation. Specifically, TabKG compresses the original table into independent columns, generates these columns using a latent diffusion model, and deterministically reconstructs dependent columns according to the validated relationships, enforcing logical consistency by construction with respect to the discovered operational rules.",
+      "authors": [
+        "Yunbo Long",
+        "Ge Zheng",
+        "Liming Xu",
+        "Alexandra Brintrup"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-05-26T10:41:37+00:00",
+      "link": "https://arxiv.org/pdf/2605.26823v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:PN"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "synthetic supply chain data generation with logical consistency",
+      "llm_evidence_cn": "具有逻辑一致性的合成供应链数据生成",
+      "llm_evidence": "具有逻辑一致性的合成供应链数据生成",
+      "canonical_evidence": "具有逻辑一致性的合成供应链数据生成",
+      "llm_tldr_en": "Proposes an LLM-driven knowledge graph reasoning approach to generate synthetic supply chain data that preserves operational logic, addressing data scarcity and privacy for supply chain simulation and policy analysis.",
+      "llm_tldr_cn": "针对供应链分析中数据稀缺和隐私问题，现有生成模型只注重统计分布而忽略运营逻辑。本文提出基于LLM的知识图谱推理方法，通过编码时序顺序、数学依赖和层次分类等规则，生成保持运营逻辑的合成供应链数据。实验表明该方法在逻辑一致性和下游任务效用上均优于传统生成模型。该工作为供应链网络冲击传播研究提供了高质量数据支撑。",
+      "llm_tldr": "针对供应链分析中数据稀缺和隐私问题，现有生成模型只注重统计分布而忽略运营逻辑。本文提出基于LLM的知识图谱推理方法，通过编码时序顺序、数学依赖和层次分类等规则，生成保持运营逻辑的合成供应链数据。实验表明该方法在逻辑一致性和下游任务效用上均优于传统生成模型。该工作为供应链网络冲击传播研究提供了高质量数据支撑。",
+      "llm_tags": [
+        "query:pn"
+      ],
+      "matched_query_tag": "query:pn",
+      "matched_query_text": "supply chain networks and shock propagation",
+      "matched_requirement_id": "req-20",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2605.26559v1",
+      "source": "arxiv",
+      "title": "Auditing and Fixing Economic Validity in Tabular Foundation Models for Discrete Choice",
+      "abstract": "Tabular foundation models achieve strong accuracy on choice prediction tasks, but their predictions often violate the economic logic those tasks require: raising a price sometimes increases predicted demand, and implied willingness-to-pay estimates are frequently negative or implausible. We propose a two-stage adapter that embeds foundation model predictions within a utility-maximization framework. In the first stage, we estimate a standard choice model whose parameters are constrained to obey economic theory. In the second stage, we freeze those parameters and train a correction term that incorporates the foundation model's predictions as additional information. The result is a model that inherits the foundation model's accuracy gains while guaranteeing monotonic price-demand relationships under policy perturbation and producing analytically computable trade-off measures. On two transportation datasets, the adapter recovers up to 13 percentage points of accuracy over a standard logit model while maintaining perfect economic consistency, something neither the raw foundation models nor conventional distillation achieve.",
+      "authors": [
+        "Yingshuo Wang",
+        "Xian Sun",
+        "Yanhang Li",
+        "Zhichao Fan",
+        "Zexin Zhuang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "econ.EM"
+      ],
+      "published": "2026-05-26T05:13:20+00:00",
+      "link": "https://arxiv.org/pdf/2605.26559v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Ensuring economic validity in choice models for policy evaluation",
+      "llm_evidence_cn": "确保选择模型的经济有效性以用于政策评估",
+      "llm_evidence": "确保选择模型的经济有效性以用于政策评估",
+      "canonical_evidence": "确保选择模型的经济有效性以用于政策评估",
+      "llm_tldr_en": "Proposes a two-stage adapter to enforce economic theory in foundation model predictions, improving validity for discrete choice analysis in policy evaluation.",
+      "llm_tldr_cn": "本文提出两阶段适配器，将基础模型预测嵌入效用最大化框架，强制第一阶段的参数符合经济理论，第二阶段用模型预测修正，使得预测结果在经济上合理，适用于政策评估中的离散选择分析。",
+      "llm_tldr": "本文提出两阶段适配器，将基础模型预测嵌入效用最大化框架，强制第一阶段的参数符合经济理论，第二阶段用模型预测修正，使得预测结果在经济上合理，适用于政策评估中的离散选择分析。",
+      "llm_tags": [
+        "query:pe"
+      ],
+      "matched_query_tag": "query:pe",
+      "matched_query_text": "causal inference and policy evaluation methods",
+      "matched_requirement_id": "req-28",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2605.25555v1",
+      "source": "arxiv",
+      "title": "Ownership Networks and Economic Power in the Italian Energy Sector",
+      "abstract": "The energy sector is a cornerstone of national strategic autonomy, yet its increasing financialization has transformed ownership structures into complex networked configurations. This paper investigates the distribution of economic power in the Italian energy sector by introducing two sector-level extensions of the Network Power framework: the Aggregate Network Power Index (A-NPI) and the Aggregate Network Power Flow (A-NPF). Unlike traditional macro-level measures, these indices aggregate firm-level control and influence into a systemic framework that accounts for the relative economic weight of each operator. Applying this framework to the Italian case reveals a \"Governance Paradox\": while the State retains formal majority ownership, the sector's deepening reliance on global capital markets and the pervasive presence of common ownership by transnational institutional investors have progressively hollowed out public strategic direction. The results show that capital centralization enables global financial actors to internalize sectoral competition, fostering a regime of tacit strategic convergence in the management of critical infrastructure. This configuration challenges European strategic autonomy, raising questions about the adequacy of traditional Foreign Direct Investment (FDI) screening and antitrust tools in addressing the systemic influence exerted through networked ownership structures.",
+      "authors": [
+        "Andrea Pannone",
+        "Francesco Giancaterini",
+        "Tiziano Bacaloni",
+        "Andrea Bernardini",
+        "Alessio Abeltino"
+      ],
+      "primary_category": "econ.GN",
+      "categories": [
+        "econ.GN"
+      ],
+      "published": "2026-05-25T08:11:37+00:00",
+      "link": "https://arxiv.org/pdf/2605.25555v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "ownership networks and economic power, network power framework",
+      "llm_evidence_cn": "所有权网络与经济权力，网络权力框架",
+      "llm_evidence": "所有权网络与经济权力，网络权力框架",
+      "canonical_evidence": "所有权网络与经济权力，网络权力框架",
+      "llm_tldr_en": "Introduces Aggregate Network Power Index to measure economic power distribution in the Italian energy sector, revealing a governance paradox.",
+      "llm_tldr_cn": "意大利能源部门所有权结构复杂且金融化加深。本文提出聚合网络权力指数（A-NPI）和聚合网络权力流（A-NPF），将企业级控制力聚合为系统性框架。应用于意大利发现“治理悖论”：国家虽持有多数股份，但部门控制权分散。该研究展示了生产网络分析在产业组织中的价值。",
+      "llm_tldr": "意大利能源部门所有权结构复杂且金融化加深。本文提出聚合网络权力指数（A-NPI）和聚合网络权力流（A-NPF），将企业级控制力聚合为系统性框架。应用于意大利发现“治理悖论”：国家虽持有多数股份，但部门控制权分散。该研究展示了生产网络分析在产业组织中的价值。",
+      "llm_tags": [
+        "query:pn"
+      ],
+      "matched_query_tag": "query:pn",
+      "matched_query_text": "inter-industry production networks and input-output linkages",
+      "matched_requirement_id": "req-19",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2605.27113v1",
+      "source": "arxiv",
+      "title": "High-Quality Synthetic Financial Time-Series using a GAN-Diffusion Framework",
+      "abstract": "In recent years, financial institutions and firms have increasingly adopted synthetic data to address data scarcity and to generate counterfactual market scenarios. However, reproducing all the statistical properties of financial time series, commonly known as stylized facts, remains an open challenge for many existing general-purpose architectures. In this paper, we present a quality-aware generative framework that combines two classes of generative methods, demonstrating how their integration addresses existing limitations while enhancing the realism of synthetic data. Specifically, we first introduce CoMeTS-GAN (Correlated Multivariate Time Series GAN), a Conditional Generative Adversarial Network (C-GAN) designed to jointly generate mid-price and volume time-series for correlated stocks. We then show how our GAN architecture can be incorporated into state-of-the-art diffusion models to enhance the quality of generated correlation structures. Specifically, the GAN's Critic serves as a quality evaluation module that guides the diffusion process, enforcing learned correlation structures in the generated time-series. Our framework offers a lightweight and responsive solution for realistic stock market simulation, explicitly modeling inter-asset correlation structures. We experimentally validate our framework against leading generative architectures, showing that it more effectively captures the stylized facts of stock markets and models inter-asset correlations.",
+      "authors": [
+        "Giuseppe Masi",
+        "Andrea Coletta",
+        "Novella Bartolini"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-05-26T14:52:01+00:00",
+      "link": "https://arxiv.org/pdf/2605.27113v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Synthetic financial time series for tail risk scenarios",
+      "llm_evidence_cn": "合成金融时间序列用于尾部风险场景",
+      "llm_evidence": "合成金融时间序列用于尾部风险场景",
+      "canonical_evidence": "合成金融时间序列用于尾部风险场景",
+      "llm_tldr_en": "Generates high-quality synthetic financial time series using a GAN-diffusion framework, capturing stylized facts for counterfactual market scenarios and tail risk modeling.",
+      "llm_tldr_cn": "本文提出GAN-扩散混合框架生成高质量合成金融时间序列，精确复现金融数据的典型特征，可用于生成反事实市场情景，为尾部风险测量和建模提供丰富的数据支持。",
+      "llm_tldr": "本文提出GAN-扩散混合框架生成高质量合成金融时间序列，精确复现金融数据的典型特征，可用于生成反事实市场情景，为尾部风险测量和建模提供丰富的数据支持。",
+      "llm_tags": [
+        "query:etr"
+      ],
+      "matched_query_tag": "query:etr",
+      "matched_query_text": "economic tail risk measurement and modeling",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2605.28341v2",
+      "source": "arxiv",
+      "title": "Identification and Inference for Structural Accelerated Failure Time Models via Instrument Interactions",
+      "abstract": "We study causal inference for time-to-event outcomes under right censoring in the presence of unmeasured confounding. Focusing on structural accelerated failure time models, we develop an identification and inference framework that exploits interactions among instrumental variables. The proposed approach does not rely on classical instrumental variable validity and yields valid causal inference under both valid and invalid instruments, provided that the interaction-based identification condition holds. To accommodate right censoring, we construct a censoring-adjusted observed data moment function using an augmented inverse probability censoring weighting approach. The resulting moment function is Neyman orthogonal with respect to nuisance functions and enjoys a double robustness property, enabling valid inference under flexible nuisance estimation. Estimation and inference are conducted using generalized empirical likelihood, which is well suited to settings with many potentially weak interaction-based moment conditions. We establish consistency, and asymptotic normality under many weak moment asymptotics, and develop diagnostic tools to assess interaction-based identification strength and overidentifying restrictions. Simulation studies demonstrate favorable finite sample performance across a range of censoring rates and instrument configurations. An application to UK Biobank data illustrates the practical relevance of the proposed method for causal survival analysis in large-scale observational studies.",
+      "authors": [
+        "Qiushi Bu",
+        "Wen Su",
+        "Xinyu Zhang",
+        "Xingqiu Zhao",
+        "Zhonghua Liu"
+      ],
+      "primary_category": "stat.ME",
+      "categories": [
+        "stat.ME",
+        "math.ST"
+      ],
+      "published": "2026-05-27T11:47:09+00:00",
+      "link": "https://arxiv.org/pdf/2605.28341v2",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "instrument interactions for causal inference with time-to-event outcomes",
+      "llm_evidence_cn": "工具变量交互在时间至事件结果因果推断中的应用",
+      "llm_evidence": "工具变量交互在时间至事件结果因果推断中的应用",
+      "canonical_evidence": "工具变量交互在时间至事件结果因果推断中的应用",
+      "llm_tldr_en": "Proposes causal inference framework for time-to-event outcomes using instrument interactions, valid even when instruments are invalid.",
+      "llm_tldr_cn": "针对存在未测量混杂的右删失生存数据，本文提出一种利用工具变量交互的结构加速失效时间模型识别与推断框架。该方法不依赖经典工具变量有效性假设，只要交互识别条件成立即可得到有效因果推断。通过增广逆概率删失加权构造Neyman正交矩函数，保证了估计的稳健性。该方法为政策评估中处理删失和弱工具问题提供了新工具。",
+      "llm_tldr": "针对存在未测量混杂的右删失生存数据，本文提出一种利用工具变量交互的结构加速失效时间模型识别与推断框架。该方法不依赖经典工具变量有效性假设，只要交互识别条件成立即可得到有效因果推断。通过增广逆概率删失加权构造Neyman正交矩函数，保证了估计的稳健性。该方法为政策评估中处理删失和弱工具问题提供了新工具。",
+      "llm_tags": [
+        "query:pe"
+      ],
+      "matched_query_tag": "query:pe",
+      "matched_query_text": "causal inference and policy evaluation methods",
+      "matched_requirement_id": "req-28",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2605.26835v1",
+      "source": "arxiv",
+      "title": "Helicase: Uncertainty-Guided Supply Chain Knowledge Graph Construction with Autonomous Multi-Agent LLMs",
+      "abstract": "LLM-based multi-agent systems have been widely adopted for knowledge retrieval and report generation, synthesizing known information through web search and textual reasoning. However, many critical information tasks in supply chains are not simple one-shot queries: they are structural inference problems requiring multi-hop reasoning across complex, fragmented web resources. Questions such as \\textit{``Which Tesla components use lithium from Australian mines?''} have no answer in any single document; answers must be computationally synthesized through the autonomous construction and analysis of dynamic knowledge graphs assembled from fragmented, heterogeneous sources. Moreover, such discovery processes must be uncertainty-aware: decisions depend not only on answers but on calibrated confidence in their reliability, traceable to source quality and reasoning consistency. To address this capability gap, we propose \\textit{Helicase}, an autonomous multi-agent LLM system for uncertainty-guided supply chain knowledge graph construction. \\textit{Helicase} decomposes high-level supply-chain queries into executable investigation plans, coordinates specialized web-search, reasoning, and coding agents through iterative verification loops, and incrementally constructs query-specific supply chain knowledge graphs with per-fact uncertainty annotations. Its three-layer uncertainty framework tracks uncertainty at the action, trajectory, and memory layers, enabling both structural inference and calibrated confidence assessment. To evaluate autonomous reasoning across the full complexity spectrum, we introduce SCQA (Supply Chain Query Assessment), a benchmark of 80 supply chain queries organized into four quadrants spanning single-hop to multi-hop inference under both high and low data visibility.",
+      "authors": [
+        "Yunbo Long",
+        "Haolang Zhao",
+        "Ge Zheng",
+        "Alexandra Brintrup"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-05-26T10:53:00+00:00",
+      "link": "https://arxiv.org/pdf/2605.26835v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:PN"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "supply chain knowledge graph construction for shock propagation",
+      "llm_evidence_cn": "供应链知识图谱构建用于冲击传播分析",
+      "llm_evidence": "供应链知识图谱构建用于冲击传播分析",
+      "canonical_evidence": "供应链知识图谱构建用于冲击传播分析",
+      "llm_tldr_en": "Proposes Helicase, a multi-agent LLM system for autonomous supply chain knowledge graph construction from fragmented web sources, handling multi-hop reasoning and uncertainty.",
+      "llm_tldr_cn": "该文提出Helicase，一个基于多智能体大语言模型的系统，用于从碎片化网络资源中自主构建供应链知识图谱。系统通过多跳推理和不确定性引导，解决如'特斯拉哪些组件使用澳大利亚锂矿'等结构推断问题。为供应链网络中的冲击传播分析提供了动态知识基础设施。",
+      "llm_tldr": "该文提出Helicase，一个基于多智能体大语言模型的系统，用于从碎片化网络资源中自主构建供应链知识图谱。系统通过多跳推理和不确定性引导，解决如'特斯拉哪些组件使用澳大利亚锂矿'等结构推断问题。为供应链网络中的冲击传播分析提供了动态知识基础设施。",
+      "llm_tags": [
+        "query:pn"
+      ],
+      "matched_query_tag": "query:pn",
+      "matched_query_text": "supply chain networks and shock propagation",
+      "matched_requirement_id": "req-20",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2605.27977v1",
+      "source": "arxiv",
+      "title": "Deep Learning Forecasting of the U.S. Aggregate Bond Index",
+      "abstract": "This study looks at the statistical properties and predictability using deep learning methods of the U.S. aggregate bond index in daily observations spanning 2018 to February 2026. We first establish that index levels are extremely persistent and consistent with unitroot behavior (Dickey and Fuller), while log returns are covariance-stationary with weak linear dependence and pronounced volatility clustering characteristic of ARCH-type processes (Engle; Bollerslev). Motivated by the trade-off between stationarity and information retention, we construct a \"stationary but maximally persistent\" representation via fractional differencing (Granger and Joyeux; Hosking) following the procedure of López de Prado, and evaluate shorthorizon forecast using two neural paradigms: (i) Multilayer Perceptrons (MLPs) trained on lagged vectors with joint lag-length and hyperparameter tuning (Hornik et al.; Rumelhart et al.); and (ii) Convolutional Neural Networks (CNNs) trained on Gramian Angular Field (GAF) image encodings (Wang and Oates). Empirically, MLPs match the strong naive persistence benchmark on levels, collapse toward near-zero forecasts on returns, and achieve the strongest incremental performance on the fractionally differenced series, where moderate dependence remains but unit-root drift is attenuated. In contrast, CNN-GAF models deliver consistently negative out-of-sample R 2 across all three representations. Overall, the results imply that, for short-horizon forecasting of broad bond indices, the primary determinant of predictive performance is the transformation of the series-its degree of stationarity and memory-rather than architectural complexity. Lag-based models remain competitive under persistence, while GAFbased CNNs are better suited to pattern-based tasks than to persistence-dominated next-step prediction.",
+      "authors": [
+        "Ajay Kumar Verma",
+        "Jul Jon Ramirez General",
+        "Yvan Landry Ndzonde Fonkou"
+      ],
+      "primary_category": "q-fin.PM",
+      "categories": [
+        "q-fin.PM",
+        "q-fin.CP",
+        "q-fin.MF",
+        "q-fin.ST"
+      ],
+      "published": "2026-05-27T05:15:28+00:00",
+      "link": "https://arxiv.org/pdf/2605.27977v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "forecasting U.S. aggregate bond index, interest rate dynamics, monetary policy instruments",
+      "llm_evidence_cn": "预测美国综合债券指数，涉及利率动态与货币政策工具",
+      "llm_evidence": "预测美国综合债券指数，涉及利率动态与货币政策工具",
+      "canonical_evidence": "预测美国综合债券指数，涉及利率动态与货币政策工具",
+      "llm_tldr_en": "Applies deep learning to forecast the U.S. aggregate bond index, analyzing persistence and volatility clustering, relevant to interest rate dynamics and monetary policy instruments.",
+      "llm_tldr_cn": "本文利用深度学习预测美国综合债券指数，发现指数存在单位根行为，对数收益具有波动集聚性。通过分数差分构造平稳但最大持久性的表示，并评估神经网络模型的短期预测能力。该研究为利率动态预测和货币政策工具效果分析提供了数据驱动的视角。",
+      "llm_tldr": "本文利用深度学习预测美国综合债券指数，发现指数存在单位根行为，对数收益具有波动集聚性。通过分数差分构造平稳但最大持久性的表示，并评估神经网络模型的短期预测能力。该研究为利率动态预测和货币政策工具效果分析提供了数据驱动的视角。",
+      "llm_tags": [
+        "query:mp"
+      ],
+      "matched_query_tag": "query:mp",
+      "matched_query_text": "interest rate dynamics and monetary policy instruments",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2605.29376v1",
+      "source": "arxiv",
+      "title": "Three-Currency HJM for Brazilian Credit Markets",
+      "abstract": "This paper develops a three-currency Heath-Jarrow-Morton framework in which corporate credit is treated as a separate economy, connected to the nominal and real economies through synthetic inflation and credit exchange rates. The framework produces a testable identity. Under joint no-arbitrage, the credit spread of an issuer expressed over the inflation-rateindexed risk-free curve equals the same issuer's credit spread expressed over the nominalrate-indexed risk-free curve plus the model-implied breakeven inflation forward at the same maturity. The identity holds within any single calibration of the framework. It is empirically falsifiable across two parallel corporate-bond segments of the same market, in a segmented market the two segments may price different corporate credit economies, and the gap between their implied corporate forwards measures the failure of the shared-credit-economy assumption. Applied to Brazilian debenture markets, the framework delivers a sharp empirical finding. Fifteen large issuers placed paper in both the CDI-indexed general-purpose segment and the IPCA-indexed infrastructure segment between January 2021 and February 2026. The within-issuer triangle residual at the 3-year tenor averages 640 basis points, with crosssectional standard deviation of 26 basis points across the 15 issuer means, and remains stable through both the 2021-2023 BCB tightening cycle and the 2024-2026 easing phase. A retail post-tax indifference benchmark anchored on Lei 12.431 closes the bulk of the residual. The remainder is consistent with institutional participation on the CDI side, contractual asymmetries between debentures with different use-of-proceeds restrictions, and segment-specific liquidity gaps.",
+      "authors": [
+        "Raphael Coelho"
+      ],
+      "primary_category": "q-fin.MF",
+      "categories": [
+        "q-fin.MF",
+        "q-fin.GN"
+      ],
+      "published": "2026-05-28T05:23:22+00:00",
+      "link": "https://arxiv.org/pdf/2605.29376v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "query:ETR",
+        "query:MP",
+        "query:PE"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "interest rate dynamics and inflation breakeven in credit markets",
+      "llm_evidence_cn": "信用市场中的利率动态与盈亏平衡通胀",
+      "llm_evidence": "信用市场中的利率动态与盈亏平衡通胀",
+      "canonical_evidence": "信用市场中的利率动态与盈亏平衡通胀",
+      "llm_tldr_en": "Proposes a three-currency HJM framework linking nominal, real, and credit economies through synthetic exchange rates.",
+      "llm_tldr_cn": "该论文开发了一个三货币Heath-Jarrow-Morton框架，将公司信用视为独立的经济体，通过合成通胀汇率和信用汇率连接名义经济与实体经济。该框架产生了一个可检验的恒等式：信用利差在不同基准曲线下的差异等于模型隐含的盈亏平衡通胀远期。这为理解利率与信用定价提供了统一视角。",
+      "llm_tldr": "该论文开发了一个三货币Heath-Jarrow-Morton框架，将公司信用视为独立的经济体，通过合成通胀汇率和信用汇率连接名义经济与实体经济。该框架产生了一个可检验的恒等式：信用利差在不同基准曲线下的差异等于模型隐含的盈亏平衡通胀远期。这为理解利率与信用定价提供了统一视角。",
+      "llm_tags": [
+        "query:mp"
+      ],
+      "matched_query_tag": "query:mp",
+      "matched_query_text": "interest rate dynamics and monetary policy instruments",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2605.26890v1",
+      "source": "arxiv",
+      "title": "Nonlinear and Heavy-Tailed Predictability in Transition-Energy Financial Markets",
+      "abstract": "Transition-related financial markets are increasingly exposed to abrupt repricing episodes, elevated volatility, and heterogeneous macro-financial shocks. Under such conditions, conventional Gaussian-linear forecasting frameworks may provide an incomplete representation of the dependence structure linking fossil-energy, renewable-energy, technology, and utility-sector assets. This paper investigates whether transition-related financial returns exhibit residual non-linear predictability after controlling for heavy-tailed multivariate linear dynamics. To address this question, we develop a hybrid forecasting framework combining Student-t Vector Autoregressions with nonlinear recurrent residual learning architectures. The empirical analysis considers six major exchange-traded funds representing broad equity markets and key transition-sensitive sectors. The results reveal substantial departures from Gaussian-linear behavior, including excess kurtosis, volatility clustering, and remaining nonlinear dependence after econometric filtering. Out-of-sample forecasting experiments show that the proposed framework consistently improves predictive accuracy relative to conventional VAR models, standalone machine-learning methods, and alternative hybrid specifications. The forecasting gains become more pronounced during periods of macro-financial stress, particularly during the COVID-19 crisis and the Ukraine-related energy shock. Overall, the findings suggest that transition-related financial systems exhibit regime-sensitive and heavy-tailed predictive dynamics that are insufficiently captured by standard Gaussian-linear models alone.",
+      "authors": [
+        "Kpante Emmanuel Gnandi",
+        "Fredy Pokou",
+        "Jules Sadefo Kamdem"
+      ],
+      "primary_category": "q-fin.CP",
+      "categories": [
+        "q-fin.CP",
+        "stat.AP",
+        "stat.ML"
+      ],
+      "published": "2026-05-26T11:52:31+00:00",
+      "link": "https://arxiv.org/pdf/2605.26890v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "heavy-tailed predictability in transition-energy financial markets related to tail risk",
+      "llm_evidence_cn": "转型能源金融市场中的重尾可预测性与尾部风险相关",
+      "llm_evidence": "转型能源金融市场中的重尾可预测性与尾部风险相关",
+      "canonical_evidence": "转型能源金融市场中的重尾可预测性与尾部风险相关",
+      "llm_tldr_en": "Investigates nonlinear heavy-tailed predictability in transition-finance markets using Student-t VAR and recurrent networks.",
+      "llm_tldr_cn": "本文研究转型能源金融市场中的重尾可预测性，针对传统高斯-线性模型在极端波动下的不足，提出结合学生t向量自回归与非线性循环残差学习的混合预测框架，实证发现资产间存在显著的非线性依赖性，为管理极端风险提供了新工具。",
+      "llm_tldr": "本文研究转型能源金融市场中的重尾可预测性，针对传统高斯-线性模型在极端波动下的不足，提出结合学生t向量自回归与非线性循环残差学习的混合预测框架，实证发现资产间存在显著的非线性依赖性，为管理极端风险提供了新工具。",
+      "llm_tags": [
+        "query:etr"
+      ],
+      "matched_query_tag": "query:etr",
+      "matched_query_text": "economic tail risk measurement and modeling",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2605.28531v1",
+      "source": "arxiv",
+      "title": "Stabilizing distribution-free probabilistic forecasts",
+      "abstract": "Multi-step-ahead forecasts are often updated as new observations become available, since shorter forecast horizons typically improve forecast quality. However, such improvements come at the cost of forecast instability, i.e., variability in forecasts for the same target period. This instability can trigger costly changes to plans formulated based on the forecasts and may erode trust in the forecasting system. In this work, we integrate forecast stability alongside forecast quality into the training of distribution-free probabilistic time-series forecasting models, allowing us to control this trade-off. We propose a method for generating stabilized forecasted conditional quantile functions using regression splines parameterized by a neural network. This approach enables joint optimization of quality and stability, as it allows us to directly penalize dissimilarities arising from forecast updates. Furthermore, it allows assigning varying importance to stabilizing different parts of the forecast distributions (e.g., central parts vs. tails) to focus on the parts most relevant for the intended downstream use (e.g., the upper tail for inventory management). We empirically evaluate the proposed method on two datasets with different statistical properties and show that it can effectively reduce forecast instability without a substantial loss in forecast quality, and that it can target stabilization effort toward specific parts of the forecast distributions.",
+      "authors": [
+        "Jente Van Belle",
+        "Honglin Wen",
+        "Wouter Verbeke",
+        "Pierre Pinson"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-05-27T14:25:05+00:00",
+      "link": "https://arxiv.org/pdf/2605.28531v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "probabilistic forecasting with quantile regression for tail risk",
+      "llm_evidence_cn": "分位数回归的概率预测方法可用于尾部风险",
+      "llm_evidence": "分位数回归的概率预测方法可用于尾部风险",
+      "canonical_evidence": "分位数回归的概率预测方法可用于尾部风险",
+      "llm_tldr_en": "Proposes a method to stabilize distribution-free probabilistic forecasts using regression splines parameterized by a neural network, controlling the trade-off between forecast quality and stability.",
+      "llm_tldr_cn": "该文针对多步预测中的稳定性与质量权衡问题，提出了一种基于回归样条和神经网络的无分布概率预测方法。通过将预测稳定性纳入训练目标，实现了对预测条件分位数函数的稳定化生成。该方法可直接应用于经济尾部风险的预测与建模，为增长-at-risk等框架提供了稳健的预测工具。",
+      "llm_tldr": "该文针对多步预测中的稳定性与质量权衡问题，提出了一种基于回归样条和神经网络的无分布概率预测方法。通过将预测稳定性纳入训练目标，实现了对预测条件分位数函数的稳定化生成。该方法可直接应用于经济尾部风险的预测与建模，为增长-at-risk等框架提供了稳健的预测工具。",
+      "llm_tags": [
+        "query:etr"
+      ],
+      "matched_query_tag": "query:etr",
+      "matched_query_text": "methods for measuring and predicting economic tail risks",
+      "matched_requirement_id": "req-16",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2605.29541v1",
+      "source": "arxiv",
+      "title": "Change-point estimation for Weibull time series with copula-based Markov models",
+      "abstract": "We study offline change-point estimation for time series data exhibiting nonlinear serial dependence. To address this problem, we propose a copula-based Markov chain model with Weibull marginal distributions, which is suitable for modeling nonnegative data such as event times and volatility measures. Nonlinear dependence is incorporated through the Clayton and Joe copulas, allowing the model to capture asymmetric lower-tail and upper-tail dependence structures, respectively. We derive the corresponding likelihood function and estimate the change point and model parameters using maximum likelihood estimation implemented through the Newton--Raphson algorithm. Confidence intervals are constructed via a parametric bootstrap Monte Carlo procedure. Extensive numerical studies are conducted to evaluate the finite-sample performance and robustness of the proposed method under different dependence structures and copula misspecification scenarios. The results demonstrate that the proposed estimators perform well in terms of RMSE and relative error, particularly for the estimation of the change point. An empirical application to the VIX index during the COVID-19 pandemic further illustrates the practical usefulness of the proposed approach in detecting structural changes in both the marginal distributions and serial dependence structure.",
+      "authors": [
+        "Li-Hsien Sun",
+        "Zong-Yuan Huang",
+        "Yi-Ling Huang",
+        "Chi-Yang Chiu",
+        "Ning Ning"
+      ],
+      "primary_category": "stat.ME",
+      "categories": [
+        "stat.ME",
+        "q-fin.ST"
+      ],
+      "published": "2026-05-28T07:55:36+00:00",
+      "link": "https://arxiv.org/pdf/2605.29541v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Change-point detection for extreme events",
+      "llm_evidence_cn": "极值事件的变点检测",
+      "llm_evidence": "极值事件的变点检测",
+      "canonical_evidence": "极值事件的变点检测",
+      "llm_tldr_en": "Proposes copula-based Markov model for change-point estimation in non-linear time series, applicable to detecting financial crises and economic regime shifts.",
+      "llm_tldr_cn": "本文提出基于copula的马尔可夫链模型用于非线性时间序列的变点检测，利用Weibull边缘分布和Clayton/Joe copula捕捉尾部依赖，能够有效识别金融危机等极端事件的发生点，为经济尾部风险分析提供新方法。",
+      "llm_tldr": "本文提出基于copula的马尔可夫链模型用于非线性时间序列的变点检测，利用Weibull边缘分布和Clayton/Joe copula捕捉尾部依赖，能够有效识别金融危机等极端事件的发生点，为经济尾部风险分析提供新方法。",
+      "llm_tags": [
+        "query:etr"
+      ],
+      "matched_query_tag": "query:etr",
+      "matched_query_text": "extreme economic events and financial crises",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2605.26964v2",
+      "source": "arxiv",
+      "title": "Semiparametric Inference for Causal Effects on Functional Outcomes",
+      "abstract": "Difference-in-differences (DiD) is a cornerstone of causal inference, yet extending it to functional outcomes is not a routine scalar generalization; rather, it entails three fundamental challenges in identification, inference, and observation. This paper develops a comprehensive semiparametric inference framework for functional DiD with discretely observed data. First, we define the functional average treatment effect under parallel trends and derive its efficient influence function (EIF), thereby establishing the semiparametric efficiency bound. Second, leveraging Neyman orthogonality and cross-fitting, we construct a debiased estimator that effectively mitigates regularization bias arising from nonparametric reconstruction. Third, we establish weak convergence of the estimator and propose an asymptotically valid uniform confidence band, enabling a rigorous transition from pointwise to curve-level inference. Finally, we demonstrate that reconstruction error under discrete sampling is asymptotically negligible for semiparametric inference, ensuring practical feasibility. Simulations and empirical applications confirm that the proposed method achieves superior coverage and testing power in finite samples, providing a theoretically grounded and computationally tractable foundation for causal evaluation with functional data.",
+      "authors": [
+        "Junzhu Nie",
+        "Chengxiu Ling",
+        "Mengfei Ran"
+      ],
+      "primary_category": "stat.ME",
+      "categories": [
+        "stat.ME",
+        "stat.AP"
+      ],
+      "published": "2026-05-26T12:52:11+00:00",
+      "link": "https://arxiv.org/pdf/2605.26964v2",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "causal inference for functional outcomes via difference-in-differences",
+      "llm_evidence_cn": "基于双重差分的功能结果因果推断",
+      "llm_evidence": "基于双重差分的功能结果因果推断",
+      "canonical_evidence": "基于双重差分的功能结果因果推断",
+      "llm_tldr_en": "Develops semiparametric inference for functional DiD with EIF, debiased estimator, and weak convergence.",
+      "llm_tldr_cn": "现有双重差分方法难以直接应用于功能型结果数据。本文建立了一个半参数推断框架，定义功能平均处理效应并推导有效影响函数，利用Neyman正交性和交叉拟合构造去偏估计量。理论证明了估计量的弱收敛性，为政策评估中处理复杂结果提供了新工具。",
+      "llm_tldr": "现有双重差分方法难以直接应用于功能型结果数据。本文建立了一个半参数推断框架，定义功能平均处理效应并推导有效影响函数，利用Neyman正交性和交叉拟合构造去偏估计量。理论证明了估计量的弱收敛性，为政策评估中处理复杂结果提供了新工具。",
+      "llm_tags": [
+        "query:pe"
+      ],
+      "matched_query_tag": "query:pe",
+      "matched_query_text": "causal inference and policy evaluation methods",
+      "matched_requirement_id": "req-28",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2605.29478v1",
+      "source": "arxiv",
+      "title": "Evolutionary Rule Extraction from Corporate Default Prediction Models",
+      "abstract": "Small and medium-sized enterprises (SMEs) represent the majority of firms in most economies and often face financial constraints and higher vulnerability to financial distress. Predicting SME default is therefore crucial for financial institutions, policymakers, and researchers. Recent advances in machine learning (ML) have improved predictive performance in credit risk modeling. Yet, the limited interpretability of complex models raises concerns regarding transparency and regulatory compliance. This study investigates SME's default predictors and applies explainable artificial intelligence (XAI) techniques to them. Using a panel of 50,718 Italian SME over the period 2015-2024, we compare traditional econometric approaches with several ML classifiers. The empirical results show that ML models significantly outperform the traditional logistic regression benchmark in terms of Balanced Accuracy and PR-AUC. To address the interpretability challenge, we introduce DEXiRE-EVO, a novel evolutionary rule extraction framework that combines multi-objective optimization with the Contextual Importance and Utility (CIU) explainability method. The extracted rules reveal economically meaningful patterns associated with SME financial distress, highlighting the roles of weak internal liquidity generation, internal capital erosion, high leverage, and operational inefficiency. Additionally, contextual macroeconomic conditions and the persistence of financial instability contribute to identifying high-risk firms. In general, the results show that combining ML with evolutionary rule extraction can improve both predictive performance and interpretability in credit risk modeling, thus supporting more transparent, data-driven decision-making in financial environments.",
+      "authors": [
+        "Desirè Fabbretti",
+        "Matteo Pasquino",
+        "Elia Pacioni",
+        "Caterina Lucarelli",
+        "Davide Calvaresi"
+      ],
+      "primary_category": "cs.NE",
+      "categories": [
+        "cs.NE",
+        "cs.AI"
+      ],
+      "published": "2026-05-28T07:07:01+00:00",
+      "link": "https://arxiv.org/pdf/2605.29478v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "SME default prediction and XAI for credit risk",
+      "llm_evidence_cn": "中小企业违约预测与可解释信贷风险模型",
+      "llm_evidence": "中小企业违约预测与可解释信贷风险模型",
+      "canonical_evidence": "中小企业违约预测与可解释信贷风险模型",
+      "llm_tldr_en": "Compares econometric and ML models for SME default prediction using Italian panel data, applying XAI to extract interpretable rules.",
+      "llm_tldr_cn": "该文利用意大利2015-2024年50718家中小企业面板数据，比较传统计量模型与多种机器学习分类器在企业违约预测中的表现。采用可解释人工智能（XAI）技术从复杂模型中提取可理解规则。研究为金融稳定评估和系统性风险监控提供了可解释的违约预测工具。",
+      "llm_tldr": "该文利用意大利2015-2024年50718家中小企业面板数据，比较传统计量模型与多种机器学习分类器在企业违约预测中的表现。采用可解释人工智能（XAI）技术从复杂模型中提取可理解规则。研究为金融稳定评估和系统性风险监控提供了可解释的违约预测工具。",
+      "llm_tags": [
+        "query:etr"
+      ],
+      "matched_query_tag": "query:etr",
+      "matched_query_text": "systemic risk and financial stability assessment",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2605.30464v1",
+      "source": "arxiv",
+      "title": "Distributional Portfolio Optimization (DPO): A Unified Framework for Distributions over Weights, Returns, and Parameters",
+      "abstract": "Classical portfolio optimization treats expected returns, covariances, and allocations as deterministic. Modern practice replaces at least one by a distribution: a posterior over parameters, a law of future returns, a stochastic allocation policy, or a distributional-robustness set. We call distributional portfolio optimization (DPO) the unified framework in which weights, returns, and parameters are all modeled as probability measures, organized around the joint coupling Gamma_theta(dw,dr) and its marginal triple (W,R,P). The contribution is synthetic and structural: we organize Bayesian, robust, chance-constrained, stochastic-allocation, and distributional reinforcement-learning portfolio methods through this coupling and prove boundary results connecting them, including a portfolio specialization of Wasserstein-CVaR duality, a static no-randomization theorem, a Bayesian credible-radius calibration of Wasserstein DRO, a Gaussian-isotropic second-order conservatism bound, a conditional two-sided rate W_1 = Theta(n^{-(1+alpha)/2}) governed by the local boundary Holder exponent alpha in [0,1], and a risk-shifted distributional Bellman contraction. A controlled experiment shows that across factor models at K in {10,25,50}, the credible-radius rule lands within 3-7 bp of the oracle out-of-sample tail risk and beats a 24-month validation-tuned radius while spending no validation data. On a K=25 DJIA backtest, equal-weight, no-view Black-Litterman, and Ledoit-Wolf shrinkage attain higher Sharpe than every distributional method; the operational claim is therefore confined to calibration-without-validation and turnover, not raw-return dominance.",
+      "authors": [
+        "Miquel Noguer i Alonso"
+      ],
+      "primary_category": "q-fin.PM",
+      "categories": [
+        "q-fin.PM"
+      ],
+      "published": "2026-05-28T18:38:56+00:00",
+      "link": "https://arxiv.org/pdf/2605.30464v1",
+      "tags": [
+        "keyword:ER",
+        "keyword:ETR",
+        "keyword:MP",
+        "keyword:PE",
+        "keyword:PN",
+        "query:ER",
+        "query:ETR",
+        "query:MP",
+        "query:PE",
+        "query:PN"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Distributional portfolio optimization framework for risk modeling",
+      "llm_evidence_cn": "分布投资组合优化框架用于风险建模",
+      "llm_evidence": "分布投资组合优化框架用于风险建模",
+      "canonical_evidence": "分布投资组合优化框架用于风险建模",
+      "llm_tldr_en": "Unifies Bayesian, robust, and distributional RL portfolio methods under a joint coupling framework, enabling tail risk analysis through distributional modeling of returns.",
+      "llm_tldr_cn": "本文提出分布投资组合优化统一框架，将权重、收益和参数均视为概率测度，组织贝叶斯、鲁棒、机会约束等投资组合方法，为宏观经济尾部风险中的分布建模提供了结构化视角。",
+      "llm_tldr": "本文提出分布投资组合优化统一框架，将权重、收益和参数均视为概率测度，组织贝叶斯、鲁棒、机会约束等投资组合方法，为宏观经济尾部风险中的分布建模提供了结构化视角。",
+      "llm_tags": [
+        "query:etr"
+      ],
+      "matched_query_tag": "query:etr",
+      "matched_query_text": "economic tail risk measurement and modeling",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

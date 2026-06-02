@@ -1,0 +1,322 @@
+Title: Modifying causal models to distinguish between transient and lasting causal effects
+
+URL Source: https://arxiv.org/pdf/2605.29961v1
+
+Published Time: Fri, 29 May 2026 01:44:25 GMT
+
+Number of Pages: 18
+
+Markdown Content:
+Observational Studies () Submitted ; Published 
+
+# Modifying causal models to distinguish between transient and lasting causal effects 
+
+Russell Steele russell.steele@mcgill.ca 
+
+Department of Mathematics and Statistics McGill University Montr´ eal, Qu´ ebec, Canada 
+
+Naftali Weinberger naftali.weinberger@gmail.com 
+
+Munich Center for Mathematical Philosophy Ludwig-Maximilians-Universit¨ at, M¨ unchen Munich, Germany 
+
+Tess Baker tess.baker@mail.mcgill.ca 
+
+Department of Mathematics and Statistics McGill University Montr´ eal, Qu´ ebec, Canada 
+
+Ian Shrier ian.shrier@mcgill.ca 
+
+Centre for Clinical Epidemiology Lady Davis Institute for Medical Research, Jewish General Hospital Montr´ eal, Qu´ ebec, Canada 
+
+Abstract 
+
+This paper considers how to classify the effects of interventions in causal models for outcomes and exposures observed over time. First, we demonstrate the limitations of the most common uses of potential outcomes and causal directed acyclic graphs (DAGs) for capturing all possible interventions in a time-varying framework, particularly in problems where the key question concerns interventions to maintain or change equilibrium behaviour. Second, we adopt a system-and state-based approach rather than a measurement-based approach to identify the causal parameters. In particular, we discuss how assumptions about the system’s equilibrium and the effects of interventions on that equilibrium can allow for more specific causal interpretations and clarify the goals of design and analysis. Third, we show how the ability to identify the the causal parameters of a time-varying system depends on the selection of timepoints for measuring the system’s states. We address this by proposing a novel version of the null-effect, which is designed to distinguish between transient and lasting causal effects. 
+
+1. Introduction 
+
+The development of potential outcome models and the use of causal directed acyclic graphs (DAGs) in causal inference for observational data has changed the landscape of modern casual inference over the last 30 years. Researchers have used these models and associated estimation methods with great success in the analysis of cross-sectional and longitudinal data in public health, economics, education and many other areas where the effects of interventions cannot always be evaluated in designed experiments. Despite the successes,  
+
+> ©Russell Steele, Naftali Weinberger, Tess Baker, and Ian Shrier.
+> arXiv:2605.29961v1 [stat.ME] 28 May 2026 Steele, et al.
+
+there are important causal questions that cannot be easily addressed by current causal inference methods and approaches, in particular when they are applied to systems with complex temporal dynamics. Consider estimating the efficacy of a new chemotherapeutic intervention to reduce breast cancer tumour size improve survival in a randomized controlled trial. Using methods con-sistent with common practice for causal DAGs in health research, our causal DAG would include a node for treatment, a node for tumour size, a node for survival, and possibly nodes for strong prognostic factors. Our randomized trial study would select patients from a well-defined cancer population and include a clear standard treatment. We would record and compare the proportion of positive discrete outcomes (remission, survival) or summaries of continuous outcomes (tumour size reduction, quality of life changes). We would consider the treatment efficacious or not depending on the magnitude and uncertainty of the esti-mated differences. If we were interested in effects at different time points, we would include time-dependent nodes in our causal DAG (e.g. dynamic treatment regimes), or nodes that represent changes in distributions between timepoints instead of absolute distributions at the timepoints (Glymour et al., 2005). In an observational setting, estimation methods would change due to the possible presence of confounding, but all other principles would remain the same. Although these methods provide important insights into treatment efficacy over time, all inferences are restricted to the timing of the measurements actually chosen, because there may be different “causal effects” depending on the duration of the intervention, the lag time between intervention initiation and treatment effect, and the duration of the treat-ment effect. These issues are especially relevant in cases where an intervention leads to a transient change in the outcome followed by the outcome returning to its baseline value (or “equilibrium” in the general sense of the word). This points to a limitation of standard def-initions of the null effect, which fail to differentiate between transient outcome effects where the system returns to equilibrium, and permanent outcome effects that do not subside. Whereas the variables in the mainstream causal models refer to measurements at partic-ular time points (i.e. values of the variables), it is also possible to incorporate the dynamics of the system. By “dynamics”, we mean that some interventions could also affect the mag-nitude of the causal relationships between the measured variables (i.e. the parameters in the causal equations linking variables at different timepoints). Differential equations are com-mon in science for representing dynamical systems mathematically, and causal diagrams that include such equations are known as “dynamic causal models” (as contrasted with “mainstream causal models”). These differential equations lead to trajectories that help us distinguish whether an intervention will have a transient or long-term effect. The purpose of this paper is to show how comparing common and dynamic causal models for the same context / system leads to new insights. First,we show that causal effects on the system dynamics cannot be achieved by interventions that simply change the values of variables (which we refer to as “states”) on the causal DAG, but require interventions on the dynamics. Second, we offer a novel version of the null effect that distinguishes between null transient and null long-term effects which allows one to differentiate formally between the two types of interventions. In the current paper, we will focus only on the causal identification problem for dynamic systems, rather than the estimation of the defined causal effects from observed data. 
+
+> 2Distinguishing amongst classes of dynamic causal effects
+
+Within mainstream causal frameworks, interventions on dynamics correspond to in-terventions on causal parameters, rather than on the distribution of variables. Although interventions on parameters may seem foreign to many causal practitioners, we argue that they are unproblematic, and can be straightforwardly understood within other frameworks (see Section 4.2 for an example using Rothman’s sufficient causal set framework (Rothman, 1995)). Our work synthesizes ideas from mainstream causal DAGs (Pearl, 2009) with re-cent work on dynamic causal models (Blom and Mooij, 2023; Weinberger, 2023; Rubenstein et al., 2018) and much earlier results on causal ordering at equilibrium (Iwasaki and Simon, 1994). This leads to a new structure that improves the specificity of interventions, study design, and data collection so that we can better answer existing questions and introduce the possibility of new ones. The next section begins by explaining that mainstream causal models are state-focused ,using either DAGs or potential outcomes for outcome causal estimation. In the third section, we use an example of cancer cells to illustrate the limitations of the mainstream causal approach under what are typical causal interventions, and discuss challenges with estimation in a context where the theoretical model is not well-understood. We then rely on work from the philosophy community to characterize the challenges of this common state-focused 
+
+model, and to provide guidance for harmonizing mainstream causal and dynamic models. In the fourth section, we discuss the implications for the design and analysis of experimental and observational studies, particularly with respect to the importance of the timing of measurements. 
+
+2. Motivating Example for Health Research 
+
+Dynamic causal models are currently used primarily in areas that explore equilibrium be-haviour for weather, chemical reactions, and so on. However, most human diseases can also be reframed as questions related to achieving or moving away from equilibrium. For example, cancer cells are continuously occurring in the human body, but are killed by the natural killer cells of our immune system (Mace, 2023). We are given a diagnosis of cancer when the volume of cancer cells achieves a particular threshold because the creation of new cancer cells exceeds the destruction of cancer cells, i.e. when the system is no longer in equilibrium. In studies using mainstream causal models, the analysis would focus on remission or tumour size (i.e. tumour volume) over a specific time interval but not on the shift away from equilibrium. More insights would be gained by exploring the change in tumour volume over time, which might also provide insight into whether that benefit would likely continue after the study. While one could design a study with multiple timepoints and report how the tumour volume changed over time, the timing and frequency of the measurements would determine exactly what could be learned and how much uncertainty might remain. Relatedly, one would not understand what the intervention has changed in the physiological system, only that observed quantities had been changed. Cho et al. (2023) provide a concrete example, which can be used to illustrate the limi-tations of the classical potential outcomes approach for capturing the full range of possible causal interventions. The authors investigated the structural identifiability of a dynamic model for tumour growth when there are multiple types of cancer cells present. In partic-ular, they examined the ability of the Lotka-Volterra competition model to produce three 
+
+> 3
+
+Steele, et al. 
+
+different kinds of cell line interactions with respect to tumour growth: competitive (both cell lines inhibit the other’s growth), mutualistic (both cell lines promote the other’s growth), and antagonistic (one cell line inhibits the other’s growth, and the other cell line either pro-motes the other’s growth or has no effect). We will use the same notation and description from Cho et al. (2023). That is, we will assume that we are interested in characterizing the change in tumour volume (i.e. growth) where the tumour is comprised of two cell types: (1) aggressively growing cells that we would like to target if we could ( T ype target ) and (2) proxy cells ( T ype proxy ) that are less aggressive, which we can intervene upon easily, but which have only an indirect effect on the target cells. The dynamic system is defined by the equations 1 and 2. For the illustrations that follow, we assume that the average population behaviour can be described with the following system of ordinary differential equations, 
+
+dV target 
+
+dt = rtarget Vtarget (t)
+
+
+
+1 − Vtarget (t) + γproxy Vproxy (t)
+
+Ktarget 
+
+
+
+; (1) 
+
+dV proxy 
+
+dt = rproxy Vproxy (t)
+
+
+
+1 − Vproxy (t) + γtarget Vtarget (t)
+
+Kproxy 
+
+
+
+. (2) 
+
+Vtarget (t) and Vproxy (t) are the volumes of the the two cell types as a function of t, Ktarget 
+
+and Kproxy represent the maximum tumour volume the system can have (generally K is assumed to be much larger than any particular Vproxy (t) or Vtarget (t) of interest), rtarget 
+
+and rproxy are the exponential growth rates, and γproxy and γtarget determine the kind (i.e. competitive, mutualistic, antagonistic) and magnitude of the interaction between the target and proxy cell types. Figure 1 illustrates the behaviour of the system with initial values Vproxy (0) = 0 .05, Vtarget (0) = 0 .25, rtarget = 0 .16, rproxy = 0 .45, Ktarget = 0 .85, 
+
+Kproxy = 0 .80, γtarget = −0.35, and γproxy = 0 .30. In the next section, we characterize some issues with common potential outcome mod-elling for defining interventions in such a dynamic system. 
+
+3. Characterizing Interventions on System States 
+
+3.1 Interventions on a single dynamic process 
+
+In the most basic causal formulation for intervention (or exposure) and outcome measure-ments, we can define the potential outcome for the outcome measurement as Y (a), i.e. the value that the outcome Y would take on if a point exposure (or intervention) A were taken. Assuming only two values for A ∈ { 0, 1} we could then define the causal effect of inter-vention A in the individual as Y (1) − Y (0) and then define an average causal effect in the population as: E(Y (1) − Y (0) ) under a parametric, semi-parametric or finite population model for the pair {Y (0) , Y (1) }.In the dynamic setting described in this paper, we need to generalize and provide more careful indexing with respect to time. We first consider a single intervention at where at in 
+
+{0, 1} at time t only affects the Vtarget . For the purposes of illustration, in this first example we assume the two cell types do not interact, i.e. γproxy = γtarget = 0. Therefore, we can 
+
+4Distinguishing amongst classes of dynamic causal effects 
+
+Figure 1: T ype proxy (left) and T ype target (right) cell volumes under the model of Equations 1 and 2 with parameter values rtarget = 0 .16, rproxy = 0 .45, Ktarget = 0 .85, Kproxy = 0 .80, 
+
+γtarget = −0.35, and γproxy = 0 .30. 
+
+5Steele, et al. 
+
+Figure 2: Example of a single intervention on the Vtarget (t) state at time t = 10. The dashed line indicates the trajectory of Vtarget (t) post-intervention, the solid line indicates the value of Vtarget (t) with no intervention. The value of Vtarget with the intervention at any time t > 10 is equal to the value of Vtarget without an intervention at time t − 10. ignore Vproxy (t) in this example. Initial volume is represented by Vtarget (0). For example, if at = 0, then Vtarget (t)at=0 is the solution of the differential equation for the volume of 
+
+T ype target tumour cells at time t using the original Vtarget (0) as the T ype target cell starting volume and no intervention. When at = 1, then the value of Vtarget (t) is increased (or decreased) relatively by some amount β, i.e. Y at=1  
+
+> t
+
+= βY at=0  
+
+> t
+
+.Figure 2 illustrates the effects of intervening directly on the target cell in the case when the target and proxy cell volumes change in isolation of each other. The effect of an intervention at time t = 10 on Vtarget (t) is to decrease the volume by 60% (dashed line) relative to the value under no intervention at time t = 10 (solid line). Note that 
+
+Vtarget (t)at=1 = Vtarget (t − 10) at=0 for t ≥ 10, which follows along the work of Robins (Robins, 2004) and others (e.g. Murphy (2003), Saarela et al. (2015)) on state-focused causal modeling of exposures. The causal effect of the intervention in our case is not a single value, but rather a function of time (cf. Ecker et al., 2024). In our example, as time increases, the effect of the intervention on Vtarget (t) diminishes, i.e. |Vtarget (t)at=1 − Vtarget (t)at=0 |
+
+decreases until it reaches the same equilibrium value as under no intervention, just at a later time point. Crucially, because a mainstream causal effect is defined at a single time-point, it is inexorably tied to the time-point which the measurement is taken. In this example, the mainstream causal DAG approach can capture some (but not all) of the nuance of the model dynamics. The mainstream causal model for this problem 
+
+6Distinguishing amongst classes of dynamic causal effects 
+
+(Figure 3) contains variables for each of the observed time points. An intervention A at time t = 10 would have a direct effect on Vtarget (10), and would have a diminishing indirect effect on Vtarget (t) as time increased. One implication of this is that once one reaches a time-point at which the effect has subsided (to some arbitrary level of precision) the model will violate the causal Faithfulness condition (Spirtes et al., 2000), which implies that an effect and its cause will be probabilistically dependent. Although our model is not itself probabilistic, one can easily see that after a certain number of time-steps the value of the target is exactly the same as it would have been in the absence of an intervention, and thus would be probabilistically independent of the intervention in a probabilistic analogue of our model incorporating random error terms at each time-step. The causal Faithfulness condition arises in constraint-based methods for causal discovery, and its failure here might just be one more reason to reject it in dynamical contexts. But the failure also points towards a broader limitation of the DAG, which is unable to differentiate transient from permanent causal effects. The simple example from Figure 2 shows an important limitation when formulating the effects of causal interventions in terms of changes to observable quantities and potential outcome states (i.e. Yt and Y at 
+
+> t
+
+). The intervention in this example does not change the equilibrium behaviour or the dynamics of the system; it only temporarily affects the state. 
+
+3.2 Characterizing interventions on system dynamics 
+
+Now consider the case where the rate of change in volume for each cell type depends on the current volume of the other cell type, as outlined in equations 1 and 2 when γproxy and 
+
+γtarget are both > 0. This type of interaction can either be competitive (both cell types inhibit the other because they are constrained by the same resources), mutualistic (each cell type increases the other because they both create a beneficial environment) or antagonistic (one cell type creates a toxic environment for the other thereby interfering with its growth, and the other cell type either has none or a beneficial effect on the first cell type). In the following example we set γproxy = 0 .4 and γtarget = 0 .6, which would indicate a competitive environment. Now consider an intervention designed to cause a change in the volume of the target cells (Vtarget ) indirectly via a change to the volume of the proxy cells ( Vproxy ). The intervention can be described using the causal DAG in Figure 4. This intervention would generally be considered as an intervention on a time-varying exposure variable ( Vproxy (t)) to affect the target cell volumes at a particular time-point where past proxy and target cell volumes( t ≥
+
+30) are potential confounders for the present effect of Vproxy (t) on Vtarget (t). What is important to consider in this example is the differentiation between the dy-namic causal relationship defined by the feedback parameters and the causal effect of an intervention that would either modify the volume of one of the cells or change the way in which the dynamics of the feedback loop evolve. In the next section, we will explain how to differentiate between these two types of interventions. 
+
+4. Defining Causal Interventions on System Dynamic 
+
+In this section, we propose a framework to rectify the limitations of the standard causal approaches for defining interventions and the causal effects of interventions. We first propose 
+
+> 7
+
+Steele, et al. 
+
+Vtarget (0) Vtarget (5) Vtarget (10) 
+
+AInt (10) 
+
+Vtarget (15) Vtarget (20) 
+
+Figure 3: Causal Directed Acyclic Graph for Vtarget (t) at different timepoints based on a single intervention on Vtarget (t) at t = 20. The solid red node at t = 10 is intervened upon, the dashed nodes indicate the nodes after t = 10 that are changed due to the indirect effects of the intervention. The intervention on Vtarget (5) will not immediately affect Vtarget 
+
+at t = 10 so the edge is removed. 
+
+VP roxy (0) VP roxy (10) VP roxy (20) 
+
+AInt (20) 
+
+VP roxy (30) VP roxy (40) 
+
+VT arget (0) VT arget (10) VT arget (20) VT arget (30) VT arget (40) 
+
+Figure 4: Causal Directed Acyclic Graph for Vtarget (t) at different timepoints based on a single intervention on Vproxy (t) at t = 20. The solid red node at t = 20 is intervened upon, the dashed nodes indicate the nodes after t = 20 that are changed due to the indirect effects of the intervention. The intervention on Vproxy will not immediately affect Vtarget at t = 20 so the edge is removed. 
+
+8Distinguishing amongst classes of dynamic causal effects 
+
+to add an additional criteria to distinguish dynamic null causal effects from the previously described distributional null effects. A dynamic null causal effect exists if there exists a combination of states where the same values of those states will yield the same distribution of outcomes at more than one time point. We then propose that (1) interventions on states of random variables that are endogenous to the process (e.g. nodes on the causal DAG and not caused by the outcome) lead to dynamic null causal effects and (2) interventions on states of random variables that are exogenous to the process (i.e. parameters, which can be represented as variables not in the causal DAG and not caused by the outcome) lead to dynamic non-null causal effects. We discuss each of these in the next two sections. 
+
+4.1 Redefinition of the null effect 
+
+The classical potential outcome model defines the null causal effect as the average of Y (a) for an intervention a relative to a baseline (or reference) potential outcome Y (0) , i.e. E(Y (a) −
+
+Y (0) ). As we saw in the previous section, when these potential outcomes are indexed by time (E(Y (a) 
+
+> t
+
+− Y (0)  
+
+> t
+
+)), the choice of t for defining the causal effect becomes critically important. Now, readers may find it obvious that causal effects depend on time, but the nature of the effect in a dynamic causal model is more nefarious. Consider the example in Figure 2 of intervening on a single cell type in an isolated system from the previous section. Although the intervention temporarily changes the state of the process, the dynamics of the system (i.e.the causal relationships between system states) are not altered in a meaningful way and are time-independent. Although the observed trajectories of the system will change after the intervention on a variable’s state, the only possible trajectories post-intervention will be trajectories which were possible under the original system dynamics. In short, one observes a change in the system states post-intervention, but the original system dynamics remain unchanged. We thus propose instead to differentiate between (1) interventions which lead to non-null average causal effects on measurements at specific timepoints and (2) interventions which modify the dynamics and the behaviour of the system over time. The single state example in Figure 2 suggests one way to approach the problem. In this example, an intervention at time t∗ affects only the value of Vtarget (t) at specific values of t > t ∗ and not the underlying dynamics of the system. The classical definition for a causal effect of an intervention a to affect Vtarget (t) is simply E(Vtarget (t)(a)) - E(V (0) 
+
+> target (0)
+
+)̸ = 0 for at least one t > t 0. With time, E(Vtarget (t)) may be equal to the same constant equilibrium state as under the null intervention process Vtarget (t)(0) or a different constant equilibrium state value. For any final observation value Tmax , the classical definition of causal effects with potential outcomes, 
+
+E(V (a)
+
+> target (Tmax )
+
+) − E(V (0) 
+
+> target (Tmax )
+
+)̸ = 0 is defined as a causal effect of the intervention on the desired outcome at the final observation time point. Figure 2 shows the difficulty with the classical definition of the causal effect in a dynamic causal system. The intervention does not actually change the underlying dynamics of the data-generating process; only the values of the state that are observed. There are only three types of intervention effects one can observe in this system when a state value is changed: a) achieving the same equilibrium value at an earlier time point; b) achieving the same equilibrium value at a later time point; and c) achieving a different equilibrium value that would be possible under the original time-invariant system dynamics for either a different set 
+
+> 9Steele, et al.
+
+of initial states and/or initial time point. For types a) and b), the effects of the interventions are transient. For type c), the intervention did not change the system equations; only the orbit where the system achieved equilibrium. One way to understand the nature of (c) is that changing only the value of a single state variable in a dynamic system creates a new set of trajectories for all states where current values for unchanged states at the time of the intervention become initial values for the new trajectories with a new initial value for the intervened upon state. Note that a type c) intervention would be a lasting change to the separate orbits, but would still lead to an orbit achievable without changing the underlying differential equations which govern the process. For example, versions of the Lotka-Volterra model with infinite carrying capacity can have distinct trajectories depending on the initial values (see, for example, Chapter 3 in Murray (2002)). In all three of these cases, the intervention has only affected the states of the process, not the underlying dynamics / causal equations and how the data generating process evolves. Please note that this paper does not take the position that the three possible causal effects in the previous paragraph are not interesting or potentially valuable; in some situa-tions, these may be the correct effects to consider. However, the classical potential outcome causal effect definition under system dynamics does not allow one to differentiate between interventions on state values and interventions on dynamics. Consider instead a different definition of a null potential outcome that allows for more precision in identifying a causal effect on the dynamics of the system. We define the inter-vention to have a null causal effect on the dynamics of the outcome variable if there exists a combination of a different initial state of the null potential outcome and a different initial time of the null potential outcome process, ˜Y (0) 
+
+> t0+∆
+
+, such that E(Y (a=1)  
+
+> t
+
+) − E( ˜Y (a=0)  
+
+> t
+
+) = 0. In other words, one can expand the definition of the null potential outcome process to remove identification of effects from interventions which do not affect dynamics of the sys-tem. Figure 2 shows how an intervention in the previous example can have a non-null effect on Vtarget (t) at particular timepoints, but a null effect on the dynamics. This is because 
+
+Vtarget (t)(a=1) = Vtarget (t−10) (a=0) for all t > 10 under our definition for the one cell volume example. Note that our definition also accommodates models with interaction between the two cell types (i.e. γtarget and γproxy ̸ = 0). For example, an intervention on Vproxy (t) at time t∗
+
+will induce a perturbation to the Vtarget , but will not change how the two systems evolve together. In other words, the Vtarget (t)(a=1) = Vtarget (t + ∆) (a=0) for all t > t ∗ if the intervention creates a situation where the target and proxy cell volumes are identical to volumes that could have been observed with no intervention but at a different initial time 
+
+t + ∆, i.e. Vproxy (t)(a=1) = Vproxy (t + ∆) (a=0) and Vtarget (t)(a=1) = Vtarget (t + ∆) (a=0) .Therefore, the same three types of effects on the Vtarget are the only effects possible: (1) increased time to equilibrium, (2) decreased time to equilibrium or (3) a different equilibrium under the same dynamics. We propose to use a generalization of the null potential outcome to allow for different initial states of both ˜Vproxy (t + ∆) (a=0) and ˜Vtarget (t + ∆) (a=0) , but where ∆ is the same for both processes. In the next subsection, we explain what types of interventions are necessary to achieve non-null effects on system dynamics under this new definition of the null potential outcome. 
+
+> 10
+
+Distinguishing amongst classes of dynamic causal effects 
+
+(a) Figure (a) left panel shows Vproxy (t) when there is no intervention (solid line) and under an intervention (dotted line) at time t = 20 to change the value of Vproxy (t) to its initial value. Figure (a) right panel shows Vtarget (t) for no intervention on Vproxy (t) (solid line) and the change in Vtarget (t)after intervening on Vproxy (t) at time t = 20 (dotted line). 
+
+.
+
+(b) Vproxy (t) and Vtarget (t) trajectories from Day 0 when initial states are equal to Vproxy (20) and 
+
+Vtarget (20) from panel (a) and there is no intervention. Note that the trajectories in panel (a) from 
+
+t = 20 are the same those in panel (b) for ∆ = −20 from time point t = 20 + ∆ = 0. 
+
+Figure 5: Examples of intervening on systems with competition. 
+
+11 Steele, et al. 
+
+4.2 Intervening on the dynamics of a system 
+
+In the previous subsection we proposed a definition of a new null potential outcome which would only allow for causal effects that modify system dynamics, as opposed to just affecting the values of state variables. The critical issue in our illustrative example (and in most dynamic systems with feedback loops) is the endogeneity of the variable that is being intervened upon. In particular, the values of the parameters, not the states, determine the dynamics and equilibrium behaviour of the system. The key difference between the parameters of the system and the states of the system in Equation 2 is that none of the parameters depend on the state values, which means the parameters can be considered to be exogenous to the process and the causal DAG. Because the parameters are exogenous, intervening directly on the parameters could induce changes to the dynamics of the system. In other words, by changing the values of the parameters, you create post-intervention trajectories which could not have been obtained under the original dynamics. Figure 6 illustrates the effects of two possible interventions on the data generating process for Vproxy (t): (a) one intervention on the carrying capacity ( Kproxy ) of the T ype proxy 
+
+cells and (b) one intervention on the interaction parameter ( γproxy ) which governs how 
+
+Vproxy (t) affects the rate of change of Vtarget (t). Note that in both cases we obtain processes after the intervention that are different from before the intervention (i.e. t = 0) even when the values of the variables are identical to t = 0. For the purposes of illustration, we show that intervening on parameters of the system rather than endogenous states allow us to obtain causal effects on system dynamics. Clearly defining an intervention on a model parameter deviates from the mainstream causal prac-tice. 1 However, if a state variable is exogenous in that it causes changes in the variables endogenous to the dynamic system, but is not itself caused by variables endogenous to the dynamic system, then it plays the same role as a parameter with respect to the data generating mechanism of the dynamic system. 
+
+5. Relationship to other research 
+
+In this section, we describe how our research connects and contrasts to relevant work done in other areas of dynamic causal modelling.         
+
+> 1. Targeting interventions to parameters is a key component of our approach. For interventions to have an effect on anything, they must cause a change in the physical universe in which we live. This is straightforward when discussing measured variables on the causal DAG. What does it mean to change a parameter, and how can we do so? In brief, a causal DAG does not usually include all causes of all variables. Rather, it only has to include common causes of the exposure of interest and outcome. Consider that A causes Y faster if B is present (e.g. an enzyme), or only if C is present. In Rothman’s sufficient causal set framework,(Rothman, 1995) both {A,B }and {A,C }represent sufficient causal sets for the arrow from A to Y, even though B and C (referred to as component causes) may not be on the causal DAG. If we intervene on B (or C), we will change the magnitude of the causal effect of A on Y, i.e. we are intervening on a variable in our physical universe that changes the parameter.
+
+12 Distinguishing amongst classes of dynamic causal effects 
+
+(a) Figure (a) left panel shows Vproxy (t) when there is no intervention (solid line) and under an intervention at time t = 20 to change the value of Kproxy from 0.8 to 0.2. Figure (a) right panel shows 
+
+Vtarget (t) for no intervention on Vproxy (t) (solid line) and the change in Vtarget (t) after intervening on Kproxy at time t = 20. 
+
+(b) Figure (b) left panel shows Vproxy (t) when there is no intervention (solid line) and under an intervention at time t = 20 to change the value of γproxy from 0.3 to 0.6. Figure (b) right panel shows 
+
+Vtarget (t) for no intervention on Vproxy (t) (solid line) and the change in Vtarget (t) after intervening on Kproxy at time t = 20. 
+
+Figure 6: Example of two interventions that lead to different system dynamics 
+
+13 Steele, et al.   
+
+> γT arget
+> KP roxy
+> dV P roxy VP roxy
+> dV T arget VT arget
+
+Figure 7: Dynamic causal graph for equations (1) and (2) using the notation of Iwasaki and Simon (1994); Weinberger (2023). Intervening on the state value of the red node leads to a change in state with no change to the dynamics of the system as described in Section 4.1. Intervening on the parameters (blue nodes) leads to a change in the dynamics of the system as described in Section 4.2. 
+
+5.1 Directed graphs for equilibrium models 
+
+Iwasaki and Simon (1994) made one of the earliest contributions for characterizing causal effects (in particular, causal ordering) for equilibrium models via directed effects. Their work defines causal ordering in self-contained dynamic systems and generalizes the idea of casusal ordering to systems which contain multiple self-contained dynamic systems. They also discuss the role of exogeneity in terms of how the casual graph should treat variables that are either unaffected or weakly unaffected by other variables in the system, at least with regards to the particular time scale. The causal graphs proposed in their paper include derivatives as variables in the directed graph. In Figure 7, we give an example of how their work applies to the dynamic model for the cells in Equations 1 and 2. Weinberger (2023) builds on the work of Iwasaki and Simon to further characterize causal effects for equilibrium models. In particular, he resolves a key issue when trying to learn causal graphs from data obtained from models at equilibrium. He highlights that a dynamical system can end up in distinct equilibrium states with distinct causal orderings depending on whether one either (1) intervenes to “clamp” a variable at a particular value, or (2) allows the variable to reach equilibrium as a result of its endogenous dynamics. Each of the equilibrium models resulting from each policy can be derived from the corresponding dynamic model, which includes derivatives for variables that have not reached equilibrium. Our paper directly extends this work to the potential outcome framework and clarifies the ways in which one can intervene on derivatives in a dynamic causal graph. Interventions on derivatives are distinct from clamp interventions, since they do not fix the values of state variables, but they also bring the system to a different equilibrium state than would result from its endogenous dynamics. Blom and Mooij (2023) have also contributed work related to the use of directed graphs for inferring the absence (or presence) of perfectly adapted systems, i.e. systems that return to perfect adaptation after having been perturbed away from that equilibrium behaviour. In their approach, they use the conditional independence structure estimated from the graph to determine whether the intervention prevented perfect adaptation or not. Their approach 
+
+> 14 Distinguishing amongst classes of dynamic causal effects
+
+would be the hypothesis testing version of our attempt to estimate effects on the basis of our novel definition of potential outcomes. 
+
+5.2 Connections to work for stochastic differential models 
+
+In our paper we have focused on the use of ordinary differential equations, but recent work by Boeken and Mooij (2024) defines a version of do-calculus and directed (both cyclic and acyclic) graphs for stochastic differential equations. Like our work in this paper, the authors emphasize the importance of differentiating between endogenous and exogenous state variables. They do not define potential outcomes, and causal relationships between state variables are inferred via the absence and presence of edges (similar to Blom and Mooij (2023)). 
+
+5.3 Related approaches for functional causal effects 
+
+There has been other recent work done in the causal literature using similar definitions of a functional potential outcome. Ecker et al. (2024) define a Functional Average Treatment Effect (the FATE) in a similar way as we have in Section 3. In their example, they illus-trate a comparison between two treatment groups (early adult residence location, urban or rural) with respect to a functional outcome (log cumulative income). They then define an individual potential outcome as θ(t) = E[y1i(t) − y0i(t)] for the function that defines the functional causal effect of an urban early adult residence location relative to a rural location. Their treatment of interest is exogenous in the way it is defined, so their context would not require the novel potential outcome definition of causal effects on the dynamics. Our work would allow one to consider the possibility of a changing residence location which is also functional. Testa et al. (2025) define the same functional treatment effect as a target for their proposed new doubly robust methods for functional estimation. Similar to Ecker et al. (2024), they only consider a binary, exogenous intervention, so there is no need for the more complex potential outcome that we propose in this paper. 
+
+5.4 Connections to dynamic treatment regimes 
+
+Finally, dynamic treatment regime models have been proposed for problems with time-varying exposures where the goal is to estimate the causal effect of a sequence of interven-tions (Murphy, 2003; Robins, 2004). Our potential outcome approach for dynamic models would mirror that of the dynamic treatment potential outcomes in that we could allow for a sequence of interventions at different timepoints ( aT0 , a T1 , ..., a Tk ). The same two issues for the single intervention case would apply for the multiple intervention case, but would be more complex. First, we would need to define the reference null potential outcome relative to what could have occurred at potentially different initial values under the same dynamics after each intervention. Second, the standard dynamic treatment regime models do not differentiate between endogenous and exogenous variables, so the same issue with respect to affecting local states but not system dynamics would still apply. 
+
+> 15 Steele, et al.
+
+5.5 Connections to differences-in-differences approaches 
+
+Differences-in-differences (DiD) methods provide the closest intuition to the potential out-come models we present in our paper. The basic DiD model applied to our tumour cell volume example would compare the pre-post difference in the rate of change in the target tumour cell growth with the intervention to the pre-post difference in the rate of change in target tumour cell growth without the intervention, while adjusting for potential con-founding factors. (Angrist and Pischke, 2009; Card and Krueger, 1993). The DiD null causal effect definition depends on an assumption that the trajectories of the two potential outcomes are parallel post-intervention (e.g. allowing for different intercepts, but the same slope in a linear model). This is similar to our proposed null effect for dynamic systems which assumes the same trajectory for systems with and without interventions with the one trajectory being just a shifted version of the other in time. 
+
+6. Discussion and future work 
+
+Our paper makes two key contributions for identifying relevant causal effects on the dynam-ics of systems defined by ordinary differential equations. The first contribution characterizes a more general approach to specifying functional null potential outcomes in order to be able to differentiate between interventions that causally influence state values and interventions that causally influence system dynamics. The second contribution of our paper is to provide guidance to researchers on how to understand what parts of the system can and cannot be intervened upon in order to produce causal effects on system dynamics, namely that inter-ventions designed to affect system dynamics should target mechanisms that are exogenous to the dynamical system. Our paper focuses on dynamical systems defined by homogeneous ordinary differential equations as such models allow for clear illustration of the difficulties in identifying causal effects on the dynamics of systems. Generalizing to non-homogeneous ordinary or partial differential equation models would make the characterization of the set of null potential outcomes more difficult, but would not be intractable. Moving to other types of systems with less hypothesized structure would also be possible, but increasing the flexibility of the functional form would likely require more data observed with higher temporal resolution. We have not discussed estimation in the current paper, as we wanted to focus only on the causal identification problem. Causal estimation using the generalized form of the null potential outcome is not necessarily straightforward, even under randomized interventions. In traditional causal estimation, estimates of null (or reference) potential outcomes are gen-erally estimated from observations before (or without any) intervention. For randomized interventions with no confounding, one approach would be to attempt to perform functional registration (Ramsay and Silverman, 2005; Ramsay et al., 2007) to compare trajectories for intervened upon sample units to reference unit trajectories at potentially different time-points with different starting values. If a parametric ODE can be used to model the data reasonably well, G-computation approaches could be used estimate intervention trajectories under different initial values which would allow closer comparison of system dynamics with reference trajectories. Such methods would work well for trajectories with appropriate fre-quency of observed measurements; such an estimation strategy would likely work less well with irregularly spaced or infrequent observations over time. When the interventions are 
+
+> 16 Distinguishing amongst classes of dynamic causal effects
+
+not randomly assigned to observations, one would need to then account for confounding of the intervention in the usual way, either through adjustment or weighting (or both). We hope to pursue all these directions in our future work on this problem. 
+
+References 
+
+Joshua D Angrist and J¨ orn-Steffen Pischke. Mostly harmless econometrics: An empiricist’s companion . Princeton university press, 2009. Tineke Blom and Joris M Mooij. Causality and independence in perfectly adapted dynamical systems. Journal of Causal Inference , 11(1):20210005, 2023. Philip Boeken and Joris M Mooij. Dynamic structural causal models. arXiv preprint arXiv:2406.01161 , 2024. David Card and Alan B Krueger. Minimum wages and employment: A case study of the fast food industry in new jersey and pennsylvania, 1993. Heyrim Cho, Allison L Lewis, Kathleen M Storey, and Helen M Byrne. Designing exper-imental conditions to use the lotka–volterra model to infer tumor cell line interaction types. Journal of Theoretical Biology , 559:111377, 2023. Kreske Ecker, Xavier de Luna, and Lina Schelin. Causal inference with a functional outcome. 
+
+Journal of the Royal Statistical Society Series C: Applied Statistics , 73(1):221–240, 2024. M Maria Glymour, Jennifer Weuve, Lisa F Berkman, Ichiro Kawachi, and James M Robins. When is baseline adjustment useful in analyses of change? an example with education and cognitive change. American journal of epidemiology , 162(3):267–278, 2005. Yumi Iwasaki and Herbert A Simon. Causality and model abstraction. Artificial intelligence ,67(1):143–194, 1994. Emily M Mace. Human natural killer cells: Form, function, and development. Journal of Allergy and Clinical Immunology , 151(2):371–385, 2023. Susan A Murphy. Optimal dynamic treatment regimes. Journal of the Royal Statistical Society Series B: Statistical Methodology , 65(2):331–355, 2003. J. D. Murray. Mathematical Biology I: An Introduction . Springer, New York, 3 edition, 2002. Judea Pearl. Causality . Cambridge university press, 2009. James O Ramsay and Bernard W Silverman. Functional data analysis . Springer, 2005. Jim O Ramsay, Giles Hooker, David Campbell, and Jiguo Cao. Parameter estimation for differential equations: a generalized smoothing approach. Journal of the Royal Statistical Society Series B: Statistical Methodology , 69(5):741–796, 2007. 
+
+> 17 Steele, et al.
+
+James M Robins. Optimal structural nested models for optimal sequential decisions. In 
+
+Proceedings of the Second Seattle Symposium in Biostatistics: analysis of correlated data ,pages 189–326. Springer, 2004. Kenneth J Rothman. Causes. American Journal of Epidemiology , 141(2):90–95, 1995. P Rubenstein, S Bongers, B Sch¨ olkopf, and JM Mooij. From deterministic odes to dynamic structural causal models. In 34th Conference on Uncertainty in Artificial Intelligence (UAI 2018) , pages 114–123. Curran Associates, Inc., 2018. Olli Saarela, Elja Arjas, David A Stephens, and Erica EM Moodie. Predictive bayesian inference and dynamic treatment regimes. Biometrical Journal , 57(6):941–958, 2015. Peter Spirtes, Clark N Glymour, and Richard Scheines. Causation, prediction, and search .MIT press, 2000. Lorenzo Testa, Tobia Boschi, Francesca Chiaromonte, Edward H Kennedy, and Matthew Reimherr. Doubly-robust functional average treatment effect estimation. arXiv preprint arXiv:2501.06024 , 2025. Naftali Weinberger. Intervening and letting go: On the adequacy of equilibrium causal models. Erkenntnis , 88(6):2467–2491, 2023.

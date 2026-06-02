@@ -1,0 +1,4007 @@
+Title: IV regression with distribution-valued outcomes
+
+URL Source: https://arxiv.org/pdf/2605.28749v1
+
+Published Time: Thu, 28 May 2026 01:39:19 GMT
+
+Number of Pages: 77
+
+Markdown Content:
+# IV regression with distribution-valued outcomes ∗
+
+## David Van Dijcke † Kaspar W¨ uthrich ‡
+
+## May 28, 2026 
+
+Abstract 
+
+We develop IV Fr´ echet regression (IVFR), an instrumental-variable (IV) method for settings where the outcome is an entire distribution. Framing the problem as an IV regression in 2-Wasserstein space, IVFR extends global Fr´ echet regression to the case with endogenous covariates. IVFR projects IV-weighted quantile curves onto the space of valid distributions and then recovers the corresponding regression coefficient func-tions. The projection provably reduces the estimation error in finite samples and guar-antees valid fitted distributions. We show that the IVFR estimator converges weakly to a mean-zero Gaussian process and establish the validity of a multiplier bootstrap procedure for uniform inference. In simulations, the projection reduces the integrated mean squared error (IMSE) by up to 63% relative to existing methods. Revisiting the effects of Chinese import competition on the wage distribution within commuting zones, the proposed method produces 9–10% narrower confidence bands than existing methods. Using our novel uniform confidence bands, we find no evidence that import competition reduced wages at the very bottom of the distribution, but only between the 10th and 35th quantile. We also revisit the effect of county food stamp programs on the county’s birth weight distribution and find no significant effects. 
+
+Keywords: instrumental variables, distributional outcomes, Fr´ echet regression, Wasser-stein distance, quantile functions, monotone projection 
+
+JEL Codes: C14, C21, C26, C36 
+
+> ∗
+
+We are grateful to Tim Christensen and Xiaohong Chen for feedback. We also thank seminar participants at the University of Michigan Econometrics Workshop for helpful comments. W¨ uthrich is also affiliated with CESifo. Van Dijcke gratefully acknowledges support from the Lawrence Klein Econometrics Fellowship and the Rackham Predoctoral Fellowship at the University of Michigan. This research was supported in part through computational resources and services provided by Advanced Research Computing at the University of Michigan, Ann Arbor. We thank Grammarly, GPT 5.2–5.5, Claude Opus 4.6–4.7, and coarse.ink for language editing, proofreading, and coding assistance. The authors are solely responsible for all content. 
+
+> †
+
+Department of Economics, University of Michigan. Email: dvdijcke@umich.edu 
+
+> ‡
+
+Department of Economics, University of Michigan. Email: kasparwu@umich.edu 
+
+1
+
+> arXiv:2605.28749v1 [econ.EM] 27 May 2026
+
+# 1 Introduction 
+
+This paper introduces an instrumental variables (IV) framework for settings where the out-come of interest is a distribution. A leading example is when researchers are interested in the effect of a treatment that varies at the group level on the distribution of an outcome within groups. Analyzing effects on the entire distribution of an outcome within groups, rather than on simple group-level averages, provides a better understanding of the impact of a treatment and allows for studying important distributional issues, such as inequality and tail risk. For instance, building on Autor et al. (2013), Chetverikov et al. (2016) (CLP henceforth) estimated the effect of import competition on the distribution of local wages and found that low-wage earners were most affected by increased import competition. In this application, the treatment (import competition) varies at the group (commuting zone (CZ)) level, and the outcome is the distribution within groups (the wage distribution within a CZ). Other examples include policies implemented at the firm, hospital, school, county, state, or country level that affect the entire distribution of employee, patient, student, or population outcomes (see also Van Dijcke (2025)). In many applications, these group-level treatments are endogenous, which motivates the use of IVs for estimating causal effects. We propose a flexible IV regression framework allowing researchers to estimate the effects of real-valued treatments on distribution-valued outcomes, using real-valued instruments. We refer to the proposed procedure as IV Fr´ echet regression (IVFR), because it can be viewed as an extension of the Fr´ echet framework for regression on metric spaces of Petersen and M¨ uller (2019) to the IV setting. We will use the grouped data terminology throughout the paper, but emphasize IVFR is very general and can be applied to panel data as well as any other setting where the outcomes of interest are distribution-valued. We consider a linear structural model for the (known or estimated) group-level quantile function corresponding to the distribution-valued outcome of interest. We show that this structural quantile function is identified as the solution to a Fr´ echet IV regression problem in 2-Wasserstein space. This identification result suggests a computationally straightforward plug-in estimation strategy: (i) construct plug-in estimates of the IV weights, (ii) compute IV-weighted average quantile curves at each covariate value, (iii) project each curve onto the space of valid quantile functions—solving the sample Fr´ echet IV problem—and (iv) recover coefficient functions by OLS. We show that the resulting estimator converges weakly to a zero-mean Gaussian process and propose uniform inference procedures based on the multiplier bootstrap. A key feature of IVFR is the projection step (iii), which has several desirable properties. First, it ensures that each estimated conditional distribution is a valid probability measure 2and that the estimator has the interpretation of an IV-weighted Wasserstein barycenter. Second, it provably decreases the error in estimating the structural quantile function in finite samples, which in turn leads to a finite-sample improvement in coefficient estimation. Finally, under a weak monotonicity condition on the population IV-weighted quantile functions, the projection step does not affect the asymptotic distribution, so that bootstrap inference remains valid. We evaluate the finite-sample performance of IVFR in Monte Carlo simulations. The projection reduces IMSE by up to 63% relative to existing methods under weak to moder-ate instruments, with the gain diminishing to below 1% under stronger instruments. Our pointwise and uniform inference confidence bands exhibit good finite sample coverage. We demonstrate the usefulness of IVFR in two empirical applications. First, we revisit the distributional wage effects of Chinese import competition in CLP. We find that IVFR produces 9–10% narrower pointwise confidence bands than CLP. Using our new uniform confidence bands, however, we find no evidence that wages are reduced at the very bottom of the distribution, but only between the 10th and 35th quantile. Second, we revisit the estimation of the causal effect of food stamps on the county birth weight distribution in Melly and Pons (2025b, MP henceforth) and find no significant effects across the distribution. 
+
+Literature. We contribute to several strands of the literature. Our first contribution is to the literature on distributional effects in panel and grouped data settings (e.g., Koenker, 2004; Canay, 2011; Galvao and Wang, 2015; Galvao and Kato, 2016; Chetverikov et al., 2016; Galvao et al., 2020; Chen and Feng, 2023; Gunsilius, 2023; Pons, 2024; Torous et al., 2024; Chen, 2025; Melly and Pons, 2025b). We show that when the object of interest is the effect of a group-level variable on a group-level distribution, the problem can be formulated naturally as a regression with distribution-valued outcomes. This perspective places existing grouped quantile IV estimators in a Fr´ echet regression framework: in the absence of individual-level covariates, the estimators of CLP and MP (building on Hausman and Taylor, 1981) coincide with the unprojected version of our estimator. The Fr´ echet formulation shows that the estimand is an IV-weighted Wasserstein barycenter, yields fitted distributions that are valid by construction, and leads to a natural projection step that improves the finite-sample performance while leaving the first-order asymptotic distribution unchanged. It also allows us to derive novel theoretical results: we establish the properties of IVFR under misspecification of the linear quantile model and propose a multiplier bootstrap for constructing uniform confidence bands. See Section 3.2.1 for a formal discussion of the relationship of our model and CLP and MP and Section 5 for a simulation comparison. Our second contribution is to the literature on Fr´ echet regression (Petersen and M¨ uller, 32019) and to the recent literature extending Fr´ echet regression and related methods to causal inference settings (e.g., Lin et al., 2023; Katta et al., 2024; Kurisu et al., 2024; Hoshino, 2024; Bhattacharjee et al., 2025; Van Dijcke, 2025; Zhou et al., 2025; Kurisu et al., 2025, 2026). We contribute to this literature by providing a linear IV framework for estimating treatment effects of endogenous group-level treatments; as well as by establishing asymptotic normality and deriving uniform confidence bands for this novel estimator, complementing related results for global and local Wasserstein-Fr´ echet regression under exogeneity (Petersen et al., 2021; Van Dijcke, 2025; Xu and Li, 2025; Song et al., 2026). Third, we contribute to the literature on quantile models with endogeneity more broadly (e.g., Abadie et al., 2002; Chernozhukov and Hansen, 2005, 2006, 2008; Lee, 2007; Horowitz and Lee, 2007; Fr¨ olich and Melly, 2013; Kaplan and Sun, 2017; Vuong and Xu, 2017; de Castro et al., 2019; W¨ uthrich, 2019, 2020; Kaido and W¨ uthrich, 2021; Beyhum et al., 2023; Holovchak et al., 2025, among many others). The goal of this literature is to estimate the effects on the quantiles of real-valued scalar outcomes, whereas we consider the functional IV regression case in which the outcomes themselves are distribution-valued. A last paper that does not fit neatly in these three groups is Qu and Kwon (2024), who use the Wasserstein space to study IV methods, but focus on distributional robustness for classical IV assumptions rather than distributional treatment effects. 
+
+Notation. We use the following notation throughout. For a vector v ∈ Rp, ∥v∥ = ( vTv)1/2
+
+denotes the Euclidean norm. For a positive semi-definite matrix A, ∥v∥A = ( vTAv )1/2 is the A-weighted norm. For functions f ∈ L2([0 , 1]), ∥f ∥L2 = ( R 10 f (u)2 du )1/2 is the standard 
+
+L2 norm. The 2-Wasserstein distance between two distributions with quantile functions 
+
+Q1, Q 2 is W2(μ, ν ) = ∥Q1 − Q2∥L2 . For a measurable function f , let P f := E[f (W )] and let Pnf := n−1 Pnj=1 f (Wj ) denote the empirical measure applied to f . We also write ⇝
+
+for weak convergence in the sense of van der Vaart and Wellner (1996), p
+
+→ for convergence in probability, ˆG∗ 
+
+> β
+
+⇝P Gβ for conditional weak convergence in probability (van der Vaart and Wellner, 1996, Section 2.9): sup h∈BL 1 |Ex[h( ˆG∗ 
+
+> β
+
+)] − E[h(Gβ )] | p
+
+→ 0, where BL 1 is the set of functions ℓ∞([ a, b ]) p+1 → R with Lipschitz constant and supremum norm both bounded by one. Finally, we write ℓ∞(T ) for the space of bounded functions on T equipped with the supremum norm. For a closed convex set K in a Hilbert space, Π K denotes the metric projection onto K.42 Setup and model 
+
+Consider a setting with n groups indexed by j = 1 , . . . , n . We are interested in estimating the effect of group-level variables Xj ∈ Rp with support X ⊆ Rp on a distribution-valued outcome Yj ∈ Y , where Y is the space of one-dimensional cumulative distribution functions (CDFs) with finite variance. Let QYj ∈ Q(Y) denote the quantile function corresponding to the CDF Yj , where Q(Y) is the space of quantile functions corresponding to Y. Note that for a fixed quantile level u ∈ (0 , 1), QYj (u) is a real-valued random variable. We also have access to a vector of group-level IVs, which includes an intercept, Zj ∈ Rl+1 , with l ≥ p. We assume throughout that {(Xj , Y j , Z j )}nj=1 are sampled i.i.d. We fix 0 < a < b < 1 and state all asymptotic results for quantile levels u ∈ [a, b ], avoiding tail quantiles. We consider a linear model for QYj , noting that our asymptotic results will allow for misspecification, 
+
+QYj (u) = β0(u) + β1(u)T(Xj − μX ) + ηj (u), E[ηj (u)] = 0 , u ∈ (0 , 1) , (1) where μX := E[Xj ], β0(u) is a scalar intercept function, β1(u) is a p-dimensional vector of slope functions, and ηj (u) is an unobserved error term. Given that we include an intercept, the assumption that E[ηj (u)] = 0 is a normalization. In what follows, we will often refer to 
+
+q(x, u ) := β0(u) + β1(u)T(x − μX ) as the structural quantile function. Writing the model in terms of demeaned variables ˜Xj = Xj − μX will be convenient for our theoretical analysis. 1 Note that due to the linearity, we can always reparametrize the model and write it in terms of Xj as 
+
+QYj (u) = ˜β0(u) + β1(u)TXj + ηj (u),
+
+where ˜β0(u) = β0(u) − β1(u)TμX . Finally, define Xj :=  1, (Xj − μX )T T .
+
+# 3 IV Fr´ echet regression 
+
+In this section, we discuss identification and estimation in the IVFR model. 
+
+## 3.1 Population problem and identification 
+
+We obtain identification of the structural quantile function q(x, u ) using the vector of IVs, 
+
+Zj . To do so, we impose the following standard assumptions. Let ˜Zj := Zj − E[Zj ]. 
+
+> 1When we use the demeaned coefficient and instrument vectors, we drop the intercept from those vectors to guarantee non-singularity of the covariance matrices.
+
+5Assumption 1 (Instrument exogeneity) . Under correct specification of the linear quantile model (1) ,
+
+E
+
+h ˜Zj ηj (u)
+
+i
+
+= 0 for all u ∈ (0 , 1) .
+
+This is the standard IV orthogonality condition for the structural error in (1). Under mis-specification, we define the pseudo-true coefficient functions by the population 2SLS projec-tion given below; in general, the corresponding pseudo-residual need not satisfy E[ ˜Zj ξj (u)] = 0 in the overidentified case. Define the population matrices Σ ZZ := E[ ˜Zj ˜ZT 
+
+> j
+
+], Σ ZX := E[ ˜Zj ˜XT 
+
+> j
+
+], and Σ XX := E[ ˜Xj ˜XT 
+
+> j
+
+]. 
+
+Assumption 2 (Full rank) . ΣZZ is positive definite and ΣZX has full column rank p.
+
+To motivate IVFR, consider first the case where Xj is exogenous, E[ ˜Xj ηj (u)] = 0. In this case, we can use conventional global Fr´ echet regression (Petersen and M¨ uller, 2019) to obtain the structural quantile function q(x, u ). Petersen and M¨ uller motivate global Fr´ echet regression as a generalization of standard linear regression. Specifically, suppose that Yj ∈ R and the conditional expectation function is linear, m(x) := E [Yj | Xj = x] = 
+
+α0 + αT
+
+> 1
+
+(x − μX ). Then, the formal characterization of the conditional expectation is m(x) = arg min m∈R E [s(Xj , x )d2 
+
+> E
+
+(Yj , m )], where dE (·) is the standard Euclidean norm and s(z, x ) = 1 + ( z − μX )TΣ−1 
+
+> XX
+
+(x − μX ) are the linear regression weights. The idea of global Fr´ echet regression is to replace the Euclidean norm dE with a more general norm d suitable for outcomes taking values in general metric spaces. Here, we extend Fr´ echet regression to settings where Xj is endogenous and the outcomes are distribution-valued. To motivate our approach, suppose first that Yj ∈ R satisfies the linear IV model Yj = α0 + αT
+
+> 1
+
+(Xj − μX ) + ηj with E[ηj ] = 0. A key observation underlying IVFR is that the linear model m(Xj ) := α0 + αT
+
+> 1
+
+(Xj − μX ) can be obtained by rewriting the canonical two-stage least-squares (2SLS) estimator as 
+
+m(x) = arg min 
+
+> m∈R
+
+E s(Zj , x )d2 
+
+> E
+
+(Yj , m ) ,
+
+where 
+
+s(Zj , x ) := 1 + ( x − μX )T(Σ T 
+
+> ZX
+
+Σ−1 
+
+> ZZ
+
+ΣZX )−1ΣT 
+
+> ZX
+
+Σ−1 
+
+> ZZ
+
+˜Zj . (2) See the proof of Lemma 1 in Appendix D for a derivation. Now, replace the Euclidean norm with the 2-Wasserstein distance W2 suitable for distribution-valued outcomes, which for two one-dimensional distributions Y1, Y 2 ∈ Y is defined as, 
+
+W2(Y1, Y 2) := 
+
+Z 10
+
+(QY1 (u) − QY2 (u)) 2 du
+
+12
+
+.
+
+6Then, the above characterization of IV-Fr´ echet regression leads to the following instrumental-variables version of Fr´ echet regression, 
+
+mIVFR (x) = arg min 
+
+> m∈Y
+
+E s(Zj , x ) W 22 (Yj , m ) , (3) where, by construction, for each given x, mIVFR (x) is a distribution function, i.e., it lies in 
+
+Y.It follows from the following Proposition that the quantile function associated with 
+
+mIVFR (x), denoted QmIVFR (x), is the L2-projection of the IV-weighted quantile function, 
+
+ψx(u) := E[s(Zj , x )QYj (u)], onto the space of quantile functions Q(Y): 
+
+QmIVFR (x)(u) := Π Q
+
+ E[s(Zj , x )QYj (u)]  . (4) 
+
+Proposition 1 (Fr´ echet characterization of the IV-weighted quantile function) . Suppose Assumption 2 holds and the IV-weighted Fr´ echet functional is finite, i.e., 
+
+E
+
+h
+
+|s(Z, x )| ∥ QY ∥2
+
+> L2(0 ,1)
+
+i
+
+< ∞.
+
+Then the minimizer of the IV-weighted Fr´ echet functional over distributions is the L2-projection of the IV-weighted mean quantile curve ψx(u) = E[s(Z, x )QY (u)] onto the quantile cone, 
+
+Q
+
+
+
+arg min 
+
+> w∈Y
+
+Es(Z, x )W 22 (Y, w )
+
+= Π Q(ψx),
+
+where Q(·) maps CDFs to their corresponding quantile function. In particular, if ψx(·) is itself a valid quantile function, then ψx is the a.e.-unique minimizer. 
+
+By the linearity of s(Zj , x ) in x, the function ψx(u) is affine in x and can be written as 
+
+ψx(u) = βunc 0 (u) + βunc 1 (u)T(x − μX ), where βunc (u) are the standard 2SLS coefficients applied quantile by quantile. Also, define the pseudo-true residual as, 
+
+ξj (u) := QYj (u) − XT 
+
+> j
+
+βunc (u).
+
+By construction, βunc (u) satisfies the population 2SLS normal equations. In the overidenti-fied case, however, this does not generally imply E[ ˜Zj ξj (u)] = 0. A different GMM weighting matrix would in general define a different pseudo-true coefficient function. Throughout the paper, we focus on the 2SLS choice, but other linear GMM estimators could be used as well. In population and under correct specification, the projection Π Q is inactive and hence 
+
+QmIVFR (x)(u) coincides with the solution to the linear 2SLS regression quantile by quantile, 7i.e., E[s(Zj , x )QYj (u)]. Moreover, the functional object mIVFR (x) has the interpretation of being the (signed) IV-weighted Wasserstein barycenter of the group-level distributions Yj . In other words, for a given x, mIVFR (x) is the IV-weighted average of each group’s distribution in probability space—which implies it can rightfully be called the “average” instrumented distribution. For more discussion on (conditional) Wasserstein barycenters, we refer to Agueh and Carlier (2011), Fan and M¨ uller (2024), and Panaretos and Zemel (2020). The IVFR coefficients are then equal to, 
+
+βIVFR 0 (u) = E[QmIVFR (X)(u)] (5) 
+
+βIVFR 1 (u) = Σ −1 
+
+> XX
+
+E[ ˜Xj QmIVFR (X)(u)] , (6) the OLS coefficients corresponding to the projected quantile function QmIVFR (x)( u). The following lemma shows that, under correct specification, QmIVFR (x)(u) and ( βIVFR 0 (u),βIVFR 1 (u)) recover the structural quantile function q(x, u ) and coefficients ( β0(u), β 1(u)), re-spectively. 
+
+Lemma 1 (Identification IVFR) . Suppose that Assumptions 1 and 2 as well as the linear quantile model in Eq. (1) hold. Then for all x ∈ X and u ∈ (0 , 1) ,
+
+QmIVFR (x)(u) = ψx(u) = q(x, u ),
+
+and βIVFR (u) = βunc (u) = β(u).
+
+Under correct specification, the projection is inactive and ψx(·) = q(x, ·) is a valid quantile function for all x ∈ X . Hence Π Q(ψx) = ψx and the Fr´ echet IV problem (3) recovers the structural quantile function exactly. Under misspecification, ψx(·) may violate monotonicity for some x ∈ X , so Π Q(ψx) may differ from ψx and consequently βIVFR (u) may differ from βunc (u). The IVFR coefficients remain well-defined and interpretable: for each x, the Fr´ echet IV solution Π Q(ψx) is the closest valid probability distribution to ψx in W2-distance, and βIVFR (u) parametrizes the best linear approximation to these projected distributions. 
+
+## 3.2 What does IVFR identify? 
+
+Here, we discuss the interpretation of the coefficient β1(u). The formal results underlying this discussion are presented in Appendix B. The coefficient β1(u) in the group-level quan-tile regression identifies the causal effect of group-level treatments on the group outcome distribution. When treatment is assigned at the group level, this group-level effect is the 8natural causal parameter. It captures the total response of the group’s distribution to the treatment, incorporating all channels through which the treatment operates. Note that this causal interpretation does not require any rank invariance assumption, as it operates at the group and not at the individual level. The group-level model (1) is agnostic about the within-group structure. The group quantile function QYj (u) is the primitive; no assumptions are made about what generates it within the group. In particular, the within-group distribution can arise from an arbitrary mixture of individual-level outcomes, and the composition of the group may itself respond to treatment. The parameter β1(u) captures all these channels. To illustrate, suppose that the treatment of interest is binary. Using potential outcomes notation, denote the counterfactual group-level CDFs without and with treatment as Y (0) and Y (1), respectively. Then, under exogeneity and assuming the linear model holds, the causal parameter IVFR targets is the total causal effect ,
+
+β1(u) = E[QY (1) (u) − QY (0) (u)] ,
+
+the average of the group-specific quantile treatment effects QY (1) (u) − QY (0) (u). This object has a direct counterfactual interpretation: it is the difference between the group quantile functions with and without the treatment, averaging over group-specific responses. Thus, the parameter β1(u) is a natural analog of the average treatment effect in the standard setting where the outcome is scalar-valued. This is different from the direct effect denoted by δ(u), which we show in Appendix B is the effect identified by approaches that control for individual-level covariates within groups (such as CLP and MP with individual controls). The direct effect δ(u) holds the group composition (e.g., the share of low-skilled and high-skilled workers) constant and measures only the within-type response (e.g., the wage response of low-skilled vs. high-skilled workers). By contrast, the total effect β(u) captures both the within-type response and the compositional response, capturing changes in who is in the group. For the direct effect to identify a causal effect on individuals, a rank invariance assumption is needed. The total causal effect is a policy-relevant parameter in many applications. If a poli-cymaker evaluates the impact of import competition on the local wage distribution, they typically care about what actually happens to wages in the affected regions, not a hypothet-ical scenario where wages change but workers cannot move. Indeed, the latter is often not a feasible policy. The total effect captures the equilibrium displacement of the distribution, and correctly characterizes the counterfactual effect on the treated unit, i.e., the entire group. That said, the direct effect δ(u) can be informative when the goal is to isolate the within-9type response, for instance in decomposition exercises that aim to separate wage structure changes from compositional shifts (e.g., Chernozhukov et al., 2013). The distinction between 
+
+β1(u) and δ(u) is related to the distinction between unconditional and conditional quantile effects in the distributional treatment effects literature (Firpo et al., 2009; Fr¨ olich and Melly, 2013); see also Remark 1 in MP for a related discussion. 
+
+Example 1 (Total vs. direct effect: import competition) . Consider a commuting zone ex-posed to an import competition shock, as in CLP. The shock is assigned at the commuting-zone level, but workers within the zone differ in their exposure. Non-college workers are more likely to be employed in manufacturing and therefore experience larger wage losses, while college workers are relatively insulated. An estimand of the direct effect δ(u), which controls for individual education, targets a direct, composition-fixed effect: how wages change within education groups, holding the mix of workers fixed. This is useful for isolating an average over within-type wage responses, but it is not the same as the effect of the shock on the commuting zone’s actual wage distribution. The latter also reflects how the shock changes who remains in the zone, which sectors shrink, and where different worker types fall in the post-shock wage distribution. This distinction arises because quantiles of a mixture are not mixtures of quantiles. Even if the wage loss at every given quantile were identical across different education groups, the direct effect δ(u) would vary with u because the composition of workers at each group quantile u varies. If the shock also induces selective out-migration of non-college workers, the composition-fixed effect and the effect on the observed CZ wage distribution can diverge further. The IVFR estimand is the latter object: the effect of import competition on the com-muting zone’s distribution as a group-level outcome. This is the relevant counterfactual for a policymaker asking what happened to the local wage distribution in the affected region. A composition-fixed estimand answers a different question: what would have happened to within-type wages if the worker composition had been held fixed. Both objects are useful, but they correspond to different counterfactuals. 
+
+3.2.1 Relationship to existing estimators 
+
+We now compare IVFR to the estimators of CLP and MP. There are two cases. 
+
+Without individual-level covariates. When CLP and MP do not control for individual characteristics, their estimand coincides with ours: both identify the total effect β(u). In this case, working directly with random distributions at the group level, as the proposed IVFR 10 estimator does, has several advantages. First, it allows us to avoid imposing any restrictions at the individual level, requiring only that the group quantile functions are linear in group-level covariates, while the individual-level structure can be fully nonparametric. Moreover, our framework also explicitly allows for misspecification of this group-level linear structure. By contrast, the statistical results in CLP and MP depend on the linear structure at the individual as well as group level. Second, our Fr´ echet regression formulation clarifies that estimation can proceed in a single step: regressing the group-level quantile functions on the treatment. Third, by projecting the quantile functions and recovering coefficients by OLS, our estimator can exploit the functional nature of the data to improve precision, as formally shown in Theorem 1 below. Fourth, our estimator for β(u) is guaranteed to produce valid quantile functions at every observed covariate value, while CLP and MP are not. 2
+
+Indeed, the simulations of Section 5 show projection gains of up to 63% in IMSE, driven by finite-sample non-monotonicity in the fitted quantile functions. In our replication of CLP’s empirical application in Section 6, the fitted conditional wage quantile functions implied by unprojected IVFR violate monotonicity in around 2% of CZ–decade cells, so the projected point estimates are close to the unprojected ones. However, the projected bootstrap still delivers meaningfully tighter confidence bands. 
+
+With individual-level covariates. When CLP and MP control for individual character-istics Wij , they identify the direct (within-type) effect δ(u). As discussed above, these are different estimands, and which estimand is of interest depends on the application and the question being asked. Finally, we emphasize that, in the presence of individual-level covariates, the instrument exogeneity assumption in CLP and MP is not weaker than the analogous assumption in IVFR without individual-level covariates. When the instrument used to identify the group-level treatment varies at the group level, our condition E[ ˜Zj ηj (u)] = 0 is equivalent to the orthogonality condition between the instrument and the group-level unobservable imposed by CLP and MP. Individual-level covariates change the estimand from a total group-level effect to a conditional/direct effect but do not weaken the required exclusion restriction for the group-level IV variation. This differs from the standard logic that conditioning on covariates can make the instrument exogeneity assumption more credible. See Appendix B.4 for a formal derivation. Note that, due to its functional nature, IVFR does not support the inclusion of individual-level covariates. Formulating a version of distribution-valued regression with individual-level covariates is an interesting avenue for future research, see also 
+
+> 2One could, alternatively, achieve the last two points by using monotone rearrangement instead of pro-jection (Chernozhukov et al., 2010). However, unlike projection, rearrangement does not naturally arise in the Fr´ echet regression framework, and one would lose the (IV-weighted) barycenter interpretation.
+
+11 the distribution-on-distribution regression approaches of Oliva et al. (2013) and Ghodrati and Panaretos (2022). 
+
+## 3.3 The IVFR estimator 
+
+The IVFR estimator solves the sample analogue of the population Fr´ echet IV problem (3) at each observed covariate value, and recovers the linear parametrization by OLS: ˆβIVFR (u) = ( ˆXT ˆX)−1 ˆXTΠQ( ˆψXj )( u), (7) where ˆX is the n×(p+1) matrix with rows (1 , (Xj −ˆμX )T), and ˆψx(u) := 1
+
+> n
+
+Pni=1 ˆsi(Zi, x ) QYi (u)is the IV-weighted average quantile curve at x, with plug-in IV weights ˆsj (Zj , x ) := 1 + ( x − ˆμX )T( ˆΣT 
+
+> ZX
+
+ˆΣ−1 
+
+> ZZ
+
+ˆΣZX )−1 ˆΣT 
+
+> ZX
+
+ˆΣ−1 
+
+> ZZ
+
+(Zj − ˆμZ ).
+
+Since ˆψx(u) is linear in x, it defines the unprojected coefficient functions ˜β(u) = ( ˜β0(u), ˜β1(u)T)T
+
+with ˆψx(u) = ˜β0(u) + ˜β1(u)T(x − ˆμX ). As above, because the IV weights can be negative, ˆψXj (·) may not be monotone. The projection Π Q maps each IV-weighted average onto the space of valid quantile functions, yielding ˆQ(Xj , u ) := Π Q( ˆψXj )( u)—the closest valid probability distribution (in W2) to the IV-weighted average at covariate value Xj . This is the sample IV-Fr´ echet barycenter, the sample analogue of the population projection (4). It can be computed as an isotonic regression by the pool-adjacent-violators algorithm (PAVA) (Ayer et al., 1955; Miles, 1959; Kruskal, 1964). If only samples from the distribution Yj are available, we replace QYj (u) by the empirical quantile function bQYj (u). We show in Section 4.4 below that under a weak condition on the relationship between within- and across-group sample sizes, this additional first-stage estimation does not affect our asymptotic results. The projection guarantees that each ˆQ(Xj , ·) is a valid quantile function and is closer to the true structural quantile function q(Xj , ·) than the unprojected ˆψXj in all Lp norms (Lemma 2 below). The OLS step in (7) then recovers the linear parametrization from the projected quantile functions. 12 4 Theoretical properties of IVFR 
+
+## 4.1 Finite-sample properties 
+
+In this section, we study the finite sample properties of the IVFR projection step and show that it decreases the estimation error. The first lemma shows that the projection step decreases the estimation error in the quantile function. This is a classical property of isotonic projections (Robertson et al., 1988) and is reproduced from Van Dijcke (2025, Lemma 2). 
+
+Lemma 2 (Improvement in estimation: quantile function) . Suppose that ˆQ is an estimator of some true quantile function Q0 ∈ Q . Then ˆQ∗ = Π Q( ˆQ) satisfies ∥ ˆQ∗ − Q0∥Lp ≤ ∥ ˆQ − Q0∥Lp
+
+for all p ∈ [1 , ∞].
+
+Applied to IVFR, this result implies that at each observed Xj , the projected ˆQ(Xj , ·) = ΠQ( ˆψXj ) is closer to any valid quantile function than the unprojected ˆψXj , in every Lp norm. Next, we show that this improvement translates into finite sample improvements for the proposed estimator of the coefficient functions, which are often the main objects of interest. Throughout, let b = ( b0, b 1) with b0 : [0 , 1] → R and b1 : [0 , 1] → Rp denote reference coefficients such that qb(Xj , ·) := b0(·) + b1(·)T(Xj − ˆμX ) ∈ Q for all j = 1 , . . . , n . The results below hold for any such b, and no assumption on the linear model (1) is needed. In practice, b is set equal to the estimation target. Under correct specification of (1), setting 
+
+b0(u) = β0(u) + (ˆ μX − μX )Tβ1(u) and b1 = β1 gives qb(Xj , u ) = q(Xj , u ) ∈ Q , so the bounds measure the estimation error for the true coefficients ( β0, β 1). Under misspecification, a natural choice is the pseudo-true parameter b = βunc : under Assumption 6 below, it produces strictly increasing quantile functions for all x ∈ X with slope at least κ > 0, so qb(Xj , ·) ∈ Q 
+
+for all j with probability approaching one as n → ∞ . In either case, the projection brings the IVFR coefficients closer to the target than their unprojected counterparts. 
+
+Theorem 1 (Improvement in estimation: joint coefficients) . Let b = ( b0, b 1) be any target coefficients such that qb(Xj , ·) ∈ Q for all j = 1 , . . . , n . Then for any realization of the sample, 
+
+∥ ˆβIVFR 0 − b0∥2 
+
+> L2
+
++ ∥ ˆβIVFR 1 − b1∥2ˆΣXX ,L 2 ≤ ∥ ˜β0 − b0∥2 
+
+> L2
+
++ ∥ ˜β1 − b1∥2ˆΣXX ,L 2 , (8) 
+
+where ˆΣXX = 1
+
+> n
+
+Pnj=1 (Xj − ˆμX )( Xj − ˆμX )T and, for a vector-valued function f : [0 , 1] → Rp,
+
+∥f ∥2ˆΣXX ,L 2 := 
+
+Z 10
+
+f (u)T ˆΣXX f (u) d u. 
+
+13 We emphasize that Theorem 1 does not assume the linear model (1). The bound in Theorem 1 is a weighted joint improvement for estimating ( b0, b 1). It does not guarantee an improvement for estimating any b1,k separately. The following results provide conditions under which the slope coefficients also improve individually. To isolate individual slope coefficients, we use the Frisch–Waugh–Lovell (FWL) decom-position and the variational characterization of the isotonic projection. Let C be the n × p
+
+matrix with rows ( Xj − ˆμX )T, write ck for its k-th column and C−k for C with column k
+
+removed. Define the FWL residual rk := M−kck with M−k := In − C−k(CT
+
+> −k
+
+C−k)−1CT
+
+> −k
+
+,let rjk denote its j-th entry, and set Jk := {j ≤ n : rjk ̸ = 0 } and ˆ vk := 1
+
+> n
+
+Pnj=1 r2 
+
+> jk
+
+> 0. Let πk denote the coefficient vector from the sample linear projection of ck on C−k, so that 
+
+ck = C−kπk + rk. For a given target b, define the nuisance estimation error 
+
+ejk (u) := ( ˜β0 − b0)( u)
+
+| {z }
+
+> intercept error
+
++ cT
+
+> j, −k
+
+( ˜β1,−k − b1,−k)( u) + πk( ˜β1,k (u) − b1,k (u)) | {z }
+
+> nuisance slope errors
+
+, (9) which collects all estimation errors except the error in the k-th slope along the residualized variation rjk . This decomposition is justified by the algebraic identity, ˆψXj (u) = qb(Xj , u ) + ejk (u) + rjk 
+
+  ˜β1,k (u) − b1,k (u), (10) which separates the unprojected fitted curve ˆψXj into three components: the target quantile function qb(Xj , ·), the nuisance error ejk , and the k-th slope error along the identifying variation rjk .
+
+Proposition 2 (Improvement in estimation: isolated coefficients) . Let b = ( b0, b 1) be any reference coefficients such that qb(Xj , ·) ∈ Q for all j ∈ Jk. Fix k ∈ { 1, . . . , p }. Then for any realization of the sample, 
+
+∥ ˆβIVFR 1,k − b1,k ∥2 
+
+> L2
+
+≤ ∥ ˜β1,k − b1,k ∥2 
+
+> L2
+
+− 1
+
+nˆvk
+
+X
+
+> j∈Jk
+
+∥DXj ∥2 
+
+> L2
+
+− 2
+
+nˆvk
+
+X
+
+> j∈Jk
+
+⟨DXj , e jk ⟩L2 , (11) 
+
+where DXj (u) := ˆQ(Xj , u ) − ˆψXj (u) is the projection correction. 
+
+The bound (11) decomposes the change in k-th coefficient error into a projection gain 
+
+> 1
+> nˆvk
+
+P 
+
+> j∈Jk
+
+∥DXj ∥2 
+
+> L2
+
+, which is always non-negative, and a nuisance cross-term 2
+
+> nˆvk
+
+P 
+
+> j∈Jk
+
+⟨DXj , e jk ⟩L2 ,which captures the interaction between projection corrections and nuisance estimation errors and can be negative or positive. An improvement obtains whenever the nuisance cross-term is positive, or when it is negative but does not overwhelm the projection gain. The following corollary gives a sufficient condition that eliminates the nuisance cross-term entirely, thus 14 guaranteeing an improvement. 
+
+Corollary 1 (Sufficient condition for coefficient-wise improvement) . Under the setup of Proposition 2, if the nuisance errors do not make the target quantile functions non-monotonic, i.e., 
+
+qb(Xj , ·) + ejk (·) ∈ Q for every j ∈ Jk, (12) 
+
+then the nuisance cross-term in (11) is eliminated and 
+
+∥ ˆβIVFR 1,k − b1,k ∥2 
+
+> L2
+
+≤ ∥ ˜β1,k − b1,k ∥2 
+
+> L2
+
+− 1
+
+nˆvk
+
+X
+
+> j∈Jk
+
+∥DXj ∥2 
+
+> L2
+
+≤ ∥ ˜β1,k − b1,k ∥2 
+
+> L2
+
+. (13) The decomposition (10) clarifies what condition (12) requires: the error in the k-th slope along the identifying variation rjk must be necessary for any monotonicity violations in ˆψXj .The nuisance errors ejk may erode the monotonicity margin of qb(Xj , ·), but as long as they do not destroy it entirely, every projection correction is fixing a violation attributable to the β1,k 
+
+error. Put differently, (12) requires qb(Xj , ·) to increase steeply enough to absorb whatever local decreases ejk introduces. Since every term in ejk is Op(n−1/2) uniformly in u and 
+
+j—the latter by Assumption 5, which bounds ∥cj, −k∥—the condition holds asymptotically whenever the target quantile functions have slopes bounded away from zero. This is the same requirement needed for uniform convergence of the estimators, formalized in Assumption 6 below. When p = 1, there is no partialling out ( rj1 = Xj − ˆμX ), the nuisance slope term in 
+
+ej1 vanishes, and (12) reduces to qb(Xj , ·) ∈ Q : the assumed monotonicity of the target. Theorem 1 and Proposition 2 sit at two ends of a spectrum. Theorem 1 requires no additional assumptions beyond valid reference coefficients, but guarantees improvement only for all coefficients jointly. Proposition 2 isolates improvements coefficient by coefficient, at the cost of requiring condition (12) on which errors drive the monotonicity violations. Anatural intermediate approach is to pick a subset S of coefficients for which (12) is expected to hold. The same argument then yields an improvement result for that subset, with the nuisance error collecting only estimation errors from the intercept and the slopes outside S.
+
+## 4.2 Asymptotic distribution 
+
+In this section, we establish functional central limit theorems for the IVFR estimator under weak conditions. We do not require the linear model (1) to hold in population. When the full group-level quantile functions are observed for each group, the unprojected results allow these quantile functions to be discrete. For the projected results, we impose below an average smoothness condition that rules out synchronized jumps at fixed quantile indices 15 while still allowing individual group distributions to have atoms and flat parts. This contrasts with existing inferential results for global Wasserstein-Fr´ echet regression (Petersen et al., 2021) and grouped quantile methods (e.g., CLP; MP), which typically impose density or pathwise smoothness conditions. Throughout this section, we work on [ a, b ] ⊂ (0 , 1), and the projection Π Q should hence be understood with respect to the relevant cone of monotone functions in L2([ a, b ]). 
+
+Assumption 3 (Sampling) . {(Zj , X j , Y j )}nj=1 is sampled i.i.d. from the joint distribution F
+
+on Rl × Rp × Y , where Y is the space of CDFs with finite second moments. 
+
+Assumption 4 (Finite 4th moments) . sup u∈[a,b ] E[|QYj (u)|4] < ∞, E[∥Zj ∥4] < ∞, and 
+
+E[∥Xj ∥4] < ∞.
+
+Assumption 4 corresponds to the standard 4th moment condition in linear IV regression (e.g., Hansen, 2022). To establish the weak convergence of the fully projected IVFR coefficients, we will addi-tionally impose a boundedness restriction on the covariates. 
+
+Assumption 5 (Bounded support) . The support X of X is bounded: sup x∈X ∥x − μX ∥ ≤ B
+
+for some B < ∞.
+
+Assumption 3 requires i.i.d. sampling across groups, but importantly leaves the within-group sampling scheme fully unrestricted. Additionally, Assumptions 4 and 5 are implied by the assumptions of CLP and MP, who assume bounded support of both X and Z.The next assumption requires that ψx(·) is uniformly strictly increasing on [ a, b ] with slope ≥ κ, for all x in the support. 
+
+Assumption 6 (Average strictness) . There exists κ > 0 such that for all c < d with [c, d ] ⊂
+
+[a, b ] and all x ∈ X ,
+
+E
+
+h
+
+s(Z, x ) QY (d) − QY (c)
+
+i
+
+≥ κ (d − c).
+
+Assumption 6 is weaker than requiring every group to have a density bounded away from zero (as, e.g., in CLP). In particular, it allows for flat parts and atoms in individual group quantile functions. The assumption only requires that, on every quantile interval, a non-negligible IV-weighted share of groups contributes a positive increment. Technically, Assumption 6 gives ψx a uniform monotonicity margin on [ a, b ], so the projection is asymp-totically inactive and the functional delta method applies. Note that Assumption 6 does not require smoothness. It is implied by a fixed positive IV-weighted fraction of groups locally “moving” (heterogeneous supports/atoms). See Remark 1 below for the case where Assumption 6 fails. 16 For the projected asymptotic results, we also require a mild average smoothness condition on the cross-group average quantile process. 
+
+Assumption 7 (Average Lipschitz quantile increments) . There exists K < ∞ such that for all c < d with [c, d ] ⊂ [a, b ], and all x ∈ X 
+
+E[s(Z, x ) ( QY (d) − QY (c))] ≤ K(d − c).
+
+Assumption 7 is an average continuity condition in the quantile index. It allows individual group distributions to have atoms, but rules out a positive mass of groups having a jump at the same quantile index. It is weaker than the pathwise Lipschitz conditions imposed in CLP on the underlying group-specific coefficient and error processes. Note that it is distinct from Assumption 6. Assumption 6 gives a lower bound on the IV-weighted population slope, while Assumption 7 gives an upper bound. With these assumptions in hand, we now first establish functional CLTs for the unpro-jected and projected estimators of the structural quantile function at a fixed x, respectively. 
+
+Theorem 2 (CLT for the unprojected quantile function) . Under Assumptions 2–4, for each fixed x ∈ X , √n  ˆψx(·) − ψx(·) ⇝ Gx(·) in ℓ∞([ a, b ]) ,
+
+where Gx is a tight mean-zero Gaussian process with covariance kernel 
+
+Γx(u, u ′) = E[ϕx(W ; u)ϕx(W ; u′)] ,
+
+and ϕx(W ; u) is the influence function of ˆψx(u), given in Appendix E. Under correct speci-fication, this reduces to ϕx(W ; u) = s(Z, x )η(u).
+
+Theorem 3 (CLT for the projected quantile function) . Under the assumptions of Theorem 2 and Assumptions 6 and 7, for each fixed x ∈ X ,
+
+√n
+
+
+
+ΠQ( ˆψx)( ·) − ψx(·)
+
+
+
+⇝ Gx(·) in ℓ∞([ a, b ]) ,
+
+with the same Gaussian limit process as in Theorem 2. 
+
+The next two theorems establish functional CLTs for the unconstrained and IVFR esti-mators of the coefficient vector, respectively. 
+
+Theorem 4 (CLT for the unconstrained coefficients) . Under Assumption 2–4, 
+
+√n  ˜β(·) − βunc (·) ⇝ Gβ (·) in ℓ∞([ a, b ]) p+1 ,
+
+17 where Gβ is a tight mean-zero Gaussian process with covariance kernel 
+
+Ω( u, u ′) = T EΦ( u) Φ( u′)T TT,
+
+with T := diag(1 , S 0), S0 := (Σ T 
+
+> ZX
+
+Σ−1 
+
+> ZZ
+
+ΣZX )−1ΣT 
+
+> ZX
+
+Σ−1 
+
+> ZZ
+
+, and score 
+
+Φ( u) := QY (u) − E[QY (u)] ˜Z ξ (u)
+
+!
+
+∈ R1+ l, ξ(u) := QY (u) − XTβunc (u).
+
+In particular, the slope–slope block of Ω is S0 E[ ˜Z ˜ZTξ(u)ξ(u′)] ST 
+
+> 0
+
+. Under correct specification, 
+
+βunc (u) = β(u) and ξ(u) = η(u).
+
+Theorem 5 (CLT for the IVFR estimator) . Under Assumptions 2–7, 
+
+√n  ˆβIVFR (·) − βIVFR (·) ⇝ Gβ (·) in ℓ∞([ a, b ]) p+1 ,
+
+the same Gaussian process as the unprojected estimator. 
+
+Under these conditions, the IVFR estimator has the same asymptotic variance as its unprojected variant, while Theorem 1 guarantees smaller finite-sample error. 
+
+Remark 1 (Inference when Assumption 6 fails) . If one does not maintain Assumption 6, the projection need not be asymptotically inactive. In that case, inference can in principle be based on the Hadamard directional differentiability of the isotonic projection map. If 
+
+√n( ˆψx − ψx) ⇝ Gx,
+
+then the directional delta method gives 
+
+√n{ΠQ( ˆψx) − ΠQ(ψx)} ⇝ DΠQ(ψx)[ Gx].
+
+Under Assumption 6, this derivative is the identity. When the monotonicity constraint binds, for instance because ψx has flat segments or because ψx /∈ Q , the derivative instead projects the perturbation onto the relevant tangent/critical cone, so the limit is generally non-Gaussian. Inference can then be conducted using methods for directionally differentiable functionals (e.g., Fang and Santos, 2019). 
+
+18 4.3 Inference 
+
+Under the conditions of Theorem 5, projected and unprojected IVFR share the limiting process Gβ . Therefore, one can use the unprojected influence functions as a starting point for developing inference procedures. We now describe pointwise and uniform procedures, distinguishing unprojected and projected variants. The uniform bootstrap confidence band results are new to the literature. 
+
+Pointwise inference. Write ¯Qn(u) := n−1 Pnj=1 QYj (u) for the cross-group average quan-tile function. For unprojected estimator ˜β(u), the asymptotic variance at a fixed u0 is Ω( u0, u 0)/n from Theorem 4. A consistent estimator is ˆΩ( u0, u 0) = ˆT 1
+
+n
+
+> n
+
+X
+
+> j=1
+
+ˆΦj (u0) ˆΦj (u0)T
+
+!
+
+ˆTT,
+
+where ˆT = diag(1 , ˆS2SLS ), ˆS2SLS is the sample analogue of S0, and the score is ˆΦj (u) = QYj (u) − ¯Qn(u)(Zj − ¯Zn) ˆξj (u)
+
+!
+
+, ˆξj (u) = QYj (u) − ˆXT 
+
+> j
+
+˜β(u).
+
+The sandwich pointwise (1 − α) CI for βk(u0) is ˜βk(u0) ± z1−α/ 2 ˆσk(u0)/√n, where ˆ σ2
+
+> k
+
+(u0) := ˆΩkk (u0, u 0). For the IVFR estimator, the projected pointwise CI replaces ˜β with ˆβIVFR and recomputes the residuals accordingly: define ˆξIVFR  
+
+> j
+
+(u) := QYj (u) − ˆXT 
+
+> j
+
+ˆβIVFR (u) and ˆΦIVFR  
+
+> j
+
+(u) = QYj (u) − ¯Qn(u)(Zj − ¯Zn) ˆξIVFR  
+
+> j
+
+(u)
+
+!
+
+,
+
+with ˆΩIVFR and ˆ σIVFR  
+
+> k
+
+defined analogously. Under the conditions of Theorem 5, both variance estimators are consistent for Ω. However, the projected residuals ˆξIVFR  
+
+> j
+
+are closer to the population residuals in finite samples (by Theorem 1), which can yield tighter pointwise CIs, as we demonstrate in the simulations and the empirical application below. 
+
+Uniform inference. For uniform confidence bands over u ∈ [a, b ], we use a multiplier bootstrap. Let {ωj }nj=1 be i.i.d. multiplier weights independent of the data satisfying E[ωj ] = 19 0, E[ω2 
+
+> j
+
+] = 1, and E|ωj |2+ δ < ∞ for some δ > 0. The unprojected bootstrap process is ˆG∗ 
+
+> β
+
+(u) = ˆT 1
+
+√n
+
+> n
+
+X
+
+> j=1
+
+ωj ˆΦj (u).
+
+Throughout, P x and Ex denote probability and expectation conditional on the data (i.e., with respect to the multiplier weights only). Recall that ˆG∗ 
+
+> β
+
+⇝P Gβ denotes conditional weak convergence in probability (van der Vaart and Wellner, 1996, Section 2.9). The following theorem establishes the conditional weak convergence of ˆG∗ 
+
+> β
+
+.
+
+Theorem 6 (Multiplier bootstrap validity) . Let Assumption 2–4 hold, and let {ωj }nj=1 be i.i.d. multipliers, independent of the data, satisfying E[ωj ] = 0 , E[ω2 
+
+> j
+
+] = 1 , and E|ωj |2+ δ < ∞
+
+for some δ > 0. Then, conditionally on the data, 
+
+ˆG∗ 
+
+> β
+
+(·) ⇝P Gβ (·) in ℓ∞([ a, b ]) p+1 ,
+
+where Gβ is the Gaussian process in Theorem 4. 
+
+The (1 − α) unprojected uniform band for βk(u) is ˜βk(u) ± ˆc1−α · ˆσk(u)/√n, where ˆ c1−α
+
+is the (1 − α)-quantile of sup u∈[a,b ] | ˆG∗
+
+> β,k
+
+(u)|/ˆσk(u) conditional on the data. In practice, we sample ωj ∼ N (0 , 1), which satisfies the general conditions on the weights and is the standard approach. The projected bootstrap constructs the bootstrap process differently: for each draw of multiplier weights, it computes bootstrap unconstrained coefficients ˜β∗(u), evaluates ˆψ∗ 
+
+> Xj
+
+(u) := ˜β∗ 
+
+> 0
+
+(u) + ˜β∗ 
+
+> 1
+
+(u)T(Xj − ˆμX ) at each observed Xj , applies Π Q to each curve, and recovers projected bootstrap coefficients ˆβIVFR ,∗(u) according to Eq. (7). The projected bootstrap process is ˆGIVFR ,∗ 
+
+> β
+
+(u) := √n( ˆβIVFR ,∗(u) − ˆβIVFR (u)), and the projected uniform band for βIVFR  
+
+> k
+
+(u) is constructed as above but with ˆGIVFR ,∗ 
+
+> β
+
+replacing ˆG∗ 
+
+> β
+
+, ˆβIVFR replacing ˜β,and ˆ σIVFR  
+
+> k
+
+replacing ˆ σk. As in the pointwise case, the projected bootstrap generally yields tighter pointwise CIs, as confirmed by the simulations and applications below. The following corollary establishes its validity. 
+
+Corollary 2 (Projected bootstrap validity) . Under the assumptions of Theorem 6 and As-sumptions 5–7, the projected bootstrap satisfies 
+
+ˆGIVFR ,∗ 
+
+> β
+
+(·) ⇝P Gβ (·) in ℓ∞([ a, b ]) p+1 ,
+
+and yields asymptotically valid uniform confidence bands for βIVFR  
+
+> k
+
+(u).
+
+20 4.4 Empirical quantile functions 
+
+In the previous sections, we have treated the group-level quantile functions QYj as observed objects. This is suitable for settings with population-level within-group data (e.g., when all workers in a commuting zone or firm are observed). Here, we consider the case where researchers only observe a sample of the within-group realizations. Suppose that for each group j, we observe draws Vjk , k = 1 , . . . , m j , from the distribution 
+
+Yj , which importantly need not be sampled i.i.d. The empirical distribution function and the associated empirical quantile function are 
+
+bYj (y) := 1
+
+mjmj
+
+X
+
+> k=1
+
+1{Vjk ≤ y}, bQYj (u) := inf {y : bYj (y) ≥ u}, u ∈ [a, b ].
+
+The feasible IV-weighted quantile curve is then ¯ψx(u) := 1
+
+n
+
+> n
+
+X
+
+> j=1
+
+ˆsj (Zj , x ) bQYj (u),
+
+and we let ¯˜β(u) = ( ¯˜β0(u), ¯˜β1(u)T)T denote the corresponding unconstrained coefficient func-tions defined by ¯ψx(u) = ¯˜β0(u) + ¯˜β1(u)T(x − ˆμX ).
+
+The projected feasible estimator is ¯βIVFR (u) := ( ˆXT ˆX)−1 ˆXTΠQ( ¯ψXj )( u),
+
+that is, the estimator obtained from (7) after replacing each QYj by bQYj . All other objects in Sections 3.3–4.3 are modified analogously. Under the following high-level condition, this additional within-group sampling step is asymptotically negligible. 
+
+Assumption 8 (High-level condition on empirical quantile functions) . There exist deter-ministic rates rmj ↓ 0 such that, with 
+
+Rn := max  
+
+> 1≤j≤n
+
+sup 
+
+> u∈[a,b ]
+
+bQYj (u) − QYj (u) ,
+
+we have 
+
+Rn = Op
+
+
+
+max  
+
+> 1≤j≤n
+
+rmj
+
+
+
+, √n max  
+
+> 1≤j≤n
+
+rmj → 0.
+
+Assumption 8 is stated in two parts. The first part requires that the stochastic fluctu-21 ations of the empirical quantile estimator are controlled uniformly over groups by a deter-ministic rate max j rmj , which follows from standard results under appropriate uniformity conditions, see Remark 2 below. Note that this allows for the within-group sampling to exhibit dependence by using appropriate quantile function estimators (e.g., Rio, 2017). Note that QYj is itself a random target, but convergence here is conditional on a given group j.The randomness of QYj across groups is accounted for in the across-group asymptotics above, and Assumption 8 only controls the additional within-group estimation error bQYj −QYj . The second part is a purely arithmetic growth condition ensuring that rate is fast enough relative to n. Together they imply √nR n = op(1), i.e., the first-stage quantile estimation error is uniformly smaller than the √n rate governing the across-group IV problem. The maximum over j appears because Proposition 3 below requires control uniformly across all groups. For instance, if mmin := min 1≤j≤n mj and the empirical quantiles satisfy 
+
+Rn = Op(m−1/2min ),
+
+then Assumption 8 reduces to the sufficient condition n/m min → 0. More generally, any quantile estimator whose uniform error over groups is op(n−1/2) can be used. 
+
+Remark 2 (Sufficient conditions under density regularity) . The high-level Assumption 8 can be verified under various primitive conditions, yielding different growth requirements on 
+
+mmin relative to n.(i) Distribution-free (DKW). The Dvoretzky–Kiefer–Wolfowitz inequality (Dvoretzky et al., 1956) gives, for each fixed group, sup u | bQYj (u) − QYj (u)| = Op(m−1/2 
+
+> j
+
+) under a uniform lower density bound. Since Assumption 8 requires the maximum over j = 1 , . . . , n , a union bound gives 
+
+Rn = Op
+
+r log nmmin 
+
+!
+
+.
+
+Thus, using the DKW inequality, Assumption 8 holds when 
+
+n log nmmin 
+
+→ 0.
+
+(ii) Bahadur linearization. If, additionally, the within-group densities are uniformly bounded away from zero and Lipschitz on the relevant support (as assumed in Assumptions 5 and 7 in CLP), one can decompose the empirical quantile error bQYj (u) − QYj (u) into a leading linear term plus a higher-order remainder. The leading Bahadur term is condi-tionally mean zero and is averaged across groups in the second stage. Its contribution 
+
+22 is therefore of order Op(( nm min )−1/2), hence op(n−1/2) whenever mmin → ∞ . The binding term is the uniform Bahadur remainder, which is of order max j sup u |rj (u)| =
+
+Op(m−3/4min (log( n∨mmin )) 3/4), which is faster than the m−1/2min rate from DKW. This yields the sufficient condition 
+
+n2/3 log( n ∨ mmin )
+
+mmin 
+
+→ 0,
+
+which matches CLP and is considerably weaker than n/m min → 0 in that it allows the within-group samples to be much smaller than the number of groups. We state Assumption 8 at a high level to accommodate both regimes and to separate the across-group IV theory (Sections 3.3–4.3) from the within-group estimation problem, which may employ quantile estimators other than the empirical quantile function. 
+
+The next proposition shows that, under Assumption 8, replacing the true group quantile functions by empirical ones has no first-order effect. 
+
+Proposition 3 (Empirical quantile convergence) . Suppose Assumptions 2, 4, and 8 hold. (i) For each fixed x ∈ Rp,
+
+∥ ¯ψx − ˆψx∥ℓ∞([ a,b ]) = op(n−1/2), ∥ΠQ( ¯ψx) − ΠQ( ˆψx)∥ℓ∞([ a,b ]) = op(n−1/2).
+
+(ii) The unconstrained coefficient functions satisfy 
+
+∥ ¯˜β − ˜β∥ℓ∞([ a,b ]) p+1 = op(n−1/2).
+
+(iii) The projected coefficient functions satisfy 
+
+∥ ¯βIVFR − ˆβIVFR ∥ℓ∞([ a,b ]) p+1 = op(n−1/2).
+
+As an immediate consequence, all of the limit theories in Section 4.2 continue to hold verbatim for the feasible estimators. 
+
+Corollary 3 (Asymptotic limits with empirical quantiles) . Under Assumption 8, the feasible estimators based on bQYj have the same weak limits as their infeasible counterparts based on 
+
+QYj . More precisely: (i) if the assumptions of Theorem 2 hold, then for each fixed x,
+
+√n  ¯ψx(·) − ψx(·) ⇝ Gx(·) in ℓ∞([ a, b ]); 23 (ii) if the assumptions of Theorem 3 hold, then for each fixed x,
+
+√n ΠQ( ¯ψx)( ·) − ψx(·) ⇝ Gx(·) in ℓ∞([ a, b ]); 
+
+(iii) if the assumptions of Theorem 4 hold, then 
+
+√n  ¯˜β(·) − βunc (·) ⇝ Gβ (·) in ℓ∞([ a, b ]) p+1 ;
+
+(iv) if the assumptions of Theorem 5 hold, then 
+
+√n  ¯βIVFR (·) − βIVFR (·) ⇝ Gβ (·) in ℓ∞([ a, b ]) p+1 .
+
+# 5 Monte Carlo simulations 
+
+To empirically validate the theoretical results above, we now compare unprojected and pro-jected IVFR across several DGP configurations. Unprojected IVFR coincides with the CLP and MP estimators without individual covariates, though algorithmically our estimator, by working directly with the quantile functions as outcomes, does not require first-stage quantile regression. For each, we report coefficient integrated mean squared error (IMSE), the average squared Wasserstein distance W 22 between estimated and true conditional quantile functions, (uniform) confidence band coverage, and computational benchmarks. Across the reported configurations, the IMSE improves by up to 63%. Our uniform and projected bootstraps also achieve correct nominal coverage with up to 1.4% smaller width in the simulations (10% in the empirical application). Finally, computational benchmarks show our one-step estimator is faster than the two-step estimators of CLP and MP without individual covariates (see Appendix C). 
+
+## 5.1 Data-generating process 
+
+The simulations use the grouped-data IV design in CLP as the benchmark. Given our focus on unconditional group-level treatment effect, we drop CLP’s individual-level covariate term (see the discussion in Section 3.2). The data-generating process (DGP) is 
+
+Yij = b0(Uij ) + Uij 
+
+2 + Xj γ(Uij ) + ( ζj − 12 )Uij +
+
+> p−1
+
+X
+
+> k=1
+
+Wjk hk(Uij ), (14) 24 where Uij ∼ U (0 , 1), ζj ∼ U (0 , 1) and 
+
+X0 
+
+> j
+
+= ( πZ + δ(ζj − 12 )) Zj + ζj + νj , Zj , ν j ∼ exp(0 .25 N (0 , 1)) .
+
+The terms Uij /2 and ( ζj − 1/2) Uij are written separately to match CLP’s location term and group error. Together they equal ζj Uij .Panel D in Table 1 is the exact no-individual-covariate CLP benchmark. If b0 ≡ 0, 
+
+γ(u) = √u, πZ = 1, δ = 0, p = 1, and Xj = X0 
+
+> j
+
+, then 
+
+yij = Xj
+
+√uij + ζj uij , Xj = Zj + ζj + νj ,
+
+which gives the DGP in CLP Appendix A with the individual covariate term omitted. The derivative of this population quantile function is Xj /(2 √u)+ ζj , so the benchmark is strongly monotone because Xj > 0 and ζj ≥ 0. Panels A–C keep the same first-stage endogeneity but add features that are common in applications: moderate instruments, controls, heterogeneous first stages, and treatment effects that need not be monotone in u. In these panels we standardize the endogenous first stage, ¯X0 
+
+> j
+
+= ( X0 
+
+> j
+
+− ¯X0)/s X0 , and set Xj = BX tanh( ¯X0 
+
+> j
+
+/B X ) with BX = 1 .5 to make sure 
+
+X has bounded support without artificially clipping the range. Controls, when included, are bounded in the same way: Wjk = BW tanh( ˜Wjk /B W ) with BW = 1 .5. Panel B sets their true effects to zero, so it isolates the finite-sample cost of estimating extra nuisance coefficient functions. Panel C uses mixed control effects: odd controls have hk(u) = u and even controls have hk(u) = 0 .1 sin( kπu ). The treatment coefficient is 
+
+γ(u) = √u + βslope sin(2 πu ),
+
+so βslope = 0 gives the CLP coefficient and βslope > 0 adds curvature. The extra baseline term b0(u) = σq 0(u) lets us vary the shape of the within-group outcome distribution while preserving valid population quantile functions. For Panels A–C, we choose 
+
+σ analytically. Let m0 = inf u∈[a,b ] q′
+
+> 0
+
+(u), Lγ = sup u∈[a,b ] |γ′(u)|, and Lk = sup u∈[a,b ] |h′
+
+> k
+
+(u)|.We set 
+
+σm 0 > B X Lγ + BW
+
+X
+
+> k
+
+Lk.
+
+Then every population quantile function generated by the DGP is strictly increasing on [a, b ]. Any monotonicity violations reported below are therefore finite-sample violations in the fitted 2SLS curves, not failures of the population DGP. 25 5.2 Results 
+
+Table 1 reports coefficient IMSE, W 22 , and the fraction of groups with non-monotone fitted curves, all averaged over 500 replications with 19 quantile grid points from u = 0 .05 to 
+
+u = 0 .95. Unless otherwise noted, the designs use n = 50 groups and N = 50 observations per group. Table 1: Monte Carlo results: IMSE and W 22 improvement from projection. 
+
+Coefficient IMSE W 22
+
+Unproj. Proj. % Gain Unproj. Proj. % Gain Inv. (%) 
+
+Panel A: Instrument strength (n = 50, N = 50, CLP-base first stage) 
+
+F
+
+5 31.06 11.54 62.8 17.82 9.38 47.3 14.7 10 0.389 0.359 7.9 0.291 0.275 5.4 5.8 21 0.155 0.155 0.4 0.156 0.156 0.2 1.4 
+
+Panel B: Included controls & heterogeneous first stage (n = 50, N = 50, median F ≈ 11–20) 
+
+p = 1, δ = 0 .0 0.155 0.155 0.4 0.156 0.156 0.2 1.4 
+
+p = 1, δ = 0 .5 0.912 0.656 28.1 0.637 0.509 20.2 4.7 
+
+p = 2, δ = 0 .0 0.139 0.137 1.2 0.164 0.163 0.5 1.7 
+
+p = 2, δ = 0 .5 0.615 0.435 29.4 0.467 0.376 19.6 5.2 
+
+p = 5, δ = 0 .0 0.184 0.182 1.1 0.245 0.244 0.4 2.6 
+
+p = 5, δ = 0 .5 0.654 0.494 24.5 0.515 0.437 15.1 6.5 
+
+Panel C: Realistic combination (n = 50, N = 25, median F ≈ 11) 
+
+p = 5, δ = 1 .0, LN, βslope = 0 .2 9.23 7.42 19.6 7.85 6.94 11.5 13.0 
+
+Panel D: CLP no-individual-covariate benchmark (median F shown by row) 
+
+F ≈ 11, ( n, N ) = (25 , 25) 0.281 0.233 17.0 0.071 0.066 7.2 11.2 
+
+F ≈ 11, ( n, N ) = (25 , 50) 0.274 0.249 8.8 0.067 0.064 3.7 6.3 
+
+F ≈ 20, ( n, N ) = (50 , 50) 0.024 0.024 0.1 0.033 0.033 0.0 1.3 
+
+Notes: 500 replications; n = 50, N = 50 unless noted; 19 quantile grid points ( u = 0 .05 , . . . , 0.95). IMSE = R ∥ ˆβ1(u) − β1(u)∥2 du averaged over replications; W 22 : average squared Wasserstein distance between estimated and true conditional distributions; “Inv.”: fraction of groups with non-monotone fitted ˆψXj .Panel A varies the first-stage F -statistic ( p = 1, no controls). Panel B adds included controls ( p) with zero true direct effects and first-stage heterogeneity ( δ), isolating the finite-sample cost of estimating nuisance coefficient functions; its first-stage F range reflects the displayed rows. Panel C combines small cells, many controls, a heterogeneous first stage, lognormal outcomes, treatment heterogeneity, and a first stage above the usual weak-instrument threshold. All panels build on the CLP Appendix-A grouped-data structure. Panel D replicates the exact DGP from CLP: Yij = Xj
+
+pUij + ζj Uij and Xj = Zj + ζj + νj , with uncentered log-normal Zj and νj .
+
+Instrument strength (Panel A). With a lognormal base distribution, a single endoge-nous regressor, and no controls, the largest gains occur when the first stage is weak or moderate. At F ≈ 5, IVFR reduces IMSE by 63% and W 22 by 47%, with 15% of groups having non-monotone fitted distributions. At F ≈ 10 the corresponding gains fall to 8% and 5%. With a stronger first stage ( F ≈ 21), violations are rare and gains are close to zero. 26 Controls and heterogeneous first stage (Panel B). Panel B adds controls to the estimating equation while setting their true direct effects to zero. This isolates the finite-sample cost of estimating more nuisance coefficient functions. With δ = 0, increasing p from 1 to 5 raises the share of non-monotone fitted curves from 1.4% to 2.6%, while projection gains remain small. With first-stage heterogeneity ( δ = 0 .5), violations rise from 4.7% to 6.5%. The projection then matters for estimation: with p = 2, IMSE falls by 29% and W 22
+
+by 20%; with p = 5, the reductions are 25% and 15%. The gains need not be monotone in 
+
+p, but the invalid-rate column shows the dimensionality channel directly. Each additional regressor adds a dimension to the fitted curve ˆψXj (u) = ˜β0(u)+ P 
+
+> k
+
+˜β1,k (u)( Xjk − ˆμk), making it harder for all dimensions to satisfy monotonicity at once. 
+
+Realistic combination (Panel C). Panel C combines small cells ( N = 25), p = 5 controls, a heterogeneous first stage ( δ = 1), lognormal outcomes, treatment-effect curvature (βslope = 0 .2), and median first-stage F ≈ 11. This conservative stress test gives a 20% IMSE reduction and a 12% W 22 reduction. About 13% of fitted quantile functions are non-monotone under unprojected IVFR. 
+
+CLP benchmark (Panel D). Panel D is the exact no-individual-covariate CLP param-eter point described above. In this all-positive-treatment design, population monotonicity is very strong: Q′ 
+
+> Yj
+
+(u) = Xj /(2 √u) + ζj > 0. Projection gains are therefore concentrated at the smallest group counts, where sampling noise and weak first stages still create occasional fitted-curve violations. At ( n, N ) = (25 , 25), IMSE falls by 17%; by ( n, N ) = (50 , 50) the gain is essentially zero. 
+
+## 5.3 Inference 
+
+Theorem 5 establishes that projected and unprojected IVFR share the same asymptotic Gaussian process under the stated assumptions, so standard inference (sandwich SEs, mul-tiplier bootstrap) applies without modification. Table 2 reports pointwise and uniform coverage alongside band widths from 500 repli-cations with B = 500 bootstrap draws. For unprojected IVFR we use sandwich SEs and the unprojected bootstrap; for projected IVFR we use the projected bootstrap, which runs PAVA inside each bootstrap draw. The first three rows use the simple p = 1 design and vary 
+
+n and N while keeping the median first-stage F at about 10 or 20. The last three use the realistic design from Panel C and vary n and N , with a median F -statistic of 11 and 23. Coverage is near-nominal for both methods across all configurations, confirming the asymptotic equivalence in Theorem 5. The projection does not distort inference. Because 27 Table 2: Coverage and uniform band widths for β1(u) (nominal 95%). 
+
+PW coverage (%) UB coverage (%) UB width Unproj. Proj. Unproj. Proj. Unproj. Proj. ∆ width 
+
+Simple design ( p = 1 )
+
+n = 50, N = 25, F ≈ 10 95.4 95.4 93.8 93.8 2.31 2.28 −1.4% 
+
+n = 50, N = 50, F ≈ 10 95.5 95.5 94.0 94.0 1.74 1.73 −0.8% 
+
+n = 100, N = 50, F ≈ 20 95.5 95.5 95.8 95.4 1.25 1.25 −0.2% 
+
+Realistic design ( p = 5 , δ = 1 , βslope = 0 .2)
+
+n = 50, N = 25, F ≈ 11 95.6 95.7 96.8 96.6 6.97 6.94 −0.4% 
+
+n = 50, N = 50, F ≈ 11 94.6 94.6 93.8 93.8 5.23 5.19 −0.7% 
+
+n = 100, N = 50, F ≈ 23 95.6 95.6 95.8 95.8 3.67 3.66 −0.1%            
+
+> Notes: 500 replications; B= 500 multiplier bootstrap draws; lognormal base distribution throughout. PW: pointwise; UB: uniform band. Band widths are medians across replications. “∆ width”: percentage reduction in UB width for projected IVFR relative to unprojected IVFR. Unprojected IVFR uses sandwich SEs and the unprojected bootstrap; projected IVFR uses the projected bootstrap (projection applied inside each draw). Simple design rows use p= 1, δ= 0, and βslope = 0.
+
+IVFR has lower IMSE at comparable standard errors, it has weakly higher power for testing 
+
+β1(u) = 0. The projected bootstrap produces similar or narrower uniform bands for IVFR. In these coverage simulations, the reduction is below 1.5%; in the empirical CLP application it is about 10% (Section 6). The projected bootstrap captures the finite-sample regularization from the projection, yielding a weakly tighter critical value for the sup-statistic. 
+
+# 6 Empirical illustrations 
+
+We present two applications. Section 6.1 revisits the distributional effects of Chinese import competition on wages studied by Autor et al. (2013) and CLP, illustrating the finite-sample gains from the IVFR projection and inference. Section 6.2 studies the Food Stamp Program’s effect on birth weights analyzed by Almond et al. (2011) and MP, using the decomposition from Appendix B to compare the IVFR estimates to the conditional quantile treatment effect estimates. 
+
+## 6.1 Import competition and the wage distribution 
+
+We revisit the distributional effects of Chinese import competition on U.S. wages, following CLP and Autor et al. (2013) (ADH henceforth). Their setting is well-suited for illustrating IVFR: there is one endogenous group-level treatment (import exposure), a standard in-28 strument (other-country imports), and a distribution-valued outcome (the wage distribution within each commuting zone (CZ)). 
+
+Setting and data. CLP estimate the effect of rising Chinese imports on the distribution of log weekly wages across U.S. commuting zones. The unit of observation is a CZ–decade pair (j = 1 , . . . , 722 CZs, two periods: 1990–2000 and 2000–2007, giving n = 1 ,444 observations). For each CZ–decade, the outcome is the vector of 19 within-CZ empirical quantiles ˆQYj (uq)for uq ∈ { 0.05 , 0.10 , . . . , 0.95 }. The endogenous variable Xj is the change in Chinese import exposure per worker in commuting zone j. Following Autor et al. (2013), Zj is a shift-share instrument that assigns Chinese exports to other high-income countries to each CZ using lagged local industry employment shares, isolating China-side supply variation. The IV regression of ˆQYj (u) on Xj at the CZ level includes six continuous controls (manufacturing employment share, college share, foreign-born share, female employment share, routine task intensity, outsourcing exposure), eight census region dummies, and a period dummy, with the same controls included in the instrument vector Zj . Regressions are weighted by CZ start-of-period population and standard errors are clustered by state (using a cluster multiplier bootstrap for the uniform bands). The first-stage F -statistic is 533, so the instrument is strongly relevant. We apply IVFR to this data and compare the results with the original CLP quantile-by-quantile 2SLS estimates, which do not include individual-level covariates. In their replication package, CLP estimate a 2SLS regression with the decade-equivalent change in CZ wage quantiles as outcome. To match this approach, we project the level quantile functions in each period and then recover the slope coefficients by OLS on the long difference between these projected quantile functions. Since both estimators share the same asymptotic distribution under the conditions of Theorem 5, any differences between them reflect the finite-sample effect of the IVFR projection step. 
+
+Results. Figure 1 overlays the CLP estimates (black circles) with the IVFR estimates (red triangles) for the full sample. Both series tell the same qualitative story: import competition depresses wages across the distribution, with the largest effects at lower quantiles (around 
+
+−1.4 log points at the 10th quantile) and smaller effects in the upper tail ( −0.4 to −0.5). The two coefficient functions are visually indistinguishable. The reason, as mentioned, is that CLP’s specification is in long differences so the natural object whose validity the IVFR projection enforces is the implied level CZ wage quantile function for each (CZ, decade) cell. Anchoring those level quantile functions at the IPUMS-derived 1990 baseline quantile, fewer than 2% violate monotonicity (0.0% in the full sample, 0.8% for females, 1.4% for males), and 29 the projection alters the slope by at most 0 .0012 log points at any quantile. This does not mean the projection is irrelevant: applying it inside the bootstrap still smooths the finite-sample distribution of the coefficient process and tightens the confidence bands reported below. −2.5 −2.0 −1.5 −1.0 −0.5 0.0 0.5               
+
+> 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9
+> Quantile
+> Coefficient (log points)
+> ADH 95% CI ADH Estimate CLP 95% CI
+> CLP IVFR
+> Pointwise CI Pointwise CI (proj.) Uniform CB Uniform CB (proj.)
+
+Full Sample 
+
+Figure 1: Chinese import competition and the U.S. wage distribution. 
+
+Notes: CLP estimates and IVFR estimates of the effect of Chinese import competition on log weekly wages, full sample ( n = 1 ,444). Black circles: CLP quantile-by-quantile 2SLS. Red triangles: IVFR. Dashed lines: CLP pointwise 95% CI (clustered by state). Red shaded bands around IVFR: projected bootstrap pointwise CI (darkest), sandwich pointwise CI (medium), and uniform confidence band (lightest), all clustered by state. Horizontal lines: ADH mean estimate and 95% CI from Autor et al. (2013). 
+
+Figure 1 displays four layers of confidence bands around the IVFR estimates. The two red bands show pointwise 95% CIs: the outer (lighter) band uses cluster-robust sandwich SEs (identical to those of CLP); the inner (darker) band uses projected-bootstrap SEs that apply PAVA inside each multiplier-bootstrap draw. The two blue bands show cluster-robust uniform 95% bands over u ∈ [0 .05 , 0.95]: the outer (lighter) band uses the unprojected multiplier-bootstrap critical value; the inner (darker) band uses the projected-bootstrap critical value. The uniform bands are new—CLP did not provide a procedure to construct uniform confidence bands. The projected pointwise CIs are on average 9.4% narrower than 30 the sandwich CIs (with reductions of up to 22% at quantiles where the unconstrained coeffi-cient function is most non-monotone, e.g. u = 0 .85); the projected uniform bands are 10.1% narrower at every u. Thus, the projection does meaningful empirical work for precision even though it does not change the CLP point estimate. Finally, we find that the unprojected multiplier-bootstrap SEs are within 1% of the sandwich SEs at every quantile, confirming that both estimate the same asymptotic variance. The uniform bands refine CLP’s conclusions about where effects are significant. CLP reported pointwise CIs, which reject the null of no effect at 12 of 19 quantiles. The projected pointwise CIs reject at 15 quantiles, illustrating the power gain coming from the narrower confidence bands. Pointwise inference, however, does not account for simultaneous testing across the quantile grid. The projected uniform band, which does, rejects the null at quantiles concentrated in the 10th–35th percentile range, plus u = 0 .75. The very bottom of the distribution ( u = 0 .05), where the CLP pointwise CI barely excludes zero, does not survive the uniform correction. Above the median, effects are negative but imprecisely estimated. The projection adds modest power here as well: the unprojected uniform bands reject at 6 quantiles, and the projection flips u = 0 .75 to significant. Import competition thus has its strongest and most robust effects on lower-middle wages, rather than at the very bottom of the distribution. 
+
+Subsampling exercise. The full CLP sample has 722 CZs, causing unprojected and pro-jected IVFR to produce near-identical point estimates, in line with the simulation evidence. As shown, the projection nonetheless still provides benefits in the form of tighter confidence bands. To further assess the practical gains from the projection step at smaller sample sizes, we subsample the data at various CZ counts and compare IMSEs. Concretely, for each subsample size M ∈ { 75 , 100 , 150 , 200 , 350 , 500 }, we draw 500 ran-dom subsets of M commuting zones (keeping both decades for each CZ), re-estimate both un-projected and level-projected IVFR on each subsample, and compute the IMSE = R ( ˆβ1(u) −
+
+β∗ 
+
+> 1
+
+(u)) 2 du , where β∗ 
+
+> 1
+
+(u) is the full-sample IVFR estimate. We decompose the IMSE into integrated squared bias and integrated variance. Figure 2 reports the results. The left panel shows the bias-variance decomposition; both methods are variance-dominated at every sample size, with squared bias accounting for less than 10% of total IMSE. The projection’s effect is concentrated at the smallest sample sizes, where weaker first stages create larger fitted-CDF excursions for it to fix. At M = 75 (150 observations for 17 regressors), IVFR reduces IMSE by 14%, almost entirely through variance reduction. At M = 100 the gain shrinks to 1%, and at M ≥ 150 the projection has essentially no IMSE effect. The simulation results in Table 1 show the same pattern across 31 DGPs: projection improves the IMSE materially when instruments are weak or fitted curves are oscillatory. 
+
+## 6.2 Food stamps and the birth weight distribution 
+
+We now turn to the empirical application in MP, who study the effect of the Food Stamp Program (FSP) on birth weights. This setting provides a natural laboratory for the decom-position developed in Appendix B: the treatment (food stamps) is individually targeted but varies at the group level, creating a gap between the conditional quantile treatment effect 
+
+δ(u) estimated by MP and the group-level distributional effect β(u) estimated by IVFR. 
+
+Setting and data. Following Almond et al. (2011) and MP, we study the staggered county-level introduction of the FSP between 1964 and 1975. Groups are county–trimester cells; within-group units are births in a county–trimester. The outcome is birth weight in grams. We use natality microdata from the NCHS (1968–1977) merged with county-level food stamp adoption dates from Almond et al. (2011), restricting to births by Black mothers (n ≈ 2.8 million individual births in approximately 17,000 county–trimester groups with at least 25 observations). Controls include per capita income, government transfers, and 1960 county characteristics interacted with a linear time trend. All regressions include county, 0123             
+
+> 75 100 150 200 350 500
+> Number of Commuting Zones
+> IMSE
+> CLP Variance CLP Bias² IVFR Variance IVFR Bias²
+> Bias−Variance Decomposition
+> No improvement
+> 50% 60% 70% 80% 90% 100%
+> 75 100 150 200 350 500
+> Number of Commuting Zones
+> IMSE Ratio (IVFR / 2SLS)
+> IVFR Relative Efficiency
+
+Figure 2: Unprojected vs. projected IVFR IMSE in CLP subsampling exercise 
+
+Notes: Left panel: IMSE bias–variance decomposition for unprojected and projected IVFR at different numbers of commuting zones M (M = 50 excluded; both methods have IMSE > 170). Bars show integrated variance (dark) and integrated squared bias (light), stacked. Right panel: IMSE ratio (IVFR); values below 100% indicate IVFR outperforms. Based on 500 random subsamples per M , with full-sample projected IVFR as target. 
+
+32 state ×year, and trimester fixed effects, with standard errors clustered by county. The treatment indicator fsp ct equals one if a food stamp program was in place at least three months before birth in county c in trimester t. Identification in MP treats variation in FSP rollout as quasi-random, conditional on controls, so both estimators use Z = X.
+
+Estimands. MP estimate a conditional quantile model with individual-level covariates (child sex, mother’s age and its square, legitimacy status), 
+
+Q(u, bw ict | fsp ct , x 1ict , x 2ct , v ct ) = fsp ct δ(u) + x′ 
+
+> 1ict
+
+β(u) + x′ 
+
+> 2ct
+
+γ2(u) + α(u, v ct ), (15) where fsp ct was introduced above, x1ict are individual-level controls, x2ct are the county-level controls mentioned above, and α(u, v ct ) is the county-level unobservable. The coefficient δ(u)is the direct within-type effect: the shift in the u-th conditional quantile for a given type of mother. The IVFR estimand β1(u) targets the effect on the realized group quantile—the actual u-th percentile of birth weights in a county–trimester cell. 
+
+Results. We replicate the MP estimates using their mdqr package (Melly and Pons, 2025a) and estimate β1(u) via IVFR on the same data. Figure 3 shows the decomposition from equation (28): 
+
+β1(u) = δ(u) + E[ ¯Wj (1) − ¯Wj (0)] ′γ(u)
+
+| {z }
+
+> composition
+
++ E[∆ j (u; 1) − ∆j (u; 0)] 
+
+| {z }
+
+> re-ranking
+
+.
+
+The composition-fixed quantile Q⊕ 
+
+> Yj
+
+(u) is computed as the within-group mean of the first-stage fitted values from mdqr , and the re-ranking gap ∆ j (u) = QYj (u) − Q⊕ 
+
+> Yj
+
+(u) is the difference between the realized group quantile and this average. Each component is then regressed on fsp with the same fixed effects. At the 5th percentile, δ(0 .05) ≈ 26 grams (s.e. 9 .5): holding mother type fixed, FSP raises the conditional 5th percentile of birth weight by about 26 grams, a statistically significant effect. 3 Yet β1(0 .05) ≈ − 7 grams (s.e. 10 .8)—the actual 5th percentile of the county birth weight distribution does not significantly move. The 33-gram gap is almost entirely accounted for by the re-ranking component, while the composition component is negligible. The IVFR coefficient function β1(u) slopes upward: it is essentially zero at most quantiles and rises to roughly +13 grams at the 95th percentile. The pointwise 95% CI excludes zero  
+
+> 3Our point estimates of δ(u) are slightly smaller than those reported in MP—e.g., 26 vs. nearly 30 grams at the 5th percentile—most likely reflecting minor differences in the NCHS natality vintage and the county crosswalk used to merge births with the Almond et al. (2011) FSP rollout data, which leave us with 18,865 black county–trimester cells versus 19,482 in MP.
+
+33 −20 020           
+
+> 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9
+> Quantile
+> Effect on birth weight (grams)
+> Total effect (IVFR) Direct effect (MP)
+> Composition Re−ranking
+
+Figure 3: Effects of FSP on the birth weight distribution (black mothers).        
+
+> Notes: Black: total IVFR effect β1(u), with a 95% uniform confidence band (grey ribbon) from a cluster multiplier bootstrap over u∈[0 .05 ,0.95]. Blue: direct within-type effect δ(u) from Melly and Pons (2025b).
+
+at u = 0 .95 and is borderline at the next three grid points, consistent with FSP shifting the right tail of the birth weight distribution modestly upward. The uniform 95% confidence band, however, contains zero at every quantile. The pointwise significance at the top should therefore be read as suggestive evidence rather than a statistically robust finding at the conventional uniform level. The large re-ranking term can be explained as follows. An individual at the group ’s 5th percentile is generally not at her own conditional 5th percentile. A young unmarried mother (whose child has lower baseline birth weight) sitting at the group’s 5th percentile may be at, say, her conditional 15th percentile, where the treatment effect δ(0 .15) ≈ 6grams is far smaller than δ(0 .05) ≈ 26 grams. The re-ranking term aggregates these within-type percentile shifts across all types at the group quantile cutoff: because δ(u) is steeply decreasing at the left tail, the effective treatment effect at the group’s 5th percentile is a density-weighted average of δ evaluated at higher within-type ranks, where the effect is much smaller. The composition channel—whether FSP changes who gives birth —is negligible through-out the distribution. This is consistent with food stamps affecting nutrition rather than 34 fertility decisions. While the model in (15) imposes a common δ(u) across types, we can run the MP estimator separately within each of four demographic cells (mother age < 24/ ≥ 24 × legit-imate/illegitimate) to examine heterogeneity. Figure 4 shows the type-specific conditional QTEs δk(u). At the 5th percentile, the effects range from 60 grams for older married mothers to −35 grams for younger married mothers, with younger unmarried mothers—the dominant type at the group’s left tail—showing an intermediate effect of approximately 40 grams. The overall δ(0 .05) ≈ 26 grams is thus an average across heterogeneous type-specific effects, implicitly weighted by each type’s conditional density at the group quantile cutoff. Types that are more concentrated at the left tail of the birth weight distribution—young unmarried mothers, who account for 46% of the density weight at the 5th percentile but only 36% of births—receive disproportionate weight. This density-weighting mechanism is inherent to any estimand based on conditional quantiles evaluated at a common quantile index. −100 −50 050 100            
+
+> 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9
+> Quantile
+> FSP Effect (grams)
+> Old+Legit Young+Legit Old+Illegit Young+Illegit
+> Type−Specific Conditional QTE (Black Mothers)
+
+Figure 4: Conditional QTEs hide large type heterogeneity at the left tail. 
+
+Notes: Type-specific conditional QTEs δk(u) for black mothers, estimated by running mdqr separately within each of four demographic cells (mother age < 24/ ≥ 24 × legitimate/illegitimate). Shaded bands are pointwise 95% CIs clustered by county. 
+
+35 Discussion. The conditional quantile treatment effect is large and positive at the left tail, while the aggregate distributional effect is close to zero and statistically insignificant, because the types who drive the conditional estimate are not the types who are marginal at the group quantile cutoff. Young unmarried mothers—who comprise 36% of births but 46% of the probability density weight across types at the group’s 5th percentile—drive the conditional estimate with a type-specific effect of approximately 40 grams, while the aggregate effect on the county’s actual 5th percentile is indistinguishable from zero. The two estimands answer different questions. The conditional effect δ(0 .05) ≈ 26 grams documents that FSP delivers large nutritional benefits to the most vulnerable births, holding observed maternal type fixed. The IVFR estimate β1(0 .05) ≈ − 7 grams (insignificant) shows that these within-type gains do not translate to detectable shifts in the left tail of the county’s birth-weight distribution. A county health department tracking the actual low-birth-weight rate—rather than conditional quantiles within demographic cells—would not detect a sig-nificant effect of FSP on the left tail of the birth weight distribution. This is because the babies at the county’s 5th percentile are predominantly of young unmarried mothers sitting at much higher within-type ranks (around their 12th–15th conditional percentile), where the treatment effect δ is only 6–10 grams. More broadly, this application illustrates when the two approaches diverge. For treat-ments that operate at the individual level but are identified through group-level variation (food stamps, school vouchers, Medicaid expansions), the conditional effect δ(u) captures the individual-level mechanism, while β1(u) captures the aggregate distributional impact. The re-ranking channel—which is first-order whenever δ(u) varies with u and types are hetero-geneously distributed across the group’s outcome distribution—can dramatically attenuate the aggregate effect even when the conditional effect is large. For treatments that operate at the group level, like the import competition shock in Section 6.1, the group quantile β1(u)is the natural estimand, and the decomposition is not needed. 
+
+# 7 Conclusion 
+
+This paper develops IV Fr´ echet regression (IVFR), a framework for estimating the effect of endogenous group-level treatments on distribution-valued outcomes. The approach recasts grouped quantile IV regression as an instrumental-variables problem in Wasserstein space. This perspective yields a simple estimator: construct IV-weighted average quantile curves, project them onto the space of valid quantile functions, and recover coefficient functions by OLS. The paper makes three main contributions. First, it provides an identification result 36 showing that, under standard quantile IV conditions, the structural distributional effect is the solution to an IV-weighted Fr´ echet problem. This gives the fitted object a clear interpretation as an instrumented average distribution. Second, it introduces a monotone projection step that guarantees valid fitted distributions and weakly improves finite-sample estimation error, while leaving the first-order asymptotic distribution unchanged under mild conditions. Third, it establishes functional asymptotic normality and multiplier-bootstrap procedures for pointwise and novel uniform inference over quantile indices. Simulations and two empirical applications illustrate the practical value of the method. In finite samples, the projection can substantially reduce the integrated mean squared error (IMSE) relative to existing grouped quantile IV estimators. In an application to Chinese import competition, the method delivers tighter confidence bands and lower IMSE. Addi-tionally, using our novel uniform confidence bands, we show that the evidence for wage losses is concentrated away from the very bottom of the distribution. In a second application to the effect of county-level food stamp programs on the birth weight distribution, we find no evidence for distributional effects using our uniform bands. More broadly, our results suggest that directly modeling outcomes as random distributions can sharpen both estimation and inference in settings where policy effects are inherently distributional. 37 References 
+
+Abadie, A., Angrist, J., and Imbens, G. (2002). Instrumental variables estimates of the effect of subsidized training on the quantiles of trainee earnings. Econometrica , 70(1):91–117. Agueh, M. and Carlier, G. (2011). Barycenters in the wasserstein space. SIAM Journal on Mathematical Analysis , 43(2):904–924. Almond, D., Hoynes, H. W., and Schanzenbach, D. W. (2011). Inside the war on poverty: The impact of food stamps on birth outcomes. The Review of Economics and Statistics ,93(2):387–403. Autor, D. H., Dorn, D., and Hanson, G. H. (2013). The China Syndrome: Local Labor Market Effects of Import Competition in the United States. American Economic Review ,103(6):2121–68. Ayer, M., Brunk, H. D., Ewing, G. M., Reid, W. T., and Silverman, E. (1955). An em-pirical distribution function for sampling with incomplete information. The Annals of Mathematical Statistics , pages 641–647. Beyhum, J., Tedesco, L., and Van Keilegom, I. (2023). Instrumental variable quantile re-gression under random right censoring. The Econometrics Journal , 27(1):21–36. Bhattacharjee, S., Li, B., Wu, X., and Xue, L. (2025). Doubly robust estimation of causal effects for random object outcomes with continuous treatments. arXiv preprint arXiv:2506.22754 .Canay, I. A. (2011). A simple approach to quantile regression for panel data. The Econo-metrics Journal , 14(3):368–386. Chen, S. (2025). Quantile regression with group-level treatments. Journal of Econometrics ,251:106079. Chen, S. and Feng, J. (2023). Group-heterogeneous changes-in-changes and distributional synthetic controls. arXiv preprint arXiv:2307.15313 .Chernozhukov, V., Fern´ andez-Val, I., and Galichon, A. (2010). Quantile and probability curves without crossing. Econometrica , 78(3):1093–1125. Chernozhukov, V., Fern´ andez-Val, I., and Melly, B. (2013). Inference on counterfactual distributions. Econometrica , 81(6):2205–2268. 38 Chernozhukov, V. and Hansen, C. (2005). An IV model of quantile treatment effects. Econo-metrica , 73(1):245–261. Chernozhukov, V. and Hansen, C. (2006). Instrumental quantile regression inference for structural and treatment effect models. Journal of Econometrics , 132(2):491–525. Chernozhukov, V. and Hansen, C. (2008). Instrumental variable quantile regression: Arobust inference approach. Journal of Econometrics , 142(1):379–398. Chetverikov, D., Larsen, B., and Palmer, C. (2016). IV quantile regression for group-level treatments, with an application to the distributional effects of trade. Econometrica ,84(2):809–833. de Castro, L., Galvao, A. F., Kaplan, D. M., and Liu, X. (2019). Smoothed GMM for quantile models. Journal of Econometrics , 213(1):121–144. Annals: In Honor of Roger Koenker. Dvoretzky, A., Kiefer, J., and Wolfowitz, J. (1956). Asymptotic minimax character of the sample distribution function and of the classical multinomial estimator. The Annals of Mathematical Statistics , pages 642–669. Fan, J. and M¨ uller, H.-G. (2024). Conditional wasserstein barycenters and interpola-tion/extrapolation of distributions. IEEE Transactions on Information Theory .Fang, Z. and Santos, A. (2019). Inference on directionally differentiable functions. The Review of Economic Studies , 86(1):377–412. Firpo, S., Fortin, N. M., and Lemieux, T. (2009). Unconditional quantile regressions. Econo-metrica , 77(3):953–973. Fr¨ olich, M. and Melly, B. (2013). Unconditional quantile treatment effects under endogeneity. 
+
+Journal of Business & Economic Statistics , 31(3):346–357. Galvao, A. F., Gu, J., and Volgushev, S. (2020). On the unbiased asymptotic normality of quantile regression with fixed effects. Journal of Econometrics , 218(1):178–215. Galvao, A. F. and Kato, K. (2016). Smoothed quantile regression for panel data. Journal of Econometrics , 193(1):92–112. Galvao, A. F. and Wang, L. (2015). Efficient minimum distance estimator for quantile regression fixed effects panel data. Journal of Multivariate Analysis , 133:1–26. 39 Ghodrati, L. and Panaretos, V. M. (2022). Distribution-on-distribution regression via opti-mal transport maps. Biometrika , 109(4):957–974. Gunsilius, F. F. (2023). Distributional synthetic controls. Econometrica , 91(3):1105–1117. Hansen, B. E. (2022). Econometrics . Princeton University Press. Hausman, J. A. and Taylor, W. E. (1981). Panel data and unobservable individual effects. 
+
+Econometrica: Journal of the Econometric Society , pages 1377–1398. Holovchak, A., Saengkyongam, S., Meinshausen, N., and Shen, X. (2025). Distributional instrumental variable method. arXiv preprint arXiv:2502.07641 .Horowitz, J. L. and Lee, S. (2007). Nonparametric instrumental variables estimation of a quantile regression model. Econometrica , 75(4):1191–1208. Hoshino, T. (2024). Functional spatial autoregressive models. arXiv preprint arXiv:2402.14763 .Kaido, H. and W¨ uthrich, K. (2021). Decentralization estimators for instrumental variable quantile regression models. Quantitative Economics , 12(2):443–475. Kaplan, D. M. and Sun, Y. (2017). Smoothed estimating equations for instrumental variables quantile regression. Econometric Theory , 33(1):105–157. Katta, S., Parikh, H., Rudin, C., and Volfovsky, A. (2024). Interpretable causal inference for analyzing wearable, sensor, and distributional data. In International Conference on Artificial Intelligence and Statistics , pages 3340–3348. PMLR. Koenker, R. (2004). Quantile regression for longitudinal data. Journal of Multivariate Analysis , 91(1):74–89. Special Issue on Semiparametric and Nonparametric Mixed Models. Kruskal, J. B. (1964). Nonmetric multidimensional scaling: a numerical method. Psychome-trika , 29(2):115–129. Kurisu, D., Okamoto, Y., and Otsu, T. (2026). Lee bounds for random objects. arXiv preprint arXiv:2601.09453 .Kurisu, D., Zhou, Y., Otsu, T., and M¨ uller, H.-G. (2024). Geodesic causal inference. arXiv preprint arXiv:2406.19604 .Kurisu, D., Zhou, Y., Otsu, T., and M¨ uller, H.-G. (2025). Regression discontinuity designs for functional data and random objects in geodesic spaces. arXiv preprint arXiv:2506.18136 .40 Lee, S. (2007). Endogeneity in quantile regression models: A control function approach. 
+
+Journal of Econometrics , 141(2):1131–1158. Lin, Z., Kong, D., and Wang, L. (2023). Causal inference on distribution functions. Journal of the Royal Statistical Society Series B: Statistical Methodology , 85(2):378–398. Melly, B. and Pons, M. (2025a). mdqr. R package version 0.1.0. https://github.com/ martinapons/mdqr .Melly, B. and Pons, M. (2025b). Minimum distance estimation of quantile panel data models. 
+
+arXiv preprint arXiv:2502.18242 .Miles, R. (1959). The complete amalgamation into blocks, by weighted means, of a finite set of real numbers. Biometrika , 46(3/4):317–327. Oliva, J., P´ oczos, B., and Schneider, J. (2013). Distribution to distribution regression. In 
+
+International Conference on Machine Learning , pages 1049–1057. PMLR. Panaretos, V. M. and Zemel, Y. (2020). An invitation to statistics in Wasserstein space .Springer Nature. Petersen, A., Liu, X., and Divani, A. A. (2021). Wasserstein F-tests and confidence bands for the Fr´ echet regression of density response curves. The Annals of Statistics , 49(1):590–611. Petersen, A. and M¨ uller, H.-G. (2019). Fr´ echet regression for random objects with Euclidean predictors. The Annals of Statistics , 47(2):691 – 719. Pons, M. (2024). Quantile on quantiles. Working Paper. Qu, Z. and Kwon, Y. (2024). Distributionally robust instrumental variables estimation. 
+
+arXiv preprint arXiv:2410.15634 .Rio, E. (2017). Asymptotic theory of weakly dependent random processes , volume 80. Springer. Robertson, T., Wright, F. T., and Dykstra, R. L. (1988). Order Restricted Statistical Infer-ence . John Wiley & Sons, New York. Rychlik, T. (2012). Projecting statistical functionals , volume 160. Springer Science & Busi-ness Media. Skorokhod, A. V. (1956). Limit theorems for stochastic processes. Theory of Probability & Its Applications , 1(3):261–290. 41 Song, W., Dubey, P., M¨ uller, H.-G., and Petersen, A. (2026). Inference for Fr´ echet regression. 
+
+arXiv preprint arXiv:2605.19519 .Torous, W., Gunsilius, F., and Rigollet, P. (2024). An optimal transport approach to esti-mating causal effects via nonlinear difference-in-differences. Journal of Causal Inference ,12(1). van der Vaart, A. W. (2000). Asymptotic Statistics , volume 3. Cambridge University Press. van der Vaart, A. W. and Wellner, J. A. (1996). Weak Convergence and Empirical Processes: With Applications to Statistics . Springer, New York. Van Dijcke, D. (2025). Regression discontinuity design with distribution-valued out-comes. arXiv preprint arXiv:2504.03992 . Frozen October 2025 version at https: //www.davidvandijcke.com/files/r3d_oct2025.pdf ; referenced results refer to this version. Vuong, Q. and Xu, H. (2017). Counterfactual mapping and individual treatment effects in nonseparable models with binary endogeneity. Quantitative Economics , 8(2):589–610. W¨ uthrich, K. (2019). A closed-form estimator for quantile treatment effects with endogeneity. 
+
+Journal of Econometrics , 210(2):219–235. W¨ uthrich, K. (2020). A comparison of two quantile models with endogeneity. Journal of Business & Economic Statistics , 38(2):443–456. Xu, H. and Li, H. (2025). Wasserstein F-tests for Frechet regression on Bures-Wasserstein manifolds. Journal of Machine Learning Research , 26(77):1–123. Zhou, Y., Kurisu, D., Otsu, T., and M¨ uller, H.-G. (2025). Geodesic difference-in-differences. 
+
+arXiv preprint arXiv:2501.17436 .42 A The projection operator 
+
+Here, we provide more formal details about the projection operator Π Q. Let L2([0 , 1]) be the Hilbert space of square-integrable functions on the unit interval, equipped with the standard inner product ⟨f, g ⟩ = R 10 f (u)g(u)d u and norm ∥f ∥L2 = p⟨f, f ⟩. Let Q(Y) ⊂ L2([0 , 1]) be the subset of functions that are non-decreasing. Q(Y) is a closed convex cone in L2([0 , 1]). The projection operator Π Q : L2([0 , 1]) → Q(Y) maps any function f ∈ L2([0 , 1]) to its unique closest element in Q(Y) under the L2 norm: ΠQ(f ) := arg min 
+
+> h∈Q(Y)
+
+∥f − h∥2 
+
+> L2
+
+= arg min 
+
+> h∈Q(Y)
+
+Z 10
+
+(f (u) − h(u)) 2du. 
+
+This projection is well-defined and unique (Rychlik, 2012), see also Petersen et al. (2021, Proof of Proposition 2). Computationally, for a function evaluated on a grid, Π Q(f ) can be computed using the Pool Adjacent Violators Algorithm (PAVA) (Ayer et al., 1955; Miles, 1959; Kruskal, 1964). If f ∈ Q(Y), then Π Q(f ) = f .
+
+# B Decomposition under an individual-level model 
+
+This appendix develops a formal decomposition of the group-level treatment effect β1(u) into direct, composition, and re-ranking components, under an individual-level quantile model, as in CLP and MP. The total causal effect β1(u) = E[QY (1) (u) − QY (0) (u)] was defined in Section 3.2, and we assume the treatment Xj is binary for ease of exposition. 
+
+## B.1 Individual-level model 
+
+To understand the channels through which group-level treatment affects the outcome distri-bution, consider a model at the level of within-group individuals, as in CLP and MP. Let individuals i be nested within groups j, and let Wij ∈ Rd denote observed individual characteristics. Suppose individual outcomes satisfy: 
+
+QYj (u | Wij , X j ) = W T 
+
+> ij
+
+γ(u) + XT 
+
+> j
+
+δ(u) + αj (u), E[αj (u) | Wij , X j ] = 0 , (16) where γ(u) is the coefficient on individual characteristics, δ(u) is the direct effect of group treatment on the quantile conditional on those characteristics, and αj (u) is group-level un-observed heterogeneity. By the Skorohod representation (Skorokhod, 1956), this implies a 43 model for the scalar-valued outcome Yij of individual i in group j,
+
+Yij = W T 
+
+> ij
+
+γ (Uij ) + XT 
+
+> j
+
+δ (Uij ) + αj (Uij ) , (17) where Uij ∼ Uniform[0 , 1]. Denote the distribution of individual characteristics within group 
+
+j as Hj (·; Xj ), with mean ¯Wj (Xj ) := R w dHj (w; Xj ). A key feature of this setup is that the mixing distribution Hj may itself depend on Xj .Treatment can affect who is in each group through hiring, attrition, migration, or sorting. In what follows, we decompose β1(u) into a direct effect δ(u) and two composition terms. To interpret the decomposition economically, we consider the setting where the group is a commuting zone, the individual is a worker, and the outcome distribution is the local wage distribution. 
+
+## B.2 Two quantile concepts 
+
+Two distinct group-level quantile objects arise from aggregating the individual conditional quantile model. Let observable worker “types” be indexed by w, with type distribution 
+
+Hj (w; X) in group j under treatment state X ∈ { 0, 1}. Assume the linear conditional quantile specification 
+
+QYj (u | w, X ) = wTγ(u) + X δ (u) + αj (u), (18) For ease of exposition, assume for the moment that αj (u) is exogenous to treatment assign-ment (random assignment at the group level); Section B.4 discusses the IV analogue. 
+
+The composition-fixed quantile. Following Petersen et al. (2021), the Wasserstein– Fr´ echet integral (WFI) quantile averages conditional quantile functions across types: 
+
+Q⊕ 
+
+> Yj
+
+(u; X) := 
+
+Z
+
+QYj (u | w, X ) d Hj (w; X) = ¯Wj (X)Tγ(u) + X δ (u) + αj (u), (19) where ¯Wj (X) := R w dHj (w; X). This object answers: what is the average type-specific 
+
+u-quantile, holding the type composition fixed at Hj (·; X)?
+
+The realized group quantile. The observed group quantile is the quantile of the mixture distribution: 
+
+QYj (u; X) := inf 
+
+n
+
+y :
+
+Z
+
+FYj (y | w, X ) d Hj (w; X) ≥ u
+
+o
+
+, (20) 44 where Fj is the CDF of the individual-level outcome Yij in (17), i.e., the inverse of the quantile function QYj . The group-level quantile function, QYj (u; X), is what the researcher observes: the unconditional u-quantile of outcomes in group j.
+
+Since quantiles and mixing do not commute, define the gap ∆j (u; X) := QYj (u; X) − Q⊕ 
+
+> Yj
+
+(u; X). (21) A convenient representation uses the re-ranking map, 
+
+tjX (w; u) := FYj
+
+ QYj (u; X) | w, X  ∈ [0 , 1] , (22) the within-type percentile attained by type w at the group u-quantile cutoff. Let QYj (· | w, X )denote the conditional quantile function (inverse CDF). Then ∆j (u; X) = 
+
+Z
+
+DjX (u | w) d Hj (w; X), DjX (u | w) := QYj
+
+ tjX (w; u) | w, X  − QYj (u | w, X ).
+
+(23) Thus the gap is the average within-type percentile shift required for each type to hit the common group cutoff. 
+
+## B.3 Treatment effect decomposition 
+
+Let β(u) be the slope from the population projection of the realized group quantile QYj (u; Xj )onto (1 , ˜Xj ), with ˜Xj := Xj − μX and Σ XX := E[ ˜X2 
+
+> j
+
+]: 
+
+β(u) := Σ −1 
+
+> XX
+
+E
+
+h ˜Xj QYj (u; Xj )
+
+i
+
+. (24) Using the identity 
+
+QYj (u; X) = Q⊕ 
+
+> Yj
+
+(u; X) + ∆ j (u; X), (25) together with the closed form for Q⊕ 
+
+> Yj
+
+in (19), we obtain the decomposition 
+
+β1(u) = δ(u)
+
+|{z} 
+
+> Direct (within-type)
+
++ Σ −1 
+
+> XX
+
+E
+
+h ˜Xj ¯Wj (Xj )Tγ(u)
+
+i| {z }
+
+> Mean composition / sorting
+
++ Σ −1 
+
+> XX
+
+E
+
+h ˜Xj ∆j (u; Xj )
+
+i| {z }
+
+> Re-ranking / aggregation
+
+. (26) Equation (26) is the form that extends immediately to IV: in the IV case, the same terms appear with ˜Xj replaced by the instrument-induced projection of Xj (and the corresponding Σ−1 
+
+> XX
+
+replaced by the usual 2SLS matrix), exactly as in 2SLS. Given the binary treatment, (26) is equivalent to a decomposition in treatment effects. 45 Specifically, for any square-integrable function g(Xj ), Σ−1 
+
+> XX
+
+E
+
+h ˜Xj g(Xj )
+
+i
+
+= E[g(1) − g(0)] , (27) since Σ XX = μX (1 − μX ) and E[ ˜Xj g(Xj )] = μX (1 − μX ){g(1) − g(0) } with Xj binary. Applying (27) yields 
+
+β1(u) = δ(u)
+
+|{z} 
+
+> Direct (within-type)
+
++ E ¯Wj (1) − ¯Wj (0) T γ(u)
+
+| {z }
+
+> Mean composition / sorting
+
++ E[∆ j (u; 1) − ∆j (u; 0)] 
+
+| {z }
+
+> Re-ranking / aggregation (TE on the gap)
+
+. (28) This decomposition separates three economically distinct channels by which treatment changes a group’s realized wage quantile QYj (u; X). 1. Direct (within-type) effect δ(u). This is the partial-equilibrium shift in the u-th 
+
+conditional quantile for a fixed type. For example, holding skill group fixed (high-skill vs. low-skill), δ(u) is the average change in the u-th wage quantile within each skill group when the group is treated. 2. Mean composition / sorting E[ ¯Wj (1) − ¯Wj (0)] Tγ(u). Treatment can change who is in the group, through, for example, entry/exit or sorting, so the treated group may become more high-skill on average. This term prices that workforce shift using γ(u), i.e., the “return to type” at percentile u.3. Re-ranking / aggregation E[∆ j (u; 1) − ∆j (u; 0)] . Even if the group’s average type were unchanged, the group’s u-quantile depends on which within-type ranks are marginal at the group cutoff. If high-skill wages have a thicker upper tail, the group’s 90th percentile may correspond to a lower within-high-skill percentile than within-low-skill. Treatment can change this mapping (the tjX (w; u) functions) by changing dispersion/tails and/or changing the mix of types, which moves realized quantiles be-yond what δ(u) captures. The re-ranking effect can be further decomposed. Abbreviating tjX (w; u) by tX , it is simply the integral of (18) over Hj (·; X) across all types w,∆j (u; X) = EHj (·;X)
+
+h
+
+wT γ(tjX (w; u)) − γ(u)i
+
++ X EHj (·;X)
+
+h
+
+δ(tjX (w; u)) − δ(u)
+
+i
+
++ EHj (·;X)
+
+h
+
+αj (tjX (w; u)) − αj (u)
+
+i
+
+.
+
+(29) The gap ∆ j (u; X) is the average within-type percentile shift required for each observable type to reach the common group cutoff QYj (u; X). If high-skill and low-skill workers have 46 differently shaped conditional wage distributions (e.g., if the distribution of high-skilled workers has a thicker upper tail), then the workers who are marginal at the group’s u-th quantile are not at the same within-type quantile across types: tjX (w; u)̸ = u in general. Equation (29) makes clear that re-ranking affects the realized group quantile only through 
+
+shape , i.e., through how γ(·), δ(·), and αj (·) vary with the quantile index. Treatment can affect this rearrangement because X changes the mixture distribution itself: it can shift the type distribution Hj (·; X) (entry/exit/sorting) and it can change the mapping w 7 → tjX (w; u) (which within-type quantiles are pivotal at the group cutoff). Thus, even holding fixed the within-type effect δ(u), the same non-commutativity mechanism that generates ∆ j (u; X) in any state will generally produce different gaps under X = 1 and 
+
+X = 0. The decomposition further shows that the re-ranking channel is first-order only to the extent that there are shape effects: it is amplified when (i) returns to type vary over the distribution ( u 7 → γ(u) is not flat), (ii) treatment effects vary over quantiles ( u 7 → δ(u) is not flat), and/or (iii) the latent group quantile function αj (u) is curved. 
+
+## B.4 IV interpretation 
+
+When we relax the exogeneity assumption in favor of the instrument exogeneity assumption 
+
+E [Zj αj (u)] = 0, the IV estimand admits a similar decomposition, 
+
+βIV 1 (u) = δ(u) + Π Z→X E
+
+h ˜Zj ¯Wj (Xj )Tγ(u)
+
+i
+
++ Π Z→X E
+
+h ˜Zj ∆j (u; Xj )
+
+i
+
+(30) where Π Z→X := (Σ XZ Σ−1 
+
+> ZZ
+
+ΣZX )−1ΣXZ Σ−1 
+
+> ZZ
+
+is the usual population 2SLS operator. For the group-level IV regression model in (1), we can write, 
+
+ηj (u) := αj (u) + rmean  
+
+> j
+
+(u) + rshape  
+
+> j
+
+(u). (31) where 
+
+rmean  
+
+> j
+
+(u) := ¯Wj (Xj )Tγ(u) −
+
+
+
+ΠZ→X E[ ˜Zj ¯Wj (Xj )Tγ(u)] 
+
+
+
+Xj , (32) 
+
+rshape  
+
+> j
+
+(u) := ∆ j (u; Xj ) −
+
+
+
+ΠZ→X E[ ˜Zj ∆j (u; Xj )] 
+
+
+
+Xj , (33) the parts of the composition and re-ranking terms that are not predicted by the instrument. Since these are projections, in the just-identified case, these residuals satisfy E[ ˜Zj rmean  
+
+> j
+
+(u)] = 
+
+E[ ˜Zj rshape  
+
+> j
+
+(u)] = 0 by construction. As a result, E[ ˜Zj ηj (u)] = E[ ˜Zj αj (u)], so the IV moment condition E[ ˜Zj ηj (u)] = 0 is 47 equivalent to, 
+
+E[ ˜Zj αj (u)] = 0 . (34) In the overidentified case, the same equivalence holds for the population 2SLS normal equa-tions, ΣXZ Σ−1 
+
+> ZZ
+
+E[ ˜Zj ηj (u)] = Σ XZ Σ−1 
+
+> ZZ
+
+E[ ˜Zj αj (u)] .
+
+In other words, the instrument may induce changes in workforce composition ¯Wj (Xj ) and in re-ranking ∆ j (u; Xj )—the equilibrium channels captured by (30)—and validity hinges only on the standard restriction that Zj is orthogonal to the latent group component αj (u). Moreover, any group-level instrument valid for the individual-level model in Eq. (18) is also valid for the group-level model in Eq. (1), and vice versa. 
+
+# C Computational benchmarks 
+
+Both CLP and MP estimate the coefficient function β1(u) by running a separate regression for each quantile level u. MP solve n × Q within-group quantile regressions, where Q is the number of points in the quantile grid, in the first stage and then perform a second-stage GMM estimation. CLP similarly estimate within-group quantile regressions and then run Q
+
+independent 2SLS regressions on the group-level intercept. When there are no individual-level covariates, our approach avoids quantile regression entirely: it computes sample quantile functions directly by sorting within each group, then solves the 2SLS normal equations for all Q quantile levels simultaneously in a single matrix operation. The key source of the speedup is this vectorization across the quantile grid—our second stage is one matrix solve rather than Q separate regressions. Table 3 reports median computation times across 20 replications for 19 quantile levels, with no individual-level covariates. At n = 100 groups and N = 200 individuals per group, MP takes 5.4 seconds, CLP takes 41 milliseconds, and IVFR (including the sample quantile computation) takes 7 milliseconds—a speedup of roughly 800 × over MP and 6 × over CLP. The MP computation time grows with both n and N because it solves n × Q quantile regression problems on N observations each; CLP grows only with n (its Q regressions are on n group-level observations); and our method is nearly insensitive to N beyond the initial sort. At n = 500, N = 1 ,000 (500K total observations), MP takes 22.7 seconds while IVFR takes 65 milliseconds, a 349 × speedup. This speed difference matters for bootstrap inference. The multiplier bootstrap in Sec-tion 4.2 requires B evaluations of the estimator ( B = 2 ,000 in our empirical application). With IVFR this takes seconds; repeating the MP or CLP estimation B times would take 48 minutes to hours. Table 3: Computational cost of IVFR relative to existing estimators. 
+
+n N Total obs MP CLP 2SLS IVFR Speedup 50 50 2,500 1,739 24 2 3 696 ×
+
+50 1,000 50,000 2,241 23 4 5 448 ×
+
+100 200 20,000 5,399 41 5 7 771 ×
+
+100 1,000 100,000 7,752 36 10 11 705 ×
+
+200 200 40,000 4,157 27 7 10 416 ×
+
+200 1,000 200,000 5,747 25 15 18 319 ×
+
+500 200 100,000 8,895 26 19 25 356 ×
+
+500 1,000 500,000 22,668 34 60 65 349 ×
+
+Notes: Median computation time (milliseconds) for 19 quantile levels, no individual-level covariates; median of 20 replications. MP: within-group quantile regression + second-stage 2SLS. CLP: quantile-by-quantile 2SLS. 2SLS and IVFR: sample quantiles + vectorized matrix 2SLS (with PAVA projection for IVFR). Speedup column: MP time / IVFR time. All timings are single-threaded on an Apple M1 Pro with 16 GB RAM. The IVFR column includes sample quantile computation and the PAVA projection; the 2SLS column includes sample quantiles but not the projection. 
+
+49 D Proofs 
+
+Proof of Proposition 1. Using the quantile representation of the 2-Wasserstein distance, W 22 (μ, ν ) = 
+
+R 10 (Qμ(u) − Qν (u)) 2 du , the IV-weighted Fr´ echet functional at candidate w is 
+
+Es(Z, x ) W 22 (Y, w ) = E
+
+
+
+s(Z, x )
+
+Z
+
+> (0 ,1)
+
+ QY (u) − Qw(u)2 du 
+
+
+
+. (35) By the assumed finiteness of the IV-weighted Fr´ echet functional, 
+
+E
+
+h
+
+|s(Z, x )| ∥ QY ∥2
+
+> L2(0 ,1)
+
+i
+
+< ∞,
+
+and since Qw ∈ L2(0 , 1), Fubini’s theorem allows us to exchange expectation and integration: (35) = 
+
+Z
+
+> (0 ,1)
+
+Es(Z, x ) QY (u)2 − 2QY (u)Qw(u) + Qw(u)2 du 
+
+=
+
+Z
+
+> (0 ,1)
+
+E[s(Z, x )QY (u)2] − 2Qw(u) ψx(u) + Qw(u)2 du, 
+
+where we used E[s(Z, x )] = 1 and ψx(u) = E[s(Z, x )QY (u)]. Assumption 2 ensures that 
+
+s(Z, x ) is well-defined, and E[s(Z, x )] = 1 because E[ ˜Z] = 0. Completing the square, =
+
+Z
+
+> (0 ,1)
+
+E[s(Z, x )QY (u)2] − ψx(u)2 du 
+
+| {z }   
+
+> =: C(x),does not depend on w
+
++
+
+Z
+
+> (0 ,1)
+
+ Qw(u) − ψx(u)2 du. 
+
+The first term C(x) does not depend on w, so the minimizer over w ∈ Y minimizes ∥Qw −
+
+ψx∥2 
+
+> L2
+
+over Qw ∈ Q , which is Π Q(ψx) by definition of the L2 projection. If ψx is itself a valid quantile function, then Π Q(ψx) = ψx and it is the a.e.-unique minimizer in L2.
+
+Proof of Lemma 1. By Assumption 1, 
+
+E[ ˜Zj ηj (u)] = 0 .
+
+Together with Assumption 2, this gives 
+
+ψx(u) = E[s(Zj , x )QYj (u)] = β0(u)E[s(Zj , x )]+ β1(u)TE[s(Zj , x )( Xj −μX )]+ E[s(Zj , x )ηj (u)] .
+
+We evaluate each term in turn. 1. Since E[ ˜Zj ] = 0, we have E[s(Zj , x )] = 1. 50 2. For the second term, 
+
+E[s(Zj , x )( Xj − μX )] = ( x − μX )T(Σ T 
+
+> ZX
+
+Σ−1 
+
+> ZZ
+
+ΣZX )−1ΣT 
+
+> ZX
+
+Σ−1 
+
+> ZZ
+
+E[ ˜Zj (Xj − μX )] = x − μX ,
+
+as E[ ˜Zj (Xj − μX )] = Σ ZX and (Σ T 
+
+> ZX
+
+Σ−1 
+
+> ZZ
+
+ΣZX )−1ΣT 
+
+> ZX
+
+Σ−1 
+
+> ZZ
+
+ΣZX = Ip.3. For the third term, E[s(Zj , x )ηj (u)] = E[ηj (u)] + ( x − μX )T(. . . )E[ ˜Zj ηj (u)] = 0, since 
+
+E[ηj (u)] = 0 and E[ ˜Zj ηj (u)] = 0. As a result, 
+
+ψx(u) = β0(u) + β1(u)T(x − μX ) = q(x, u ).
+
+Since q(x, u ) is non-decreasing in u by construction, ψx(·) = q(x, ·) is a valid quantile function for all x ∈ X .
+
+Proof of Theorem 1. Let b = ( b0, b 1) be any reference coefficients such that qb(Xj , ·) := 
+
+b0(·) + b1(·)T(Xj − ˆμX ) ∈ Q for all j = 1 , . . . , n .Since qb(Xj , ·) ∈ Q for each j, Lemma 2 with p = 2 gives 
+
+Z 10
+
+ˆQ(Xj , u ) − qb(Xj , u ) 2 du ≤
+
+Z 10
+
+ˆψXj (u) − qb(Xj , u ) 2 du. 
+
+Averaging over j = 1 , . . . , n and exchanging the order of summation and integration: 
+
+Z 10
+
+1
+
+n
+
+> n
+
+X
+
+> j=1
+
+ˆQ(Xj , u ) − qb(Xj , u ) 2 du ≤
+
+Z 10
+
+1
+
+n
+
+> n
+
+X
+
+> j=1
+
+ˆψXj (u) − qb(Xj , u ) 2 du. (36) Fix u ∈ [0 , 1]. Let ˆX denote the n × (p + 1) design matrix with j-th row (1 , (Xj −
+
+ˆμX )T). The IVFR coefficients are defined by ˆβIVFR (u) = ( ˆXT ˆX)−1 ˆXT ˆQ(u), where ˆQ(u) = ( ˆQ(X1, u ), . . . , ˆQ(Xn, u )) T. Write the OLS fitted values as ˆ qIVFR (Xj , u ) = ˆβIVFR 0 (u)+ ˆβIVFR 1 (u)T(Xj −
+
+ˆμX ) and the residuals as ej (u) = ˆQ(Xj , u ) − ˆqIVFR (Xj , u ). Both ˆ qIVFR (Xj , u ) and qb(Xj , u ) are linear in (1 , (Xj −ˆμX )T), so their difference ˆ qIVFR (Xj , u )−
+
+qb(Xj , u ) lies in the column space of ˆX, while ej (u) lies in its orthogonal complement by the OLS normal equations. The Pythagorean theorem therefore gives 1
+
+n
+
+> n
+
+X
+
+> j=1
+
+ˆQ(Xj , u ) − qb(Xj , u ) 2 = 1
+
+n
+
+> n
+
+X
+
+> j=1
+
+ˆqIVFR (Xj , u ) − qb(Xj , u ) 2 + 1
+
+n
+
+> n
+
+X
+
+> j=1
+
+ej (u)2. (37) 51 Since 1
+
+> n
+
+Pnj=1 (Xj − ˆμX ) = 0 by construction, 1 
+
+> n
+
+ˆXT ˆX is block-diagonal, 1
+
+n ˆXT ˆX = 1 0T
+
+0 ˆΣXX 
+
+!
+
+.
+
+Writing δ0(u) = ˆβIVFR 0 (u) − b0(u) and δ1(u) = ˆβIVFR 1 (u) − b1(u), the cross term vanishes: 1
+
+n
+
+> n
+
+X
+
+> j=1
+
+ˆqIVFR (Xj , u ) − qb(Xj , u ) 2 = 1
+
+n
+
+> n
+
+X
+
+> j=1
+
+δ0(u) + δ1(u)T(Xj − ˆμX ) 2
+
+= δ0(u)2 + 2 δ0(u) δ1(u)T 1
+
+n
+
+> n
+
+X
+
+> j=1
+
+(Xj − ˆμX )
+
+| {z }
+
+> = 0
+
++δ1(u)T ˆΣXX δ1(u)= δ0(u)2 + δ1(u)T ˆΣXX δ1(u).
+
+Since 1
+
+> n
+
+P 
+
+> j
+
+ej (u)2 ≥ 0, combining (37) and the above gives, for each u,
+
+ˆβIVFR 0 (u)−b0(u) 2+  ˆβIVFR 1 (u)−b1(u)T ˆΣXX 
+
+  ˆβIVFR 1 (u)−b1(u) ≤ 1
+
+n
+
+> n
+
+X
+
+> j=1
+
+ˆQ(Xj , u )−qb(Xj , u ) 2.
+
+(38) Since ˆψXj (u) = ˜β0(u)+ ˜β1(u)T(Xj −ˆμX ) is exactly linear in ˆX, regressing ( ˆψX1 (u), . . . , ˆψXn (u)) T
+
+on ˆX recovers ( ˜β0(u), ˜β1(u)) with zero residuals. The same block-diagonal expansion there-fore gives 1
+
+n
+
+> n
+
+X
+
+> j=1
+
+ˆψXj (u) − qb(Xj , u ) 2 = ˜β0(u) − b0(u) 2 +   ˜β1(u) − b1(u)T ˆΣXX 
+
+  ˜β1(u) − b1(u).
+
+To finish, integrate (38) over u ∈ [0 , 1] and apply (36) to obtain, 
+
+∥ ˆβIVFR 0 −b0∥2 
+
+> L2
+
++∥ ˆβIVFR 1 −b1∥2ˆΣXX ,L 2 ≤
+
+Z 10
+
+1
+
+n
+
+> n
+
+X
+
+> j=1
+
+ˆψXj (u)−qb(Xj , u ) 2 du = ∥ ˜β0−b0∥2 
+
+> L2
+
++∥ ˜β1−b1∥2ˆΣXX ,L 2 ,
+
+where the equality integrates the previous equation over u, which gives Eq. (8). 
+
+Proof of Proposition 2. By FWL, for each u the k-th slope coefficient from regressing ( ˆQ(X1, u ), . . . , ˆQ(Xn, u )) T
+
+52 on (1 n, C ) is ˆβIVFR 1,k (u) = 1
+
+nˆvknX
+
+> j=1
+
+rjk ˆQ(Xj , u ).
+
+Since ˆψXj (u) = ˜β0(u) + ( Xj − ˆμX )T ˜β1(u) is exactly linear in (1 n, C ), the same identity gives ˜β1,k (u) = 1
+
+> nˆvk
+
+P 
+
+> j
+
+rjk ˆψXj (u), so ∆k(u) := ˆβIVFR 1,k (u) − ˜β1,k (u) = 1
+
+nˆvknX
+
+> j=1
+
+rjk DXj (u). (39) Fix j with rjk ̸ = 0. Since ˆQ(Xj , ·) = Π Q( ˆψXj ) is the closest element of Q to ˆψXj in L2,it satisfies the first-order condition: for every h ∈ Q ,
+
+⟨DXj , h − ˆQ(Xj , ·)⟩L2 ≥ 0,
+
+where remember that DXj = ˆQ(Xj , ·) − ˆψXj is the projection correction. Since qb(Xj , ·) ∈ Q 
+
+by assumption, taking h = qb(Xj , ·): 
+
+⟨DXj , q b(Xj , ·) − ˆQ(Xj , ·)⟩L2 ≥ 0.
+
+Substituting qb(Xj , ·) − ˆQ(Xj , ·) = −ejk − rjk ( ˜β1,k − b1,k ) − DXj from (10): 
+
+rjk ⟨DXj , ˜β1,k − b1,k ⟩L2 ≤ −∥ DXj ∥2 
+
+> L2
+
+− ⟨ DXj , e jk ⟩L2 . (40) Summing over j with rjk ̸ = 0, dividing by nˆvk, and noting that ˜β1,k − b1,k does not depend on j:
+
+D 1
+
+nˆvk
+
+X  
+
+> j:rjk ̸=0
+
+rjk DXj , ˜β1,k − b1,k 
+
+E
+
+> L2
+
+≤ − 1
+
+nˆvk
+
+X  
+
+> j:rjk ̸=0
+
+∥DXj ∥2 
+
+> L2
+
+− 1
+
+nˆvk
+
+X  
+
+> j:rjk ̸=0
+
+⟨DXj , e jk ⟩L2 .
+
+By (39), the left-hand side equals ⟨∆k, ˜β1,k − b1,k ⟩L2 , giving (41). 
+
+⟨ ˜β1,k − b1,k , ∆k⟩L2 ≤ − 1
+
+nˆvk
+
+X
+
+> j∈Jk
+
+∥DXj ∥2 
+
+> L2
+
+− 1
+
+nˆvk
+
+X
+
+> j∈Jk
+
+⟨DXj , e jk ⟩L2 . (41) By Cauchy–Schwarz applied to (39) and the definition of ˆ vk := 1
+
+> n
+
+Pni=1 r2
+
+> jk
+
+:
+
+∥∆k∥2 
+
+> L2
+
+≤ 1
+
+nˆvk
+
+X
+
+> j∈Jk
+
+∥DXj ∥2 
+
+> L2
+
+. (42) 53 Since ˆβIVFR 1,k − b1,k = ( ˜β1,k − b1,k ) + ∆ k, expanding the squared norm gives 
+
+∥ ˆβIVFR 1,k − b1,k ∥2 
+
+> L2
+
+= ∥ ˜β1,k − b1,k ∥2 
+
+> L2
+
++ 2 ⟨ ˜β1,k − b1,k , ∆k⟩L2 + ∥∆k∥2 
+
+> L2
+
+.
+
+Substituting the bounds (41) and (42) on the cross-term and the squared correction yields (11). 
+
+Proof of Corollary 1. Under (12), the point qb(Xj , ·)+ ejk (·) = ˆψXj (·)+ rjk (b1,k (·)− ˜β1,k (·)) ∈Q (by (10)) provides a tighter feasible point in the variational inequality, yielding 
+
+rjk ⟨DXj , ˜β1,k − b1,k ⟩L2 ≤ −∥ DXj ∥2
+
+> L2
+
+without the ⟨DXj , e jk ⟩ term. The rest follows as in the proof of Proposition 2. 
+
+Lemma 3 (Local smoothness of weights) . Let θ = ( μX , μ Z , ΣZX , ΣZZ ) and 
+
+g(θ, Z ) = 1 + ( x − μX )⊤
+
+
+
+Σ⊤ 
+
+> ZX
+
+Σ−1 
+
+> ZZ
+
+ΣZX 
+
+−1
+
+Σ⊤ 
+
+> ZX
+
+Σ−1 
+
+> ZZ
+
+(Z − μZ ).
+
+If Assumption 2 holds at θ0, then there exists an open neighborhood N of θ0 such that: (i) ΣZZ (θ) and A(θ) := Σ ZX (θ)⊤ΣZZ (θ)−1ΣZX (θ) are invertible for all θ ∈ N ;(ii) for each fixed Z, the map θ 7 → g(θ, Z ) is C2 on N ;(iii) for any compact K ⊂ N there exist constants C0, C 1 < ∞ such that 
+
+sup 
+
+> θ∈K
+
+∇2
+
+> θθ
+
+g(θ, Z ) ≤ C0 + C1∥Z∥ for all Z.Proof. Since Σ ZZ (θ0) is p.d. and A(θ0) is p.d. by Assumption 2, and eigenvalues depend continuously on matrix entries, there is an open neighborhood N of θ0 on which both matrices remain invertible, proving (i). The maps θ 7 → ΣZZ (θ) and θ 7 → ΣZX (θ) are affine in the components of θ. Matrix addition and multiplication preserve smoothness of the entries, and inversion is smooth on the set of nonsingular square matrices. Therefore θ 7 → g(θ, Z ) is a composition of smooth maps on N , hence C2, proving (ii). Finally, write g(θ, Z ) = a(θ) + b(θ)⊤Z. By (ii), a and b are C2 on N , so on any compact 
+
+K ⊂ N the quantities 
+
+M0 := sup 
+
+> θ∈K
+
+∇2a(θ) , M1 := sup 
+
+> k
+
+sup 
+
+> θ∈K
+
+∇2bk(θ)
+
+54 are finite. Since ∇2g(θ, Z ) = ∇2a(θ) + P 
+
+> l
+
+Zl ∇2bl(θ), we have 
+
+∇2g(θ, Z ) ≤ M0 + M1
+
+X
+
+> l
+
+|Zl| ≤ M0 + √d M 1 ∥Z∥,
+
+where d = dim( Z). Setting C0 = M0 and C1 = √d M 1 yields (iii). 
+
+Lemma 4 (VC-subgraph for the weighted quantile class) . Let Q = {y 7 → Qy(u) : u ∈ [a, b ]}
+
+on Y be VC-subgraph and let sx : Z → R be a fixed measurable function z 7 → s(z, x ). For a given x, define the class on Y × Z ,
+
+S = (y, z ) 7 → s(z, x ) Qy(u) : u ∈ [a, b ] .
+
+Then S is VC-subgraph. As a result, S satisfies the uniform entropy bound (2.5.1) of van der Vaart and Wellner (1996) with envelope H(y, z ) = |s(z, x )| sup u∈[a,b ] |Qy(u)|.Proof. Define eQ = {(y, z ) 7 → Qy(u) : u ∈ [a, b ]} on Y × Z and the fixed function ˜ s(y, z ) = 
+
+s(z, x ). As shown in Van Dijcke (2025, Lemma A-3), Q is VC-subgraph on Y. Hence, the lifted class eQ is VC-subgraph on Y × Z . To see this, note that the composition of eQ and the fixed projection ( y, z ) 7 → y preserves the VC-subgraph property by van der Vaart and Wellner (1996, Lemma 2.6.18(vii)). Further, by van der Vaart and Wellner (1996, Lemma 2.6.18(vi)), the product of eQ and the fixed function ( z, y ) → ˜s(y, z ) is VC-subgraph. VC-subgraph classes satisfy the uniform entropy bound in van der Vaart and Wellner (1996, Eq. 2.6.7) with respect to the L2(P )-metric for every P . The stated envelope follows directly. 
+
+Proof of Theorem 2. Let ˆψx(u) = 1
+
+n
+
+> n
+
+X
+
+> j=1
+
+ˆsj (x) QYj (u), ψx(u) = Es(Z, x )QY (u),
+
+where ˆ sj (x) = g(ˆθ, Z j ) and s(Z, x ) = g(θ0, Z ). Write 
+
+√n  ˆψx(u) − ψx(u) = 1
+
+√n
+
+> n
+
+X
+
+> j=1
+
+
+
+s(Zj , x )QYj (u) − ψx(u)
+
+| {z }
+
+> (A)
+
++ 1
+
+√n
+
+> n
+
+X
+
+> j=1
+
+ ˆsj (x) − s(Zj , x )QYj (u)
+
+| {z }
+
+> (B)
+
+.
+
+Main term (A). Consider F = {(Y, Z ) 7 → s(Z, x )QY (u) − ψx(u) : u ∈ [a, b ]}. Recall from Lemma 4 that 
+
+FY =  y 7 → Qy(u) : u ∈ [a, b ]
+
+55 is a VC–subgraph class on Y with envelope FY (y) = sup u∈[a,b ] |Qy(u)|. For each fixed x,write sx(z) = s(z, x ) and define the class on Y × Z ,
+
+S = (y, z ) 7 → sx(z) Qy(u) : u ∈ [a, b ] .
+
+By Lemma 4, S is VC–subgraph with envelope 
+
+H(y, z ) = |sx(z)| FY (y) ≲ (1 + ∥z∥) sup 
+
+> u∈[a,b ]
+
+|Qy(u)|.
+
+By Assumption 4, E[∥Z∥4] < ∞. Since QY (·) is nondecreasing on [ a, b ], sup u∈[a,b ] |QY (u)| =max {| QY (a)|, |QY (b)|} , so E[sup u∈[a,b ] |QY (u)|4] ≤ E[|QY (a)|4] + E[|QY (b)|4] < ∞ by As-sumption 4. Therefore 
+
+P H 2 ≤  E[(1 + ∥Z∥)4]1/2 E[(sup 
+
+> u
+
+|QY (u)|)4]1/2 < ∞.
+
+Therefore, by Theorem 2.5.2 of van der Vaart and Wellner (1996), S is P –Donsker and (A) ⇝ G1 in ℓ∞([ a, b ]) ,
+
+a tight mean-zero Gaussian process with covariance Cov( s(Z, x )QY (u), s (Z, x )QY (u′)). 
+
+Empirical weights term (B). By Lemma 3, a second-order expansion gives ˆsj (x) − s(Zj , x ) = ∇θs(θ0, Z j )⊤(ˆθ − θ0) + Rj , |Rj | ≤ C(1 + ∥Zj ∥) ∥ˆθ − θ0∥2.
+
+Hence, uniformly in u,
+
+1
+
+√n
+
+> n
+
+X
+
+> j=1
+
+Rj QYj (u) ≤ √n ∥ˆθ − θ0∥2 1
+
+n
+
+> n
+
+X
+
+> j=1
+
+(1 + ∥Zj ∥) sup 
+
+> u∈[a,b ]
+
+|QYj (u)| = op(1) ,
+
+by the LLN and √n∥ˆθ − θ0∥2 = op(1). Therefore (B) =
+
+h
+
+Pnfu
+
+i √n(ˆθ − θ0) + op(1) , fu(Y, Z ) := QY (u) ∇θs(θ0, Z )⊤.
+
+By Lemma 4, the class {fu : u ∈ [a, b ]} is VC-subgraph with envelope F (Y, Z ) ≲ (1 + 
+
+∥Z∥) sup u∈[a,b ] |QY (u)| ∈ L1, hence sup u∈[a,b ] |Pnfu − ∂θψx(u)⊤| → p 0. 
+
+Joint convergence and covariance. Let 
+
+m(W ) = 
+
+
+
+X −μX , Z −μZ , vec {(Z −μZ )( X −μX )⊤ −ΣZX }, vec {(Z −μZ )( Z −μZ )⊤ −ΣZZ }
+
+
+
+56 and Gθ = {mk : k = 1 , . . . , d } with d = dim θ. Since Gθ is finite and square-integrable, it is P –Donsker. We have shown S is P –Donsker. Let H and G(W ) := max k |mk(W )| be envelopes for S and Gθ, respectively. Under Assumption 4, P H 2 < ∞ and P G 2 < ∞, so the union J = S ∪ G θ has square-integrable envelope J := H + G and hence ∥P ∥J < ∞. By van der Vaart and Wellner (1996, Example 2.10.7), J is P –Donsker and therefore 
+
+
+
+(A), √n(ˆθ − θ0)
+
+
+
+⇝  G1, Zθ
+
+ in ℓ∞([ a, b ]) × Rd,
+
+with G1 as above and Zθ ∼ N (0 , Σ). The mapping ( h, z ) 7 → h(·) + ∂θψx(·)⊤z is continuous 
+
+ℓ∞([ a, b ]) × Rd → ℓ∞([ a, b ]) and sup u |Pnfu − ∂θψx(u)⊤| → p 0, so by the continuous mapping theorem, √n( ˆψx − ψx) = (A) + ( B) ⇝ G1 + ∂θψx(·)⊤ Zθ in ℓ∞([ a, b ]) .
+
+The covariance kernel follows from the joint Gaussian limit and this linear mapping. 
+
+Lemma 5 (Average Lipschitz increments imply L2 continuity) . Suppose Assumptions 4 and 7 hold. Then, for every u ∈ [a, b ],
+
+QY (un) → QY (u) a.s. whenever un → u. 
+
+Moreover, 
+
+E|QY (un) − QY (u)|4 → 0.
+
+Consequently, for any random vector H with E∥H∥4 < ∞,
+
+E∥H∥2 |QY (un) − QY (u)|2 → 0.
+
+Proof. Fix u ∈ [a, b ). For h > 0 such that u + h ∈ [a, b ], monotonicity gives 0 ≤ QY (u + h) − QY (u).
+
+By Assumption 7, 0 ≤ E[QY (u + h) − QY (u)] ≤ Kh → 0.
+
+Let ∆+ 
+
+> Y
+
+(u) := QY (u+) − QY (u) = lim  
+
+> h↓0
+
+{QY (u + h) − QY (u)}.
+
+By Fatou’s lemma, 0 ≤ E[∆ + 
+
+> Y
+
+(u)] ≤ lim inf  
+
+> h↓0
+
+E[QY (u + h) − QY (u)] = 0 .
+
+57 Hence ∆ + 
+
+> Y
+
+(u) = 0 a.s. Since QY (·) is left-continuous by convention, QY (·) is a.s. continuous at the fixed point u. At u = b, left-continuity alone gives continuity from within [ a, b ]. Therefore QY (un) → QY (u) a.s. for every deterministic sequence un → u.Furthermore, 
+
+|QY (un) − QY (u)|4 ≤ 16 sup 
+
+> t∈[a,b ]
+
+|QY (t)|4 = 16 max {| QY (a)|, |QY (b)|} 4,
+
+and the right-hand side is integrable by Assumption 4. Dominated convergence gives E[|QY (un)−
+
+QY (u)|4] → 0. Finally, by Cauchy–Schwarz, 
+
+E∥H∥2|QY (un) − QY (u)|2 ≤ { E∥H∥4}1/2{E|QY (un) − QY (u)|4}1/2 → 0.
+
+Lemma 6 (Continuity of the covariance kernel) . Under Assumptions 2–4, and 7, the co-variance kernel 
+
+Γx(u, u ′) := E[ϕx(W ; u)ϕx(W ; u′)] 
+
+of the limiting process in Theorem 2 is jointly continuous on [a, b ]2. Consequently, its intrin-sic variance semimetric 
+
+ρx(u, u ′)2 := E(Gx(u) − Gx(u′)) 2 = Γ x(u, u ) + Γ x(u′, u ′) − 2Γ x(u, u ′)
+
+satisfies ρx(un, u ) → 0 whenever un → u.Proof. Recall from Appendix E that 
+
+ϕx(W ; u) =  s(Z, x )QY (u) − ψx(u) +  ∂θψx(u)Tm(W ).
+
+By Lemma 5, s(Z, x )QY (un) → s(Z, x )QY (u) in L2(P ), because for fixed x, s(Z, x ) is affine in Z and hence has finite fourth moment under Assumption 4. Therefore 
+
+ψx(un) = E[s(Z, x )QY (un)] → E[s(Z, x )QY (u)] = ψx(u).
+
+Next, each component of ∂θψx(u) is an expectation of the form 
+
+E[QY (u)h(W )] where h(W ) is either constant or affine in Z for the gradient blocks derived in Appendix E. 58 Hence ∂θψx(un) → ∂θψx(u) by Lemma 5 and Cauchy–Schwarz. Moreover, E∥m(W )∥2 < ∞
+
+under Assumption 4. It follows that 
+
+∥ϕx(·; un) − ϕx(·; u)∥L2(P ) → 0.
+
+Let ( un, u ′
+
+> n
+
+) → (u, u ′). Then 
+
+|Γx(un, u ′
+
+> n
+
+) − Γx(u, u ′)| ≤ E[|ϕx(W ; un) − ϕx(W ; u)| | ϕx(W ; u′
+
+> n
+
+)|]+ E[|ϕx(W ; u)| | ϕx(W ; u′
+
+> n
+
+) − ϕx(W ; u′)|] .
+
+By Cauchy–Schwarz, 
+
+|Γx(un, u ′
+
+> n
+
+) − Γx(u, u ′)| ≤ ∥ ϕx(·; un) − ϕx(·; u)∥L2(P )∥ϕx(·; u′
+
+> n
+
+)∥L2(P )
+
++ ∥ϕx(·; u)∥L2(P )∥ϕx(·; u′
+
+> n
+
+) − ϕx(·; u′)∥L2(P ).
+
+The difference terms converge to zero. By Lemma 5 and the preceding argument, u 7 →
+
+ϕx(·; u) is continuous as a map from [ a, b ] into L2(P ). Since [ a, b ] is compact, it follows that 
+
+u 7 → ∥ ϕx(·; u)∥L2(P ) is bounded on [ a, b ]. Hence Γ x is jointly continuous. The statement for 
+
+ρx follows from the displayed identity and continuity of Γ x.
+
+Corollary 4. Under the assumptions of Theorem 2 and Assumption 7, for each fixed x ∈X , the centered tight Gaussian limit process Gx in Theorem 2 admits a modification with a.s. continuous sample paths on [a, b ]. In what follows we replace Gx by this continuous modification, so that Gx ∈ C([ a, b ]) a.s. Proof. Let ρx be the canonical semimetric of Gx,
+
+ρx(u, u ′)2 := E(Gx(u) − Gx(u′)) 2 , u, u ′ ∈ [a, b ].
+
+By Lemma 6, ρx(un, u ) → 0 whenever un → u. Since [ a, b ] is compact, this implies that ([ a, b ], ρ x) is totally bounded. Moreover, Gx is a tight Borel measurable random element of ℓ∞([ a, b ]) and is stochas-tically continuous with respect to ρx. By Addendum 1.5.8 of van der Vaart and Wellner (1996), Gx admits a modification whose sample paths are a.s. uniformly ρx-continuous on [a, b ]. For this modification, if un → u in the usual metric, then ρx(un, u ) → 0 and hence 
+
+Gx(un) → Gx(u). Therefore its sample paths are a.s. continuous on [ a, b ]. 
+
+Proof of Theorem 3. The structure of this proof is analogous to the proof of Theorem 4 in 59 Van Dijcke (2025). Recall from Theorem 2 that 
+
+√n   ˆψx − ψx
+
+ ⇝ Gx in ℓ∞([ a, b ]) .
+
+By Corollary 4, we may (and do) replace Gx by a modification such that Gx ∈ C([ a, b ]) a.s. All Fr´ echet objectives and W2 distances are L2-integrals of quantile functions. Hence changing representatives on null sets (e.g. switching from left- to right-continuous versions) does not alter the objective nor its argmin. We can therefore compute the L2([ a, b ]) projec-tion and then select a right-continuous representative, to view the result as an element of 
+
+ℓ∞([ a, b ]). As before, let ˆq(x, ·) := Π Q( ˆψx), q(x, ·) := Π Q(ψx),
+
+so that ˆ q(x, ·) = ˆQmIVFR (x)(·) and q(x, ·) is the population target quantile function. Then, the result follows in three steps. 
+
+Step 1 (Lipschitzness and uniform consistency). By Lemma A-6 (iii) in Van Dijcke (2025), ΠQ is 1–Lipschitz in the uniform norm: 
+
+∥ΠQ(f ) − ΠQ(g)∥∞ ≤ ∥ f − g∥∞ ∀f, g ∈ ℓ∞([ a, b ]) .
+
+Therefore, 
+
+∥ˆq(x, ·) − q(x, ·)∥∞ ≤ ∥ ˆψx − ψx∥∞ = op(1) .
+
+Step 2 (Local differentiability). By Assumptions 6 and 7, for all a ≤ c < d ≤ b,
+
+κ(d − c) ≤ ψx(d) − ψx(c) = E[s(Z, x ){QY (d) − QY (c)}] ≤ K(d − c).
+
+Hence ψx is Lipschitz on [ a, b ], therefore absolutely continuous, and the lower secant bound implies ψ′
+
+> x
+
+(u) ≥ κ for a.e. u ∈ [a, b ]. Then ψx ∈ Q , so q(x, ·) = Π Q(ψx) = ψx. Moreover, the hypotheses of Lemma A-7 in Van Dijcke (2025) are satisfied at m = ψx, so Π Q is Hadamard directionally differentiable at ψx as a mapping from ℓ∞([ a, b ]) to ℓ∞([ a, b ]) tangentially to 
+
+C([ a, b ]), with derivative equal to the identity: 
+
+DΠQ[ψx]( h) = h ∀ h ∈ C([ a, b ]) .
+
+Step 3 (Functional delta method). Since √n( ˆψx − ψx) ⇝ Gx in ℓ∞([ a, b ]) by Theorem 2 and the limit satisfies Gx ∈ C([ a, b ]) a.s. by Corollary 4, the functional delta method for (fully) Hadamard differentiable maps (van der Vaart, 2000, Thm. 20.8), applied tangentially 60 to C([ a, b ]), yields 
+
+√n  ˆq(x, ·) − q(x, ·) = √n
+
+
+
+ΠQ( ˆψx) − ΠQ(ψx)
+
+
+
+⇝ DΠQ[ψx]( Gx) = Gx in ℓ∞([ a, b ]) which gives the result. 
+
+Proof of Theorem 4. Step 1: Exact representation. The intercept estimator satisfies ˜β0(u) = 
+
+> 1
+> n
+
+Pnj=1 QYj (u), hence ˜β0(u) − βunc 0 (u) = 1
+
+n
+
+> n
+
+X
+
+> j=1
+
+ QYj (u) − E[QY (u)] . (43) For the slope, since P 
+
+> j
+
+(Zj − ˆμZ ) = 0 and ( Xj − μX ) = ( Xj − ˆμX ) + (ˆ μX − μX ), the standard 2SLS normal equations give ˜β1(u) − βunc 1 (u) = ˆSn
+
+1
+
+n
+
+> n
+
+X
+
+> j=1
+
+(Zj − ˆμZ ) ξj (u), (44) where ˆSn := ( ˆΣT 
+
+> ZX
+
+ˆΣ−1 
+
+> ZZ
+
+ˆΣZX )−1 ˆΣT 
+
+> ZX
+
+ˆΣ−1 
+
+> ZZ
+
+and ξj (u) := QYj (u) − βunc 0 (u) − βunc 1 (u)T(Xj − μX ). Writing ˜Zj := Zj − μZ and replacing the centering on the sample mean by centering on the population mean, 1
+
+√n
+
+> n
+
+X
+
+> j=1
+
+(Zj − ˆμZ ) − ˜Zj
+
+ξj (u) = −√n(ˆ μZ − μZ ) ¯ξn(u),
+
+where ¯ξn(u) := 1
+
+> n
+
+P 
+
+> j
+
+ξj (u). By the multivariate CLT (under Assumption 4), √n(ˆ μZ − μZ ) = 
+
+OP (1). The Donsker property established in Step 2 below gives sup u∈[a,b ] | ¯ξn(u)| = OP (n−1/2), so the product is oP (1) uniformly. Therefore 
+
+√n  ˜β1(u) − βunc 1 (u) = ˆSn
+
+1
+
+√n
+
+> n
+
+X
+
+> j=1
+
+˜Zj ξj (u) + oP (1) in ℓ∞([ a, b ]) p. (45) 
+
+Step 2: Functional CLT for the score. Define the joint score Φj (u) := ζj (u)˜Zj ξj (u)
+
+!
+
+∈ R1+ l, ζj (u) := QYj (u) − E[QY (u)] .
+
+We verify that the class F := {(X, Y, Z ) 7 → Φ( u) : u ∈ [a, b ]} is P -Donsker componen-twise. The first component class {ζ(u) : u ∈ [a, b ]} is P -Donsker by Lemma 4 with 61 square-integrable envelope sup u∈[a,b ] |QY (u)| + |E[QY (u)] | (Assumption 4). For each coor-dinate k ≥ 1 of the slope score, decompose ˜Zk ξ(u) = ˜Zk QY (u) − ˜Zk XTβunc (u), where X := (1 , (X −μX )T)T. The first term is P -Donsker by Lemma 4 with square-integrable envelope;the second lies in a finite-dimensional linear span and is therefore P -Donsker (the envelope is square-integrable since sup u ∥βunc (u)∥ < ∞: monotonicity of QY on [ a, b ] gives |QY (u)| ≤ 
+
+max( |QY (a)|, |QY (b)|) for all u ∈ [a, b ], so ∥E[Z QY (u)] ∥ ≤ E[∥Z∥ max( |QY (a)|, |QY (b)|)] <
+
+∞ uniformly in u by Cauchy–Schwarz and Assumption 4, and βunc (u) = ¯S2SLS E[Z QY (u)] inherits this bound). Since there are finitely many components, F is P -Donsker (van der Vaart and Wellner, 1996, Example 2.10.7). To obtain the Gaussian limit for the coefficient process, it is enough to show that the transformed score T Φ( u) is mean zero, since √n( ˜β(·) − βunc (·)) is asymptotically equivalent to T n −1/2 Pnj=1 Φj (·). The intercept component satisfies E[ζ(u)] = 0 by construction. For the slope component, we do not require E[ ˜Z ξ (u)] = 0 componentwise. Instead, it is enough that the transformed score entering the coefficient process has mean zero. Recall that 
+
+T = diag(1 , S 0), S0 = (Σ T 
+
+> ZX
+
+Σ−1 
+
+> ZZ
+
+ΣZX )−1ΣT 
+
+> ZX
+
+Σ−1 
+
+> ZZ
+
+.
+
+Then 
+
+T E [Φ( u)] = 0
+
+S0 E[ ˜Z ξ (u)] 
+
+!
+
+.
+
+By the definition of βunc (u) as the population 2SLS coefficient function, ΣT 
+
+> ZX
+
+Σ−1 
+
+> ZZ
+
+E[ ˜Z ξ (u)] = 0 ,
+
+and hence S0 E[ ˜Z ξ (u)] = 0. Therefore 
+
+T E [Φ( u)] = 0 .
+
+Since F is P -Donsker, it follows that 1
+
+√n
+
+> n
+
+X
+
+> j=1
+
+ Φj (·) − E[Φ( ·)]  ⇝ GΦ(·) in ℓ∞([ a, b ]) 1+ l,
+
+where GΦ is a tight mean-zero Gaussian process with covariance kernel 
+
+E
+
+h Φ( u) − E[Φ( u)]   Φ( u′) − E[Φ( u′)] Ti
+
+.
+
+62 Multiplying by the constant matrix T and using T E [Φ( u)] = 0, we obtain 
+
+T 1
+
+√n
+
+> n
+
+X
+
+> j=1
+
+Φj (·) ⇝ T GΦ(·) in ℓ∞([ a, b ]) p+1 .
+
+Step 3: Conclusion. We now combine the asymptotic linear representation with the cen-tered Gaussian limit for the transformed score process. By the law of large numbers and Assumption 2, ˆSnp
+
+→ S0 := (Σ T 
+
+> ZX
+
+Σ−1 
+
+> ZZ
+
+ΣZX )−1ΣT 
+
+> ZX
+
+Σ−1 
+
+> ZZ
+
+.
+
+Define T := diag(1 , S 0) ∈ R(p+1) ×(1+ l). Combining (43)–(45) with Slutsky’s theorem and the result of Step 2, 
+
+√n  ˜β(·)−βunc (·) = diag(1 , ˆSn) 1
+
+√n
+
+> n
+
+X
+
+> j=1
+
+Φj (·)+ oP (1) ⇝ T GΦ(·) =: Gβ (·) in ℓ∞([ a, b ]) p+1 .
+
+Since T E [Φ( u)] = 0, the covariance kernel of Gβ is Ω( u, u ′) = T E Φ( u)Φ( u′)T TT.
+
+In particular, the slope–slope block is 
+
+S0 E
+
+h ˜Z ˜ZTξ(u)ξ(u′)
+
+i
+
+ST 
+
+> 0
+
+,
+
+the standard heteroskedasticity-robust 2SLS sandwich form. 
+
+Lemma 7 (Continuity of the coefficient covariance kernel) . Under Assumption 2–4, and Assumption 7, the covariance kernel 
+
+Ω( u, u ′) = T E Φ( u)Φ( u′)T T T
+
+of the limiting process in Theorem 4 is jointly continuous on [a, b ]2.Proof. We first show that u 7 → Φ( u) is continuous from [ a, b ] into L2(P ). The first component follows from Lemma 5: 
+
+QY (un) − E[QY (un)] → QY (u) − E[QY (u)] in L2(P ).
+
+63 For the slope component, write 
+
+ξ(un) − ξ(u) = {QY (un) − QY (u)} − XT{βunc (un) − βunc (u)}.
+
+Since 
+
+βunc (u) = E[QY (u)] 
+
+S0E[ ˜ZQ Y (u)] 
+
+!
+
+,
+
+Lemma 5 implies βunc (un) → βunc (u). Hence, using Assumption 4, 
+
+E
+
+h
+
+∥ ˜Z∥2|ξ(un) − ξ(u)|2
+
+i
+
+→ 0.
+
+Therefore 
+
+∥Φ( un) − Φ( u)∥L2(P ) → 0.
+
+Now let ( un, u ′
+
+> n
+
+) → (u, u ′). Since Φ( un)Φ( u′
+
+> n
+
+)T − Φ( u)Φ( u′)T =  Φ( un) − Φ( u)Φ( u′
+
+> n
+
+)T + Φ( u) Φ( u′
+
+> n
+
+) − Φ( u′)T,
+
+Cauchy–Schwarz gives 
+
+EΦ( un)Φ( u′
+
+> n
+
+)T − Φ( u)Φ( u′)T
+
+≤ ∥ Φ( un) − Φ( u)∥L2(P ) ∥Φ( u′
+
+> n
+
+)∥L2(P ) + ∥Φ( u)∥L2(P ) ∥Φ( u′
+
+> n
+
+) − Φ( u′)∥L2(P ).
+
+The difference terms converge to zero, and u 7 → ∥ Φ( u)∥L2(P ) is bounded on compact [ a, b ]. Therefore 
+
+E[Φ( un)Φ( u′
+
+> n
+
+)T] → E[Φ( u)Φ( u′)T].
+
+Since T is constant, Ω( u, u ′) is jointly continuous. 
+
+Corollary 5. Under the assumptions of Theorem 4 and Assumption 7, the Gaussian limit 
+
+Gβ admits a modification with a.s. continuous sample paths on [a, b ].Proof. By Lemma 7, the covariance kernel Ω( u, u ′) is jointly continuous on [ a, b ]2. Since [a, b ] is compact and Gβ is a mean-zero Gaussian process, Addendum 1.5.8 of van der Vaart and Wellner (1996) implies that Gβ admits a version with a.s. continuous sample paths on [a, b ]. 
+
+Proof of Theorem 5. By Theorem 4 and Corollary 5, 
+
+√n( ˜β(·) − βunc (·)) ⇝ Gβ (·)64 in ℓ∞([ a, b ]) p+1 , and the limit process admits a version with a.s. continuous sample paths on [a, b ]. Under Assumption 6, ψx ∈ Q for every x ∈ X , so the population projection is inactive and βIVFR = βunc . It therefore suffices to show that 
+
+√n ∥∆n∥∞ = oP (1) , ∆n := ˆβIVFR − ˜β, (46) since the result then follows from Slutsky’s theorem. The projection correction Dx(u) := Π Q( ˆψx)( u) − ˆψx(u) enters through the OLS decom-position, ∆0,n (u) = 1
+
+n
+
+> n
+
+X
+
+> j=1
+
+DXj (u), ∆1,n (u) = ˆΣ−1
+
+> XX
+
+1
+
+n
+
+> n
+
+X
+
+> j=1
+
+(Xj − ˆμX ) DXj (u).
+
+Under the bounded support assumption 5, sup x∈X ∥x − μX ∥ ≤ B and thus ∥Xj − ˆμX ∥ ≤ 2B
+
+for all j, so both components can be controlled once we establish sup 
+
+> x∈X
+
+√n ∥Dx∥∞
+
+> p
+
+→ 0. (47) Indeed, (47) immediately gives √n∥∆0,n ∥∞ →P 0, and for the slope 
+
+√n∥∆1,n ∥∞ ≤ 2B ∥ ˆΣ−1 
+
+> XX
+
+∥op sup 
+
+> x
+
+√n∥Dx∥∞ →P 0since ˆΣ−1 
+
+> XX
+
+= OP (1). We now prove (47). The estimation error ex(u) := ˆψx(u) − ψx(u) is affine in x. Writing 
+
+dn := ˜β1 − βunc 1 ∈ Rp with components dn, 1, . . . , d n,p , and an := ˜β0 − βunc 0 + ˜β⊤ 
+
+> 1
+
+(μX − ˆμX ), we have 
+
+ex = an +
+
+> p
+
+X
+
+> r=1
+
+dn,r (xr − μX,r ).
+
+Set Hxn := √n e x and denote its p + 1 coefficient functions by H0,n := √n a n and Hr,n := 
+
+√n d n,r for r = 1 , . . . , p , so that Hxn = H0,n + Ppr=1 Hr,n (xr − μX,r ). We claim that (H0,n , H 1,n , . . . , H p,n ) is jointly asymptotically tight in C([ a, b ]) p+1 . For each r = 1 , . . . , p ,
+
+√n d n,r is a coordinate of √n( ˜β1 − βunc 1 ), which converges weakly in ℓ∞([ a, b ]) p to a limit with a.s. continuous paths (Corollary 5), and is therefore asymptotically tight in C([ a, b ]) p.For the intercept coefficient, split ˜β1 = βunc 1 + dn to obtain 
+
+√n a n = √n( ˜β0 − βunc 0 ) − βunc 1 ⊤√n(ˆ μX − μX ) + d⊤
+
+> n
+
+√n(μX − ˆμX ); 65 the first term is asymptotically tight in C([ a, b ]) by Theorem 4 and Corollary 5 and the sec-ond is OP (1) times the continuous function βunc 1 (·). For the third term, sup u∈[a,b ] ∥dn(u)∥ =
+
+OP (n−1/2) by Theorem 4 and √n(ˆ μX − μX ) = OP (1) by the multivariate CLT under As-sumption 4, so sup u∈[a,b ] |dn(u)T√n(μX − ˆμX )| ≤ sup u ∥dn(u)∥ · ∥ √n(ˆ μX − μX )∥ = oP (1). Fix ε > 0. By asymptotic tightness in C([ a, b ]) p+1 , there exist a compact Kε ⊂ C([ a, b ]) p+1 
+
+and an integer Nε such that P (( √n a n, √n d n, 1, . . . , √n d n,p ) ∈ Kε) ≥ 1 − ε for all n ≥ Nε.Since Kε is compact in C([ a, b ]) p+1 , it is totally bounded and can be covered by finitely many sup-norm ε-balls. Approximating each ball center by a nearby C1 function (using density of 
+
+C1 in C([ a, b ])) and setting Λ ε to be the maximum Lipschitz constant over these finitely many approximants, we obtain random functions ℓ0,n , . . . , ℓ p,n ∈ C1([ a, b ]) with Lip( ℓr,n ) ≤ Λε
+
+(namely, the nearest C1 center to the realization) such that the event 
+
+En := 
+
+n
+
+max  
+
+> r
+
+∥Hr,n − ℓr,n ∥∞ ≤ ε
+
+o
+
+satisfies P (En) ≥ 1 − ε for all n ≥ Nε. Since Hxn = H0,n + P 
+
+> r
+
+Hr,n (xr − μX,r ), define the corresponding smooth proxy Lxn := ℓ0,n + P 
+
+> r
+
+ℓr,n (xr − μX,r ), so that Hxn − Lxn = ( H0,n −
+
+ℓ0,n ) + P
+
+> r
+
+(Hr,n − ℓr,n )( xr − μX,r ). On En, for every x ∈ X , the triangle inequality gives 
+
+∥Hxn − Lxn∥∞ ≤ ∥ H0,n − ℓ0,n ∥∞ + X
+
+> r
+
+∥Hr,n − ℓr,n ∥∞ |xr − μX,r | ≤ ε(1 + ∥x − μX ∥1) ≤ CB ε, 
+
+where CB := 1 + √p B by Cauchy–Schwarz and Assumption 5. Similarly, Lip( Lxn) ≤ Λε(1 + 
+
+∥x − μX ∥1) ≤ ΛεCB .For n large enough that n−1/2ΛεCB ≤ κ/ 2, the function ψx + n−1/2Lxn has secant slopes at least κ − n−1/2ΛεCB ≥ κ/ 2 > 0 on [ a, b ] (using Assumption 6), hence lies in Q. By the 
+
+∥ · ∥ ∞-contraction of Π Q (Lemma A-6 in Van Dijcke, 2025): 
+
+√n ∥Dx∥∞ = ∥ΠQ(ψx + n−1/2Hxn ) − (ψx + n−1/2Hxn )∥∞ · √n
+
+≤ ∥ ΠQ(ψx + n−1/2Hxn ) − ΠQ(ψx + n−1/2Lxn)∥∞ · √n + ∥Hxn − Lxn∥∞
+
+≤ 2∥Hxn − Lxn∥∞ ≤ 2CB ε. 
+
+Since the bound holds simultaneously for all x ∈ X on En, we have P (sup x∈X 
+
+√n ∥Dx∥∞ ≤
+
+2CB ε) ≥ 1 − ε for all n large enough. Moreover, since ε > 0 is arbitrary, (47) follows. 
+
+Proof of Theorem 6. The proof of Theorem 4 establishes that the score class F := {Φ( ·, u ) : 
+
+u ∈ [a, b ]} is P -Donsker with square-integrable envelope. By the multiplier CLT for Donsker classes (van der Vaart and Wellner, 1996, Theorem 2.9.6), the centered process n−1/2 P 
+
+> j
+
+ωj (Φ j (·)−
+
+66 ¯Φn(·)) ⇝P GΦ(·), where ¯Φn := n−1 P 
+
+> j
+
+Φj . The difference between centered and uncentered processes is ¯ ωn · √n ¯Φn(·), where ¯ ωn := n−1 P 
+
+> j
+
+ωj = OP X (n−1/2) and sup u ∥ ¯Φn(u)∥ = OP (1) by the Donsker property, so the difference is oP X (1) uniformly. Therefore the uncentered infeasible process satisfies T n −1/2 P 
+
+> j
+
+ωj Φj (·) ⇝P Gβ (·). It remains to replace (Φ j , T ) by ( ˆΦj , ˆT ). Since ∥ ˆT − T ∥ = op(1), it suffices to show 
+
+Rn(·) := n−1/2 P 
+
+> j
+
+ωj ∆j (·) = oP x (1) in ℓ∞([ a, b ]) 1+ l, where ∆ j := ˆΦj − Φj . We decompose ∆j and bound each term. For the intercept component, ∆ j, 0(u) = E[QY (u)] − ¯Qn(u) does not depend on j, so 
+
+n−1/2 P 
+
+> j
+
+ωj ∆j, 0(u) = √n (E[QY (u)] − ¯Qn(u)) ¯ ωn. Since sup u |E[QY (u)] − ¯Qn(u)| = Op(n−1/2)by the Donsker property and ¯ ωn = OP x (n−1/2), this is oP x (1) uniformly. For the slope components ( k = 1 , . . . , l ), remember the definition ˜Zjk = Zjk − μZ,k . Then write, ∆j,k (u) = ( Zjk − ¯Zn,k ) ˆξj (u) − ˜Zjk ξj (u)= ( μZ,k − ¯Zn,k ) ξj (u)
+
+| {z }
+
+> (a)
+
++ ˜Zjk 
+
+  ˆξj (u) − ξj (u)| {z }
+
+> (b)
+
++ ( μZ,k − ¯Zn,k )  ˆξj (u) − ξj (u)| {z }
+
+> (c)
+
+.
+
+For ( a): n−1/2 P 
+
+> j
+
+ωj (μZ,k − ¯Zn,k )ξj (u) = ( μZ,k − ¯Zn,k ) · n−1/2 P 
+
+> j
+
+ωj ξj (u). The first factor is op(1); the second is OP X (1) uniformly in u by the multiplier CLT applied to the class 
+
+{ξ(·, u ) : u ∈ [a, b ]}, which is P -Donsker as shown in the proof of Theorem 4 (Step 2). The product is oP x (1) uniformly. For ( b): expand ˆξj (u) − ξj (u) = −XT 
+
+> j
+
+( ˜β(u) − βunc (u)) + (ˆ μX − μX )T ˜β1(u). Then 1
+
+√n
+
+X
+
+> j
+
+ωj ˜Zjk 
+
+  ˆξj (u) − ξj (u)
+
+= −  ˜β(u) − βunc (u)T 1
+
+√n
+
+X
+
+> j
+
+ωj ˜Zjk Xj + (ˆ μX − μX )T ˜β1(u) 1
+
+√n
+
+X
+
+> j
+
+ωj ˜Zjk .
+
+In the first term, sup u ∥ ˜β(u)−βunc (u)∥ = Op(n−1/2) by Theorem 4, while n−1/2 P 
+
+> j
+
+ωj ˜Zjk Xj =
+
+OP x (1) (a finite-dimensional multiplier sum with finite second moments by Assumption 4). The product is oP x (1) uniformly. The second term is op(1) · Op(1) · OP x (1) = oP x (1) by the same reasoning. For ( c): the product of the op(1) and Op(n−1/2) factors from ( a) and ( b) gives a contri-bution of smaller order. Combining all terms yields sup u ∥Rn(u)∥ = oP x (1) in probability, completing the proof. 67 Proof of Corollary 2. Conditionally on the data, the projected bootstrap coefficients are ˆβIVFR ,∗(u) = ( ˆXT ˆX)−1 ˆXTΠQ( ˆψ∗ 
+
+> Xj
+
+)( u), where ˆψ∗ 
+
+> Xj
+
+(u) = ˜β∗ 
+
+> 0
+
+(u)+ ˜β∗T 
+
+> 1
+
+(u)( Xj −ˆμX ) and ˜β∗ are the bootstrap unconstrained coefficients. The bootstrap process is ˆGIVFR ,∗ 
+
+> β
+
+(u) = √n( ˆβIVFR ,∗(u)−
+
+ˆβIVFR (u)). The argument proceeds exactly as in the proof of Theorem 5, with the bootstrap pertur-bation playing the role of the estimation error. Specifically, define the bootstrap analogue of the estimation error e∗
+
+> x
+
+(u) := ˆψ∗
+
+> x
+
+(u) − ˆψx(u), which is affine in x with coefficient functions ˜β∗(u) − ˜β(u). The bootstrap projection correction is D∗
+
+> x
+
+(u) := Π Q( ˆψ∗
+
+> x
+
+)( u) − ˆψ∗
+
+> x
+
+(u), and the difference between projected and unprojected bootstrap coefficients is ˆβIVFR ,∗(u) − ˜β∗(u) = ( ˆXT ˆX)−1 ˆXTD∗ 
+
+> Xj
+
+(u).
+
+It suffices to show sup x∈X 
+
+√n ∥D∗
+
+> x
+
+∥∞ = oP x (1) in probability. By Theorem 6, √n( ˜β∗(·) −
+
+˜β(·)) ⇝P Gβ (·) in ℓ∞([ a, b ]) p+1 , which has a.s. continuous paths by Corollary 5. The boot-strap coefficient functions are therefore conditionally asymptotically tight in C([ a, b ]) p+1 .Write ˆψ∗ 
+
+> x
+
+= ψx+n−1/2(Hxn +H∗,x n ), where Hxn := √n( ˆψx−ψx) is the scaled estimation error and 
+
+H∗,x n := √n( ˆψ∗ 
+
+> x
+
+− ˆψx) is the scaled bootstrap perturbation. Denote the coefficient functions of Hxn by ( H0,n , . . . , H p,n ) as in the proof of Theorem 5, and those of H∗,x n by ( H∗
+
+> 0,n
+
+, . . . , H ∗
+
+> p,n
+
+). By Theorem 4 and Corollary 5, ( H0,n , . . . , H p,n ) is asymptotically tight in C([ a, b ]) p+1 . By Theorem 6, ( H∗
+
+> 0,n
+
+, . . . , H ∗
+
+> p,n
+
+) is conditionally asymptotically tight in C([ a, b ]) p+1 on a data event An with P (An) → 1. Fix ε > 0. By the same covering argument as in the proof of Theorem 5, on a data event of probability ≥ 1−ε for n large, there exist C1 proxies ℓr,n for Hr,n with max r ∥Hr,n −ℓr,n ∥∞ ≤ ε
+
+and Lip( ℓr,n ) ≤ Λε. Conditionally on such data, there likewise exist C1 proxies ℓ∗ 
+
+> r,n
+
+for H∗
+
+> r,n
+
+with max r ∥H∗ 
+
+> r,n
+
+− ℓ∗
+
+> r,n
+
+∥∞ ≤ ε and Lip( ℓ∗
+
+> r,n
+
+) ≤ Λ∗ 
+
+> ε
+
+with conditional probability ≥ 1 − ε. Define 
+
+Lxn := ℓ0,n + P 
+
+> r
+
+ℓr,n (xr − μX,r ) and L∗,x n := ℓ∗ 
+
+> 0,n
+
++ P 
+
+> r
+
+ℓ∗
+
+> r,n
+
+(xr − μX,r ), so that Lip( Lxn + L∗,x n ) ≤
+
+(Λ ε + Λ ∗ 
+
+> ε
+
+)CB . For n large enough that n−1/2(Λ ε + Λ ∗ 
+
+> ε
+
+)CB ≤ κ/ 2, Assumption 6 ensures that 
+
+ψx + n−1/2(Lxn + L∗,x n ) has secant slopes ≥ κ/ 2 > 0 on [ a, b ] for all x ∈ X , hence lies in Q.By the ∥ · ∥ ∞-contraction of Π Q (Lemma A-6 (iii) in Van Dijcke, 2025): 
+
+√n ∥D∗
+
+> x
+
+∥∞ = √n ∥ΠQ( ˆψ∗
+
+> x
+
+) − ˆψ∗
+
+> x
+
+∥∞
+
+≤ 2∥(Hxn + H∗,x n ) − (Lxn + L∗,x n )∥∞
+
+≤ 2( ∥Hxn − Lxn∥∞ + ∥H∗,x n − L∗,x n ∥∞) ≤ 4CB ε, 
+
+uniformly over x ∈ X . Since ε is arbitrary, sup x
+
+√n∥D∗
+
+> x
+
+∥∞ = oP X (1) in probability. It follows that ˆGIVFR ,∗ 
+
+> β
+
+and the unprojected bootstrap process ˆG∗ 
+
+> β
+
+have the same con-68 ditional weak limit Gβ . Combined with Theorem 6, this gives ˆGIVFR ,∗ 
+
+> β
+
+(·) ⇝P Gβ (·) in 
+
+ℓ∞([ a, b ]) p+1 .
+
+Proof of Proposition 3. For each j ≤ n, define the first-stage quantile estimation error ˆ∆j (u) := bQYj (u) − QYj (u), u ∈ [a, b ],
+
+and recall 
+
+Rn = max  
+
+> 1≤j≤n
+
+∥ ˆ∆j ∥∞.
+
+By Assumption 8, Rn = op(n−1/2). 
+
+Step 1: unconstrained coefficients. Because the feasible unprojected estimator is just the sample 2SLS coefficient vector with bQYj (u) in place of QYj (u) at each u, we have ¯˜β0(u) − ˜β0(u) = 1
+
+n
+
+> n
+
+X
+
+> j=1
+
+ˆ∆j (u),
+
+and ¯˜β1(u) − ˜β1(u) = ˆS2SLS 
+
+1
+
+n
+
+> n
+
+X
+
+> j=1
+
+(Zj − ˆμZ ) ˆ∆j (u)
+
+!
+
+,
+
+where ˆS2SLS := ( ˆΣT 
+
+> ZX
+
+ˆΣ−1 
+
+> ZZ
+
+ˆΣZX )−1 ˆΣT 
+
+> ZX
+
+ˆΣ−1 
+
+> ZZ
+
+.
+
+Therefore, sup 
+
+> u∈[a,b ]
+
+¯˜β0(u) − ˜β0(u) ≤ 1
+
+n
+
+> n
+
+X
+
+> j=1
+
+∥ ˆ∆j ∥∞ ≤ Rn,
+
+and sup 
+
+> u∈[a,b ]
+
+¯˜β1(u) − ˜β1(u) ≤ ∥ ˆS2SLS ∥ · 1
+
+n
+
+> n
+
+X
+
+> j=1
+
+∥Zj − ˆμZ ∥ ∥ ˆ∆j ∥∞
+
+≤ ∥ ˆS2SLS ∥ 1
+
+n
+
+> n
+
+X
+
+> j=1
+
+∥Zj − ˆμZ ∥
+
+!
+
+Rn. (48) Under Assumption 2, the population matrix 
+
+S2SLS := (Σ T 
+
+> ZX
+
+Σ−1 
+
+> ZZ
+
+ΣZX )−1ΣT 
+
+> ZX
+
+Σ−1
+
+> ZZ
+
+is well-defined. Since ˆΣZZ p
+
+→ ΣZZ and ˆΣZX p
+
+→ ΣZX by the law of large numbers, it follows that ˆS2SLS 
+
+> p
+
+→ S2SLS , hence ∥ ˆS2SLS ∥ = Op(1). Moreover, Assumption 4 implies E∥Z∥ < ∞,69 so 1
+
+n
+
+> n
+
+X
+
+> j=1
+
+∥Zj − ˆμZ ∥ = Op(1) .
+
+Combining this with (48) and Rn = op(n−1/2) yields sup 
+
+> u∈[a,b ]
+
+¯˜β1(u) − ˜β1(u) = op(n−1/2).
+
+Together with the intercept bound, this proves part (ii): 
+
+∥ ¯˜β − ˜β∥ℓ∞([ a,b ]) p+1 = op(n−1/2).
+
+Step 2: IV-weighted quantile curves at a fixed x. For each fixed x ∈ Rp,¯ψx(u) − ˆψx(u) =   ¯˜β0(u) − ˜β0(u) +   ¯˜β1(u) − ˜β1(u)T(x − ˆμX ).
+
+Hence 
+
+∥ ¯ψx − ˆψx∥∞ ≤ sup 
+
+> u∈[a,b ]
+
+¯˜β0(u) − ˜β0(u) + ∥x − ˆμX ∥ sup 
+
+> u∈[a,b ]
+
+¯˜β1(u) − ˜β1(u)
+
+= op(n−1/2),
+
+because ˆ μXp
+
+→ μX and therefore ∥x − ˆμX ∥ = Op(1) for fixed x.For the projected curves, Lemma A-6 (iii) in Van Dijcke (2025) gives the contraction bound 
+
+∥ΠQ( ¯ψx) − ΠQ( ˆψx)∥∞ ≤ ∥ ¯ψx − ˆψx∥∞ = op(n−1/2).
+
+This proves part (i). 
+
+Step 3: projected coefficient functions. Let 
+
+dj (u) := Π Q( ¯ψXj )( u) − ΠQ( ˆψXj )( u), ˆXj := 1
+
+Xj − ˆμX
+
+!
+
+.
+
+Then ¯βIVFR (u) − ˆβIVFR (u) = ˆXT ˆX
+
+n
+
+!−1
+
+1
+
+n
+
+> n
+
+X
+
+> j=1
+
+ˆXj dj (u)
+
+!
+
+.
+
+70 Taking norms and suprema, sup 
+
+> u∈[a,b ]
+
+∥ ¯βIVFR (u) − ˆβIVFR (u)∥ ≤ ˆXT ˆX
+
+n
+
+!−1
+
+· sup 
+
+> u∈[a,b ]
+
+1
+
+n
+
+> n
+
+X
+
+> j=1
+
+ˆXj dj (u) . (49) By the contraction property of Π Q,
+
+|dj (u)| ≤ ∥ ¯ψXj − ˆψXj ∥∞ ≤ sup 
+
+> v∈[a,b ]
+
+¯˜β0(v) − ˜β0(v) + ∥Xj − ˆμX ∥ sup 
+
+> v∈[a,b ]
+
+¯˜β1(v) − ˜β1(v) .
+
+Therefore, sup 
+
+> u∈[a,b ]
+
+1
+
+n
+
+> n
+
+X
+
+> j=1
+
+ˆXj dj (u) ≤ 1
+
+n
+
+> n
+
+X
+
+> j=1
+
+∥ ˆXj ∥
+
+!
+
+sup 
+
+> v∈[a,b ]
+
+¯˜β0(v) − ˜β0(v)
+
++ 1
+
+n
+
+> n
+
+X
+
+> j=1
+
+∥ ˆXj ∥ ∥ Xj − ˆμX ∥
+
+!
+
+sup 
+
+> v∈[a,b ]
+
+¯˜β1(v) − ˜β1(v) .
+
+Assumption 4 implies E∥X∥2 < ∞, hence 1
+
+n
+
+> n
+
+X
+
+> j=1
+
+∥ ˆXj ∥ = Op(1) , 1
+
+n
+
+> n
+
+X
+
+> j=1
+
+∥ ˆXj ∥ ∥ Xj − ˆμX ∥ = Op(1) .
+
+Further, ˆXT ˆX
+
+n = 1 0T
+
+0 ˆΣXX 
+
+!
+
+,
+
+and ˆΣ−1 
+
+> XX
+
+= Op(1) as shown in the proof of Theorem 5. Combining the preceding display with (49) and part (ii), we obtain 
+
+∥ ¯βIVFR − ˆβIVFR ∥ℓ∞([ a,b ]) p+1 = op(n−1/2),
+
+which proves part (iii). 
+
+Proof of Corollary 3. Each feasible estimator decomposes as its infeasible counterpart plus a remainder that is op(1) in the relevant ℓ∞ norm after scaling by √n, by Proposition 3. 71 Specifically: (i) √n  ¯ψx − ψx
+
+ = √n  ˆψx − ψx
+
+ + √n  ¯ψx − ˆψx
+
+| {z }
+
+> op(1)
+
+,
+
+(ii) √n ΠQ( ¯ψx) − ψx
+
+ = √n ΠQ( ˆψx) − ψx
+
+ + √n ΠQ( ¯ψx) − ΠQ( ˆψx)| {z }
+
+> op(1)
+
+,
+
+(iii) √n  ¯˜β − βunc  = √n  ˜β − βunc  + √n  ¯˜β − ˜β| {z }
+
+> op(1)
+
+,
+
+(iv) √n  ¯βIVFR − βIVFR  = √n  ˆβIVFR − βIVFR  + √n  ¯βIVFR − ˆβIVFR | {z }
+
+> op(1)
+
+.
+
+In each line, the first term converges weakly to the corresponding Gaussian limit by Theo-rems 2–5. The result follows by Slutsky’s lemma. 
+
+# E Derivation of the asymptotic covariance expression 
+
+This subsection derives the influence function of ˆψx(u) and the corresponding asymptotic covariance kernel appearing in Theorem 2. Under correct specification, the general expression simplifies to a closed form, which is useful for comparison with CLP. 
+
+Notation. To simplify these derivations, we first introduce some additional notation. Let 
+
+eZ := Z − μZ , eX := X − μX , and fix the evaluation point x ∈ Rp with ˜ x := x − μX . Define the population moments 
+
+M := Σ −1 
+
+> ZZ
+
+, S := Σ ZX , A := STM S. 
+
+The IV weight used in our estimator can be written as, 
+
+s(Z, x ) = 1 + ˜ xTA−1STM eZ. 
+
+Collect the nuisance parameters into θ = ( μX , μ Z , ΣZX , ΣZZ ), and write the target functional as 
+
+ψx(u; θ) = E sθ(Z, x ) QY (u) .
+
+We first derive the general asymptotic linear representation of ˆψx(u). We then show that, under correct specification of the linear model, the influence function simplifies to a closed form that coincides with the covariance formula in CLP. 72 The vector for the sample moments is 
+
+m(W ) = 
+
+ eX, eZ, vec   eZ eXT − ΣZX 
+
+ , vec   eZ eZT − ΣZZ 
+
+ 
+
+.
+
+Influence Function. Recall that the unprojected estimator is, ˆψx(u) = n−1 Pnj=1 ˆsj (x) QYj (u). A first-order expansion of ˆ sj = g(ˆθ, Z j ) about θ0 gives 
+
+√n  ˆψx(u) − ψx(u) = 1
+
+√n
+
+> n
+
+X
+
+> j=1
+
+
+
+sj QYj (u) − ψx(u)
+
+
+
++
+
+
+
+∂θψx(u)
+
+T 1
+
+√n
+
+> n
+
+X
+
+> j=1
+
+m(Wj ) + op(1) ,
+
+where 
+
+∂θψx(u) = E QY (u) ∇θs(Z, x )  ∈ Rdim( θ).
+
+Thus the influence function of ˆψx(u) is 
+
+ϕx(W ; u) :=  s(Z, x )QY (u) − ψx(u) +  ∂θψx(u)Tm(W ).
+
+To simplify this expression, we now derive the gradient terms involved in the term 
+
+∂θψx(u). Remember the following standard formulas for matrix differentials, 
+
+dM = − M (dΣZZ ) M, dA = ( dS )TM S +STM (dS )+ ST(dM )S, d(A−1) = − A−1(dA ) A−1.
+
+Write s = 1 + ˜ xTA−1STM eZ. Its total differential is 
+
+ds = ( d˜x)TA−1STM eZ + ˜ xTd(A−1)STM eZ + ˜ xTA−1(dS )TM eZ + ˜ xTA−1ST(dM ) eZ + ˜ xTA−1STM (d eZ).
+
+Then, we derive expressions for the gradients for each block of θ by rewriting ds = tr  (∇s)Td(·).1. Gradient w.r.t. μX . When varying μX , we only have d˜x = − dμ X ,
+
+ds = − (dμ X )TA−1STM eZ = tr   (−A−1STM eZ) ( dμ X )T = tr  (∇μX s)Tdμ X
+
+,
+
+hence 
+
+∇μX s = − A−1STM eZ. 
+
+2. Gradient w.r.t. μZ . We only have d eZ = − dμ Z ,
+
+ds = − ˜xTA−1STM (dμ Z ) = tr   (−M SA −1 ˜x) ( dμ Z )T = tr  (∇μZ s)Tdμ Z
+
+,
+
+73 hence 
+
+∇μZ s = − M SA −1 ˜x. 
+
+3. Gradient w.r.t. S = Σ ZX . Collect the dS and ( dS )T terms. Using d(A−1) = −A−1(dA )A−1
+
+and dA above, 
+
+ds = ˜ xTA−1(dS )TM eZ − ˜xTA−1
+
+h
+
+(dS )TM S + STM (dS )
+
+i
+
+A−1STM eZ + terms in dM, d eZ, d ˜x. 
+
+Drop the terms not involving dS . Rewrite each contribution as a trace against dS ,˜xTA−1(dS )TM eZ = tr  M eZ ˜xTA−1 dS ,
+
+−˜xTA−1(dS )TM S A −1STM eZ = − tr  M SA −1STM eZ ˜xTA−1 dS ,
+
+−˜xTA−1STM (dS ) A−1STM eZ = − tr  (˜ xTA−1STM eZ) A−1STM dS 
+
+= − tr  M SA −1 ˜x eZTM SA −1 dS ,
+
+where in the last equality we used cyclicity of trace and transpose identities. Therefore 
+
+ds = tr 
+
+ M eZ ˜xTA−1 − M SA −1STM eZ ˜xTA−1 − M SA −1 ˜x eZTM SA −1 TdS 
+
+
+
+,
+
+so 
+
+∇S s = M eZ ˜xTA−1 − M SA −1
+
+
+
+STM eZ ˜xTA−1 + ˜ x eZTM SA −1
+
+
+
+.
+
+4. Gradient w.r.t. ΣZZ . Here dM = −M (dΣZZ )M enters both the ST(dM ) eZ and the dA 
+
+term inside d(A−1). After some algebra (collect dΣZZ and use d(A−1)), we get, 
+
+ds = ˜ xTA−1ST(dM ) eZ − ˜xTA−1ST(dM )S A −1STM eZ
+
+= − tr 
+
+M SA −1STM eZ − M eZ (M SA −1 ˜x)T dΣZZ 
+
+
+
+,
+
+hence 
+
+∇ΣZZ s =  M SA −1STM eZ − M eZ (M SA −1 ˜x)T.
+
+E.0.1 Simplification under correct specification 
+
+Assume now that the linear model is correctly specified, 
+
+QY (u) = β0(u) + β1(u)T eX + η(u), E[η(u)] = 0 , E[ eZ η (u)] = 0 ,
+
+and denote β0 = β0(u), β1 = β1(u) for brevity. 74 Then, using E[ eZ] = 0, E[η] = 0, and E[ eZ Q Y ] = Sβ 1, we can derive the corresponding expressions for the gradients of ψx,1. 
+
+∂μX ψx = EQY (−A−1STM eZ) = −A−1STM (Sβ 1) = − β1.
+
+2. 
+
+∂μZ ψx = EQY (−M SA −1 ˜x) = − β0 M SA −1 ˜x. 
+
+3. 
+
+∂S ψx = E
+
+h
+
+QY
+
+n
+
+M eZ ˜xTA−1 − M SA −1 STM eZ ˜xTA−1 + ˜ x eZTM SA −1oi 
+
+= M (Sβ 1) ˜ xTA−1 − M SA −1
+
+
+
+(STM S )β1 ˜xTA−1 + ˜ x β T 
+
+> 1
+
+STM SA −1
+
+
+
+= − M SA −1 ˜x β T 
+
+> 1
+
+.
+
+4. 
+
+∂ΣZZ ψx = EQY
+
+ M SA −1STM eZ − M eZ (M SA −1 ˜x)T
+
+=  M SA −1STM (Sβ 1) − M (Sβ 1)(M SA −1 ˜x)T = 0 .
+
+Cancellation against estimation error term sQ Y − ψx. Then 
+
+sQ Y − ψx = β0 (s − 1) + βT
+
+> 1
+
+ s eX − ˜x + s η, 
+
+and note s − 1 = ˜ xTA−1STM eZ, and s eX = eX + (˜ xTA−1STM eZ) eX. Thus 
+
+sQ Y − ψx = β0 ˜xTA−1STM eZ
+
+| {z }
+
+> (A)
+
++ βT 
+
+> 1
+
+( eX − ˜x)
+
+| {z }
+
+> (B)
+
++ βT 
+
+> 1
+
+eX ˜xTA−1STM eZ
+
+| {z }
+
+> (C)
+
++ s η 
+
+|{z} 
+
+> (D)
+
+.
+
+Now multiply the derivative blocks by the corresponding components of m(W ): 1. ( ∂μZ ψx)T eZ = − β0 ˜xTA−1STM eZ cancels (A). 2. ( ∂μX ψx)T eX = − βT 
+
+> 1
+
+eX cancels the + βT 
+
+> 1
+
+eX part of (B). 3. Frobenius inner product with the S-score: 
+
+∂S ψx, eZ eXT −S F = tr 
+
+−M SA −1 ˜x β T
+
+> 1
+
+T( eZ eXT −S)
+
+
+
+= − βT 
+
+> 1
+
+eX ˜xTA−1STM eZ + βT 
+
+> 1
+
+˜x, 
+
+which cancels (C) and the remaining − βT 
+
+> 1
+
+˜x part of (B). 75 4. The Σ ZZ -block is 0 and contributes nothing. Therefore all deterministic β-terms cancel, and only the noise η(u) remains, 
+
+ϕx(W ; u) =  sQ Y − ψx
+
+ +  ∂θψx
+
+Tm(W ) = s(Z, x ) η(u).
+
+Covariance kernel. As a result of the above derivations, the asymptotic covariance kernel of ˆψx(·) is Γx(u, u ′) = E s(Z, x )2 η(u) η(u′) .
+
+To keep intercept handling transparent, in this paragraph let X and Z denote the centered 
+
+regressors and instruments, and introduce the augmented stacks 
+
+X := 
+
+"
+
+1
+
+X
+
+#
+
+, Z := 
+
+"
+
+1
+
+Z
+
+#
+
+, x := 
+
+"
+
+1˜x
+
+#
+
+.
+
+Define the (population) 2SLS operator 
+
+S2SLS :=  ΣXZ Σ−1 
+
+> ZZ
+
+ΣZX 
+
+−1 ΣXZ Σ−1
+
+> ZZ
+
+, ΣXZ := E[XZ ⊤], ΣZZ := E[ZZ ⊤] ( ≻ 0) .
+
+By the Riesz representer identity, 
+
+s(Z, x ) = xTS2SLS Z.
+
+Let a := ST
+
+> 2SLS
+
+x. Then s(Z, x ) = aTZ and Γx(u, u ′) = E(aTZ)2 η(u)η(u′) = aT EZZ Tη(u)η(u′)| {z }
+
+> =: J(u,u ′)
+
+a = xTS2SLS J(u, u ′) ST
+
+> 2SLS
+
+x,
+
+which is exactly the S J (u, u ′) ST covariance in CLP, pushed through x. In the just-identified case (dim Z = dim X and Σ ZX invertible), 
+
+S2SLS = (Σ ZX )−1 =⇒ Γx(u, u ′) = xT(Σ ZX )−1 J(u, u ′) (Σ T
+
+> ZX
+
+)−1x.
+
+Misspecification. Under misspecification, let βunc (u) denote the population 2SLS coeffi-cient functions and recall the definition of the pseudo-residual 
+
+ξ(u) := QY (u) − XTβunc (u).
+
+76 Then ˆψx(u) continues to admit the linear representation 
+
+√n  ˆψx(u) − ψx(u) = 1
+
+√n
+
+> n
+
+X
+
+> j=1
+
+ϕx(Wj ; u) + op(1) ,
+
+with 
+
+ϕx(W ; u) =  s(Z, x )QY (u) − ψx(u) +  ∂θψx(u)Tm(W ).
+
+In the overidentified case, the derivative correction term does not in general collapse to 
+
+s(Z, x )ξ(u). Accordingly, the asymptotic covariance kernel is Γx(u, u ′) = E[ϕx(W ; u)ϕx(W ; u′)] .
+
+When the model is correctly specified, this expression reduces to E[s(Z, x )2η(u)η(u′)] as shown above. 77

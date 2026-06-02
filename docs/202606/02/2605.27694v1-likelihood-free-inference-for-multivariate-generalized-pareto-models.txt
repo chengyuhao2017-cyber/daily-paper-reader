@@ -1,0 +1,1573 @@
+Title: Likelihood-Free Inference for Multivariate Generalized Pareto Models
+
+URL Source: https://arxiv.org/pdf/2605.27694v1
+
+Published Time: Thu, 28 May 2026 00:22:14 GMT
+
+Number of Pages: 38
+
+Markdown Content:
+# Likelihood-Free Inference for Multivariate Generalized Pareto Models 
+
+## Samira Aka LSCE, Universit´ e Paris Saclay & ESSEC Business School CREAR and Marie Kratz ESSEC Business School, IDO Dep. and CREAR and Philippe Naveau Laboratoire des Sciences du Climat et de l’Environnement, CNRS-CEA-UVSQ-IPSL 
+
+Abstract 
+
+Likelihood-based inference for multivariate extreme-value models is often unreliable or infeasible when likelihoods are intractable or supports are discrete. This chal-lenge is particularly acute for multivariate discrete generalized Pareto models, where both marginal tail behavior and dependence must be inferred from sparse exceedance samples. We propose a two-stage likelihood-free inference procedure, termed AW– NBE (Adaptive Wasserstein Neural Bayes Estimator), that combines neural Bayes estimation with a targeted optimal transport refinement step based on the Sinkhorn discrepancy. In the first stage, a neural Bayes estimator trained on simulated data provides fast and stable initial parameter estimates. In the second stage, these esti-mates are locally refined by minimizing the Sinkhorn divergence between the empiri-cal distributions of observed and simulated exceedances. This refinement reduces the Sinkhorn discrepancy between the empirical distributions of observed and simulated exceedances, while preserving dependence features learned by the neural estimator. Model adequacy is assessed using new optimal transport based multivariate Q–Q and potential diagnostics. Applications to financial log-returns and Swiss dry spell exceedances suggest that AW–NBE can improve parameter inferences compared to estimation using solely, either the Sinkhorn discrepancy, or the standard neural Bayes estimators and censored likelihood estimation. 
+
+Keywords: simulation-based inference, minimum distance estimation, multivariate extremes 1
+
+> arXiv:2605.27694v1 [stat.AP] 26 May 2026
+
+# 1 Introduction 
+
+Statistical inference for parametric models commonly relies on likelihood-based methods such as maximum likelihood estimation (MLE) or composite likelihood (Lindsay, 1988; Cox and Reid, 2004; Varin et al., 2011), which are widely used due to their theoretical properties and efficiency. These approaches face significant limitations when the likelihood is intractable or computationally expensive to evaluate, as is often the case for multivariate models with complex dependence structures or discrete support. In such settings, MLE may be infeasible and composite likelihood methods are commonly used as practical surrogates. A large class of likelihood-free techniques instead relies on simulation-based comparisons between observed data and synthetic data generated under candidate parameter values (Papamakarios et al., 2019; Cranmer et al., 2020). Among these, approximate Bayesian computation (ABC) replaces likelihood evaluation by accepting parameters that generate simulated data sufficiently close to observed data, typically measured through summary statistics (Beaumont et al., 2002; Lintusaari et al., 2016). Synthetic likelihood methods approximate the likelihood of summary statistics through a parametric model, while indi-rect inference relies on auxiliary models to link simulated and observed data (Gourieroux et al., 1993; Heggland and Frigessi, 2004; Wood, 2010; Price et al., 2018). More recently, deep learning simulation-based inference methods have been proposed, en-abling inference through neural networks trained on simulated data (Sainsbury-Dale et al., 2024). These include neural posterior and likelihood approximation methods (Rezende and Mohamed, 2015; Papamakarios et al., 2021), as well as neural Bayes estimators (NBE) (see, e.g. Sainsbury-Dale et al., 2024), which directly approximate Bayes estimators under a given loss function. NBE provide a flexible and computationally efficient framework, par-ticularly well suited to complex dependence structures and high-dimensional observations, while allowing fast evaluation once trained. An alternative class of likelihood-free methods relies on distributional distances between probability measures. Optimal transport (OT) provides a principled framework to compare probability distributions through Wasserstein-type discrepancies (Villani, 2008; Panaretos and Zemel, 2019; Bernton et al., 2019). Such approaches capture global distributional features and can naturally accommodate dependence and heavy tails. To address compu-tational challenges, scalable approximations such as entropy-regularized optimal transport (EOT), also known as Sinkhorn divergence-based optimal transport, have been proposed (Cuturi, 2013; Genevay et al., 2018; Flamary et al., 2021), together with projection-based variants such as sliced Wasserstein distances (Bonneel et al., 2015; Nietert et al., 2022). These approaches exhibit complementary strengths. NBEs are fast and scalable but may lack accuracy in the tail, while OT-based methods directly enforce distributional alignment but require solving a potentially challenging optimization problem. This complementarity is particularly relevant in extreme-value settings. In multivariate extreme value theory (EVT) (see Resnick (1987), Resnick (2007), de Haan and Ferreira (2006), Chap. 7 by Naveau and Segers in de Carvalho et al. (2026)), threshold exceedances are naturally modeled by multivariate generalized Pareto distributions (MG-PDs) (Rootz´ en and Tajvidi, 2006; Rootz´ en et al., 2018a,b; Kiriliouk et al., 2019). Although MGPDs provide a theoretically sound framework for modeling joint tail behavior, their like-lihood is often unavailable in closed form for general dependence structures, making infer-ence challenging, especially in high dimensions or in discrete settings. Moreover, in various 2applications, including climate science, environmental monitoring, and insurance, extreme events are naturally recorded as counts or durations, such as threshold exceedance counts, or damage reports. These discrete-valued extremes are not naturally accommodated within continuous MGPD models without additional modeling assumptions. To address this gap, discrete extensions of the MGPD have been recently proposed, such as the multivariate discrete generalized Pareto Distribution (MDGPD) in Aka et al. (2025), designed specifi-cally for modeling multivariate extremes with integer-valued supports. The MDGPD lacks a closed-form density and often relies on latent-variable or simulation-based methods. As a result, standard likelihood-based approaches are no longer applicable and alternative infer-ence strategies are needed. The statistical challenges arising in these discrete constructions go beyond those encountered in continuous MGPD models. Discrete supports generate irregular likelihood structures and combinatorial features that complicate likelihood-based calibration (Chakraborty, 2015; Hitz et al., 2024). Moreover, as is well-known in multi-variate extremes, the rarity of joint exceedances further reduces the effective sample size after thresholding (Coles, 2001; de Haan and Ferreira, 2006). These limitations naturally motivate the use of simulation-based and likelihood-free inference methodologies that rely on forward model simulation rather than explicit likelihood evaluations. In this work, we develop a likelihood-free inference strategy that combines neural Bayes estimation with a targeted optimal transport refinement that might be beneficial, espe-cially, in the discrete setting. The proposed approach, denoted AW–NBE for adaptive Wasserstein-NBE, first provides fast parameter estimation through simulation-based neu-ral training and then improves calibration by minimizing a Sinkhorn discrepancy between observed and simulated exceedances (see e.g., Feydy et al., 2019; Genevay et al., 2018). The framework is applicable to both continuous and discrete exceedance models and is supported by theoretical results and empirical investigations on financial and environmen-tal datasets, with gains that are especially significant in the discrete setting. The main contributions in this paper are the following: 
+
+• A new hybrid likelihood-free estimator, bθAW  
+
+> n
+
+, combining neural Bayes inference and optimal transport refinement; 
+
+• A finite-sample guarantee that AW–NBE does not increase the empirical Sinkhorn discrepancy compared to NBE; 
+
+• Consistency and, under a local regularity condition, asymptotic normality of AW– NBE, with asymptotic equivalence to the EOT estimator; 
+
+• Empirical evidence, on a continuous financial dataset and a discrete environmental dataset, that the proposed refinement is most beneficial in the discrete setting. The paper is organized as follows: Section 2 presents the likelihood-free methods com-pared in the paper, specifically the novel AW–NBE estimator and its theoretical properties. Section 3 illustrates the practical relevance of the approach through applications to real datasets. Proofs of the main theoretical results are deferred to the Appendix. Before concluding this introduction, let us introduce some notations. Bold face symbols denote vectors in Kd, where K = R, Z or N, for example, 0 = (0 , . . . , 0) and 1 = (1 , . . . , 1). Mathematical operations such as addition, multiplication, and exponentiation are to be interpreted componentwise when applied to vectors. For instance, for x, ξ ∈ Rd, we write (1 + ξx )−1/ξ for the vector 
+
+
+
+(1 + ξ1x1)− 1 
+
+> ξ1
+
+, . . . , (1 + ξdxd)− 1
+
+> ξd
+
+
+
+.3We denote by Pθ the distribution of the observations under parameter θ, and by π(θ) the prior distribution. We let ε > 0 denote the entropic regularization parameter. Writing (Z⩽̸ u) means that at least one coordinate of Z exceeds the corresponding coordinate of 
+
+u, i.e., Wdj=1 (Zj > u j ). 1A is the indicator function, equal to 1 if A is true and 0 otherwise. Given random elements ( θ, X), we denote by E[θ | X] the conditional expectation of θ
+
+given X. For any generic function fψ parameterized by ψ, we denote by f bψ its calibrated version obtained from simulated data. Finally, estimators of the parameter θ computed from a sample of size n are denoted by bθMethod  
+
+> n
+
+, where the superscript indicates the name of the chosen estimation method. 
+
+# 2 Likelihood-free inference 
+
+Throughout this section, let {Pθ : θ ∈ Θ ⊂ Rp} be a parametric statistical model on 
+
+Rd, and let Pθ0 denote the true distribution. We observe X1, . . . , Xni.i.d. 
+
+∼ Pθ0 , with em-pirical measure bPn = 1
+
+> n
+
+Pni=1 δXi . For each θ ∈ Θ, we assume that one can simulate 
+
+Y (θ)1 , . . . , Y (θ)
+
+> mn
+> i.i.d.
+
+∼ Pθ, with empirical measure bPmn,θ = 1
+
+> mn
+
+Pmn 
+
+> j=1
+
+δY (θ)
+
+> j
+
+; this assumption is standard in likelihood-free inference (Cranmer et al., 2020; Papamakarios et al., 2019). 
+
+## 2.1 Background: neural Bayes and optimal transport approaches 
+
+Likelihood-free inference has recently benefited from simulation-based methods that com-pare observed data with synthetic samples generated under candidate parameter values. A prominent approach is the NBE introduced by Sainsbury-Dale et al. (2024), which ap-proximates the Bayes estimator using a neural network trained on simulated data. Let 
+
+θ ∈ Θ denote the model parameter and Xn,d = ( X1, . . . , Xn) be an observed sample from 
+
+Pθ, where each Xi ∈ Rd and n denotes the sample size. Training data are generated by simulating pairs ( θ(k), X(k)
+
+> n,d
+
+), where θ(k) ∼ π(θ) and X(k) 
+
+> n,d
+
+∼ Pθ(k) . A neural network fψ,where ψ denotes its parameter, is trained to minimize 1
+
+K
+
+> K
+
+X
+
+> k=1
+
+fψ(X(k)
+
+> n,d
+
+) − θ(k) 2
+
+, where K ∈ N \ { 0},
+
+so that, under quadratic loss, it approximates E[θ | X]. The resulting estimator is 
+
+bθNBE  
+
+> n
+
+= f bψ(Xn,d ). (1) This approach is computationally efficient once trained and well suited to complex or high-dimensional models. An alternative class of likelihood-free methods relies on distributional discrepancies between empirical measures. In this work, we use the Sinkhorn divergence Sε as a computationally tractable optimal transport criterion (Cuturi, 2013; Genevay et al., 2018; Feydy et al., 2019); see Equation (3). Given an observed sample Xn,d and simulated samples Y (θ)1 , . . . , Y (θ) 
+
+> m
+
+∼
+
+Pθ with respective empirical measures 
+
+bPn = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+δXi and bPm, θ = 1
+
+m
+
+> m
+
+X
+
+> j=1
+
+δY (θ)
+
+> j
+
+, (2) 4the transport-based estimator is defined as 
+
+bθEOT  
+
+> n
+
+∈ arg min  
+
+> θ∈Θ
+
+Sε( bPn, bPm, θ),
+
+whenever a minimizer exists (see, e.g. Cuturi, 2013; Genevay et al., 2018; Bernton et al., 2019). Such estimators only require the ability to simulate from the model and can capture global distributional features, including dependence and tail behavior. In the definition of the EOT estimator, m denotes a generic simulated sample size, whereas in the asymptotic analysis we write mn to emphasize that the simulated sample size may depend on n and grows with n.These two approaches exhibit complementary strengths: NBE provides fast and stable es-timation but does not explicitly enforce distributional alignment, while optimal transport directly targets discrepancies between empirical distributions but may involve a more chal-lenging optimization problem. One main question is how to merge these two complementary approaches. 
+
+## 2.2 Improving neural Bayes inference with optimal transport: Adaptive Wasserstein Neural Bayes Estimator 
+
+Although our final statistical objective is to estimate MGPD parameters (i.e. modeling multivariate extremes), this section provides likelihood-free inference procedures that can be applied beyond the MGPD class. More precisely, we define an adaptive Wasserstein neural Bayes estimator (AW–NBE), which can be interpreted as a regularized optimal transport refinement of a NBE. Let Π( μ, ν ) denote the set of couplings between probability measures μ and ν on Rd and c : Rd ×Rd → [0 , +∞) be a measurable cost function, typically chosen as c(x, y ) = ∥x − y∥p for some p ≥ 1. The entropy-regularized optimal transport cost between μ and ν is defined as OT ε(μ, ν ) = inf 
+
+> π∈Π( μ,ν )
+
+Z 
+
+c(x, y ) dπ (x, y ) + ε KL( π ∥ μ ⊗ ν)
+
+
+
+,
+
+where KL denotes the Kullback–Leibler divergence and ε > 0 the entropic regularization parameter. We denote by Sε(μ, ν ) the Sinkhorn divergence between probability measures 
+
+μ and ν (see, e.g. Genevay et al., 2018; Feydy et al., 2019), defined by: 
+
+Sε(μ, ν ) = OT ε(μ, ν ) − 12OT ε(μ, μ ) − 12OT ε(ν, ν ). (3) This quantity defines a non-negative discrepancy between probability measures that inter-polates between optimal transport distances and kernel-based integral probability metrics (Genevay et al., 2018; Feydy et al., 2019). In particular, 
+
+Sε(μ, ν ) ≥ 0 and Sε(μ, μ ) = 0 .
+
+In what follows, Sε(·, ·) measures the discrepancy between the empirical observed and model-simulated distributions. 5Definition 2.1 (Adaptive Wasserstein Neural Bayes estimator) . For λn ≥ 0, define 
+
+Qn(θ) = Sε( bPn, bPmn,θ) + λn∥θ − bθNBE  
+
+> n
+
+∥22,
+
+where Sε is defined in Equation (3) , bθNBE  
+
+> n
+
+in Equation (1) , bPn, bPmn,θ in Equation (2) and 
+
+∥ · ∥ 2 is the Euclidean norm. Any minimizer of Qn, whenever it exists, 
+
+bθAW  
+
+> n
+
+∈ arg min  
+
+> θ∈Θ
+
+Qn(θ)
+
+is called an adaptive Wasserstein NBE (AW–NBE). 
+
+Remark 2.1. The use of the Euclidean norm ∥·∥ 2 is mainly required for the local asymptotic analysis in Theorem 2.2, where second-order expansions and quadratic terms are involved. The other results remain valid for more general norms on Rp.
+
+The following result establishes consistency of AW–NBE. Throughout the asymptotic anal-ysis, ( mn)n≥1 denotes a sequence of positive integers with mn → ∞ as n → ∞ , representing the simulation sample size; its growth rate relative to n is made precise in (H3)(i) and strengthened in ( H4∗). The result holds under the following hypotheses: (H1) Θ ⊂ Rp is compact. (H2) (Identification) 
+
+Sε(Pθ0 , P θ) > 0, ∀θ ∈ Θ \ { θ0}.
+
+(H3) (Uniform convergence and continuity) (i) (Uniform convergence) As n → ∞ with mn → ∞ ,sup 
+
+> θ∈Θ
+
+Sε( bPn, bPmn,θ) − Sε(Pθ0 , P θ) P
+
+−→ 0.
+
+(ii) (Continuity) The mapping θ 7 −→ Sε(Pθ0 , P θ) is continuous on Θ. (H4) As n → ∞ , λn → 0. These assumptions, standard in the analysis of extremum estimators (see, e.g., van der Vaart, 1998), ensure identifiability, stability of the objective function, and asymptotic van-ishing of the regularization term. 
+
+Theorem 2.1. Under (H1)–(H4), as n → ∞ ,
+
+bθAW 
+
+> n
+> P
+
+−→ θ0.
+
+The proof of Theorem 2.1 relies on the standard separation argument for extremum es-timators (see, e.g., Newey and McFadden, 1994; van der Vaart, 1998) and is provided in Appendix A.1. After proving consistency, we now investigate the local asymptotic behavior of bθAW  
+
+> n
+
+. Since a direct analysis is currently not feasible due to the lack of known conver-gence rates for the NBE, we adopt a comparison-based approach and relate bθAW  
+
+> n
+
+to our two benchmark estimators: the transport-based estimator bθEOT  
+
+> n
+
+and the NBE bθNBE  
+
+> n
+
+.6The asymptotic theory of entropic optimal transport functionals is now well understood, in particular through Hadamard differentiability and functional delta method arguments. Combined with standard M-estimation theory (van der Vaart (1998)), it implies that, under suitable regularity, smoothness, and identification conditions, 
+
+√n bθEOT  
+
+> n
+
+− θ0
+
+ d
+
+−−−→ 
+
+> n→∞
+
+N  0, Vε(θ0)−1Σε(θ0)Vε(θ0)−1 , (4) where Vε(θ0) denotes the Hessian of the limiting objective function Q(θ) = Sε(Pθ0 , P θ)evaluated at θ0, and Σε(θ0) is the asymptotic covariance matrix of the empirical gradient (see, e.g. Goldfeld et al., 2023, 2024). Hence, bθEOT  
+
+> n
+
+satisfies 
+
+bθEOT  
+
+> n
+
+− θ0 = OP(n−1/2). (5) Consequently, our strategy is twofold: we compare bθAW  
+
+> n
+
+against bθEOT  
+
+> n
+
+at the level of asymp-totic rates, and bθAW  
+
+> n
+
+against bθNBE  
+
+> n
+
+through their discrepancy since the convergence rate of the NBE estimator is currently unknown. To this end, we introduce the following additional hypotheses: (H4∗) (Penalty decay). We replace ( H4) with a stronger condition that the penalty sequence (λn)n satisfies 
+
+λn
+
+√n −−−→ 
+
+> n→∞
+
+0.
+
+This condition ensures that the regularization term in Equation (6) is asymptotically negligible compared to the stochastic fluctuations of the empirical Sinkhorn score 
+
+∇Sε( bPn, bPmn,θ), which are of order n−1/2 as assumed in the next assumption. (H5) (Local stochastic expansion of ∇Sε). Motivated by (5), we assume that there exists a neighborhood U of θ0 such that, for any sequence ( θn)n in U satisfying θn
+
+> P
+
+−→ θ0,
+
+∇Sε( bPn, bPmn,θn ) = ∇Sε( bPn, bPmn,θ0 ) + Vε(θ0)( θn − θ0) + oP
+
+ ∥θn − θ0∥2 + n−1/2, (6) where Vε(θ0) is a symmetric positive definite matrix. This assumption should be understood as a local stochastic linearization. The term ∥θn − θ0∥2 reflects first-order differentiability with respect to the parameter, while the n−1/2 term accounts for stochastic fluctuations of the empirical measure. Such fluctuations arise because smooth functionals of empirical measures admit asymptotically linear expansions and satisfy a central limit theorem, which implies variations at the n−1/2 scale; see (van der Vaart, 1998, Chap. 5 and 20). Assumption ( H5) should be read as a model-specific regularity condition rather than as a consequence of existing results. Existing limit theorems for the empirical Sinkhorn divergence (Goldfeld et al., 2023, 2024) describe its behavior when a target measure is replaced by its empirical counterpart based on a sample of growing size. They yield a first-order expansion in which a leading linear term governs the asymptotic distribution and a remainder of smaller order is negligible at the rate n−1/2. Assumption ( H5) is of a different nature: it requires a first-order expansion in the model parameter θ, along the family {Pθ : θ ∈ Θ},with the simulated measure bPmn,θ replacing Pθ. Establishing such an expansion additionally requires that the model map θ 7 → Pθ be sufficiently smooth and that the simulation error in bPmn,θ be controlled uniformly in θ. Existing results make ( H5) 7plausible but do not, to our knowledge, imply it. Accordingly, Theorem 2.2 should be understood as a conditional asymptotic result: it holds whenever ( H5) holds. The empirical findings of Section 3 do not depend on ( H5). Conditions ( H4∗) and ( H5) ensure that the penalty term in the criterion 
+
+Qn(θ) = Sε( bPn, bPmn,θ) + λn∥θ − bθNBE  
+
+> n
+
+∥22
+
+is asymptotically negligible at the n−1/2 scale. Indeed, differentiating the penalty term yields 2λn(θ − bθNBE  
+
+> n
+
+).
+
+Since Θ is compact under ( H1), both θ and bθNBE  
+
+> n
+
+remain bounded, so that ∥θ − bθNBE  
+
+> n
+
+∥2 =
+
+OP(1) and the penalty gradient is of order OP(λn). Under ( H4∗), this term is therefore 
+
+oP(n−1/2). The assumptions ( H4∗) and ( H5) are chosen so that the gradient of Qn is locally governed by the Sinkhorn term, which yields the same limit as for the EOT estimator. The following theorem establishes the asymptotic distribution of bθAW  
+
+> n
+
+and its relationship with the EOT estimator. Note that ( H4∗) replaces ( H4) in the assumptions below. The detailed proof is deferred to Appendix A.2. 
+
+Theorem 2.2. Under (H1) –(H3) , (H4∗) and (H5) , we have 
+
+bθAW  
+
+> n
+
+− bθEOT  
+
+> n
+
+= oP(n−1/2),
+
+and, therefore, 
+
+√n(bθAW  
+
+> n
+
+− θ0) d
+
+−→ N  0, Vε(θ0)−1Σε(θ0)Vε(θ0)−1 , as n → ∞ ,
+
+where Vε(θ0) is the Hessian of Q(θ) = Sε(Pθ0 , P θ) evaluated at θ0, assumed to be sym-metric positive definite, and Σε(θ0) is the asymptotic covariance matrix of the empirical gradient as defined in Equation (4) .
+
+Theorem 2.2 proves that the AW–NBE estimator is asymptotically equivalent to the EOT estimator, thereby inheriting the same theoretical guarantees while remaining numerically easier to optimize thanks to the NBE-based regularization. 
+
+Remark 2.2 (Conditional nature of Theorem 2.2) . Once (H5) is assumed, the proof of Theorem 2.2 follows by standard M-estimation arguments (van der Vaart, 1998). The novel content of the theorem is therefore not the M-estimation step itself, but the asymptotic equiv-alence bθAW  
+
+> n
+
+−bθEOT  
+
+> n
+
+= oP(n−1/2), which shows that the contribution of the NBE-based penalty in Qn is asymptotically negligible at the n−1/2 scale. Deriving (H5) from explicit smooth-ness conditions on the parametric family {Pθ : θ ∈ Θ} and on the entropic regularization parameter ε remains open, and constitutes the main theoretical limitation of the present asymptotic analysis. Consequently, the role of NBE in bθAW  
+
+> n
+
+is primarily finite-sample and computational rather than asymptotic. 
+
+We now compare the AW–NBE estimator with the classical NBE estimator. Since the asymptotic behavior of the NBE estimator has not yet been theoretically characterized, we do not attempt a direct comparison of their asymptotic distributions. Instead, we compare the two estimators through the empirical Sinkhorn discrepancy. 8Proposition 2.1. Let (mn)n≥1 be the simulation sample size sequence introduced in Defi-nition 2.1, and let bθAW  
+
+> n
+
+be as in the same definition. Then, for any positive integer n,
+
+Sε( bPn, bPmn,bθAW 
+
+> n
+
+) ≤ Sε( bPn, bPmn,bθNBE 
+
+> n
+
+).
+
+Proposition 2.1 provides a finite-sample comparison with the NBE and establishes that the AW–NBE estimator always achieves an empirical Sinkhorn discrepancy no larger than that of the NBE estimator; see the proof in Appendix A.3. This does not imply a uniform improvement in parameter error, but it shows that the refinement step is effective for the discrepancy of interest. In the empirical results, this refinement appears to have a noticeable impact in finite samples, with a more pronounced effect for discrete distributions than for continuous ones. 
+
+An analytical one-dimensional example. Before turning to applications, we first consider a simple one-dimensional example where the criterion Qn(θ) can be computed explicitly. This example follows the conjugate model studied in Sainsbury-Dale et al. (2024, Section 2.2.3), in particular p = 1 and d = 1. Let {Pθ : θ ∈ Θ} be a parametric family of probability distributions on R. In this example, we take 
+
+Pθ = Unif(0 , θ ), Θ ⊂ R+,
+
+and a sample X1, . . . , X n | θ i.i.d. 
+
+∼ Pθ with prior distribution on θ,
+
+θ ∼ Pareto( α, β ), α > 0, β > 0,
+
+where the Pareto distribution with shape parameter α and scale parameter β is defined by its density 
+
+π(θ) = αβ αθ−(α+1) 1(θ≥β).
+
+Under absolute loss L(θ, a ) = |θ − a|, the Bayes estimator is the posterior median and admits the closed–form expression (see, e.g. Sainsbury-Dale et al., 2024, Eq. (8)) 
+
+bθBayes  
+
+> n
+
+(X) = 2 1/(α+n) max  X1, . . . , X n, β . (7) An NBE is an estimator of the form bθNBE  
+
+> n
+
+= ψ(X), where ψ is obtained by minimizing a Monte Carlo approximation of the Bayes risk (Sainsbury-Dale et al., 2024). In this example, 
+
+bθNBE  
+
+> n
+
+targets the Bayes decision rule, i.e. 
+
+bθNBE  
+
+> n
+
+≈ bθBayes  
+
+> n
+
+defined in Equation (7) .
+
+To make the AW–NBE refinement mechanism explicit, we consider a population analogue of the criterion introduced in Definition 2.1, in which the empirical Sinkhorn discrepancy is replaced by its population counterpart and the NBE by its target. This oracle construction does not define a feasible estimator, since it depends on the unknown true parameter θ0,but it illustrates the shrinkage mechanism underlying Theorems 2.1 and 2.2. Fix λ > 0 and define ¯θAW ∈ arg min 
+
+> θ∈Θ
+
+n
+
+Sε(Pθ0 , P θ) + λ θ − bθBayes 
+
+> n
+
+2o
+
+.
+
+9For the quadratic cost c(x, y ) = ( x − y)2, the Sinkhorn divergence Sε(Pθ0 , P θ) converges to W 22 (Pθ0 , P θ) as ε ↓ 0 Feydy et al. (2019). For the chosen model Pθ = Unif(0 , θ ), the quantile function is F −1 
+
+> θ
+
+(u) = θu for any u ∈ [0 , 1]. Hence the squared 2-Wasserstein distance between Pθ0 and Pθ is 
+
+W 22 (Pθ0 , P θ) = 
+
+Z 10
+
+ F −1 
+
+> θ0
+
+(u) − F −1 
+
+> θ
+
+(u)2 du =
+
+Z 10
+
+(θ0u − θu )2 du = (θ − θ0)2
+
+3 .
+
+Replacing Sε by this limit yields the oracle objective 
+
+J(θ) = (θ − θ0)2
+
+3 + λ θ − bθBayes 
+
+> n
+
+2.
+
+Since J is strictly convex, its minimizer is ¯θAW = θ0/3 + λ bθBayes 
+
+> n
+
+λ + 1 /3 ,
+
+which can be rewritten as a weighted average of θ0 and bθBayes  
+
+> n
+
+:¯θAW = 11 + 3 λ θ0 +
+
+
+
+1 − 11 + 3 λ
+
+bθBayes  
+
+> n
+
+.
+
+Substituting the closed-form expression (7) gives ¯θAW = 11 + 3 λ θ0 +
+
+
+
+1 − 11 + 3 λ
+
+
+
+21/(α+n) max( X1, . . . , X n, β ).
+
+This provides a finite-sample illustration of the refinement mechanism in Theorems 2.1 and 2.2. The transport term shrinks the estimate toward θ0, while λ controls the relative weight of the NBE initialization. The feasible AW–NBE estimator bθAW  
+
+> n
+
+replaces Sε(Pθ0 , P θ)with the empirical Sinkhorn discrepancy Sε( bPn, bPmn,θ ) and bθBayes  
+
+> n
+
+with bθNBE  
+
+> n
+
+, thereby recov-ering the criterion of Definition 2.1. We now describe the metrics used to assess goodness-of-fit, which will be applied in Sec-tion 3. 
+
+## 2.3 Goodness-of-fit assessment 
+
+To assess the goodness-of-fit of the fitted models, we consider the null hypothesis H0 that the true data-generating distribution belongs to a chosen parametric family 
+
+{Pθ : θ ∈ Θ}.
+
+We test this hypothesis using the Sinkhorn divergence introduced in Equation (3), cali-brated via a parametric bootstrap procedure (see e.g., Efron and Tibshirani, 1994; van der Vaart, 1998). Let bPn and bPmn,bθn denote the empirical measures defined in Equation (2), where ( mn)n≥1
+
+is a sequence of positive integers with mn → ∞ as n → ∞ . These are based, respectively, 10 on the observed sample Xn,d and on a sample of size mn simulated from the fitted model 
+
+Pbθn . We define the observed discrepancy as 
+
+Dn(bθn) = Sε
+
+ bPn, bPmn,bθn
+
+
+
+,
+
+where smaller values indicate a better agreement between the data and the fitted model. The goal is to assess whether the observed discrepancy Dn(bθn) is larger than what would be expected due to finite-sample variability. In our setting, the chosen parametric family lacks a closed-form likelihood, and the finite-sample distribution of the Sinkhorn discrepancy is analytically intractable while depending on the unknown true parameter. We therefore approximate this distribution using a parametric bootstrap. In this approach, we simulate replicated datasets under the fitted model Pbθn , which serves as a plug-in estimate of the true distribution. The procedure is carried out as follows: For b = 1 , . . . , B :(i) Generate a parametric bootstrap sample X(b)1 , . . . , X(b) 
+
+> n
+
+∼ Pbθn , and denote by bP (b)
+
+> n
+
+its empirical distribution. (ii) Estimate the model parameters on this bootstrap sample to obtain bθ(b) 
+
+> n
+
+.(iii) Simulate a new sample of size mn from the re-fitted model Pbθ(b)
+
+> n
+
+, with empirical measure bPmn,bθ(b)
+
+> n
+
+.(iv) Compute the parametric bootstrap discrepancy: 
+
+Db = Sε
+
+ bP (b) 
+
+> n
+
+, bPmn,bθ(b)
+
+> n
+
+
+
+.
+
+Finally, the bootstrap p-value is calculated as (see Efron and Tibshirani (1994)): 
+
+p-value = 1
+
+B + 1 1 + 
+
+> B
+
+X
+
+> b=1
+
+1{Db≥Dn(bθn)}
+
+!
+
+;it evaluates whether the observed discrepancy is unusually large compared to the discrep-ancies expected under the fitted model. Large p-values indicate that the model provides an adequate fit, whereas small p-values suggest a lack of fit. A formal validity analysis of this parametric bootstrap calibration for the Sinkhorn discrepancy under simulation-based estimation is beyond the scope of the present paper and is left for future work. The pro-cedure should therefore be interpreted as a practical diagnostic and model-adequacy tool rather than as a hypothesis test with established asymptotic guarantees in this setting. Beyond parameter estimation, EOT provides graphical diagnostic tools for model valida-tion. Following Singha et al. (2024), we use EOT maps and potentials to visually assess model adequacy. Let μ denote the uniform distribution on the unit ball Bd ⊂ Rd, and let U 1, . . . , U n
+
+> iid
+
+∼ μ
+
+be auxiliary reference points, independent of the observed and simulated samples. For bP ∈ { bPn, bPmn,bθMethod 
+
+> n
+
+}, the EOT map, more precisely the barycentric projection of the entropic coupling, T ε 
+
+> bP
+
+: Bd → Rd and the source-side EOT potential ϕε 
+
+> bP
+
+: Bd → R are defined through the entropy-regularized optimal transport problem from μ to bP under the quadratic cost c(u, x) = 12∥u − x∥2, that is, 
+
+T ε 
+
+> bP
+
+(u) = Eπ⋆ [X | U = u], where ( U , X) ∼ π⋆μ, bP ,
+
+11 where π⋆μ, bP denotes the optimal entropic coupling between μ and bP . Under the quadratic cost, the barycentric projection admits the representation 
+
+T ε 
+
+> bP
+
+(u) = u − ∇ ϕε 
+
+> bP
+
+(u), u ∈ Bd,
+
+see Pooladian and Niles-Weed (2021, Section 3). The two transports compared in the diagnostics share the same source measure: 
+
+μ −→ bPn, μ −→ bPmn,bθMethod 
+
+> n
+
+,
+
+which makes it possible to compare the resulting transports at common reference locations 
+
+U j .The EOT Q–Q plot in coordinate i is ∆εi =
+
+n ⟨T ε 
+
+> bPn
+
+(U j ), ei⟩, ⟨T ε
+
+> bPmn, bθMethod
+> n
+
+(U j ), ei⟩ : j = 1 , . . . , n 
+
+o
+
+,
+
+where ei is the i-th canonical basis vector of Rd. If the fitted model adequately reproduces the data distribution, the points in ∆ εi should concentrate around the diagonal. The EOT potential plot is Γε =
+
+n ϕε 
+
+> bPn
+
+(U j ), ϕ ε
+
+> bPmn, bθMethod
+> n
+
+(U j ) : j = 1 , . . . , n 
+
+o
+
+.
+
+Concentration around the diagonal indicates similar transport structures for the observed and fitted distributions. A practical advantage of the potential plot is that it provides a single diagnostic representation regardless of the dimension d.To statistically validate these visual assessments, Singha et al. (2024) introduced the dis-crepancy statistics 
+
+Eεn = n
+
+Z
+
+> Bd
+
+T ε 
+
+> bPn
+
+(u)−T ε
+
+> bPmn, bθMethod
+> n
+
+(u) 2 dμ (u), F εn = n
+
+Z
+
+> Bd
+
+ϕε 
+
+> bPn
+
+(u)−ϕε
+
+> bPmn, bθMethod
+> n
+
+(u) 2 dμ (u),
+
+(8) and developed formal goodness-of-fit tests based on these quantities (see Theorem 4.2 therein), relying on functional central limit theorems for empirical EOT maps and potentials established by Goldfeld et al. (2024). 
+
+Adaptation to the discrete case for dry spells data. Since the dry spell exceedances take integer values, many observations are identical. Plotting all n data points individually would lead to overlapping points, hiding the true concentration of the data. To avoid this and properly reflect the discrete structure in the EOT diagnostics, we rep-resent the empirical measure by its distinct support points z1, . . . , zm together with their empirical frequencies p1, . . . , p m, so that 
+
+bPn =
+
+> m
+
+X
+
+> k=1
+
+pk δzk .
+
+In the EOT Q–Q and potential plots, each distinct value is plotted once, with a marker size proportional to its empirical frequency pk. This weighted representation avoids overplotting 12 and makes the discrete probability mass visually explicit, while remaining consistent with the general EOT framework of Singha et al. (2024). Regarding the entropic regularization parameter ε, it is well known that it dictates the trade-off between approximating the unregularized Wasserstein distance (small ε) and en-suring numerically stable, smooth transport maps (large ε) (Cuturi, 2013; Feydy et al., 2019). In our setting, we found the diagnostics to be qualitatively stable across a wide range of regularization levels. Consequently, we fix ε = 10 −2 in all figures, as it provides an effective compromise between computational stability and visual interpretability. 
+
+# 3 Application to financial and environmental time se-ries 
+
+In this section, we first revisit the financial example of Kiriliouk et al. (2019), which ana-lyzes weekly negative log-returns of four major U.K. banks over 2007–2016, keeping their thresholding and generator T (Gumbel– T MGPD model): we use this threshold model as a benchmark to compare censored likelihood estimation with likelihood-free estimators based on neural Bayes inference and Wasserstein refinements. The financial dataset provides a controlled benchmark in which model specification and threshold choices are kept from the previous study, allowing us to isolate the impact of the inference methodology. Second, we turn to discrete environmental data and apply the MDGPD framework to dry spell lengths from Swiss precipitation records. Here, parameters are estimated either by AW–NBE or via NBE trained on simulated MDGPD samples. Across both continuous and discrete settings, the goal is not to re-select models (i.e. to propose a new MGPD model) but to show, on real data, how OT-based and likelihood-free approaches perform relative to the classical censored likelihood, using the same thresholds and generators as in the original studies. 
+
+## 3.1 Banks log-returns 
+
+The empirical illustration in Kiriliouk et al. (2019) considers weekly negative returns of four major U.K. banks, denoted ( X(1)  
+
+> t
+
+, X (2)  
+
+> t
+
+, X (3)  
+
+> t
+
+, X (4)  
+
+> t
+
+) for HSBC, Lloyds, RBS, and Barclays respectively, over the period from 2007/10/29 to 2016/10/17 ( n = 470 observations). Their focus is on modeling joint tail events, 
+
+> 4
+
+[
+
+> i=1
+
+X(i) 
+
+> t
+
+> u i ,
+
+where ui denotes a high marginal threshold, chosen at the 83 rd percentile. After marginal standardization to exponential margins via the probability integral trans-form, excesses are extracted and rescaled to obtain observations in the canonical domain 
+
+{z ∈ R4+ : max  
+
+> 1≤j≤4
+
+zj > 1}.
+
+Multivariate extreme value theory implies that the MGPD arises as an asymptotic model for exceedances in the joint tail region; see Rootz´ en et al. (2018a) (or, e.g., the survey by Naveau and Segers in (de Carvalho et al., 2026, Chap. 7)). The density of the MGPD 13 depends on the distribution of a generator vector T . We recall that a standard MGPD vector Z can be represented as Z = E 1 + S, where E is a unit exponential random variable independent of S, with max S = 0; see Appendix B for further details. The non-positive vector T = S − max S is called a generator. In the standardized case ( σ = 1 , γ = 0), if T
+
+has density fT , the MGPD density can be written as 
+
+1{max( x)>0}emax( x)
+
+Z ∞
+
+> 0
+
+fT (x + log t) t−1dt, 
+
+see Equation (3.3) in Kiriliouk et al. (2019). Different choices of the generator distribu-tion T result in distinct MGPD families. Examples considered in Kiriliouk et al. (2019) include constructions based on Gumbel, Gaussian, and reverse exponential distributions. Parameters were estimated by maximizing a censored likelihood (henceforth referred to as MLE), with model selection performed using the Akaike Information Criterion (AIC) and likelihood ratio tests. Ultimately, the Gumbel-T family was identified as providing the best fit for the bank data. In what follows, we do not revisit their model selection. We retain their generator, namely the Gumbel– T MGPD, together with the same threshold choice (83 rd percentile) and cen-soring framework. Our objective is purely comparative: we contrast estimation criteria 
+
+while keeping the model parametric specification fixed. All conclusions are therefore con-ditional on the Gumbel– T MGPD model class. Applying the goodness-of-fit scheme of Section 2.3 yields Table 1, which reports Dn(bθn)and the corresponding bootstrap p-values for four different estimation methods. Table 1: Goodness-of-fit discrepancies and bootstrap p-values for the banking loss dataset. Smaller values of Dn(bθn) indicate better agreement between the observed and simulated joint exceedances. For each method, Dn(bθn) = Sε( bPn, bPmn,bθn ), where bθn ∈ { bθAW         
+
+> n,bθNBE
+> n,bθEOT
+> n,bθMLE
+> n}. The quantity
+> |∆|denotes the percentage reduction in discrepancy relative to MLE.
+
+Method Dn(bθn) |∆| Bootstrap p-value AW–NBE 0.0189 36 .8% 0.20 NBE 0.0209 30 .1% 0.11 OT 0.0246 17 .7% 0.17 MLE 0.0299 − 0.21 
+
+Caveat on evaluation. Since the goodness-of-fit discrepancy Dn is itself based on the Sinkhorn divergence, estimators that explicitly minimize Sinkhorn-type criteria (OT and AW–NBE) are favored by construction over those that do not (MLE, NBE). The com-parison nevertheless remains informative because all estimators are evaluated on the same fitted model class with identical thresholds, simulation size, and entropic regularization parameter; we therefore interpret it as a comparison under a common OT-based diagnostic rather than as evidence of universal superiority. The AW–NBE estimator achieves the smallest discrepancy (0 .0189), followed by NBE (0 .0209), OT (0 .0246), and MLE (0 .0299). Although these results indicate a moderate global improvement, it is important to note that the Wasserstein-based metric Dn aggre-gates agreement across the entire support. Consequently, refinements achieved in the tail 14 regions may be partially smoothed out in this global average. Nevertheless, all bootstrap 
+
+p-values are above standard significance levels, indicating that none of the fitted models is rejected by the goodness-of-fit test. Among the four estimators considered here, AW–NBE achieved the smallest discrepancy, followed by NBE, OT, and MLE. In Figure 1, we present the EOT potential plots. While NBE and OT display broadly simi-lar patterns, with only moderate differences, the AW–NBE estimator exhibits the strongest concentration along the diagonal. This suggests that the Wasserstein refinement improves the overall agreement between the empirical and simulated distributions, further support-ing the results in Table 1. In Figure 3, we compare the EOT Q–Q plots for the OT, NBE, and AW–NBE estimators. All methods effectively capture the global dependence struc-ture, as shown by the overall diagonal alignment, but systematic differences emerge in the upper tail. The OT and NBE estimators exhibit comparable behavior, with moderate de-viations across margins. In contrast, the AW–NBE estimator shows a consistently tighter concentration around the diagonal. This improvement is particularly visible in the extreme quantiles, where deviations are noticeably smaller than for both OT and NBE. Visually, the dispersion around the diagonal appears reduced in the upper quantiles, although the bootstrap confidence bands overlap and no formal tail-specific test is performed. Overall, among the three likelihood-free estimators considered here, AW–NBE achieved the smallest discrepancy, followed by NBE and OT. 
+
+Figure 1: EOT potential plots for the bank log-return exceedances dataset under the MGPD model. The three estimation procedures are displayed: OT (grey circles), NBE (red triangles), and AW–NBE (green squares). 
+
+15 Figure 2: EOT potential plots for the bank log-return exceedances dataset under the MGPD model. MLE (blue triangles) and AW–NBE (green squares). 
+
+Figure 3: Quadrivariate EOT Q–Q plots for the bank log-return exceedances dataset under the MGPD model. The plots compare the OT in grey circles, the NBE in red triangles, and the AW–NBE in green squares. Each panel corresponds to the projection onto the ei coordinate, i = 1 , . . . , 4, where e1, e2,
+
+e3, and e4 correspond respectively to HSBC, Lloyds, RBS, and Barclays. 
+
+16 After analyzing the likelihood-free estimators, we compare them to the censored maximum likelihood estimator (hereafter MLE), introduced in Kiriliouk et al. (2019), which serves as a parametric benchmark for MGPD models. For clarity, we focus on a visual comparison between the MLE and AW–NBE estimators with potential (Figure 2) and the EOT paired quantile rank plots (Figure 4). The AW–NBE serves as a representative likelihood-free method, as the different likelihood-free estimators exhibit broadly similar behavior in the graphical diagnostics. Figure 2 displays the EOT potential plots for the banks dataset under the MLE and AW– NBE estimations. Overall, both methods capture the main dependence structure of the joint exceedances reasonably well, as most points remain concentrated around the identity line. However, the AW–NBE estimator exhibits a tighter alignment with the diagonal over a broad range of quantile levels, particularly in the intermediate and upper regions of the distribution. The confidence bands further highlight these differences. The AW– NBE bands remain globally closer to the diagonal and appear slightly more stable across the support, whereas the MLE fit shows larger deviations in several regions, especially for moderate-to-large simulated potential values. These visual diagnostics seem consistent with the discrepancy values reported in Table 1, where AW–NBE achieves the smallest goodness-of-fit discrepancy among all competing estimators. 17 Figure 4: EOT paired quantile–rank plots for the bank log-return exceedances dataset under the MGPD model. The solid curve shows the observed EOT map, the dashed curve the simulated model EOT map, and shaded bands denote pointwise 95% bootstrap confidence intervals (pink for MLE, dark green for AW–NBE). 
+
+In Figure 4, the x-axis represents the EOT quantile level, obtained for each estimator by computing EOT-transported values and ordering them component-wise. Although the ob-served EOT-transported values are identical across estimators, they are displayed according to the empirical rankings induced by the corresponding fitted model. A well-fitted model is characterized by close agreement between the observed (solid) and simulated (dashed) curves, with the observed curve remaining within the bootstrap confidence bands. Figure 4 shows that MLE and AW–NBE produce similar results over the central quantile range for all four banks. In the upper tail, MLE tends to produce higher extrapolated quantiles than AW–NBE, most visibly for Lloyds, where the dashed MLE curve clearly ex-ceeds the AW–NBE curve and departs from the observed solid curve. For RBS and HSBC, both methods remain broadly consistent, though MLE shows slightly more variability in the tails. Barclays is the most stable case, with both estimators remaining close throughout. While these visual conclusions could be formally validated using the statistical tests defined in (8), the bootstrap p-values reported in Table 1 already provide sufficient evidence for 18 this assessment. This is consistent with the use of likelihood-free approaches in settings where the likelihood may be less accurate due to model or data constraints. 
+
+## 3.2 Daily dry spells records in Switzerland 
+
+Here, we consider the dry spell dataset constructed from daily precipitation measurements collected by MeteoSwiss (see, e.g. Aka et al., 2025) and located at the two nearby stations called Interlaken and Lauterbrunnen. A dry spell is defined as a sequence of consecutive days with little or no precipitation, and the data consist of the lengths of these runs over several decades of observations in Switzerland (typically 1930–2014). Extreme events are defined as dry spells whose duration exceeds the local 99 th percentile at either of the two sites. The use of a high percentile threshold is consistent with the literature on these hydrological risks (see, e.g. Dommange et al., 2026). As illustrated in Aka et al. (2025), these lengths are discrete, heavy-tailed, and may occur jointly across nearby stations. This discrete and dependent structure makes the dataset a natural case study for evaluating the robustness of our inference procedures. In the present application, the data consist of time series of dry spell lengths and therefore exhibit temporal dependence. To account for this feature, we use as MDGPD generator a bivariate variable-length Markov process (see, e.g. Rissanen, 1983; B¨ uhlmann and Wyner, 1999; Galves and L¨ ocherbach, 2008), which provides a way to capture time dependence. Therefore, we use as generator a bivariate variable-length Markov chain (VLMC). We briefly recall its definition. Let {Xt}t∈Z be a stochastic process taking values in a finite or countable alphabet A. A VLMC, introduced by Rissanen (1983), is a process for which the conditional distribution of Xt given the past depends on a context whose length may vary with the observed history. More precisely, there exists a set of contexts C such that 
+
+P(Xt = x | Xt−1, X t−2, . . . ) = p(x | ct),
+
+where ct denotes the relevant suffix of the past belonging to C.In the present application, Xt represents the vector of dry spell lengths observed at two nearby stations (e.g., Interlaken and Lauterbrunnen). This formulation allows the depen-dence on the past to adapt to persistence patterns of different durations, which is partic-ularly suitable for modeling dry spell dynamics. The estimator is trained on large sets of data simulated from the MDGPD model, using a DeepSets architecture to guarantee per-mutation invariance across replicated samples. Once trained, the network quickly produces parameter estimates θ for new datasets, with uncertainty quantified via bootstrap. 19 Figure 5: EOT potential plots for the dry spell exceedances dataset under the MDGPD model. The three fitted procedures are displayed OT in green circles, NBE in red triangles and AW–NBE in blue squares. 
+
+Figure 6: EOT Q–Q plots for the dry spell exceedances dataset under the MDGPD model. The plots compare the observed samples with samples simulated from the fitted model under three estimation procedures the OT estimator in green circles, the NBE in red triangles and the AW–NBE in blue squares. Each panel corresponds to the projection onto the ei coordinate, i = 1 , 2, where e1, e2
+
+correspond respectively to Interlaken and Lauterbrunnen. The diagonal indicates perfect agreement between observed and simulated samples. 
+
+Figure 5 provides a diagnostic based on EOT potentials. The three estimators remain 20 globally close to the diagonal for small and moderate values, showing that each fitted model captures the main transport structure of the data. Nevertheless, the NBE fit dis-plays more visible departures from linearity as the exceedances increase, reflecting residual discrepancies between observed and simulated samples. Visually, the two transport-based methods (OT and AW–NBE) yield a similarly stable global alignment, clearly outperform-ing the baseline NBE. This highlights the relevance of the EOT fit method for retrieving the distribution, which will be further investigated through simulation analysis. Overall, the potential plots demonstrate that incorporating optimal transport into the fitting procedure results in a more accurate global transport alignment. Figure 6 additionally compares the multivariate EOT Q–Q plots obtained from the OT, NBE, and AW–NBE fits for the dry spell exceedances dataset. All three procedures re-produce the overall ordering structure of the exceedances reasonably well, as most points remain close to the diagonal over a large part of the support. However, clearer differ-ences emerge in the tails. The NBE estimator exhibits a systematic downward deviation in the upper quantiles, indicating an underestimation of the largest dry spell exceedances. The OT estimator provides a better overall alignment with the diagonal, especially for large values. By contrast, the AW–NBE fit is generally the closest to the diagonal across both stations and displays the smallest overall dispersion, particularly in the upper tail. This suggests that the Wasserstein refinement improves the agreement with the observed exceedances under the OT-based diagnostics. To complement the graphical EOT diagnostics, we compare the NBE and AW–NBE fits applying the procedure in Section 2.3. The results are presented in Table 2. Table 2: Sinkhorn goodness-of-fit diagnostics for the dry spell exceedance dataset under the MDGPD model. 
+
+Method Dn(bθn) Bootstrap p-value NBE 0.0596 0.56 OT 0.0324 0.31 AW–NBE 0.0186 0.42 Table 2 reports the Sinkhorn discrepancy Dn(bθn) and the associated bootstrap p-values. Although OT and AW–NBE show comparable performance in the visual potential plots, the numerical results reveal that the AW–NBE refinement achieves the best overall fit. Specifically, the AW–NBE estimator yields a discrepancy of 0 .0186, representing a nearly twofold improvement over OT (0 .0324) and a threefold improvement over the baseline NBE (0 .0596). All bootstrap p-values remain well above conventional significance levels, indicat-ing that none of the fitted models is rejected by the goodness-of-fit test. Unlike the banking dataset, the dry spell data are discrete, and in this setting the OT estimator appears to outperform the NBE estimator. This suggests that discreteness may play an important role in the relative performance of the estimators and warrants further investigation. Moreover, comparing Tables 1 and 2 shows that the improvement is substantially more pronounced for the dry spell data than for the banking example. 21 4 Conclusion 
+
+This paper proposed a likelihood-free inference framework for MGPD models based on a two-step procedure combining neural Bayes estimation with an optimal transport refine-ment step. The AW–NBE estimator reduces the Sinkhorn discrepancy between observed and simulated exceedances while preserving the stability and computational efficiency of simulation-based neural inference. Consistency was established under standard regularity conditions, and asymptotic normal-ity under an additional local first-order expansion condition on the empirical Sinkhorn gradient. The verification of this condition for Sinkhorn-based simulation models remains an open theoretical question. Empirical results on financial and environmental datasets show that the proposed method can improve the fit between observed and simulated exceedances compared with both cen-sored likelihood estimation and baseline neural estimators, with gains that are particularly pronounced in the discrete setting. The proposed framework applies to both continuous and discrete MGPD models and provides a flexible alternative when likelihood evaluation is intractable. Future work may extend the methodology to higher-dimensional settings, design adaptive tail-weighting strategies, and consider alternative discrepancies beyond Wasserstein-type ones. Additional directions include the theoretical analysis of Sinkhorn-based bootstrap calibration procedures and a deeper understanding of the finite-sample behavior observed in discrete models. 
+
+Acknowledgement. The work of S. Aka was supported by ANRT (CIFRE PhD pro-gram) in collaboration with Square Management .P. Naveau acknowledges financial support from the Agence Nationale de la Recherche (ANR) through the SICIM and SHARE PEPR Maths-Vives projects (France 2030, ANR-24-EXMA-0008), the EXSTA grant (ANR-23-CE40-0009-01), PORC-EPIC, the PEPR TRACCS program (PC4 EXTENDING, ANR-22-EXTR-0005), and the PEPR IRIMONT project (France 2030, ANR-22-EXIR-0003). He also benefited from the GeoLearning re-search chair. 
+
+# References 
+
+Aka, S., Kratz, M., and Naveau, P. (2025). Multivariate discrete generalized pareto distri-butions: Theory, simulation, and applications to dry spells. arXiv:2506.19361. Beaumont, M. A., Zhang, W., and Balding, D. J. (2002). Approximate Bayesian compu-tation in population genetics. Genetics , 162(4):2025–2035. Bernton, E., Jacob, P. E., Gerber, M., and Robert, C. P. (2019). On parameter estimation with the Wasserstein distance. Information and Inference: A Journal of the IMA , 8:657– 676. Bonneel, N., Rabin, J., Peyr´ e, G., and Pfister, H. (2015). Sliced and Radon Wasserstein barycenters of measures. Journal of Mathematical Imaging and Vision , 51:22–45. 22 B¨ uhlmann, P. and Wyner, A. (1999). Variable length markov chains. Annals of Statistics ,27(2):480–513. Chakraborty, S. (2015). Generating discrete analogues of continuous probability distributions-a survey of methods and constructions. Journal of Statistical Distributions and Applications , 2:6. Coles, S. (2001). An Introduction to Statistical Modeling of Extreme Values . Springer. Cox, D. R. and Reid, N. (2004). A theory of statistical inference. Annals of Statistics ,32(1):1–33. Cranmer, K., Brehmer, J., and Louppe, G. (2020). The frontier of simulation-based infer-ence. Proceedings of the National Academy of Sciences , 117(48):30055–30062. Cuturi, M. (2013). Sinkhorn distances: Lightspeed computation of optimal transport. In 
+
+Advances in Neural Information Processing Systems , volume 26, pages 2292–2300. de Carvalho, M., Huser, R., Naveau, P., and Reich, B. J. (2026). Handbook of Statistics of Extremes . Chapman & Hall/CRC, Boca Raton, FL. de Haan, L. and Ferreira, A. (2006). Extreme Value Theory: An Introduction . Springer Series in Operations Research and Financial Engineering. Springer. Dommange, A., Ghasemifar, E., Planche, C., and Baray, J.-L. (2026). Climatology of long-term extreme precipitation using rain gauges data over france. Atmospheric Research ,336:108886. Efron, B. and Tibshirani, R. J. (1994). An Introduction to the Bootstrap . Chapman and Hall/CRC, 1 edition. Feydy, J., S´ ejourn´ e, T., Vialard, F.-X., Amari, S.-I., Trouve, A., and Peyr´ e, G. (2019). In-terpolating between optimal transport and mmd using Sinkhorn divergences. In Chaud-huri, K. and Sugiyama, M., editors, Proceedings of the Twenty-Second International Conference on Artificial Intelligence and Statistics , volume 89 of Proceedings of Machine Learning Research , pages 2681–2690. PMLR. Flamary, R., Courty, N., Gramfort, A., Alaya, M. Z., Boisbunon, A., Chambon, S., Chapel, L., Corenflos, A., Fatras, K., Fournier, N., Gautheron, L., Gayraud, N. T., Janati, H., Rakotomamonjy, A., Redko, I., Rolet, A., Schutz, A., Seguy, V., Sutherland, D. J., Tavenard, R., Tong, A., and Vayer, T. (2021). Pot: Python optimal transport. Journal of Machine Learning Research , 22(78):1–8. Galves, A. and L¨ ocherbach, E. (2008). Stochastic chains with memory of variable length. 
+
+Probability Surveys , 5:1–35. Genevay, A., Peyre, G., and Cuturi, M. (2018). Learning generative models with Sinkhorn divergences. In Storkey, A. and Perez-Cruz, F., editors, Proceedings of the Twenty-First International Conference on Artificial Intelligence and Statistics , volume 84 of 
+
+Proceedings of Machine Learning Research , pages 1608–1617. PMLR. 23 Goldfeld, Z., Kato, K., Rioux, G., and Sadhu, R. (2024). Limit theorems for entropic opti-mal transport maps and Sinkhorn divergence. Electronic Journal of Statistics , 18(1):980 – 1041. Goldfeld, Z., Van Handel, R., Bassetti, F., and Pavon, M. (2023). Statistical inference via regularized optimal transport. The Annals of Statistics , 51(2):503–533. Gourieroux, C., Monfort, A., and Renault, E. (1993). Indirect inference. Journal of Applied Econometrics , 8:S85–S118. Heggland, K. and Frigessi, A. (2004). Estimating functions in indirect inference. Journal of the Royal Statistical Society Series B , 66(2):447–462. Hitz, A. S., Davis, R. A., and Samorodnitsky, G. (2024). Discrete extremes. Journal of Data Science , 22(4):524–536. Kiriliouk, A., Rootz´ en, H., Segers, J., and Wadsworth, J. L. (2019). Peaks over thresholds modeling with multivariate generalized Pareto distributions. Technometrics , 61:123–135. Lindsay, B. G. (1988). Composite likelihood methods , volume 80. Contemporary Mathe-matics. Lintusaari, J., Gutmann, M. U., Dutta, R., Kaski, S., and Corander, J. (2016). Fundamen-tals and recent developments in approximate Bayesian computation. Systematic Biology ,66(1):e66–e82. Newey, W. K. and McFadden, D. (1994). Large sample estimation and hypothesis testing. In Handbook of Econometrics, Vol. 4 , chapter 36. Elsevier. Nietert, S., Goldfeld, Z., Sadhu, R., and Kato, K. (2022). Statistical, robustness, and com-putational guarantees for sliced Wasserstein distances. Advances in Neural Information Processing Systems , 35:28179–28193. Panaretos, V. M. and Zemel, Y. (2019). Statistical aspects of Wasserstein distances. Annual Review of Statistics and Its Application , 6:405–431. Papamakarios, G., Nalisnick, E., Rezende, D., Mohamed, S., and Lakshminarayanan, B. (2021). Normalizing flows for probabilistic modeling and inference. Journal of Machine Learning Research , 22:1–64. Papamakarios, G., Sterratt, D., and Murray, I. (2019). Sequential neural likelihood: Fast likelihood-free inference with autoregressive flows. Proceedings of the 22nd International Conference on Artificial Intelligence and Statistics , pages 837–848. Pooladian, A.-A. and Niles-Weed, J. (2021). Entropic estimation of optimal transport maps. arXiv:2109.12004. Price, L. F., Drovandi, C. C., Lee, A., and Nott, D. J. (2018). Bayesian synthetic likelihood. 
+
+Journal of Computational and Graphical Statistics , 27(1):1–11. 24 Resnick, S. I. (1987). Multivariate Extremes , pages 250–306. Springer New York, New York, NY. Resnick, S. I. (2007). Heavy-Tail Phenomena: Probabilistic and Statistical Modeling .Springer Series in Operations Research and Financial Engineering. Springer. Rezende, D. and Mohamed, S. (2015). Variational inference with normalizing flows. In Bach, F. and Blei, D., editors, Proceedings of the 32nd International Conference on Machine Learning , volume 37 of Proceedings of Machine Learning Research , pages 1530– 1538, Lille, France. PMLR. Rissanen, J. (1983). A universal data compression system. IEEE Transactions on Infor-mation Theory , 29:656–664. Rootz´ en, H., Segers, J., and Wadsworth, J. L. (2018a). Multivariate generalized Pareto distributions: Parametrizations, representations, and properties. Journal of Multivariate Analysis , 165:117–131. Rootz´ en, H., Segers, J., and Wadsworth, J. L. (2018b). Multivariate peaks over thresholds models. Extremes , 21:115–145. Rootz´ en, H. and Tajvidi, N. (2006). Multivariate generalized Pareto distributions. 
+
+Bernoulli , 12(5):917–930. Sainsbury-Dale, M., Zammit-Mangion, A., and Huser, R. (2024). Likelihood-free parameter estimation with neural Bayes estimators. The American Statistician , 78:1–14. Singha, S., Kratz, M., and Vadlamani, S. (2024). Comparing multivariate distributions: A novel approach using optimal transport-based plots. arXiv:2404.19700. van der Vaart, A. W. (1998). Asymptotic Statistics . Cambridge University Press. Varin, C., Reid, N., and Firth, D. (2011). An overview of composite likelihood methods. 
+
+Statistica Sinica , 21(1):5–42. Villani, C. (2008). Optimal Transport: Old and New . Grundlehren der Mathematischen Wissenschaften. Springer. Wood, S. N. (2010). Statistical inference for noisy nonlinear ecological dynamic systems. 
+
+Nature , 466:1102–1104. 25 A Proofs 
+
+## A.1 Proof of Theorem 2.1 
+
+This proof relies on the standard separation argument for extremum estimators (see, e.g. Newey and McFadden, 1994; van der Vaart, 1998). Let us define 
+
+Q(θ) := Sε(Pθ0 , P θ), θ ∈ Θ.
+
+For all θ ∈ Θ, we can write 
+
+Qn(θ) − Q(θ) = 
+
+n
+
+Sε( bPn, bPmn,θ) − Sε(Pθ0 , P θ)
+
+o
+
++ λn∥θ − bθNBE  
+
+> n
+
+∥22,
+
+with Qn(θ) introduced in Definition 2.1. Hence, sup 
+
+> θ∈Θ
+
+|Qn(θ) − Q(θ)| ≤ sup 
+
+> θ∈Θ
+
+Sε( bPn, bPmn,θ) − Sε(Pθ0 , P θ) + λn sup 
+
+> θ∈Θ
+
+∥θ − bθNBE  
+
+> n
+
+∥22. (9) By compactness of Θ, R := sup θ∈Θ ∥θ∥2 < ∞. Since we take bθNBE  
+
+> n
+
+∈ Θ, then ∥bθNBE  
+
+> n
+
+∥2 ≤ R.Moreover, for any θ ∈ Θ, 
+
+∥θ − bθNBE  
+
+> n
+
+∥2 ≤ ∥ θ∥2 + ∥bθNBE  
+
+> n
+
+∥2 ≤ 2R, 
+
+hence sup 
+
+> θ∈Θ
+
+∥θ − bθNBE  
+
+> n
+
+∥22 ≤ (2 R)2 = 4 R2,
+
+and by (H4), 
+
+λn sup 
+
+> θ∈Θ
+
+∥θ − bθNBE  
+
+> n
+
+∥22 ≤ 4R2λn → 0, as n → ∞ .Combining this last result with (H3) in Equation (9), we obtain sup 
+
+> θ∈Θ
+
+|Qn(θ) − Q(θ)| P
+
+−→ 0, as n → ∞ . (10) Fix η > 0 and define Θη := {θ ∈ Θ : ∥θ − θ0∥2 ≥ η},
+
+which is compact under (H1). By (H2), Q(θ) > 0 for every θ̸ = θ0, so θ0 is the unique minimizer of Q. In particular, Q(θ) > 0 for all θ ∈ Θη. As Q is continuous, 
+
+γ(η) := inf 
+
+> θ∈Θη
+
+Q(θ) = min 
+
+> θ∈Θη
+
+Q(θ) > 0.
+
+Thus, for all θ ∈ Θη,
+
+Q(θ) ≥ γ(η) and Q(θ0) = 0 .
+
+Now, introduce the event 
+
+An(η) := 
+
+
+
+sup 
+
+> θ∈Θ
+
+|Qn(θ) − Q(θ)| < γ(η)3
+
+
+
+,
+
+26 on which the uniform bound implies that for every θ ∈ Θ, 
+
+|Qn(θ) − Q(θ)| < γ(η)3 .
+
+Hence, for every θ ∈ Θη,
+
+Qn(θ) > Q (θ) − γ(η)3 ≥ γ(η) − γ(η)3 = 2γ(η)3 .
+
+Furthermore, at θ0,
+
+Qn(θ0) < Q (θ0) + γ(η)3 = γ(η)3 .
+
+Therefore, on An(η), inf 
+
+> θ∈Θη
+
+Qn(θ) ≥ 2γ(η)3 > γ(η)3 ≥ Qn(θ0).
+
+Now, suppose by contradiction that bθAW  
+
+> n
+
+∈ Θη. Then, 
+
+Qn(bθAW  
+
+> n
+
+) ≥ inf 
+
+> θ∈Θη
+
+Qn(θ) > Q n(θ0),
+
+which contradicts the minimizing property of bθAW  
+
+> n
+
+. Hence, on the event An(η), one has 
+
+bθAW  
+
+> n
+
+/∈ Θη.
+
+This implies 
+
+An(η) ⊆ {∥ bθAW  
+
+> n
+
+− θ0∥2 < η }.
+
+By uniform convergence (Equation (10)), 
+
+P(An(η)) → 1 as n → ∞ ,
+
+which implies 
+
+bθAW 
+
+> n
+> P
+
+−→ θ0.
+
+## A.2 Proof of Theorem 2.2 
+
+We already know that as n → ∞ 
+
+bθAW 
+
+> n
+> P
+
+−→ θ0 (Theorem 2.1) and bθEOT 
+
+> n
+> P
+
+−→ θ0 (Goldfeld et al., 2023) .
+
+Since bθEOT  
+
+> n
+
+is a local interior minimizer of θ 7 → Sε( bPn, bPmn,θ ) which is, by ( H5), a differen-tiable function in U, we have almost surely 
+
+∇Sε( bPn, bPmn,bθEOT 
+
+> n
+
+) = 0 .
+
+Since bθEOT  
+
+> n
+
+is asymptotically normal at rate √n, we have 
+
+bθEOT  
+
+> n
+
+− θ0 = OP(n−1/2).
+
+27 We now turn to bθAW  
+
+> n
+
+. Since bθAW  
+
+> n
+
+is a local minimizer of Qn (see Definition 2.1), we have almost surely 
+
+∇Qn(bθAW  
+
+> n
+
+) = ∇Sε( bPn, bPmn,bθAW 
+
+> n
+
+) + 2 λn
+
+ bθAW  
+
+> n
+
+− bθNBE 
+
+> n
+
+ = 0 .
+
+Applying the local expansion (H5) with θn = bθAW  
+
+> n
+
+, we obtain 0 = ∇Sε( bPn, bPmn,θ0 ) + Vε(θ0) bθAW  
+
+> n
+
+− θ0
+
+ + 2 λn
+
+ bθAW  
+
+> n
+
+− bθNBE 
+
+> n
+
+ + oP
+
+
+
+∥bθAW  
+
+> n
+
+− θ0∥2 + n−1/2
+
+
+
+.
+
+Since both estimators take values in the compact set Θ (under ( H1)), both bθAW  
+
+> n
+
+and bθNBE 
+
+> n
+
+are bounded in probability, so 
+
+∥bθAW  
+
+> n
+
+− bθNBE  
+
+> n
+
+∥2 = OP(1) ,
+
+and, under ( H4∗), 2λn
+
+ bθAW  
+
+> n
+
+− bθNBE 
+
+> n
+
+ = oP(n−1/2). (11) Applying (H5) with θn = bθEOT  
+
+> n
+
+, given its asymptotic properties (see (4)), yields 
+
+∇Sε( bPn, bPmn,θ0 ) + Vε(θ0)( bθEOT  
+
+> n
+
+− θ0) = oP(n−1/2).
+
+Both expansions imply, after subtraction and using (11), 
+
+Vε(θ0) bθAW  
+
+> n
+
+− bθEOT 
+
+> n
+
+ = oP
+
+
+
+∥bθAW  
+
+> n
+
+− θ0∥2 + n−1/2
+
+
+
+.
+
+Using the triangle inequality and bθEOT  
+
+> n
+
+− θ0 = OP(n−1/2), 
+
+∥bθAW  
+
+> n
+
+− θ0∥2 ≤ ∥ bθAW  
+
+> n
+
+− bθEOT  
+
+> n
+
+∥2 + OP(n−1/2),
+
+so that 
+
+Vε(θ0) bθAW  
+
+> n
+
+− bθEOT 
+
+> n
+
+ = oP
+
+
+
+∥bθAW  
+
+> n
+
+− bθEOT  
+
+> n
+
+∥2 + n−1/2
+
+
+
+.
+
+Since Vε(θ0) is symmetric positive definite, let c := λmin 
+
+ Vε(θ0) > 0. Then 
+
+c ∥bθAW  
+
+> n
+
+− bθEOT  
+
+> n
+
+∥2 ≤ Vε(θ0) bθAW  
+
+> n
+
+− bθEOT 
+
+> n
+
+ 
+
+> 2
+
+= oP
+
+
+
+∥bθAW  
+
+> n
+
+− bθEOT  
+
+> n
+
+∥2 + n−1/2
+
+
+
+,
+
+which yields, after rearranging, 
+
+ c − oP(1)  ∥bθAW  
+
+> n
+
+− bθEOT  
+
+> n
+
+∥2 ≤ oP(n−1/2),
+
+and therefore bθAW  
+
+> n
+
+− bθEOT  
+
+> n
+
+= oP(n−1/2).
+
+Then, √n(bθAW  
+
+> n
+
+− θ0) = √n(bθEOT  
+
+> n
+
+− θ0) + oP(1) ,
+
+from which we conclude that 
+
+√n(bθAW  
+
+> n
+
+− θ0) d
+
+−→ N  0, Vε(θ0)−1Σε(θ0)Vε(θ0)−1 .
+
+28 A.3 Proof of Proposition 2.1 
+
+By definition of bθAW  
+
+> n
+
+, we have 
+
+bθAW  
+
+> n
+
+∈ arg min  
+
+> θ∈Θ
+
+Qn(θ),
+
+which implies that for all θ ∈ Θ, 
+
+Qn(bθAW  
+
+> n
+
+) ≤ Qn(θ).
+
+Since bθNBE  
+
+> n
+
+∈ Θ, we may choose θ = bθNBE  
+
+> n
+
+, which yields 
+
+Qn(bθAW  
+
+> n
+
+) ≤ Qn(bθNBE  
+
+> n
+
+).
+
+But, by definition of Qn, we have 
+
+Qn(bθNBE  
+
+> n
+
+) = Sε( bPn, bPmn,bθNBE 
+
+> n
+
+) and Qn(bθAW  
+
+> n
+
+) = Sε( bPn, bPmn,bθAW 
+
+> n
+
+) + λn∥bθAW  
+
+> n
+
+− bθNBE  
+
+> n
+
+∥22.
+
+Hence, we obtain 
+
+Sε( bPn, bPmn,bθAW 
+
+> n
+
+) + λn∥bθAW  
+
+> n
+
+− bθNBE  
+
+> n
+
+∥22 ≤ Sε( bPn, bPmn,bθNBE 
+
+> n
+
+),
+
+from which, we deduce that 
+
+Sε( bPn, bPmn,bθAW 
+
+> n
+
+) ≤ Sε( bPn, bPmn,bθNBE 
+
+> n
+
+).
+
+# B Multivariate GPD 
+
+This section recalls the notion of multivariate generalized Pareto distributions in both continuous and discrete settings. We first review the representations and properties of continuous MGPDs, which arise as limiting laws of multivariate threshold exceedances. We then introduce their discrete counterparts, the MDGPDs, designed to model integer-valued extremes while preserving threshold stability and dependence. These constructions provide the toy models for the applications in Section 3. 
+
+## B.1 Continuous MGPD 
+
+Multivariate generalized Pareto distributions (MGPDs) arise as limiting distributions for multivariate threshold exceedances and form a central object of multivariate extreme value theory. They extend the univariate generalized Pareto distribution to the multivariate setting and are closely connected to multivariate extreme value (max-stable) distributions; see Rootz´ en and Tajvidi (2006); Rootz´ en et al. (2018a,b). Let X = ( X1, . . . , X d) be a random vector with distribution function F defined on Rd. For a threshold vector u ∈ Rd, an observation x is said to exceed u if at least one component exceeds its marginal threshold, that is, 
+
+x ≰ u,
+
+29 where inequalities between vectors are interpreted componentwise. The corresponding ex-ceedance region 
+
+{x ∈ Rd : x ≰ u}
+
+has an L-shaped geometry, reflecting that extreme events may occur through the exceedance of any marginal component. If F belongs to the multivariate domain of attraction of a multivariate extreme value dis-tribution G, then, under suitable marginal normalizations, the conditional distribution of threshold exceedances converges to a multivariate generalized Pareto distribution. Specifi-cally, letting 
+
+Xu = X − u
+
+σ(u) ,
+
+we have 
+
+π(Xu | Xu ≰ 0) = ⇒ H, 
+
+where H is a MGPD associated with G (Rootz´ en and Tajvidi, 2006). Following Rootz´ en et al. (2018a,b), a convenient characterization of MGPDs is obtained through marginal standardization. A random vector Z = ( Z1, . . . , Z d) defined on [ −∞ , ∞)d
+
+follows a standard MGPD if it admits the representation 
+
+Z = S + E, 
+
+where E is a unit exponential random variable and S is a random vector taking values in [−∞ , 0] d, independent of E, and satisfying max( S) = 0 almost surely. The support of Z is contained in {z ∈ [−∞ , ∞)d : max( z) > 0}. This representation separates the magnitude of exceedances, governed by the exponential variable E, from the extremal dependence structure encoded by the spectral vector S (de Carvalho et al., 2026, see, e.g., Chapter 7). The spectral vector can be constructed by introducing an auxiliary random vector T on [−∞ , ∞)d such that max( T) > −∞ almost surely and defining 
+
+S = T − max( T). (12) Different choices of the distribution of T lead to different dependence structures. A general MGPD is obtained through marginal transformation of a standard MGPD. A random vector X follows a MGPD with scale vector σ ∈ (0 , ∞)d and shape vector ξ ∈ Rd
+
+if 
+
+X = σ exp( ξZ) − 1
+
+ξ ,
+
+where operations are interpreted componentwise and the usual limit convention is used when ξj = 0. The support of each marginal component depends on the sign of ξj . If ξj > 0, then Xj
+
+is bounded below by −σj /ξ j . If ξj = 0, the support is unbounded. If ξj < 0, then Xj is bounded above by −σj /ξ j .MGPD distributions satisfy a threshold stability property: if X follows a MGPD and v ≥ 0
+
+is such that σ + ξv > 0 componentwise, then (X − v | X ≰ v)is again MGPD with updated scale parameters and identical shape parameters (Rootz´ en et al., 2018a). 30 B.2 Discrete MGPD 
+
+While MGPDs provide a powerful framework for modeling multivariate extremes in the continuous setting, discrete distributions generally do not possess a classical maximum do-main of attraction, which complicates the extension of multivariate extreme value theory to integer-valued settings. Recent developments have therefore aimed to construct discrete analogues of extreme value models that retain their key asymptotic and stability proper-ties. In this spirit, multivariate discrete generalized Pareto distributions (MDGPDs) were introduced in Aka et al. (2025) as an extension of MGPDs to integer-valued data. Unlike discretizations of continuous models, MDGPDs are defined directly on Zd and preserve the fundamental structural properties of multivariate threshold exceedances. Following Aka et al. (2025), a standard MDGPD random vector N is constructed through a stochastic representation analogous to the continuous spectral decomposition of MGPDs. In this setting, the maximum component 
+
+G = max( N)follows a geometric distribution, which plays the discrete counterpart of the exponential radial component appearing in continuous MGPD representations. The associated discrete spectral vector 
+
+S = N − G
+
+is independent of G and satisfies max( S) = 0. This decomposition separates marginal tail from extremal dependence, mirroring the continuous MGPD structure. This leads to the representation 
+
+N = T − max( T) + G, 
+
+where T is a discrete generator encoding the dependence structure of the model. The generator T plays a central role in shaping extremal dependence, allowing for a wide range of dependence patterns through flexible parametric or nonparametric specifications. In particular, the distribution of pairwise differences induced by T governs the joint extremal behavior of the MDGPD. An important consequence of this construction is that MDGPDs preserve a discrete ana-logue of the threshold stability property. Specifically, the marginal conditional exceedance distribution satisfies a geometric memoryless property, ensuring that exceedances above increasing thresholds remain within the same parametric family. This property provides a discrete counterpart to the classical POT characterization of MGPDs. Non-standard MDGPDs are obtained by defining their cumulative distribution function through a discrete transformation of the continuous MGPD representation. Since the marginal transformation used in the continuous setting does not preserve the integer sup-port, it cannot be directly applied in the discrete case. We therefore define non-standard MDGPDs through their cumulative distribution function. A random vector M ∈ Zd is said to follow a non-standard MDGPD with parameters (σ, ξ, S) if, for all k ∈ Zd,
+
+P(M ≤ k) = 1 − E
+
+
+
+1 ∧ exp 
+
+
+
+max 
+
+
+
+S − 1
+
+ξ log  1 + ξ k/σ 
+
+.
+
+31 This construction yields a flexible family indexed by marginal scale and shape parameters (σ, ξ), together with a discrete spectral distribution governing extremal dependence. Importantly, MDGPDs are not mere discretizations of MGPDs. Although asymptotic equivalence holds when the scale parameter tends to infinity, finite-sample behavior can differ substantially, particularly when tail probabilities are influenced by integer constraints and lattice effects. This justifies the need for a dedicated discrete modeling framework. From an inferential perspective, MDGPDs pose significant challenges because their like-lihood is generally intractable, especially when the generator distribution is unknown or high-dimensional. This naturally motivates the use of likelihood-free inference methods, such as NBEs or optimal transport–based approaches, which rely on faithful simulation of the underlying discrete model. 
+
+# C EOT Q–Q and potential plots for comparison be-tween likelihood-free inference strategies (banks log-returns and dry spells) 
+
+## C.1 Banks log-returns from Kiriliouk et al. (2019) 
+
+This section provides the full set of EOT graphical diagnostics for the banking dataset. Figures 7 and 8 compare MLE, NBE, and AW–NBE via EOT potential and Q–Q plots, while Figures 9 and 10 focus on the pairwise comparison between MLE and the OT esti-mator. Figure 7 provides complementary diagnostics based on the potentials associated with the entropic optimal transport coupling between observed and simulated excess samples. The potentials summarize global transport discrepancies between the empirical and simulated distributions and therefore provide an alternative goodness-of-fit diagnostic. For the MLE estimator, the potentials follow an approximately linear pattern but exhibit visible de-partures from the diagonal at intermediate and large quantile levels, indicating residual discrepancies in the joint tail representation. The NBE estimator substantially reduces these discrepancies. The potentials concentrate more tightly around the diagonal, although moderate deviations remain in the lower tail region. These may reflect the finite-threshold nature of the peaks-over-threshold approximation and possible second-order tail effects, particularly given the limited number of joint exceedances. The AW–NBE estimator fur-ther improves the fit. The potentials remain tightly concentrated around the diagonal across most quantile levels, indicating reduced global transport discrepancies between ob-served and simulated excess distributions. Minor deviations persist in the lower tail region and are consistent with finite-sample variability. 32 Figure 7: EOT potential plots with 95% bootstrap confidence bands for the banking return ex-ceedances dataset under three estimation methods MLE in blue, NBE in red, AW–NBE in green for the Gumbel– T MGPD model. The potentials are centered to remove arbitrary additive constants. All methods are computed using a common entropic regularization parameter ε = 10 −2.
+
+Figure 8 evaluates the adequacy of the three estimators by comparing observed excesses with excesses simulated from the fitted Gumbel– T MGPD model. Both samples contain the same number of joint exceedances ( n = 149) and are equally weighted. The panels display EOT Q–Q plots together with pointwise 95% bootstrap confidence bands. Overall, all estimators capture the global tail behavior satisfactorily. However, systematic differences appear across methods. The MLE fit exhibits noticeable curvature in several margins, particularly for the largest quantiles, suggesting residual discrepancies between observed and simulated extremes and indicating that the parametric likelihood-based spec-ification may not fully reproduce the extremal dependence structure. The NBE estimator reduces these deviations. The Q–Q plots show improved alignment with the diagonal across most quantile levels, together with narrower confidence bands. This indicates that the likelihood-free estimator provides a more flexible representation of the extremal depen-dence structure while preserving adequate marginal tail behavior. The AW–NBE estimator in green provides the closest agreement with the diagonal, particularly in the upper quantile region. The dispersion of the EOT quantile pairs around the diagonal is further reduced, suggesting improved reproduction of joint exceedance patterns and a more accurate de-scription of extremal dependence. Overall, the graphical diagnostics consistently suggest a progressive improvement from MLE to NBE and moderate one from NBE to AW–NBE. 33 Figure 8: Quadrivariate EOT Q–Q plots with 95% bootstrap confidence bands for the banking return exceedances dataset under three estimation methods MLE in blue, NBE in red, AW–NBE in green for the Gumbel– T MGPD model. Each panel corresponds to the projection onto the ei coordinate, 
+
+i = 1 , . . . , 4, where e1, e2, e3, and e4 correspond respectively to HSBC, Lloyds, RBS, and Barclays. EOT quantiles are computed using a shared entropic regularization parameter ε = 10 −2 to ensure fair visual comparison across methods. 
+
+34 Figure 9: EOT potential plots for the banks log-returns exceedances dataset under the MGPD model. The plots compare the MLE in blue triangles and the OT estimator in red circles. 
+
+Figure 9 shows that, especially in the tail, the MLE exhibits stronger deviations, while the OT estimator remains closer to the diagonal. When turning to Figure 10, the difference in behavior between the OT estimator and the MLE is less pronounced than in Figure 9, although the points and confidence region associated with the MLE appear shifted to the right along the diagonal. 35 Figure 10: EOT Q–Q plots for the bank log-return exceedances dataset under the MGPD model. The plots compare observed samples with samples simulated from the fitted model using two estimation procedures MLE in blue triangles and the OT estimator in red circles. Each panel corresponds to the projection onto the ei coordinate, i = 1 , . . . , 4, where e1, e2, e3, and e4 correspond respectively to HSBC, Lloyds, RBS, and Barclays. 
+
+36 C.2 Dry spells from Aka et al. (2025) 
+
+Figure 11: EOT potentials for the dry spell exceedances dataset under the MDGPD model. The red triangles correspond to the NBE estimator and the blue squares to the AW–NBE estimator. 
+
+In Figure 11, we observe that the AW–NBE potentials points are more tightly concen-trated around the diagonal, indicating a more stable transport coupling between observed and simulated exceedances. By contrast, the NBE potentials display larger curvature and visible departures from linearity for intermediate and large exceedances, reflecting residual discrepancies in the transport structure. Overall, the potential plots confirm the improved global alignment achieved by the AW–NBE refinement. Complementary, Figure 12 compares the multivariate EOT quantiles obtained from the NBE and AW–NBE fits for the dry spell exceedances dataset. Both estimators reproduce the global ordering structure of the exceedances. For moderate quantile levels, the two methods are close to the diagonal, even though NBE is in better agreement than AW–NBE in the lower tail. However, the NBE estimator exhibits a systematic downward deviation in the upper quantiles, indicating an underestimation of the largest dry spell exceedances. In contrast, the AW–NBE fit aligns more closely with the diagonal across most quantile levels and shows reduced dispersion, particularly in the upper tail, which is of greater interest to us. 37 Figure 12: Bivariate EOT Q–Q plots for the dry spell exceedances dataset under the MDGPD model. The plots compare observed samples with samples simulated from the fitted model using the optimal transport coupling. Red triangles correspond to the NBE estimator and blue squares to the AW–NBE estimator. Each panel corresponds to the projection onto the ei coordinate, i = 1 , 2, where e1, e2
+
+correspond respectively to Interlaken and Lauterbrunnen. The diagonal indicates perfect agreement between observed and simulated samples. 
+
+38
