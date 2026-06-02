@@ -376,7 +376,6 @@ window.SubscriptionsSmartQuery = (function () {
   const filterVisiblePaperSources = (values) => {
     const visible = new Set(VISIBLE_PAPER_SOURCES);
     const result = (Array.isArray(values) ? values : []).filter((value) => visible.has(normalizeText(value).toLowerCase()));
-    // Fallback: if we only got arxiv (config not loaded), return all visible sources
     if (result.length <= 1 && result[0] === 'arxiv' && VISIBLE_PAPER_SOURCES.length > 2) {
       return [...VISIBLE_PAPER_SOURCES];
     }
@@ -408,8 +407,8 @@ window.SubscriptionsSmartQuery = (function () {
   };
 
   const getAvailablePaperSources = () => {
-    let cfg = window.SubscriptionsManager && window.SubscriptionsManager.getDraftConfig ? window.SubscriptionsManager.getDraftConfig() : {};
-    const rawBackends = cfg && cfg.source_backends && typeof cfg.source_backends === 'object' && Object.keys(cfg.source_backends).length > 0
+    const cfg = window.SubscriptionsManager.getDraftConfig ? window.SubscriptionsManager.getDraftConfig() : {};
+    const rawBackends = cfg && cfg.source_backends && typeof cfg.source_backends === 'object'
       ? cfg.source_backends
       : {};
     const seen = new Set();
