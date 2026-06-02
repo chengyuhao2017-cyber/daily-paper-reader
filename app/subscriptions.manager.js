@@ -237,11 +237,33 @@ window.SubscriptionsManager = (function () {
       bm25_rpc: 'match_biorxiv_papers_bm25',
       schema: 'public',
     },
+    medrxiv: {
+      papers_table: 'medrxiv_papers',
+      use_vector_rpc: true,
+      vector_rpc: 'match_medrxiv_papers_exact',
+      vector_rpc_exact: 'match_medrxiv_papers_exact',
+      use_bm25_rpc: true,
+      bm25_rpc: 'match_medrxiv_papers_bm25',
+      schema: 'public',
+    },
+    chemrxiv: {
+      papers_table: 'chemrxiv_papers',
+      use_vector_rpc: true,
+      vector_rpc: 'match_chemrxiv_papers_exact',
+      vector_rpc_exact: 'match_chemrxiv_papers_exact',
+      use_bm25_rpc: true,
+      bm25_rpc: 'match_chemrxiv_papers_bm25',
+      schema: 'public',
+    },
   };
 
   const filterVisiblePaperSources = (values) => {
     const visible = new Set(VISIBLE_PAPER_SOURCES);
-    return (Array.isArray(values) ? values : []).filter((value) => visible.has(normalizeSourceKey(value)));
+    const result = (Array.isArray(values) ? values : []).filter((value) => visible.has(normalizeSourceKey(value)));
+    if (result.length <= 1 && result[0] === 'arxiv' && VISIBLE_PAPER_SOURCES.length > 2) {
+      return [...VISIBLE_PAPER_SOURCES];
+    }
+    return result;
   };
 
   const getAvailablePaperSources = (config) => {
@@ -1416,9 +1438,7 @@ window.SubscriptionsManager = (function () {
     if (draftConfig) {
       renderFromDraft();
     } else {
-      loadSubscriptions().then(() => {
-        // ensure render after async load completes
-      });
+      loadSubscriptions();
     }
   };
 
