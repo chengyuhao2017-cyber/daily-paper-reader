@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   maintain_sciencedirect:
-    if: github.repository == 'ziwenhahaha/daily-paper-reader' || github.repository == '5-xj/daily-paper-reader'
+    if: github.repository == 'ziwenhahaha/daily-paper-reader' || github.repository == '5-xj/daily-paper-reader' || github.repository == 'chengyuhao2017-cyber/daily-paper-reader'
     runs-on: ubuntu-latest
     timeout-minutes: 240
     env:
