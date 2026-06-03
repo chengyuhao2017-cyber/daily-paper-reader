@@ -1,0 +1,98 @@
+name: maintain-serp-scholar
+
+on:
+  schedule:
+    - cron: "23 1 * * *"  # 北京时间 09:23（UTC 01:23），每天一次
+  workflow_dispatch:
+    inputs:
+      year_from:
+        description: "只抓取该年份及之后的论文（0 = 无过滤）"
+        required: false
+        default: "0"
+      force_full_window:
+        description: "是否忽略 seen 状态并全量回补（true/false）"
+        required: false
+        default: "false"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: daily-paper-reader-maintain-serp-scholar
+  cancel-in-progress: false
+
+jobs:
+  maintain_serp_scholar:
+    if: github.repository == 'ziwenhahaha/daily-paper-reader' || github.repository == '5-xj/daily-paper-reader'
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    env:
+      SUPABASE_URL: https://lyucdwgefyfbmaiopjbk.supabase.co
+      SUPABASE_SCHEMA: public
+      SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+      SUPABASE_BACKEND_KEY: serp_scholar
+      SUPABASE_PAPERS_TABLE: serp_scholar_papers
+      SUPABASE_RETENTION_DAYS: "45"
+      DPR_ENABLE_SERP_SCHOLAR_BACKEND: "1"
+      DPR_SERP_SCHOLAR_ENABLED: "1"
+      DPR_SERP_SCHOLAR_PAPERS_TABLE: serp_scholar_papers
+      DPR_SERP_SCHOLAR_VECTOR_RPC_EXACT: match_serp_scholar_papers_exact
+      DPR_SERP_SCHOLAR_BM25_RPC: match_serp_scholar_papers_bm25
+      SERP_API_KEY: ${{ secrets.SERP_API_KEY }}
+      PYTHONUNBUFFERED: "1"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Cache pip + torch
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.cache/torch
+          key: ${{ runner.os }}-dpr-serp-scholar-hf-v1-${{ hashFiles('requirements.txt') }}
+
+      - name: Install deps (skip sqlite3)
+        run: |
+          python - <<'PY'
+          import re
+          lines = open("requirements.txt", "r", encoding="utf-8").read().splitlines()
+          lines = [l for l in lines if l.strip() and not re.match(r"^sqlite3\\b", l)]
+          open("/tmp/req.txt", "w", encoding="utf-8").write("\n".join(lines))
+          PY
+          python -m pip install --upgrade pip
+          python -m pip install uv
+          uv pip install --system -r /tmp/req.txt
+
+      - name: Run SerpAPI Scholar Maintain Pipeline
+        run: |
+          set -euo pipefail
+          set -x
+
+          if [ -z "${SERP_API_KEY}" ]; then
+            echo "[WARN] 未配置 SERP_API_KEY，已跳过 SerpAPI Scholar 维护同步。"
+            exit 0
+          fi
+
+          if [ -z "${SUPABASE_SERVICE_KEY}" ]; then
+            echo "[WARN] 未配置 SUPABASE_SERVICE_KEY，已跳过 SerpAPI Scholar 维护同步。"
+            exit 0
+          fi
+
+          YEAR_FROM="${{ github.event.inputs.year_from }}"
+          FORCE_FULL_WINDOW="${{ github.event.inputs.force_full_window }}"
+          if [ -z "$YEAR_FROM" ]; then
+            YEAR_FROM="0"
+          fi
+
+          ARGS=(--year-from "$YEAR_FROM")
+          if [ "${FORCE_FULL_WINDOW:-false}" = "true" ]; then
+            ARGS+=(--force-full-window)
+          fi
+          python src/maintain/serp_scholar.py "${ARGS[@]}"
