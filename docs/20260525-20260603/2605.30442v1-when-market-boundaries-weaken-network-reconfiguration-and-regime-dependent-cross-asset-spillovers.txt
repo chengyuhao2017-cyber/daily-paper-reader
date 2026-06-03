@@ -1,0 +1,1155 @@
+Title: When market boundaries weaken: Network reconfiguration and regime-dependent cross-asset spillovers
+
+URL Source: https://arxiv.org/pdf/2605.30442v1
+
+Published Time: Mon, 01 Jun 2026 00:06:16 GMT
+
+Number of Pages: 45
+
+Markdown Content:
+# When market boundaries weaken: Network reconfiguration and regime-dependent cross-asset spillovers 
+
+Ruixue Jing a, Luis E. C. Rocha a,b 
+
+> aDepartment of Economics, Ghent University, Ghent, 9000, Belgium
+> bDepartment of Physics and Astronomy, Ghent University, Ghent, 9000, Belgium
+
+Abstract 
+
+Cryptocurrencies are increasingly adopted as investment assets, making their interactions with traditional financial markets central to cross-asset diversification and systemic risk. This paper studies the integration of cryptocurrencies, fiat currencies, and S&P500 equities using a balanced panel of 381 assets from October 2017 to February 2024. We combine rolling correlation networks, consensus-based community detection, market-specific and system-wide Tur-bulence Indices, and VAR-based connectedness analysis to examine how market stress, network topology, and shock transmission co-evolve across regimes. The results show that cross-asset integration is episodic. In normal periods, the three asset classes remain relatively segmented, whereas under stress, local clustering increases, modular sepa-ration weakens, and communities become more compositionally mixed across asset classes. Connectedness analysis further shows that regime shifts alter the structure of transmission rather than simply increasing spillover magnitudes. In high-turbulence states, fiat-market turbulence becomes the main propagation channel, while network clustering and modularity become more involved in forecast-uncertainty transmission. These findings support the interpretation of network topology as an emergent, state-dependent amplification channel rather than a persistent exogenous driver of turbulence. The results highlight the need for regime-aware risk monitoring, since full-sample connectedness esti-mates can understate the coupling that arises when diversification benefits are most vulnerable. 
+
+Keywords: Financial networks, Cross-asset connectedness, Cryptocurrency markets, Turbulence index, Regime-dependent spillovers, Network topology 
+
+1. Introduction 
+
+Financial markets are interconnected across asset classes in ways that are neither constant over time nor symmetric across market states. A recurring empirical regularity is that correlations and volatility spillovers rise during episodes of systemic stress, compressing the diversification benefits that investors and risk managers ordinarily expect from positions across distinct markets [1, 2, 3, 4, 5, 6, 7, 8]. This regularity is well documented, but its transmission struc-ture remains less well understood. Standard explanations emphasise common factor exposure or direct transmission 
+
+> arXiv:2605.30442v1 [physics.pop-ph] 28 May 2026
+
+through financial intermediaries [4, 8], yet these accounts do not fully explain why cross-asset coupling varies between tranquil and turbulent states, or why the identity of markets that transmit and absorb stress may change when market conditions deteriorate. These questions have become more important in the post-2017 period, as cryptocurrencies have developed into a market traded alongside equities and currencies, while global markets have experienced the COVID-19 crisis, post-pandemic stimulus, monetary tightening, the Russia–Ukraine war, and major cryptocurrency-specific disruptions. Understanding cross-asset integration therefore requires not only measuring stronger comovement dur-ing stress, but also examining how market turbulence, network structure, and shock transmission co-evolve across regimes. A large body of work studies cross-market integration through time-varying dependence and volatility models. Multivariate GARCH and Dynamic Conditional Correlation frameworks provide standard tools for estimating chang-ing correlations and volatility spillovers across markets [9, 10, 11, 12, 13]. These models show that comovement is time-varying and that financial stress is often associated with stronger dependence. However, crisis episodes also reveal that dependence can be nonlinear and state-contingent. Correlations may increase disproportionately during extreme market conditions, so average or full-sample correlations can understate the e ff ective coupling experienced in turbulent states [5, 14, 15]. This motivates a regime-dependent view of cross-asset dependence, in which tran-quil and turbulent periods may not simply di ff er in the magnitude of correlations, but may correspond to di ff erent transmission environments. A complementary literature examines dynamic connectedness through multivariate time-series systems. Within the VAR tradition [16, 17], Granger-causality tests evaluate whether one variable contains predictive information for another [18], while forecast error variance decompositions quantify how shocks propagate across variables. The Diebold–Yilmaz connectedness framework has become influential because it translates variance decompositions into interpretable measures of total, directional, and net spillovers [19, 20, 21, 22, 23]. Extensions based on generalised forecast error variance decompositions and generalised impulse responses are especially useful in financial applications because they avoid sensitivity to variable ordering and allow contemporaneously correlated innovations [24, 25]. This literature shifts the focus from static association toward predictive transmission, shock persistence, and system-wide amplification. At the same time, full-sample connectedness estimates can average over periods with di ff erent propagation mechanisms. Rolling estimates reveal time variation, but they do not by themselves establish whether the system follows qualitatively di ff erent transmission structures in low- and high-stress states. Connectedness studies have also been widely applied to cryptocurrency markets. Existing evidence suggests that spillovers between cryptocurrencies and traditional financial assets are time-varying, asymmetric, and sensitive to global risk conditions [26, 27, 28, 29, 30, 31, 32]. Several studies find that traditional markets, volatility expectations, and macro-financial uncertainty often transmit more strongly into cryptocurrencies than cryptocurrencies transmit 2back into traditional markets. This supports the view that cryptocurrencies are not fully isolated from the broader financial system, but neither are they necessarily dominant systemic transmitters. Their role appears conditional on the market environment, as cryptocurrencies may remain partly segmented in normal periods while becoming more coupled with traditional markets during broad stress episodes. This distinction between average integration and stress-state integration is central for portfolio construction and systemic-risk monitoring. Network approaches provide another perspective on financial interdependence by representing dependence struc-tures as graphs [33, 34, 35, 36, 37]. In correlation-based financial networks, assets are represented as nodes and pairwise dependence defines links or distances. This representation allows researchers to study not only the average level of comovement, but also the topology of market organisation. Measures such as clustering, modularity, and community composition reveal whether assets form tightly connected local groups, whether the system separates into distinct communities, and whether those communities are concentrated within or mixed across asset classes. These network properties are useful because systemic stress may reorganise the structure of dependence in ways that are not fully captured by average correlations alone. The network literature has shown that financial networks often re-organise during crises. Stress periods are typically associated with stronger comovement, shorter e ff ective distances, denser local structures, and changing community organisation [34, 35, 36]. In such periods, assets that appear weakly related in normal times may become more synchronised, causing market boundaries to weaken. However, interpret-ing these network measures requires caution. Correlation networks are descriptive representations of comovement, not structural causal maps. Their topology emerges from market behaviour and should therefore be interpreted as a state-dependent pattern of dependence rather than as an exogenous driver of returns. In addition, community detection may be sensitive to sampling noise, resolution limits, and algorithmic stochasticity [38, 39, 40, 41]. This motivates ro-bust clustering approaches, including consensus clustering, that focus on persistent communities rather than unstable partitions [42]. Although the connectedness and network literatures are closely related, they are often used separately. Con-nectedness models quantify directional spillovers and transmitter–receiver roles, but they rarely describe how the cross-sectional dependence topology itself changes over time. Network studies describe market structure, clustering, and community formation, but they often remain descriptive and are not embedded in the same dynamic system used to estimate shock transmission. This separation is limiting because, during stress, network topology may be more than a contemporaneous summary of comovement, and it may also become part of the short-run propagation environment. Theoretical work on financial networks shows that the structure of interconnections can a ff ect whether shocks are diversified, absorbed, or amplified, and that this e ff ect may depend on the level and pattern of connectivity [43, 44]. This motivates an empirical question that remains underexplored in cross-asset settings, that whether network topol-3ogy mainly reflects market stress, or whether it becomes more involved in transmission when the system is already turbulent. Currency markets add another important dimension to this problem. The global financial cycle literature empha-sises that dollar conditions, exchange-rate movements, funding liquidity, and cross-border capital flows are closely linked [45, 46, 47]. During stress, currency-market turbulence may therefore reflect more than exchange-rate volatility alone. It can summarise shifts in global funding conditions, risk appetite, and collateral valuation that are relevant for both traditional and digital asset markets. This suggests that fiat turbulence should not be treated merely as one symmetric market variable among others. Its role in cross-asset transmission may change when global risk conditions deteriorate, especially when dollar-denominated funding and portfolio rebalancing channels become more important. A further challenge is state dependence. If cross-asset integration is episodic, then full-sample estimates may obscure the mechanisms that operate specifically during turbulent periods. Regime-dependent models, including threshold VARs, provide a tractable way to examine whether propagation changes when markets move from low-stress to high-stress conditions [48, 49, 50]. In this setting, multivariate turbulence measures based on Mahalanobis distance are useful because they capture unusual joint return movements relative to recent market behaviour while accounting for covariance structure [51, 52]. A system-wide turbulence measure is particularly relevant for cross-asset analysis be-cause it identifies states in which the joint configuration of the full asset universe is unusual, rather than states defined by volatility in one market alone. The paper advances the literature by connecting network description with dynamic transmission analysis in a cross-asset setting. First, it studies cryptocurrencies, fiat currencies, and S&P500 equities within a balanced empirical design, allowing dependence topology, market turbulence, and spillover dynamics to be compared across asset classes in a common framework. Second, it incorporates time-varying network structure into a VAR-based connectedness system, so that clustering, modularity, and cross-class community diversity are analysed jointly with market turbulence and macro-financial conditions rather than treated as separate descriptive outputs. Third, it examines whether the role of network topology changes across turbulence regimes, thereby distinguishing ordinary cross-asset comovement from stress-state transmission. The contribution is therefore an integrated framework for assessing when cross-asset network structure remains a description of market organisation and when it becomes part of the short-run spillover environment. 42. Materials and Methods 
+
+2.1. Market turbulence and regime classification 
+
+Let Pi,t denote the price of asset i at time t. Daily log returns are computed as 
+
+ri,t = ln Pi,t
+
+Pi,t−1
+
+!
+
+. (1) These log returns are used to compute both the Turbulence Indices and the rolling correlation networks. Before computing the Turbulence Index [51], each asset’s daily log return series is standardised as 
+
+zi,t = ri,t − ¯ri
+
+si
+
+, (2) where ¯ ri and si are the sample mean and standard deviation of the daily log returns of asset i. This standardisation places assets with di ff erent volatility scales on a comparable basis before measuring multivariate turbulence. For a given market m, let zm,t ∈ RNm denote the vector of standardised daily log returns for the Nm assets in market m. The market-specific Turbulence Index is computed as a regularised squared Mahalanobis-type distance [52] between the current standardised return vector and its recent rolling distribution: TI m,t = (zm,t − μm,t)⊤ Σreg 
+
+> m,t
+
++
+
+(zm,t − μm,t), (3) where μm,t and Σreg  
+
+> m,t
+
+are estimated from the previous ∆TI daily return observations. The superscript + denotes the Moore–Penrose pseudoinverse, which is used as a numerical safeguard in the high-dimensional rolling-window set-ting. The covariance matrix is estimated using the Ledoit–Wolf shrinkage estimator [53]. This estimator stabilises the high-dimensional rolling covariance estimate by shrinking the empirical covariance matrix toward a scaled identity target, thereby shrinking o ff -diagonal covariances toward zero and variances toward their cross-sectional average. This reduces sensitivity to sampling noise when the number of observations is small relative to the number of assets. We then add a small diagonal perturbation, 
+
+Σreg  
+
+> m,t
+
+= ΣLW  
+
+> m,t
+
++ λI, (4) where ΣLW  
+
+> m,t
+
+denotes the Ledoit–Wolf covariance estimate, λ = 10 −5, and I is the Nm × Nm identity matrix. This perturbation adds a small constant to the diagonal elements of the covariance matrix while leaving the o ff -diagonal elements unchanged. It is included as a numerical safeguard, whereas the principal stabilisation comes from the 5Ledoit–Wolf shrinkage estimator. The Moore–Penrose pseudoinverse in Eq. (3) provides an additional safeguard against near-singular directions in short-window high-dimensional settings. For the full cross-asset system, let zt ∈ RN collect the standardised daily log returns of all assets across the asset classes. The system-wide Turbulence Index is TI t = (zt − μt)⊤ Σreg 
+
+> t
+
++
+
+(zt − μt). (5) This index is used for regime classification, while the three market-specific indices enter the VAR system. 
+
+2.2. Dynamic connectedness and regime-dependent transmission 
+
+We use a vector autoregression (VAR) [16] to study how changes in market turbulence, network structure, and macro-financial conditions are transmitted through time. A VAR represents each variable as a function of its own lagged values and the lagged values of all other variables in the system. The model is used to measure predictive transmission, connectedness, and regime-dependent amplification. Before estimating the VAR, each endogenous series is transformed into a standardised first di ff erence. For any variable Xt, we define 
+
+eXt = ∆Xt − ∆Xs∆X
+
+, ∆Xt = Xt − Xt−1, (6) where ∆X and s∆X are the sample mean and sample standard deviation of ∆Xt. Thus, the tilde indicates that the variable is expressed as a standardised day-to-day change. This transformation places all endogenous variables on a comparable scale and focuses the VAR on changes rather than persistent level di ff erences. The baseline VAR with p lags is specified as 
+
+Yt = α +
+
+> p
+
+X
+
+> ℓ=1
+
+ΦℓYt−ℓ + ut, (7) where α is a vector of intercepts, Φℓ is the coe ffi cient matrix for lag ℓ, and ut is the vector of model residuals. The residuals represent the part of the current change in each variable that is not explained by the past values included in the model. Their covariance matrix is denoted by 
+
+Σu = E(utu⊤ 
+
+> t
+
+). (8) The lag order p determines how many previous days are used to explain current movements in the system. We compare candidate lag lengths using standard information criteria, including AIC [54], BIC [55], HQIC [56], and 6FPE [57]. These criteria balance model fit against model complexity. After estimation, we check that the VAR is dynamically stable, meaning that shocks to the system eventually dissipate rather than grow indefinitely. This is verified by confirming that all eigenvalues of the companion matrix lie inside the unit circle. To measure the magnitude of transmission, we use the Diebold–Yilmaz connectedness framework [20, 21] based on the generalised forecast error variance decomposition (GFEVD) [24]. The idea is to decompose the forecast uncertainty of each variable into parts attributable to itself and parts attributable to other variables. For example, if a large share of the forecast uncertainty of cryptocurrency turbulence is attributable to equity turbulence, then equity turbulence acts as an important transmitter to the crypto market. The estimated VAR can be written in moving-average form as 
+
+Yt =
+
+> ∞
+
+X
+
+> h=0
+
+Ψhut−h, (9) where Ψh describes how a model residual propagates after h days. The H-day generalised variance share from variable 
+
+j to variable i is 
+
+θ(H) 
+
+> i j
+
+= σ−1 
+
+> u,j j
+
+PH−1
+
+> h=0
+
+e⊤ 
+
+> i
+
+ΨhΣue j
+
+2
+
+PH−1 
+
+> h=0
+
+e⊤ 
+
+> i
+
+ΨhΣuΨ⊤ 
+
+> h
+
+ei
+
+, (10) where ei is a selection vector for variable i, and σu, j j is the j-th diagonal element of Σu. We use the generalised decomposition because it is invariant to the ordering of variables in the VAR. Because the generalised variance shares do not necessarily sum to one across each row, we normalise them as 
+
+eθ(H) 
+
+> i j
+
+= θ(H)
+
+> i j
+
+PKj=1 θ(H)
+
+> i j
+
+,
+
+> K
+
+X
+
+> j=1
+
+eθ(H) 
+
+> i j
+
+= 1, (11) where K is the number of variables in Yt. All connectedness measures are reported in percentage terms. For each variable i, spillovers received from the rest of the system are defined as From (H) 
+
+> i
+
+=
+
+X
+
+> j,i
+
+eθ(H) 
+
+> i j
+
+, (12) while spillovers transmitted from variable i to the rest of the system are defined as To (H) 
+
+> i
+
+=
+
+X
+
+> j,i
+
+eθ(H) 
+
+> ji
+
+. (13) The net spillover position is Net (H) 
+
+> i
+
+= To (H) 
+
+> i
+
+− From (H) 
+
+> i
+
+. (14) 7A positive value means that variable i transmits more forecast uncertainty than it receives, whereas a negative value means that it receives more than it transmits. The total spillover index is TSI (H) = 1
+
+K
+
+> K
+
+X
+
+> i=1
+
+X
+
+> j,i
+
+eθ(H) 
+
+> i j
+
+. (15) This index summarises the average share of forecast uncertainty that comes from cross-variable spillovers rather than from a variable’s own residuals. To examine how connectedness changes over time, we apply the VAR-GFEVD calculation in rolling windows. For each rolling window, we estimate the VAR and compute the corresponding total, directional, and net connectedness measures. This produces time-varying series TSI (H) 
+
+> t
+
+, To (H) 
+
+> i,t
+
+, From (H) 
+
+> i,t
+
+, Net (H) 
+
+> i,t
+
+.
+
+The rolling analysis shows whether the system becomes more connected during stress periods and whether the iden-tities of net transmitters and receivers change over time. The rolling analysis describes time variation along the calendar dimension, but it does not directly separate normal and elevated-turbulence states. To test whether the system behaves di ff erently across turbulence states, we estimate a two-regime threshold VAR [48, 49]. The regime is defined directly from the system-wide Turbulence Index in levels, TI t. We use a one-day delay, so the regime for day t depends on the previous day’s system-wide turbulence: 
+
+st =
+
+
+
+Low , TI t−1 ≤ γ, 
+
+High , TI t−1 > γ. 
+
+(16) Here, γ is the estimated turbulence threshold. The one-day delay avoids using the current day’s system-wide turbu-lence to define the same day’s regime. The threshold VAR is then 
+
+Yt = α(st ) +
+
+> p
+
+X
+
+> ℓ=1
+
+Φ(st ) 
+
+> ℓ
+
+Yt−ℓ + u(st ) 
+
+> t
+
+, (17) where the intercepts, lag coe ffi cients, and residual covariance matrix are allowed to di ff er between the low- and high-turbulence regimes. In other words, the model estimates one set of transmission dynamics for low-turbulence days and another set for high-turbulence days. The threshold γ is selected by grid search. Candidate thresholds are restricted to the range between the 10th and 90th percentiles of TI t−1, so that both regimes contain enough observations. For each candidate threshold, we estimate the two-regime VAR and select the threshold that minimises the Bayesian 8Information Criterion (BIC). We then check the stability of the VAR separately in each regime. For each regime s ∈ { Low , High }, we compute regime-specific connectedness measures: 
+
+eθ(H,s) 
+
+> i j
+
+, To (H,s) 
+
+> i
+
+, From (H,s) 
+
+> i
+
+, Net (H,s) 
+
+> i
+
+, TSI (H,s).
+
+To summarise how transmission roles change under stress, we define 
+
+∆Net (H) 
+
+> i
+
+= Net (H,High)  
+
+> i
+
+− Net (H,Low)  
+
+> i
+
+. (18) A positive ∆Net (H) 
+
+> i
+
+means that variable i becomes more transmissive in the high-turbulence regime. A negative value means that it becomes more absorptive. We use generalised impulse response functions (GIRFs) to visualise the dynamic adjustment behind the connected-ness measures [24]. A GIRF traces the expected response of one variable after an unexpected one-standard-deviation change in another variable. Because we use the generalised version, the responses do not depend on the ordering of variables in the VAR. The response of variable q to a shock in variable v at horizon h is GIRF q←v(h) = [ΨhΣu]qv 
+
+√σu,vv 
+
+. (19) For the threshold VAR, the GIRFs are computed separately in the low- and high-turbulence regimes using the cor-responding regime-specific coe ffi cients and covariance matrices. Uncertainty is assessed using bootstrap confidence intervals. For the linear VAR, we resample model residuals, simulate bootstrap series from the estimated model, re-estimate the VAR, and recompute the GIRFs. For the threshold VAR, residuals are resampled within each regime and responses are recomputed using the corresponding regime-specific coe ffi cient matrices. Confidence bands are reported at the 90% level. The interpretation focuses on the size, sign, persistence, and regime contrast of the responses. Finally, we summarise transmission across three groups of variables for market turbulence, network structure, and macro-financial conditions. Let Ga and Gb denote two such groups. The spillover from group b to group a is 
+
+Θ(H) 
+
+> a←b
+
+= 1
+
+|G a|
+
+X
+
+> i∈G a
+
+X
+
+> j∈G b
+
+eθ(H) 
+
+> i j
+
+. (20) Group-level received, transmitted, and net connectedness are then From (H) 
+
+> a
+
+=
+
+X
+
+> b,a
+
+Θ(H)
+
+> a←b
+
+, To (H) 
+
+> a
+
+=
+
+X
+
+> b,a
+
+Θ(H)
+
+> b←a
+
+, (21) 9and Net (H) 
+
+> a
+
+= To (H) 
+
+> a
+
+− From (H) 
+
+> a
+
+. (22) These block measures show whether transmission mainly originates in market turbulence, macro-financial conditions, or the network structure of cross-asset dependence. 
+
+2.3. Correlation networks and structural indicators 
+
+We represent the cross-asset dependence structure at each time t as an undirected weighted network Gt = (V, At, Wt), where V is the set of assets and N = |V| is the number of nodes. The adjacency matrix At = {ai j ,t} indicates whether two assets are connected, with ai j ,t = 1 if assets i and j are linked at time t, and ai j ,t = 0 otherwise. The weighted adjacency matrix Wt = {wi j ,t} records the strength of each positive comovement link, with wi j ,t > 0 for connected pairs and wi j ,t = 0 otherwise. The number of edges and the total edge weight are defined as 
+
+Et =
+
+X 
+
+> i<j
+
+ai j ,t, Mt =
+
+X 
+
+> i<j
+
+wi j ,t = 12
+
+X 
+
+> i,j
+
+wi j ,t. (23) These quantities provide the basic network scale used in the weighted structural measures below. Using the daily log returns defined in Eq. (1), we compute the Pearson correlation coe ffi cient between each pair of assets i and j. Let Rt denote the network estimation window ending at time t. The rolling correlation is 
+
+ρi j ,t =
+
+Pτ∈R t (ri,τ − ¯ri,t)( r j,τ − ¯r j,t)
+
+qPτ∈R t (ri,τ − ¯ri,t)2
+
+qPτ∈R t (r j,τ − ¯r j,t)2
+
+, (24) where ¯ ri,t is the mean return of asset i within Rt.The baseline network retains only positive return comovements. Specifically, we apply the correlation threshold 
+
+θρ = 0, (25) and define the adjacency matrix as 
+
+ai j ,t = I(ρi j ,t > θ ρ), aii ,t = 0. (26) The corresponding edge weight is 
+
+wi j ,t = ρi j ,tai j ,t. (27) Thus, connected pairs have positive correlation weights, while non-positive correlations are excluded from the net-10 work. This construction focuses the analysis on positive comovement links, which represent assets moving together within the rolling window. The baseline network measures are computed from the positive-correlation weighted network defined in Eq. (27). For interpretability and robustness, we also consider the corresponding correlation-distance representation [33], 
+
+di j ,t =
+
+q
+
+2(1 − ρi j ,t). (28) Shorter distances correspond to stronger positive comovement, and the threshold ρi j ,t > 0 is equivalent to di j ,t < √2. The distance-transformed modularity series is reported in the Supplementary Information and shows a broadly similar temporal pattern to the baseline correlation-weighted version. We summarise the network using three structural indicators that correspond to di ff erent levels of market organ-isation, including local cohesion, global segmentation, and cross-class mixing. Local cohesion is measured by the average weighted clustering coe ffi cient. The degree of node i is 
+
+ki,t =
+
+X
+
+> j,i
+
+ai j ,t, (29) and its weighted degree, or strength, is 
+
+κi,t =
+
+X
+
+> j,i
+
+wi j ,t. (30) We use the Barrat weighted clustering coe ffi cient: 
+
+cc i,t = 1
+
+κi,t(ki,t − 1) 
+
+X
+
+> j,h
+
+wi j ,t + wih ,t
+
+2 ai j ,taih ,ta jh ,t, (31) for nodes with ki,t > 1. Here, ki,t counts the number of neighbours of node i, whereas κi,t measures the total weight of its connections. The network-level clustering coe ffi cient is 
+
+⟨cc ⟩t = 1
+
+N(cc )
+
+> t
+
+X 
+
+> i:ki,t>1
+
+cc i,t, (32) where N(cc ) 
+
+> t
+
+is the number of nodes with degree greater than one. A higher ⟨cc ⟩t indicates that assets are embedded in tighter local triangles of comovement, reflecting stronger local cohesion in the cross-asset dependence network. Global segmentation is measured by modularity. For a partition of the network into communities, let gi,t denote 11 the community assignment of asset i. The weighted modularity is 
+
+Qt = 12Mt
+
+X 
+
+> i,j
+
+"
+
+wi j ,t − κi,tκ j,t
+
+2Mt
+
+#
+
+δ(gi,t, g j,t), (33) where the kronecker function δ(gi,t, g j,t) = 1 if assets i and j belong to the same community and zero otherwise. Higher 
+
+Qt indicates stronger separation into internally cohesive but mutually distinct communities. We use the Louvain algorithm [38] to obtain modular partitions by maximising Qt.Because modularity maximisation is stochastic and can be sensitive to sampling variability, we use a consensus clustering procedure to identify robust communities. This follows the consensus-clustering logic introduced in our previous network analysis and adapts it to the present cross-asset setting [58]. For each reference time t, we apply Louvain to ns adjacent rolling windows indexed by b = 1, . . . , ns, each shifted by one day relative to the previous window. Let g(b) 
+
+> i,t
+
+denote the community assignment of asset i in repetition b, with b = 1, . . . , ns. The co-membership frequency of assets i and j is 
+
+πi j ,t = 1
+
+nsnsX
+
+> b=1
+
+I g(b) 
+
+> i,t
+
+= g(b)
+
+> j,t
+
+ . (34) The matrix Πt = {πi j ,t} records how often each pair of assets is assigned to the same community across adjacent windows. We retain pairs with 
+
+πi j ,t ≥ θπ, θπ = 0.5. (35) The connected components of this thresholded co-membership network define robust clusters. Thus, two assets are treated as belonging to the same robust cluster only if they co-occur in the same community in at least half of the repeated partitions. This procedure reduces dependence on a single Louvain realisation and focuses the analysis on persistent groupings. Cross-class mixing is measured using Simpson’s Diversity Index [59]. For a robust cluster C, let nC,t denote the number of assets in the cluster, and let nx,C,t denote the number of assets belonging to asset class x. The cluster-level diversity index is 
+
+DC,t = 1 −
+
+PXx=1 nx,C,t(nx,C,t − 1) 
+
+nC,t(nC,t − 1) , (36) where X is the number of asset classes. Equivalently, for su ffi ciently large clusters, if px,C,t = nx,C,t/nC,t, then 
+
+DC,t ≈ 1 −
+
+> X
+
+X
+
+> x=1
+
+p2
+
+> x,C,t
+
+. (37) The index equals zero when all assets in a cluster come from the same class and reaches its maximum when the three 12 asset classes are equally represented. For three equally represented classes, the theoretical maximum is Dmax = 2/3. We summarise cross-class mixing by averaging over robust clusters larger than a minimum size threshold: 
+
+⟨D⟩t = 1
+
+|C ∗ 
+
+> t
+
+|
+
+X
+
+> C∈C ∗
+> t
+
+DC,t, (38) where C∗ 
+
+> t
+
+denotes the set of robust clusters with more than five assets. A higher ⟨D⟩t indicates weaker asset-class boundaries and greater compositional mixing inside robust communities. All network quantities are computed in rolling windows. We denote the network estimation window by Lnet and set Lnet = 30 days, following the sampling-window choice used for short-run financial network estimation [60]. Thus, 
+
+Rt = {t − Lnet + 1, . . . , t} is the return window used to estimate ρi j ,t, the adjacency matrix, and the correlation weights at time t.
+
+2.4. Asset data and market indicators 
+
+We analyse the period from 15 October 2017 to 29 February 2024, yielding Ttotal = 2, 329 calendar days before return construction. This period covers several distinct economic and financial episodes, including the later stages of Brexit-related uncertainty, the COVID-19 crisis, the post-pandemic recovery, the Russia–Ukraine war, global mone-tary tightening, and the 2022 cryptocurrency market disruption. The empirical setting combines three asset classes: cryptocurrencies, fiat currencies, and S&P500 equities. This design allows us to compare the behaviour of a digital asset market, a global currency market, and a traditional equity market within a common cross-asset framework. The raw cryptocurrency dataset contains daily prices recorded at midnight for 5,450 cryptocurrencies collected from several online sources ( www.investing.com , coinmarketcap.com , www.coindesk.com , www.coincodex. com , and www.marketwatch.com ). We first identified the top 1,000 cryptocurrencies by market capitalisation as of 22 February 2022 and retained those that were active over the full sample period. Cryptocurrencies with more than 10 missing daily prices were excluded, leaving 157 eligible cryptocurrencies before the final balancing step. The fiat dataset contains daily exchange rates against the U.S. dollar for more than 180 currencies, obtained from Yahoo Finance [61]. After excluding currencies with more than 10 missing observations, 127 fiat currencies remained. The equity dataset contains daily closing prices for S&P 500 constituents over the same period, also obtained from Yahoo Finance [61]. After excluding stocks with more than 10 missing observations, 484 stocks remained eligible. To ensure balance across asset classes, we retained the same number of assets from each market. Specifically, we ranked eligible cryptocurrencies and S&P 500 stocks by market capitalisation on 29 February 2024 and retained the top 127 assets in each class. Together with the 127 fiat currencies passing the missing-data filter, this yields a balanced final sample of Ncrypto = 127, Nfiat = 127, NS&P500 = 127, and therefore N = 381 assets in the combined 13 cross-asset system. The full asset list is provided in the Supplementary Information. Because cryptocurrencies trade continuously, while fiat currencies and equities follow di ff erent trading calendars, all price series are aligned to a common daily calendar. Weekend values for fiat currencies and S&P500 equities are linearly interpolated to match the weekend trading of cryptocurrencies. This calendar alignment allows us to compute daily cross-asset return vectors and rolling correlation networks using the same time index across all three markets. In addition to asset prices, we include three macro-financial indicators that capture broad market conditions. The CBOE Volatility Index ( cboe.com ) measures market-implied volatility in U.S. equities and is used as a proxy for global risk sentiment. The broad U.S. dollar index ( fred.stlouisfed.org ) captures movements in the value of the U.S. dollar relative to other major currencies. The U.S. Economic Policy Uncertainty Index ( fred.stlouisfed.org )captures policy-related uncertainty based on news coverage. All macro-financial indicators are obtained at daily frequency, and weekend values are filled by linear interpolation to match the common calendar used for the asset-price data. 
+
+3. Results and Discussion 
+
+3.1. Evolution of cross-asset network structure 
+
+Figure 1 summarises the evolution of the combined cross-asset network using three structural indicators, includ-ing local cohesion measured by the average weighted clustering coe ffi cient ⟨cc ⟩t, global segmentation measured by modularity Qt, and cross-class mixing measured by the average Simpson diversity index ⟨D⟩t. Figure 1A shows that local cohesion varies episodically over time. The average weighted clustering coe ffi cient fluctuates around its time average of g⟨cc ⟩ = 0.17, with pronounced increases during periods of market stress. The largest spike occurs around the onset of the COVID-19 crisis in early 2020, indicating that assets became embedded in tighter local triangles of positive comovement. A second increase appears around late 2022, close to the FTX-related cryptocurrency market disruption. These episodes suggest that stress temporarily compresses local market distances and strengthens short-run cross-asset cohesion, but the e ff ect is not persistent, where clustering repeatedly returns toward, and later falls below, its long-run average. Figure 1B shows that modularity Qt fluctuates around a time average of eQ = 0.29, indi-cating a moderate but time-varying degree of community organisation. Higher modularity in 2018–2019 suggests that the combined network was more clearly separated into internally cohesive communities. Around the COVID-19 pe-riod, modularity declines, implying that community boundaries weakened as cross-asset stress increased. From 2021 to 2022, Qt remains mostly below or near its long-run average, before rising again in 2023 as the network becomes more segmented. Thus, the global organisation of the network alternates between periods of stronger community separation and periods of stress-related integration. Figure 1C shows that the average Simpson diversity index ⟨D⟩t
+
+14 Figure 1: Evolution of network structure and modular organisation in the combined cross-asset network. Panel (A) shows the mean weighted clustering coe ffi cient ⟨cc ⟩, the dashed line indicates its time average g⟨cc ⟩ = 1      
+
+> T
+> PTt=1⟨cc ⟩tover the entire period. Panel (B) shows the modularity Q
+> for the largest connected component, with the dashed line representing the time average eQ. Panel (C) shows the average Simpson’s Diversity Index
+> ⟨D⟩for stable large clusters (more than 5 assets), the grey band indicates one standard deviation. The vertical dashed lines in panel (C) mark the breakpoints of a piecewise linear regression with corresponding slopes βfor each segment. Breakpoint locations are optimised by minimising the overall sum of squared residuals (RSS) across all time intervals.
+
+remains below the theoretical maximum of Dmax = 2/3, meaning that robust communities are not evenly balanced across cryptocurrencies, fiat currencies, and S&P500 equities. Nevertheless, ⟨D⟩t increases over the sample, indicat-ing greater cross-class mixing within stable communities. The piecewise linear fit suggests a stronger increase before the COVID-19 period, a temporary interruption around February–March 2020, and a slower positive trend afterwards. This pattern is consistent with a gradual weakening of asset-class boundaries. Overall, Fig. 1 supports an episodic-integration view of cross-asset dependence. The combined network remains partly segmented in normal periods, but stress episodes are associated with tighter local cohesion, weaker modular separation, and greater cross-class mixing. These patterns indicate that network topology behaves as an emergent descriptor of the market state, that it records how asset-class boundaries and dependence structures reconfigure during stress, rather than representing an exogenous source of turbulence. 
+
+3.2. Market-specific turbulence and system-wide regimes 
+
+Figure 2A–C show the Turbulence Index for cryptocurrencies, fiat currencies, and S&P500 equities, respectively. The three market-specific indices exhibit distinct turbulence profiles. Cryptocurrency turbulence is highly episodic, with long intervals of moderate values interrupted by sharp peaks around 2019 and again during 2021–2022. Since 15 Figure 2: Evolution of market-specific and system-wide turbulence. All Turbulence Indices are computed with ∆TI = 30. Panels (A), (B), and (C) show the Turbulence Index for the cryptocurrency, fiat, and S&P500 markets, respectively, together with the 30-day moving average. Panel (D) reports the system-wide Turbulence Index computed from the full cross-asset return vector, together with the estimated threshold used to define regimes in the two-regime threshold VAR. The dashed line in panel (D) indicates the estimated threshold ˆ γ. Observations are assigned to the high-turbulence regime when TI t−1 > ˆγ, and to the low-turbulence regime otherwise, following the threshold VAR specification in Sec. 2.2. 
+
+the Turbulence Index measures covariance-adjusted displacement from recent market behaviour, these peaks indicate periods when cryptocurrency returns moved unusually far from their recent multivariate pattern. This suggests that digital-asset stress is concentrated in discrete bursts rather than evolving smoothly over time. Fiat turbulence also exhibits pronounced peaks, especially around the 2020–2021 period, when global currency markets were a ff ected by pandemic-related uncertainty, uneven recovery dynamics, and changes in monetary-policy expectations. By contrast, S&P500 turbulence appears more compressed under the common scale used in the figure. This does not imply the absence of equity-market stress; rather, relative to the scale of the three panels, equity turbulence is less dominated by isolated extreme peaks and instead displays shorter and more frequent fluctuations. Figure 2D reports the system-wide Turbulence Index used to define the low- and high-turbulence regimes. This index is computed from the full cross-asset return vector, rather than by aggregating the three market-specific indices, and therefore captures abnormal joint movements across the entire asset universe. It rises when the combined system deviates from its recent multivariate benchmark, not merely when one market displays an isolated turbulence spike. The estimated threshold, obtained from the TVAR specification described in Section 2.2, lies above typical day-to-day variation but is crossed repeatedly during periods of market stress. Thus, the high-turbulence regime captures recurrent episodes of elevated system-wide displacement, rather than only a small number of extreme outliers or single-market volatility events. This regime definition provides the empirical basis for the state-dependent transmission analysis below. 16 Variable Mean Std. Dev. Min Max Skewness Kurtosis 
+
+TI s&p500 185.54 219.07 3.71 2259.59 2.15 8.33 TI fiat 157.64 440.79 3.24 8689.96 11.46 165.96 TI crypto 184.99 373.78 10.95 10481.77 15.73 334.81 
+
+⟨cc ⟩ 0.17 0.04 0.11 0.41 2.10 7.67 
+
+Q 0.29 0.06 0.11 0.48 0.26 0.09 
+
+⟨D⟩ 0.26 0.08 0.07 0.54 0.45 0.20 
+
+VIX 20.27 7.91 9.15 82.69 2.44 10.92 
+
+USDX 116.70 4.33 106.49 128.45 0.17 -0.25 
+
+EPU 151.48 111.18 4.05 1026.38 2.39 7.83 
+
+> Table 1: Descriptive statistics of the daily variables in levels entering the VAR system. Skewness and kurtosis are computed from sample moments.
+
+3.3. Distributional properties and stationarity diagnostics 
+
+Table 1 summarises the distributional properties of the variables used in the empirical analysis. The three market turbulence indices are strongly right-skewed and leptokurtic, indicating that turbulence is concentrated in irregular bursts rather than distributed evenly over time. This pattern is most noticeable for cryptocurrency turbulence, which has the largest maximum, skewness, and kurtosis among the market-specific indices. Fiat turbulence also displays substantial tail risk, while S&P500 turbulence is less extreme by comparison, suggesting a more compressed distribu-tion of multivariate equity-market stress. The network indicators have a di ff erent distributional profile. The average clustering coe ffi cient ⟨cc ⟩t, modularity Qt, and diversity index ⟨D⟩t are bounded by construction and vary within nar-rower ranges than the turbulence indices. This indicates that network topology evolves more smoothly than market turbulence, that return-based stress can produce sharp short-run displacements, whereas changes in local cohesion, modular segmentation, and cross-class mixing are more gradual. The macro-financial variables are heterogeneous. VIX and EPU are positively skewed and heavy-tailed, reflecting occasional surges in volatility expectations and policy uncertainty, whereas USDX is more symmetric and less spike-driven over the full sample. Table 2 reports stationarity diagnostics for the variables entering the VAR. The ADF and KPSS tests provide complementary evidence because they use opposite null hypotheses, where ADF tests for a unit root, whereas KPSS tests for stationarity. In levels, the evidence is mixed. The ADF test rejects the unit-root null for most variables, but not for USDX, and only weakly for EPU. The KPSS test rejects level stationarity for Qt, VIX, USDX, and EPU. These results indicate that estimating the VAR directly in levels would combine variables with di ff erent persistence properties. After first di ff erencing, the evidence is consistent across all variables. ADF rejects the unit-root null, while KPSS fails to reject stationarity. The dynamic transmission model is therefore estimated using standardised first di ff erences, as defined in Eq. (6). This specification focuses the VAR on changes in market turbulence, network structure, and macro-financial conditions, while placing all variables on a comparable scale for impulse responses and variance-decomposition connectedness. 17 Levels First Di ff erences Variable ADF KPSS ADF KPSS 
+
+TI s&p500 <0.001 > 0.10 <0.001 > 0.10 TI fiat <0.001 > 0.10 <0.001 > 0.10 TI crypto <0.001 > 0.10 <0.001 > 0.10 
+
+⟨cc ⟩ <0.001 > 0.10 <0.001 > 0.10 
+
+Q <0.001 < 0.01 <0.001 > 0.10 
+
+⟨D⟩ <0.001 > 0.10 <0.001 > 0.10 
+
+VIX <0.001 0.024 <0.001 > 0.10 
+
+USDX 0.257 < 0.01 <0.001 > 0.10 
+
+EPU 0.074 0.017 <0.001 > 0.10      
+
+> Table 2: Unit root tests for the variables entering the VAR system. The table reports p-values from Augmented Dickey–Fuller (ADF) and KPSS tests in levels and first di ff erences. The ADF null hypothesis is a unit root, whereas the KPSS null hypothesis is stationarity. P-values smaller than 0.001 are reported as <0.001. KPSS p-values are tabulated and bounded in common implementations, that values reported as 0.100 and 0.010 correspond to the upper and lower interpolation limits and are therefore shown as >0.10 and <0.01, respectively.
+
+3.4. Full-sample connectedness and impulse responses 
+
+Table 3 reports the Diebold–Yilmaz connectedness decomposition at a 30-day horizon. The table answers a variance-decomposition question regarding when forecasting each variable, what share of forecast uncertainty is ex-plained by its own shocks and what share is explained by shocks from other variables? Because entries measure directional contributions from column variables to row variables, the table is not symmetric. The diagonal entries dominate for all variables, indicating that most forecast uncertainty is self-driven in the full-sample VAR. This is especially clear for the three market turbulence indices, where own shocks explain 92 .51% of S&P500 turbulence, 94 .47% of fiat turbulence, and 95 .76% of cryptocurrency turbulence. Nevertheless, the o ff -diagonal entries reveal selective cross-market transmission. S&P500 turbulence contributes more to fiat and cryptocurrency turbulence than it receives from them, while the reverse contribution from cryptocurrency turbulence to traditional markets is smaller. Consistent with this asymmetry, S&P500 and fiat turbulence are net transmitters, with net positions of 1 .85 and 3 .19 percentage points, whereas cryptocurrency turbulence is a net receiver with −1.42 percentage points. This supports the interpretation that cryptocurrency turbulence is integrated into the broader system but is not the dominant transmitter in the average full-sample dynamics. The network indicators play a distinct role. The average clustering coe ffi cient ⟨cc ⟩ receives 24 .41% of its forecast uncertainty from the rest of the system and transmits 28 .78%, giving the largest positive net position in the table. This suggests that local network cohesion is both shaped by system-wide conditions and informative for subsequent forecast uncertainty elsewhere in the system. Modularity Q is closer to balance, while the diversity index ⟨D⟩ is relatively self-driven, with 95 .22% of its variance explained by own shocks. Thus, local clustering is more involved in short-run transmission than global compositional mixing, which appears to evolve more slowly. 18 TI s&p500 TI fiat TI crypto ⟨cc ⟩ Q ⟨D⟩ VIX USDX EPU From 
+
+TI s&p500 92.505 3.263 0.393 0.317 0.345 0.372 1.067 0.382 1.356 7.495 TI fiat 2.872 94.472 0.038 0.063 0.167 0.357 0.696 0.754 0.581 5.528 TI crypto 0.600 1.798 95.756 0.531 0.386 0.152 0.161 0.504 0.112 4.244 
+
+⟨cc ⟩ 0.448 0.646 0.282 75.593 14.543 1.196 6.491 0.517 0.284 24.407 
+
+Q 0.756 0.247 0.371 15.563 81.631 0.246 0.523 0.240 0.423 18.369 
+
+⟨D⟩ 0.271 0.295 1.060 1.035 0.689 95.219 0.875 0.158 0.397 4.780 
+
+VIX 1.937 0.553 0.253 9.551 1.556 0.736 79.527 5.506 0.380 20.472 
+
+USDX 0.306 0.540 0.126 1.424 0.529 0.209 8.606 87.775 0.485 12.225 
+
+EPU 2.154 1.374 0.302 0.298 0.248 0.201 0.689 0.434 94.300 5.700 
+
+To 9.344 8.716 2.825 28.782 18.463 3.469 19.108 8.495 4.018 
+
+Net 1.849 3.188 -1.419 4.375 0.094 -1.311 -1.364 -3.730 -1.682 11.469            
+
+> Table 3: Diebold–Yilmaz connectedness table based on the generalised forecast error variance decomposition (GFEVD) from the estimated VAR at horizon H=30. Each entry reports the percentage of the 30-day-ahead forecast error variance of the row variable attributable to shocks in the column variable. Diagonal entries measure own-shock contributions, while o ff -diagonal entries measure cross-variable spillovers. From is the total o ff -diagonal spillover received by each row variable, To is the total o ff -diagonal spillover transmitted by each column variable, and Net is To −From. Positive Net values indicate net transmitters of forecast uncertainty, whereas negative values indicate net receivers. The bottom-right entry reports the total spillover index. All entries are percentages.
+
+Among macro-financial variables, VIX is the most connected. It receives 20 .47% of its forecast uncertainty from the system and transmits 19 .11%, giving a near-balanced but slightly negative net position. The connection between VIX and ⟨cc ⟩ is particularly informative, that VIX contributes 6 .49% to the forecast uncertainty of ⟨cc ⟩,while ⟨cc ⟩ contributes 9 .55% to VIX. The first channel is consistent with implied volatility being followed by tighter local comovement in the cross-asset network. The reverse channel suggests that network clustering contains predictive information about subsequent variation in implied volatility, possibly because broader return synchronisation is related to the covariance environment relevant for portfolio risk and option pricing. The GFEVD cannot identify a structural mechanism, but it indicates a non-trivial reduced-form link between local clustering and volatility uncertainty. The total spillover index is 11 .47%, meaning that about one-ninth of the system’s 30-day forecast uncertainty is explained by cross-variable shocks rather than own shocks. The full-sample system is therefore not dominated by pervasive spillovers. Instead, connectedness is moderate and selective, with economically meaningful transmission concentrated around S&P500 and fiat turbulence, VIX, and the network clustering coe ffi cient. The connectedness table quantifies how much of each variable’s H-step forecast uncertainty is attributable to shocks in other variables, but it does not show the response path. We therefore complement the GFEVD analysis with generalised impulse response functions, which trace how a one-standard-deviation unexpected change propagates over subsequent days. Figure 3 complements the connectedness table by showing the temporal profile of shock propagation. The re-sponses are estimated from the full-sample VAR and should therefore be interpreted as average dynamic responses over the sample, not as responses during a specific crisis. A one-standard-deviation shock represents an unexpected 19 0 5 10 15 20 25 30 
+
+> −0.10
+> −0.05
+> 0.00
+> 0.05
+> 0.10
+> 0.15
+> Response (std. units)
+
+A TI S&P500        
+
+> TI Fiat
+> TI Crypto
+> 0510 15 20 25 30
+> −0.10
+> −0.05
+> 0.00
+> 0.05
+> 0.10
+> 0.15
+
+B       
+
+> 0510 15 20 25 30
+> −0.10
+> −0.05
+> 0.00
+> 0.05
+> 0.10
+> 0.15
+
+C      
+
+> 0510 15 20 25 30
+> −0.10
+> −0.05
+> 0.00
+> 0.05
+> 0.10
+> 0.15
+> Response (std. units)
+
+D ⟨cc ⟩      
+
+> Q
+> ⟨D⟩
+> 0510 15 20 25 30
+> −0.10
+> −0.05
+> 0.00
+> 0.05
+> 0.10
+> 0.15
+
+E      
+
+> 0510 15 20 25 30
+> −0.10
+> −0.05
+> 0.00
+> 0.05
+> 0.10
+> 0.15
+
+F      
+
+> 0510 15 20 25 30
+> Horizon (days)
+> −0.1
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> Response (std. units)
+
+G ⟨cc ⟩       
+
+> Q
+> ⟨D⟩
+> 0510 15 20 25 30
+> Horizon (days)
+> −0.1
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+
+H       
+
+> 0510 15 20 25 30
+> Horizon (days)
+> −0.1
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+
+IFigure 3: Generalised impulse responses across the market–network–macro system. Rows correspond to transmission channels and columns to originating shocks. The first row reports cross-market responses among the three market turbulence indices following shocks to (A) S&P500 turbulence, (B) fiat turbulence, and (C) cryptocurrency turbulence, with own responses suppressed. The second row reports responses of network indicators to shocks in (D) S&P500 turbulence, (E) fiat turbulence, and (F) cryptocurrency turbulence. The third row reports network responses to shocks in (G) VIX, (H) USDX, and (I) EPU. Responses are computed using the Pesaran–Shin generalised framework, expressed in standard-deviation units, and invariant to variable ordering. Shaded bands denote 90% bootstrap confidence intervals based on B = 300 residual-bootstrap replications. 
+
+increase in the standardised first di ff erence of the originating variable. When a response returns toward zero, the in-cremental e ff ect of the shock has dissipated. Panels A–C show cross-market propagation among the three turbulence indices. A shock to S&P500 turbulence generates a clear short-run response in fiat turbulence and a weaker response in cryptocurrency turbulence. A shock to fiat turbulence also a ff ects S&P500 turbulence and produces a delayed re-sponse in cryptocurrency turbulence. By contrast, shocks originating in cryptocurrency turbulence have limited e ff ects on the two traditional markets. This pattern is consistent with the connectedness table, that cryptocurrency turbulence responds to the broader system, but it is not the dominant source of full-sample cross-market transmission. 20 Panels D–F link market turbulence shocks to subsequent changes in network topology. The responses indicate that market stress can disturb several layers of network organisation, but the a ff ected layer and the duration of the response di ff er by the originating market. Following an S&P500 turbulence shock in panel D, the network response is relatively longer lasting, continues to fluctuate over a longer horizon before dissipating. This suggests that equity-market turbulence produces a more prolonged disturbance to community organisation and local cohesion, even though it does not lead to a permanent topological shift. A fiat turbulence shock in panel E produces a sharper but shorter-lived adjustment across ⟨cc ⟩ and ⟨D⟩, indicating that currency-market stress temporarily a ff ects local cohesion and cross-class composition, but is absorbed relatively quickly. A cryptocurrency turbulence shock in panel F generates a visible early response in ⟨D⟩, suggesting that crypto stress is associated more with a temporary disturbance in cross-class community composition than with a sustained change in local clustering or modular separation. Thus, market-to-network transmission in the full-sample VAR is not confined to one structural indicator. Rather, di ff erent market shocks disturb di ff erent dimensions of the dependence network. Panels G–I show how macro-financial shocks a ff ect network topology. A VIX shock produces the clearest re-sponse, with stronger local clustering and weaker modular separation at short horizons. This pattern is consistent with a flight-to-correlation mechanism, in which higher volatility expectations compress the dependence structure and reduce the separation between previously distinct communities. Responses to USDX and EPU shocks are weaker and less persistent, suggesting that broad dollar movements and policy uncertainty a ff ect the network less directly than volatility expectations in the full-sample VAR. Overall, Fig. 3 supports the interpretation that network topology acts as a short-run reconfiguration channel in the average linear system. Market and macro-financial shocks temporarily disturb local cohesion, modular organisation, and cross-class composition, but the responses revert toward zero. 
+
+3.5. Rolling connectedness and net transmission 
+
+The full-sample connectedness estimates provide an average description of spillovers over the entire sample. To examine whether this average masks changes in aggregate transmission and transmitter–receiver roles, we estimate rolling-window connectedness measures. This allows us to distinguish periods in which the system is only moderately connected from periods in which forecast uncertainty becomes more widely shared across market turbulence, network structure, and macro-financial variables. Figure 4A shows substantial time variation in aggregate connectedness. The rolling TSI ranges from 17 .21% to 47 .80%, with a sample mean of 24 .42%, which is higher than the full-sample TSI reported in Table 3. This di ff erence indicates that the constant-parameter VAR smooths over periods in which cross-variable transmission is much stronger. Before the COVID-19 crisis, the TSI remains in a relatively narrow band around 20%, suggesting a moderate baseline level of cross-variable dependence. At the onset of the pandemic, the index rises sharply and 21 Figure 4: Rolling aggregate and directional spillover dynamics based on the Diebold–Yilmaz generalised FEVD framework. Panel (A) reports the Rolling Total Spillover Index (TSI), estimated from a VAR fitted on a 365-day rolling window updated weekly with forecast horizon H = 30. The dashed horizontal line denotes the sample mean of the rolling TSI series. Panel (B) reports rolling net connectedness, defined as transmitted minus received spillovers. Positive values indicate that a variable contributes more to others’ forecast uncertainty than it receives, while negative values indicate that it receives more than it transmits. 
+
+reaches its maximum of 47 .80% on 12 March 2020, indicating that forecast uncertainty became much more shared across market turbulence, network structure, and macro-financial variables. The index remains elevated through much of 2020 and early 2021 before declining toward a lower range from late 2021 onward. Thus, aggregate connectedness is episodic, in that it intensifies sharply during broad stress events but does not remain permanently high. Figure 4B decomposes aggregate connectedness into time-varying net spillover positions. The main point is that transmission roles are unstable over time, rather than fixed properties of individual variables. Fiat and cryptocur-rency turbulence display the largest swings. Fiat turbulence moves from a net receiver before the pandemic to a major transmitter during the high-connectedness period of 2020–2021, whereas cryptocurrency turbulence becomes strongly negative during the same period. This suggests that currency-market turbulence became a central propagation channel during the pandemic-related adjustment, while cryptocurrency turbulence mainly absorbed shocks from the broader system. The macro-financial variables show a di ff erent pattern. VIX displays a sharp transmitter episode around the onset of COVID-19, consistent with volatility expectations acting as a short-run stress channel. USDX and EPU are more often negative, indicating that dollar movements and policy uncertainty tend to absorb more forecast 22 To (Low) From (Low) Net (Low) To (High) From (High) Net (High) ∆Net (High-Low) 
+
+TI s&p500 14.645 8.096 6.549 14.864 26.565 -11.700 -18.249 TI fiat 8.421 12.186 -3.765 54.743 11.191 43.552 47.317 TI crypto 1.708 2.250 -0.542 16.209 12.170 4.040 4.582 
+
+⟨cc ⟩ 11.915 13.793 -1.878 47.640 39.959 7.681 9.559 
+
+Q 11.032 11.879 -0.846 30.954 28.944 2.010 2.856 
+
+⟨D⟩ 3.672 3.724 -0.052 7.021 16.405 -9.384 -9.332 
+
+VIX 15.459 7.133 8.326 31.571 40.676 -9.105 -17.431 
+
+USDX 3.460 10.259 -6.799 13.432 24.216 -10.785 -3.986 
+
+EPU 7.244 8.237 -0.993 2.675 18.985 -16.309 -15.316                  
+
+> Table 4: Regime-specific directional connectedness under the threshold VAR. For each variable, To is the percentage of forecast uncertainty transmitted to all other variables, and From is the percentage of forecast uncertainty received from all other variables. Net is defined as To −From ,where positive values identify net transmitters, while negative values identify net receivers. The final column ∆Net reports the change in net connectedness from the low- to the high-turbulence regime. To and From are reported as percentages of forecast error variance, whereas Net and
+> ∆Net are reported in percentage points.
+
+uncertainty than they transmit in the rolling system. Among the network indicators, ⟨cc ⟩ becomes positive around the COVID-19 onset and again later in the sample, suggesting that stronger local network cohesion can coincide with outward transmission during specific stress episodes. By contrast, Q and ⟨D⟩ fluctuate closer to zero for much of the sample, indicating that global community separation and cross-class mixing are less frequently dominant rolling transmitters. Overall, Fig. 4 shows that connectedness is both time-varying and selective. Stress episodes increase aggregate spillovers, but they also change the identity of transmitters and receivers. This motivates the threshold-VAR analysis below, which separates low- and high-turbulence states rather than averaging over the entire sample. 
+
+3.6. Regime-dependent connectedness and network amplification 
+
+The rolling analysis shows that connectedness varies over calendar time, but it does not directly test whether the transmission mechanism di ff ers between normal and stressed market states. We therefore estimate a two-regime threshold VAR in which the regimes are defined by the system-wide Turbulence Index. Observations are assigned to the low-turbulence regime when TI t−1 ≤ ˆγ, and to the high-turbulence regime when TI t−1 > ˆγ. This allows the VAR coe ffi cients, residual covariance matrix, connectedness measures, and impulse responses to vary across regimes. The purpose is not only to assess whether spillovers are larger under stress, but to test whether transmitter–receiver roles and network-related propagation channels are reorganised when the system enters an elevated-turbulence state. Stability diagnostics reported in the Supplementary Information confirm that both regime-specific VARs admit well-defined moving-average representations. We first examine regime-specific transmitter–receiver roles at the variable level. Table 4 shows that transmitter– receiver roles change substantially across regimes. In the low-turbulence regime, net transmission is concentrated in S&P500 turbulence and VIX, with net positions of 6 .55 and 8 .33 percentage points, respectively. Most other variables 23 are weak receivers or close to neutral, and the network indicators are slightly negative or near zero. This suggests that, in tranquil states, network topology mainly reflects market organisation rather than acting as an important out-ward transmitter of forecast uncertainty. The high-turbulence regime displays a di ff erent transmission structure. Fiat turbulence becomes the dominant net transmitter, with Net = 43 .55 percentage points and ∆Net = 47 .32 percentage points, while S&P500 turbulence switches from a net transmitter to a net receiver. Cryptocurrency turbulence be-comes mildly transmissive, but its role remains much smaller than that of fiat turbulence. This shift is consistent with the idea that currency-market turbulence captures stress in global funding conditions, monetary-policy expectations, and cross-border risk repricing. During elevated system-wide turbulence, exchange-rate movements may therefore act as a coordination channel through which macro-financial pressure is redistributed across equity and cryptocurrency markets. The VAR cannot identify the underlying structural mechanism, but the regime contrast shows that fiat turbu-lence becomes central to reduced-form shock propagation under stress. Network structure also becomes more active in the high-turbulence regime. The clustering coe ffi cient ⟨cc ⟩ moves from a mild net receiver to a net transmitter, with 
+
+∆Net = 9.56 percentage points, while modularity Q also becomes mildly positive. This indicates that tighter local comovement and changes in community organisation are not only consequences of stress. Under elevated turbulence, they become more involved in transmitting forecast uncertainty. By contrast, diversity ⟨D⟩ becomes more negative, implying that cross-class compositional mixing is mainly shaped by shocks from the broader system rather than acting as an independent transmitter. The high-turbulence regime therefore activates both a market channel, dominated by fiat turbulence, and a structural channel, centred on local clustering and modular organisation. The macro-financial variables become net receivers in the high-turbulence regime. VIX, USDX, and EPU all have negative net positions, with EPU showing the strongest receiver role. This di ff ers from the rolling analysis, where VIX appears as a trans-mitter around the COVID-19 period, because the two analyses answer di ff erent questions. The rolling VAR describes calendar-time connectedness over a moving one-year window, whereas the threshold VAR isolates observations by turbulence state. Thus, the rolling results capture the evolution of connectedness through historical episodes, while the TVAR identifies how the transmission structure di ff ers between low- and high-turbulence states. We then aggregate variables into blocks to assess whether regime dependence also appears at the group level. Table 5 aggregates the regime-specific connectedness measures into three blocks: Markets, Network, and Macro. In the low-turbulence regime, the block spillover matrix is almost diagonal. Each block explains more than 95% of its own forecast error variance, and cross-block spillovers are small. The directional block measures are also close to zero, indicating that no block strongly dominates transmission under normal conditions. In the high-turbulence regime, cross-block transmission increases markedly. The Market block becomes the dominant net transmitter, with Net =
+
+11 .96 percentage points, while the Macro block becomes the dominant net receiver, with Net = −12 .07 percentage 24 Block spillover matrices Regime Block Markets Network Macro 
+
+Low Markets 96 .540 0.821 2.639 Network 1.406 96 .939 1.654 Macro 2.801 1.314 95 .884 High Markets 93 .326 3.921 2.753 Network 7.513 86 .461 6.026 Macro 11 .125 9.720 79 .154 
+
+Directional block connectedness Regime Block From To Net 
+
+Low Markets 3.460 4.207 0.747 Network 3.061 2.135 −0.926 Macro 4.116 4.294 0.178 High Markets 6.674 18 .638 11 .964 Network 13 .539 13 .642 0.103 Macro 20 .846 8.779 −12 .066               
+
+> Table 5: Regime-dependent block spillovers under the threshold VAR. The upper panel reports block-level generalised FEVD shares aggregated over three variable groups, including market turbulence, network structure, and macro-financial conditions. Rows denote receiving blocks and columns denote sourcing, or transmitting, blocks. Each entry gives the percentage of the receiving block’s forecast error variance attributable to shocks from the sourcing block. The lower panel reports directional block connectedness. From is the total spillover a block receives from the other blocks, To is the total spillover it transmits to the other blocks, and Net =To −From . Positive Net values identify net transmitting blocks, whereas negative values identify net receiving blocks. Block spillover matrix entries, From , and To are reported as percentages of forecast error variance, and Net is reported in percentage points.
+
+points. The Network block remains close to balanced in net terms, but both its received and transmitted spillovers increase. This distinction indicates that the network block is not the main net transmitter at the aggregate level, but it becomes more tightly coupled to the rest of the system under stress. The largest changes occur in the Market–Network and Network–Macro links. The share of Network forecast uncertainty explained by Markets rises from 1 .41% to 7.51%, indicating that market turbulence reshapes network structure more strongly in the high regime. At the same time, the share of Macro forecast uncertainty explained by Network rises from 1 .31% to 9 .72%, suggesting that network reconfiguration becomes part of the broader stress-transmission environment. High turbulence is therefore not simply a period of larger within-market spillovers, but it is a regime in which markets, network topology, and macro-financial conditions become more tightly coupled. Finally, we use regime-conditional GIRFs to examine how market shocks translate into changes in network topol-ogy within each regime. Figure 5 should be read as a regime comparison rather than as a separate description of each panel. In the low-turbulence regime, responses of ⟨cc ⟩, Q, and ⟨D⟩ remain small, indicating that ordinary market shocks do not substantially reorganise the cross-asset dependence network. The network absorbs these shocks with limited movement in local cohesion, modular separation, or cross-class composition. In the high-turbulence regime, the same type of market shock produces much larger responses. The amplification is most visible for ⟨cc ⟩, especially 25 0 5 10 15 20 25                                
+
+> −0.100
+> −0.075
+> −0.050
+> −0.025
+> 0.000
+> 0.025
+> 0.050
+> 0.075
+> 0.100
+> Response (std. units)
+> A⟨cc ⟩
+> Q
+> ⟨D⟩
+> 0510 15 20 25
+> −0.100
+> −0.075
+> −0.050
+> −0.025
+> 0.000
+> 0.025
+> 0.050
+> 0.075
+> 0.100 B
+> 0510 15 20 25
+> −0.100
+> −0.075
+> −0.050
+> −0.025
+> 0.000
+> 0.025
+> 0.050
+> 0.075
+> 0.100 C
+> 0510 15 20 25
+> Horizon (days)
+> −0.2
+> −0.1
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> Response (std. units)
+> D⟨cc ⟩
+> Q
+> ⟨D⟩
+> 0510 15 20 25
+> Horizon (days)
+> −0.2
+> −0.1
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4 E
+> 0510 15 20 25
+> Horizon (days)
+> −0.2
+> −0.1
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4 F
+
+Figure 5: Regime-conditional generalised impulse response functions from market turbulence shocks to network topology. Rows correspond to the low- and high-turbulence regimes identified by the threshold VAR, and columns correspond to the originating market-turbulence shock. Panels (A)– (C) report responses of ⟨cc ⟩, Q, and ⟨D⟩ to shocks in S&P500, fiat, and cryptocurrency turbulence under the low-turbulence regime. Panels (D)–(F) report the corresponding responses under the high-turbulence regime. Responses are expressed in standardised units and traced over H = 30 days. Shaded areas denote 90% bootstrap confidence bands from a regime-conditional residual bootstrap with B = 300 replications. Vertical scales di ff er across rows to preserve detail in the low-regime responses. 
+
+after S&P500 and fiat turbulence shocks, indicating that local triangles of comovement tighten when the system is already stressed. This is the local-network expression of stress amplification, where assets that are already close in the dependence network move more synchronously after an additional market-turbulence shock. The response of modu-larity Q captures the mesoscopic organisation of the network. Short-run movements in Q under the high regime indi-cate that market shocks disturb community separation, rather than only strengthening pairwise correlations. When Q
+
+declines, previously distinct communities become less separated, and when it rebounds, the network begins to recover its segmented organisation. Thus, elevated turbulence a ff ects not only the intensity of links but also the organisation of asset groups. The diversity response is generally weaker than the clustering and modularity responses, which is informative. ⟨D⟩ measures the asset-class composition of robust communities, a slower structural feature than local clustering or modularity. The relatively muted diversity response suggests that high-turbulence shocks first a ff ect the strength and arrangement of connections, while deeper changes in cross-class community composition are less im-mediate. Taken together, Fig. 5 explains the mechanism behind the regime connectedness results in Tables 4 and 5. In tranquil states, network topology mainly describes the prevailing market organisation. In high-turbulence states, it becomes more reactive, where market shocks generate larger short-run movements in local clustering and community 26 structure, allowing topology to participate in spillover propagation. The e ff ects remain temporary, but their magni-tude is substantially larger under stress. This supports the interpretation of network topology as a state-dependent amplification channel rather than a persistent exogenous driver of turbulence. 
+
+4. Conclusion 
+
+This study shows that cross-asset systemic risk is not captured only by higher volatility or stronger average cor-relations. It is also reflected in how the dependence structure linking cryptocurrencies, fiat currencies, and S&P 500 equities reorganises under stress. Using rolling correlation networks, consensus-based community detection, market-specific and system-wide Turbulence Indices, and VAR-based connectedness analysis, we document an episodic form of cross-asset integration. In normal periods, the combined system remains partly segmented, where modular structure is visible, robust communities are only partially mixed across asset classes, and most forecast uncertainty is explained by own-market dynamics. During stress periods, this organisation changes. Local clustering increases, modular separation weakens, and communities become more compositionally mixed, indicating that asset-class boundaries compress when the system enters elevated turbulence. The dynamic transmission results show that this structural reorganisation is not merely descriptive. Full-sample spillovers are moderate and selective, with meaningful channels involving S&P 500 turbulence, fiat turbulence, VIX, and network clustering. Rolling connectedness reveals that aggregate spillovers rise sharply during broad stress episodes, especially around the onset of the COVID-19 crisis, and that transmitter–receiver roles vary over time. The threshold VAR provides the clearest evidence of state dependence. Low-turbulence periods are characterised by limited spillovers, mainly transmitted through equity turbulence and volatility expectations. High-turbulence peri-ods display a di ff erent transmission structure. Fiat turbulence becomes the dominant transmitter, equity turbulence becomes more absorptive, and network clustering and modularity become more involved in propagating forecast uncertainty. At the block level, markets, network topology, and macro-financial conditions become substantially more coupled under stress. These findings support the interpretation of network topology as an emergent and state-dependent amplification channel, rather than as a persistent exogenous driver of turbulence. The results have implications for portfolio allocation, risk monitoring, and macro-financial surveillance. For investors, the findings suggest that diversification benefits are regime-dependent. Asset classes that appear segmented in normal periods can become locally clustered and compositionally mixed under stress, reducing the protection normally expected from cross-asset diversification. Risk-management frameworks should therefore monitor not only volatility and pairwise correlations, but also the structural organisation of dependence networks, including clustering, modularity, and cross-class mixing. For regulators, the results indicate that cryptocurrencies are not consistently 27 dominant transmitters of systemic stress, but they are su ffi ciently integrated to absorb shocks from broader market and currency conditions. The strong role of fiat turbulence in high-turbulence regimes further suggests that currency-market instability can become a central channel of cross-asset propagation when the system is already disturbed. Several limitations remain. The analysis is based on correlation networks and reduced-form VAR connected-ness, which capture comovement, predictive transmission, and forecast-error variance spillovers, but do not identify structural causal shocks. The results should therefore be interpreted as evidence of state-dependent transmission and contagion-like coupling, not as causal proof that one market structurally drives another. The rolling correlation net-works are estimated from short windows relative to the number of assets, so individual pairwise links may contain sampling noise. For this reason, the interpretation focuses on aggregate and consensus-based network summaries rather than individual edges. The balanced sample improves comparability across asset classes, but it necessarily emphasises large and persistent assets and may underrepresent the long tail of cryptocurrencies and equities. In addi-tion, aligning continuously traded cryptocurrencies with traditional market calendars requires interpolating weekend fiat and equity prices, which may attenuate estimated crypto–traditional market correlations during weekend-specific crypto stress episodes. Future work could extend the framework in several directions. Methodologically, rolling correlation networks could be compared with shrinkage-based, random-matrix-filtered, sparse, partial-correlation, copula-based, tail-dependence, or high-frequency realised-dependence networks. Econometrically, structural identification strategies or external in-struments could help distinguish predictive transmission from causal shock propagation. Empirically, the frame-work could be extended to commodities, bonds, derivatives, stablecoins, decentralised finance tokens, or cross-border capital-flow indicators. More broadly, the approach developed here could support real-time monitoring systems in which turbulence regimes, network clustering, modularity, and diversity are tracked jointly to identify periods when diversification benefits are likely to deteriorate, and cross-market spillover risk is likely to intensify. 28 Acknowledgements 
+
+The authors declare that they have no conflict of interest. R.J. is funded by the China Scholarship Council (CSC) from the Ministry of Education of P. R. China. L.E.C.R. is partially funded by the Bijzonder Onderzoeksfonds (BOF) (2024 /01 /709) from Ghent University, Belgium. 
+
+References 
+
+[1] M. Billio, M. Getmansky, A. W. Lo, L. Pelizzon, Econometric measures of connectedness and systemic risk in the finance and insurance sectors, Journal of financial economics 104 (3) (2012) 535–559. [2] T. Adrian, M. K. Brunnermeier, Covar, Tech. rep., National Bureau of Economic Research (2011). [3] V. V. Acharya, L. H. Pedersen, T. Philippon, M. Richardson, Measuring systemic risk, The review of financial studies 30 (1) (2017) 2–47. [4] K. J. Forbes, R. Rigobon, No contagion, only interdependence: measuring stock market comovements, The journal of Finance 57 (5) (2002) 2223–2261. [5] F. Longin, B. Solnik, Extreme correlation of international equity markets, The journal of finance 56 (2) (2001) 649–676. [6] G. Bekaert, C. R. Harvey, Market integration and contagion (2003). [7] G. Bekaert, M. Ehrmann, M. Fratzscher, A. Mehl, The global crisis and equity market contagion, The Journal of Finance 69 (6) (2014) 2597–2649. [8] M. Dungey*, R. Fry, B. González-Hermosillo, V. L. Martin, Empirical modelling of contagion: a review of methodologies, Quantitative finance 5 (1) (2005) 9–24. [9] T. Bollerslev, Modelling the coherence in short-run nominal exchange rates: a multivariate generalized arch model, The review of economics and statistics (1990) 498–505. [10] R. F. Engle, K. F. Kroner, Multivariate simultaneous generalized arch, Econometric theory 11 (1) (1995) 122– 150. [11] R. Engle, Dynamic conditional correlation: A simple class of multivariate generalized autoregressive conditional heteroskedasticity models, Journal of business & economic statistics 20 (3) (2002) 339–350. 29 [12] Y. K. Tse, A. K. C. Tsui, A multivariate generalized autoregressive conditional heteroscedasticity model with time-varying correlations, Journal of Business & Economic Statistics 20 (3) (2002) 351–362. [13] G. P. Aielli, Dynamic conditional correlation: on properties and estimation, Journal of Business & Economic Statistics 31 (3) (2013) 282–299. [14] A. J. Patton, Modelling asymmetric exchange rate dependence, International economic review 47 (2) (2006) 527–556. [15] P. Embrechts, A. McNeil, D. Straumann, Correlation and dependence in risk management: properties and pit-falls, Risk management: value at risk and beyond 1 (2002) 176–223. [16] C. A. Sims, Macroeconomics and reality, Econometrica: journal of the Econometric Society (1980) 1–48. [17] L. Kilian, New introduction to multiple time series analysis, by helmut lütkepohl, springer, 2005, Econometric theory 22 (5) (2006) 961–967. [18] C. W. Granger, Investigating causal relations by econometric models and cross-spectral methods, Econometrica: journal of the Econometric Society (1969) 424–438. [19] F. X. Diebold, K. Yilmaz, Measuring financial asset return and volatility spillovers, with application to global equity markets, The Economic Journal 119 (534) (2009) 158–171. [20] F. X. Diebold, K. Yilmaz, Better to give than to receive: Predictive directional measurement of volatility spillovers, International Journal of forecasting 28 (1) (2012) 57–66. [21] F. X. Diebold, K. Yılmaz, On the network topology of variance decompositions: Measuring the connectedness of financial firms, Journal of econometrics 182 (1) (2014) 119–134. [22] N. Antonakakis, I. Chatziantoniou, D. Gabauer, Refined measures of dynamic connectedness based on time-varying parameter vector autoregressions, Journal of Risk and Financial Management 13 (4) (2020) 84. [23] D. Gabauer, Volatility impulse response analysis for dcc-garch models: The role of volatility transmission mech-anisms, Journal of Forecasting 39 (5) (2020) 788–796. [24] H. H. Pesaran, Y. Shin, Generalized impulse response analysis in linear multivariate models, Economics letters 58 (1) (1998) 17–29. [25] G. Koop, M. H. Pesaran, S. M. Potter, Impulse response analysis in nonlinear multivariate models, Journal of econometrics 74 (1) (1996) 119–147. 30 [26] D. Koutmos, Return and volatility spillovers among cryptocurrencies, Economics Letters 173 (2018) 122–127. [27] S. Corbet, B. Lucey, A. Urquhart, L. Yarovaya, Cryptocurrencies as a financial asset: A systematic analysis, International Review of Financial Analysis 62 (2019) 182–199. [28] E. Bouri, M. Das, R. Gupta, D. Roubaud, Spillovers between bitcoin and other assets during bear and bull markets, Applied Economics 50 (55) (2018) 5935–5949. [29] D. G. Baur, K. Hong, A. D. Lee, Bitcoin: Medium of exchange or speculative assets?, Journal of International Financial Markets, Institutions and Money 54 (2018) 177–189. [30] T. Klein, H. P. Thu, T. Walther, Bitcoin is not the new gold–a comparison of volatility, correlation, and portfolio performance, International Review of Financial Analysis 59 (2018) 105–116. [31] Q. Ji, E. Bouri, C. K. M. Lau, D. Roubaud, Dynamic connectedness and integration in cryptocurrency markets, International Review of Financial Analysis 63 (2019) 257–272. [32] A. H. Dyhrberg, Bitcoin, gold and the dollar–a garch volatility analysis, Finance research letters 16 (2016) 85–92. [33] R. N. Mantegna, Hierarchical structure in financial markets, The European Physical Journal B-Condensed Matter and Complex Systems 11 (1999) 193–197. [34] J.-P. Onnela, A. Chakraborti, K. Kaski, J. Kertesz, A. Kanto, Dynamics of market correlations: Taxonomy and portfolio analysis, Physical Review E 68 (5) (2003) 056110. [35] M. Tumminello, T. Aste, T. Di Matteo, R. N. Mantegna, A tool for filtering information in complex systems, Proceedings of the National Academy of Sciences 102 (30) (2005) 10421–10426. [36] T. Aste, T. Di Matteo, M. Tumminello, R. N. Mantegna, Correlation filtering in financial time series, in: Noise and Fluctuations in Econophysics and Finance, Vol. 5848, SPIE, 2005, pp. 100–109. [37] M. E. Newman, Mixing patterns in networks, Physical review E 67 (2) (2003) 026126. [38] V. D. Blondel, J.-L. Guillaume, R. Lambiotte, E. Lefebvre, Fast unfolding of communities in large networks, Journal of statistical mechanics: theory and experiment 2008 (10) (2008) P10008. [39] S. Fortunato, M. Barthelemy, Resolution limit in community detection, Proceedings of the national academy of sciences 104 (1) (2007) 36–41. 31 [40] B. H. Good, Y.-A. De Montjoye, A. Clauset, Performance of modularity maximization in practical contexts, Physical Review E—Statistical, Nonlinear, and Soft Matter Physics 81 (4) (2010) 046106. [41] S. Fortunato, Community detection in graphs, Physics reports 486 (3-5) (2010) 75–174. [42] A. Lancichinetti, S. Fortunato, Consensus clustering in complex networks, Scientific reports 2 (1) (2012) 336. [43] D. Acemoglu, A. Ozdaglar, A. Tahbaz-Salehi, Systemic risk and stability in financial networks, American Eco-nomic Review 105 (2) (2015) 564–608. [44] M. Elliott, B. Golub, M. O. Jackson, Financial networks and contagion, American Economic Review 104 (10) (2014) 3115–3153. [45] S. Miranda-Agrippino, H. Rey, Us monetary policy and the global financial cycle, The Review of Economic Studies 87 (6) (2020) 2754–2776. [46] S. Avdjiev, V. Bruno, C. Koch, H. S. Shin, The dollar exchange rate as a global risk factor, IMF Economic Review 67 (1) (2019) 151–173. [47] M. K. Brunnermeier, L. H. Pedersen, Market liquidity and funding liquidity, The review of financial studies 22 (6) (2009) 2201–2238. [48] H. Tong, Threshold models in non-linear time series analysis, Springer Science & Business Media, 2012. [49] R. S. Tsay, Testing and modeling multivariate threshold models, journal of the american statistical association 93 (443) (1998) 1188–1202. [50] B. E. Hansen, Sample splitting and threshold estimation, Econometrica 68 (3) (2000) 575–603. [51] M. Kritzman, Y. Li, Skulls, financial turbulence, and risk management, Financial Analysts Journal 66 (5) (2010) 30–41. [52] R. De Maesschalck, D. Jouan-Rimbaud, D. L. Massart, The mahalanobis distance, Chemometrics and intelligent laboratory systems 50 (1) (2000) 1–18. [53] O. Ledoit, M. Wolf, A well-conditioned estimator for large-dimensional covariance matrices, Journal of Multi-variate Analysis 88 (2) (2004) 365–411. [54] H. Akaike, A new look at the statistical model identification, IEEE transactions on automatic control 19 (6) (1974) 716–723. 32 [55] G. Schwarz, Estimating the dimension of a model, The annals of statistics (1978) 461–464. [56] E. J. Hannan, B. G. Quinn, The determination of the order of an autoregression, Journal of the Royal Statistical Society: Series B (Methodological) 41 (2) (1979) 190–195. [57] H. Akaike, Fitting autoregreesive models for prediction, in: Selected Papers of Hirotugu Akaike, Springer, 1969, pp. 131–135. [58] R. Jing, R. Kobayashi, L. E. C. Rocha, Optimising cryptocurrency portfolios through stable clustering of price correlation networks, arXiv preprint arXiv:2505.24831 (2025). [59] E. Simpson, Measurement of diversity, Nature 163 (1949). [60] L. E. C. Rocha, N. Masuda, P. Holme, Sampling of temporal networks: Methods and biases, Physical Review E 96 (5) (2017) 052302. [61] R. Aroussi, et al., yfinance: Yahoo! finance market data downloader, PyPI.[Online]. Available: https: // pypi. org /project /yfinance (2023). [62] L. Kilian, H. Lütkepohl, Structural vector autoregressive analysis, Cambridge University Press, 2017. [63] T. G. Andersen, T. Bollerslev, F. X. Diebold, P. Labys, Modeling and forecasting realized volatility, Economet-rica 71 (2) (2003) 579–625. [64] J. D. Hamilton, Time series analysis, Princeton university press, 2020. [65] S. Gonçalves, L. Kilian, Bootstrapping autoregressions with conditional heteroskedasticity of unknown form, Journal of econometrics 123 (1) (2004) 89–120. [66] J. Baruník, T. Kˇ rehlík, Measuring the frequency dynamics of financial connectedness and systemic risk, Journal of Financial Econometrics 16 (2) (2018) 271–296. 33 Supplementary Information 
+
+4.1. Asset lists 
+
+Table S1 shows the code of the cryptocurrencies used in our study. 
+
+ADA ADX AE AION AMB ANT AOAR ARDR ARK AST BAT BCD BCH BCN BLOCK BNB BNT BTC BTM BTS BTU NEBL NEO NLG NMC NMR NXS NXT OAX OCEANp OMG PAC PART PAY PIVX PLR PND PPC CND CVC DASH DCN DCR DENT DGB DIME DNT DOGE EDG ETC ETH ETP FCT FTC FUN GAME GAS PPT PRE PRO QRL QTUM RCN RDD RDN REV RLC SALT SC SCRT SNC SNM SNT SOUL STEEM STORJ STRAX SWFTC SYNX SYS GBYTE GLM GRC ICX IGNIS KEY KMD KNC LBC LINK LRC LSK LTC LUNA MAID MANA MDA MDT IOTA MKR MLN MONA MTH MTL MYST NAS TOA TRX UBQ USDT VAL VERI VET VIB WAVES WGR XCP XEM XLM XRP XTZ XVG ZAP ZCL ZEC ZEN ZRX    
+
+> Table S1: The list of the N=127 cryptocurrencies used in our study.
+
+Table S2 shows the code of the fiat currencies used in our study. 
+
+AED AFN ALL ANG ARS AUD AWG BBD BDT BGN BHD BIF BMD BND BOB BRL BSD BWP BYN BZD CAD CDF CHF CLP CNY COP CRC CVE CZK DJF DKK DOP DZD EGP ETB EUR FJD GBP GHS GMD GNF GTQ GYD HKD HNL HTG HUF IDR ILS INR IQD IRR ISK JMD JOD JPY KES KHR KMF KRW KWD KYD KZT LAK LKR LRD LSL LYD MAD MDL MGA MKD MMK MOP MUR MVR MWK MXN MYR MZN NAD NGN NIO NOK NPR NZD OMR PAB PEN PGK PHP PKR PLN PYG QAR RON RSD RUB RWF SAR SCR SDG SEK SGD SLL SOS SVC SZL THB TMT TND TRY TTD TWD TZS UAH UGX UYU UZS VND XAF XCD XOF XPF YER ZAR ZMW    
+
+> Table S2: The list of the N=127 fiat currencies used in our study.
+
+Table S3 shows the code of the S&P500 stocks used in our study. 
+
+4.2. Correlation and network descriptive statistics 
+
+Table S4 reports average within- and between-class correlations over the study period. Within-class correlations are higher for cryptocurrencies and S&P500 equities than for fiat currencies, indicating stronger average synchroni-sation within the crypto and equity universes and more heterogeneous movements across exchange rates. Between-class correlations are weak on average, with the largest mean cross-class value observed between cryptocurrencies and S&P500 equities. The near-zero average correlations between crypto–fiat and fiat–equity pairs indicate limited 34 AVGO MSFT AAPL NVDA AMZN META GOOGL GOOG LLY TSLA JPM XOM WMT UNH V MA JNJ HD PG COST AMD MRK ORCL ABBV CRM CVX BAC NFLX ADBE KO ACN PEP TMO LIN MCD ABT DIS CSCO TMUS DHR WFC INTU INTC QCOM AMAT IBM CMCSA CAT VZ NOW AXP TXN UNP AMGN PFE ISRG MS LOW GE PM SPGI SYK COP HON LRCX GS NKE BA PLD BLK RTX BKNG T SCHW ETN ELV NEE VRTX TJX PGR UPS REGN MDT MU C SBUX CB ADP LMT DE BMY MMC BSX PANW ADI KLAC MDLZ CI AMT CVS BX SNPS ANET GILD FI ZTS CDNS EQIX SHW WM HCA ICE CME ITW CSX GD CMG SO TGT MAR CL SLB MCO DUK PH AON MCK    
+
+> Table S3: The list of the N=127 S&P500 stocks used in our study.
+
+Crypto Fiat S&P500 Assets Crypto 0.35 (0 .30) 0.00 (0 .20) 0.07 (0 .21) 127 
+
+Fiat 0.10 (0 .31) 0.00 (0 .23) 127 
+
+S&P500 0.33 (0 .30) 127             
+
+> Table S4: Time-average of the mean correlation f⟨ρ⟩and standard deviation σ(in parenthesis) of log returns ri,tbetween and within asset classes: crypto, fiat, and S&P500, where ⟨ρ⟩t=1
+> (N
+> 2)
+> Pi<jρi j ,t. The last column indicates the number of assets (nodes) in each asset class.
+
+baseline comovement across these classes, although the reported standard deviations show that pairwise correlations vary substantially over time. Thus, weak average cross-class dependence does not preclude temporary increases in comovement during stress episodes. Figure S1 illustrates how the distribution of rolling pairwise correlations changes across selected periods. Panel A shows that the mean correlation of the combined system varies over time, with visible increases around major stress episodes. Panels B–E show that the individual asset classes have distinct correlation profiles. Cryptocurrencies and S&P500 equities are generally shifted toward positive correlations, whereas fiat correlations are more concentrated around zero. During the COVID-19 period, the distributions shift toward stronger positive comovement, especially for S&P500 equities and the combined asset universe, indicating a broad compression of cross-asset distances. Later periods show a partial moderation of this e ff ect, although the combined distribution remains sensitive to episodes of market stress. These descriptive patterns support the analysis by showing that average correlations conceal substantial temporal variation in the shape of the dependence distribution. Table S5 reports descriptive properties of the positive-correlation networks for each asset class and for the com-bined system. The crypto and S&P500 networks have larger average edge counts, weighted degree, and clustering than the fiat network, indicating stronger within-class comovement in digital assets and equities. The fiat network is comparatively weaker and less clustered, consistent with the heterogeneous macroeconomic and policy drivers of exchange-rate movements. The combined network contains many more edges in absolute terms because it includes all 35 1.0 0.5 0.0 0.5 1.0 
+
+> 0.0
+> 1.0
+> 2.0
+> 3.0
+> 4.0
+> P (  )
+
+B Crypto     
+
+> Fiat
+> S&P500
+> Combined
+> 1.0 0.5 0.0 0.5 1.0
+> 0.0
+> 1.0
+> 2.0
+> 3.0
+> 4.0
+
+C    
+
+> 1.0 0.5 0.0 0.5 1.0
+> 0.0
+> 1.0
+> 2.0
+> 3.0
+> 4.0
+
+D    
+
+> 1.0 0.5 0.0 0.5 1.0
+> 0.0
+> 1.0
+> 2.0
+> 3.0
+> 4.0
+
+E
+
+> 2018
+> 2019
+> 2020
+> 2021
+> 2022
+> 2023
+> 2024
+> 0.2
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+
+B C D EA B: 2018-09-25 
+
+> C: 2020-03-25
+> D: 2021-08-25
+> E: 2022-11-25
+
+Figure S1: Panel A shows the evolution of the mean correlation ⟨ρ⟩ for each time window, with the shaded area indicating the standard deviation. The average of ⟨ρ⟩ for the entire study period is f⟨ρ⟩ = 1
+
+> T
+
+PTt=1 ⟨ρ⟩t = 0.1 (horizontal dashed line). The panels (B, C, D, E) show the probability density function P ( ρ) of correlation ρ values for crypto, fiat, S&P500, and combined assets, with the dashed line of 0, for specific dates (vertical dashed lines in panel (A)) with and without external shocks. 
+
+Crypto Fiat S&P500 Combined 
+
+N 127 127 127 381 
+
+eE 6778 (656) 4627 (377) 6814 (823) 43904 (3893) 
+
+g⟨ κ⟩ 45.39 (14.51) 21.10 (3.71) 44.41 (16.93) 61.17 (13.39) 
+
+g⟨ cc ⟩ 0.36 (0.12) 0.18 (0.03) 0.34 (0.13) 0.17 (0.04) 
+
+Table S5: Characteristics of networks constructed with a correlation threshold of 0, i.e. ρi j ≤ 0 → wi j = 0, for crypto, fiat, S&P500, and combined asset classes over the study period. N is the number of nodes, eE is the time-average of the number of edges, g⟨ κ⟩ is the time-average of the mean weighted degree for each network, g⟨ cc ⟩ is the time-average of the mean weighted clustering coe ffi cient for each network, with standard deviations in parentheses. 
+
+within- and between-class pairs, but its average clustering coe ffi cient is lower than that of the crypto and S&P500 net-works. This reflects the fact that cross-class links are more heterogeneous and less locally triangular than within-class links. Accordingly, the combined network captures both within-class cohesion and weaker cross-class connections, which motivates the focus on modularity and cross-class diversity rather than density alone. 
+
+4.3. Consensus clustering diagnostics 
+
+To assess whether the modular organisation corresponds to persistent groups rather than single-window partitions, we apply the consensus clustering procedure described in Section 2.3. Figure S2A shows the evolution of the number of stable clusters in the combined network. The number of large clusters is relatively stable, while the total number 36 2018 
+
+> 2019
+> 2020
+> 2021
+> 2022
+> 2023
+> 2024
+> 5
+> 10
+> 15
+> 20
+> 25
+> 30
+> 35
+> Number of clusters
+
+A All clusters 
+
+> Large clusters (>5 nodes)
+> 6 month mean All clusters
+> 6 month mean Large clusters
+> 2018
+> 2019
+> 2020
+> 2021
+> 2022
+> 2023
+> 2024
+> 5
+> 10
+> 15
+> 20
+> 25
+> 30
+> 35
+> Avg. number of nodes per cluster (%)
+
+BFigure S2: Evolution of robust clusters obtained through the consensus clustering in the combined network. (A) Number of robust clusters over time, where each point represents the consensus clustering derived from every 30 correlation networks with no overlap. Lighter circles represent individual values (for a given ∆c), dark circles represent 6-month averages, and vertical bars represent the standard deviation; (B) The average fraction of nodes in each cluster over time. 
+
+of stable clusters increases over time, indicating that the network becomes more locally partitioned. Figure S2B shows a decline in the average fraction of nodes per cluster, particularly after 2022, suggesting that robust clusters become smaller on average. This cluster-count analysis should be interpreted together with the diversity results in the main text. An increasing number of robust clusters does not necessarily imply stronger asset-class separation. Instead, it indicates greater partitioning of the combined network, while the su ffi ciently large stable clusters can still become more compositionally mixed across asset classes. Thus, cluster fragmentation and cross-class diversity capture di ff erent aspects of network organisation, with the former concerning the number and size of robust groups, whereas the latter concerns their asset-class composition. 
+
+4.4. VAR specification and diagnostics 
+
+Lag order selection for the VAR model is reported in Table S6. The VAR is estimated on standardised first dif-ferences of all variables to ensure stationarity and comparability across series with heterogeneous scales. Information criteria provide mixed guidance, where the AIC and FPE favour a higher lag order ( p = 9), while the more parsi-monious BIC and HQIC select p = 6. Given the dimensionality of the system and the need to preserve degrees of freedom, we adopt VAR(6), which is selected by BIC and HQIC and provides a parsimonious specification relative to the AIC /FPE choice of p = 9 [17, 62]. The estimated VAR(6) satisfies the stability condition, with all eigen-values lying strictly inside the unit circle, ensuring a well-defined moving-average representation and valid impulse response analysis. Residual diagnostics indicate remaining conditional heteroskedasticity and minor serial depen-dence in the turbulence indices. These features are common in volatility- and stress-related financial series and do 37 Lag AIC BIC FPE HQIC 0 -0.3944 -0.3716 0.6741 -0.3860 
+
+1 -1.3150 -1.0870 0.2685 -1.2320 
+
+2 -1.6270 -1.1940 0.1965 -1.4690 
+
+3 -1.9250 -1.2860 0.1459 -1.6920 
+
+4 -2.2410 -1.3980 0.1063 -1.9330 
+
+5 -2.4760 -1.4270 0.0841 -2.0930 
+
+6 -2.6940 -1.4400* 0.0676 -2.2360* 7 -2.7200 -1.2610 0.0659 -2.1870 
+
+8 -2.7360 -1.0710 0.0649 -2.1280 
+
+9 -2.7390* -0.8692 0.0647* -2.0570 
+
+10 -2.7250 -0.6504 0.0656 -1.9680  
+
+> Table S6: VAR lag order selection criteria with lag orders from 0 to 10. AIC denotes the Akaike Information Criterion, BIC the Bayesian Information Criterion, FPE the Final Prediction Error, and HQIC the Hannan–Quinn Information Criterion. An asterisk (*) indicates the lag length selected by the corresponding criterion.
+
+not invalidate the reduced-form VAR analysis, but they motivate the use of robust /bootstrap procedures rather than the homoskedastic Gaussian assumption [11, 63, 64]. Rather than over-fitting the lag structure to eliminate residual dependence, we retain VAR(6) and explicitly address this issue by conducting inference using generalised impulse responses (GIRFs) and generalised forecast error variance decompositions (GFEVD), both complemented with boot-strap confidence bands [65]. This approach follows established practice in the spillover literature, where emphasis is placed on the patterns, persistence, and relative magnitudes of dynamic transmission rather than on exact pointwise significance [21, 66]. 
+
+4.5. Full-sample predictive and impulse-response diagnostics 
+
+We use Granger causality [18] tests to identify directional predictive links between variables. For a pair of variables 
+
+i → j, the test asks whether past values of variable i improve the prediction of variable j, after controlling for the past values of all other variables in the system. In the VAR, this corresponds to testing whether the coe ffi cients on the lagged values of i are jointly zero in the equation for j. Let Φℓ( j, i) denote the coe ffi cient linking variable i at lag ℓ to variable j. The null hypothesis is 
+
+H0 : Φℓ( j, i) = 0 for all ℓ = 1, . . . , p. (39) Rejecting this null means that variable i contains useful past information for predicting variable j. These tests are directional and predictive, but they do not quantify the magnitude of spillovers and should not be interpreted as evidence of structural causality. Table S7 reports pairwise Granger causality tests from the full-sample linear VAR. The tests assess direct lagged predictive content, that whether past values of one variable improve the prediction of another variable after condi-38 Causing Caused TI s&p500 TI fiat TI crypto ⟨cc ⟩ Q ⟨D⟩ VIX USDX EPU                                                                         
+
+> TI s&p500 <0.001 0.016 0.794 0.009 0.479 0.002 0.183 <0.001 TI fiat 0.013 <0.001 0.007 0.334 0.426 0.560 0.332 0.001 TI crypto 0.347 0.997 0.800 0.058 0.001 0.629 0.973 0.639
+> ⟨cc ⟩0.870 0.963 0.320 0.004 0.027 <0.001 <0.001 0.606
+> Q0.316 0.866 0.598 <0.001 0.001 0.481 0.347 0.271
+> ⟨D⟩0.335 0.180 0.166 0.296 0.490 0.288 0.462 0.871
+> VIX 0.015 0.137 0.635 <0.001 0.456 0.526 <0.001 0.188
+> USDX 0.401 0.300 0.493 0.897 0.636 0.903 0.312 0.093
+> EPU 0.002 0.145 0.994 0.365 0.176 0.258 0.412 0.030 Table S7: Full-sample Granger causality tests from the estimated VAR. Entries report p-values for the null hypothesis that lagged values of the row variable do not improve the prediction of the column variable, conditional on the other variables in the system. Rows denote causing variables and columns denote caused variables. Lower p-values indicate stronger evidence of direct lagged predictive content.
+
+tioning on the remaining variables in the system. The results indicate asymmetric predictive transmission among the three market turbulence indices. S&P500 turbulence Granger-causes both fiat and cryptocurrency turbulence, while fiat turbulence Granger-causes cryptocurrency turbulence. By contrast, cryptocurrency turbulence does not signifi-cantly Granger-cause either S&P500 or fiat turbulence. This pattern is consistent with a hierarchy in the full-sample predictive dynamics, where turbulence in traditional markets and currency markets contains more information for subsequent cryptocurrency turbulence than the reverse. The tests also suggest that market turbulence helps predict changes in network structure. S&P500 turbulence significantly predicts modularity Q, fiat turbulence predicts the average clustering coe ffi cient ⟨cc ⟩, and cryptocurrency turbulence predicts both modularity Q and diversity ⟨D⟩. Because these network indicators are constructed from the combined cross-asset network, this pattern supports the interpretation that market-specific turbulence reshapes system-wide network topology in the average full-sample dynamics. Internal predictive links are also present within the network block, especially between ⟨cc ⟩, Q, and ⟨D⟩, indicating that local cohesion, modular segmentation, and cross-class mixing co-evolve once changes in market structure occur. Network indicators exhibit limited direct predictive power for market turbulence in the full-sample linear Granger causality tests. This does not contradict the threshold-VAR results reported in the main text. The Granger causality tests impose a single parameter structure across all observations and therefore summarise average predictive rela-tionships across both low- and high-turbulence states. By contrast, the threshold VAR separates observations by turbulence regime and shows that the role of network structure changes when the system is in an elevated-turbulence state. In particular, ⟨cc ⟩ changes from a mild net receiver in the low-turbulence regime to a net transmitter in the high-turbulence regime, indicating that local network cohesion becomes more involved in the propagation of fore-cast uncertainty under stress. Thus, the two analyses answer di ff erent questions, that the full-sample Granger tests assess direct average lagged predictability, whereas the regime-specific connectedness measures assess how forecast-39 uncertainty transmission is reorganised across turbulence states. Among macro-financial variables, predictive links to market turbulence are concentrated mainly in S&P500 tur-bulence. Both VIX and EPU Granger-cause S&P500 turbulence, while neither significantly predicts fiat or cryp-tocurrency turbulence at conventional levels. The reverse channels are also informative, where S&P500 turbulence Granger-causes both VIX and EPU, and fiat turbulence Granger-causes EPU. USDX plays a more limited role in directly predicting market turbulence, but it is linked to EPU, suggesting that dollar conditions and policy uncer-tainty interact more through the macro-financial block than through direct market-turbulence prediction. Overall, the Granger causality results suggest that, in the full-sample linear system, market turbulence variables provide the clear-est direct predictive signals, macro-financial variables mainly interact with equity turbulence and policy uncertainty, and network topology behaves primarily as an adaptive market-structure channel rather than as an average exogenous source of turbulence. TI S&P500   
+
+> TI fiat
+> TI crypto
+> cc
+> Q
+> D
+> VIX
+> USDX
+> EPU
+> Figure S3: Directed predictive network based on pairwise Granger causality tests from the estimated VAR. Nodes represent variables and directed edges indicate statistically significant Granger-causal links ( p<0.1). Edge thickness increases with statistical significance. The network layout is based on the Fruchterman–Reingold force-directed algorithm with a fixed random seed for reproducibility.
+
+Figure S3 provides a network representation of the full-sample Granger causality results. The plot should be interpreted as a map of direct average lagged predictive links in the linear VAR, not as a structural causal graph. Within this full-sample predictive system, market turbulence variables occupy a relatively upstream position, with S&P500 turbulence showing several outgoing links to fiat turbulence, cryptocurrency turbulence, macro-financial variables, and network structure. Fiat turbulence acts as an intermediate transmitter, while cryptocurrency turbulence has fewer outgoing predictive links to the traditional markets. The network indicators appear mainly as receivers in 40 the full-sample Granger graph, consistent with the interpretation that market turbulence reshapes the system-wide dependence topology on average. However, this does not imply that network topology is irrelevant for transmission. As shown in the threshold-VAR results in the main text, the role of network structure is state-dependent, which is weakly predictive in the pooled linear system but becomes more involved in forecast-uncertainty propagation under high-turbulence states. The Granger network therefore complements, rather than substitutes for, the regime-dependent connectedness analysis. 0 5 10 15 20 25 30             
+
+> Horizon (days)
+> 0.10
+> 0.05
+> 0.00
+> 0.05
+> 0.10
+> Response (std. units)
+> A
+> S&P500
+> Fiat
+> Crypto
+> 0510 15 20 25 30
+> Horizon (days)
+> B
+> 0510 15 20 25 30
+> Horizon (days)
+> C
+
+Figure S4: Supplementary full-sample generalised impulse response functions from the estimated VAR. Panels A–C report cross-market responses among the S&P500, fiat, and cryptocurrency turbulence indices following shocks to (A) S&P500 turbulence, (B) fiat turbulence, and (C) cryp-tocurrency turbulence. Panels D–F report responses of market turbulence to macro-financial shocks in (D) VIX, (E) USDX, and (F) EPU. Panels G–I report responses of market turbulence to shocks in network structure, namely (G) ⟨cc ⟩, (H) Q, and (I) ⟨D⟩. Responses are computed using the Pesaran–Shin generalised framework, are expressed in standard-deviation units, and are traced over a 30-day horizon. Shaded areas denote 90% bootstrap confidence intervals. 
+
+Figure S4 reports supplementary full-sample GIRFs that complement the Granger-causality diagnostics by show-ing the dynamic response paths following one-standard-deviation shocks. Panels A–C show cross-market responses among the three turbulence indices. Consistent with the connectedness and Granger-causality results, shocks to 41 S&P500 turbulence generate short-run responses in fiat and cryptocurrency turbulence, with the stronger response appearing in fiat turbulence. Shocks to fiat turbulence also a ff ect the other markets, including a delayed response in cryptocurrency turbulence. By contrast, shocks originating in cryptocurrency turbulence generate weaker responses in S&P500 and fiat turbulence, supporting the interpretation that cryptocurrency turbulence is more reactive than transmissive in the full-sample linear system. Panels D–F show the responses of market turbulence to macro-financial shocks. The responses are concentrated at short horizons and generally converge back toward zero, indicating that macro-financial shocks mainly generate transitory adjustments rather than persistent displacement in market turbu-lence. A VIX shock in Panel D produces immediate responses across the three markets, with particularly visible early movements in S&P500 and fiat turbulence. This suggests that changes in implied equity volatility are associated not only with equity-market stress but also with short-run adjustments in currency and cryptocurrency turbulence through the broader risk environment. The response to a USDX shock in Panel E is more oscillatory, especially for fiat turbu-lence, which is consistent with the direct relevance of broad dollar movements for currency-market stress. S&P500 and cryptocurrency turbulence respond more weakly and less persistently. Panel F shows that EPU shocks generate short-run fluctuations in market turbulence, with the clearest oscillatory response appearing in S&P500 turbulence, while fiat and cryptocurrency responses are smaller and surrounded by wider confidence bands. Panels G–I show the responses of market turbulence to shocks in network structure. These responses are generally smaller and less persistent than the market-to-market and macro-to-market responses. This supports the main-text interpretation that, in the full-sample linear VAR, network topology is not an average exogenous driver of market turbulence. However, this does not rule out a state-dependent network channel. The threshold-VAR results show that network-related trans-mission becomes more pronounced under high-turbulence states, meaning that the weak full-sample response partly reflects averaging over calm and stressed periods. 
+
+4.6. Threshold VAR robustness and regime diagnostics 
+
+Table S8 summarises the data-driven regime definition obtained from BIC-based threshold selection. Because the threshold VAR estimates separate parameter sets in each regime, we re-selected the lag order for the TVAR using BIC within the threshold-search procedure, which selected p = 4. The estimated threshold assigns two-thirds of the sample to the low-turbulence regime and one-third to the high-turbulence regime. The resulting regime sequence contains 708 switches, indicating that the high-turbulence state should not be interpreted as a small number of prolonged crisis episodes. Rather, it identifies days on which the joint cross-asset return configuration is unusually displaced relative to its recent multivariate benchmark. Accordingly, the regime-conditional GIRFs describe shock propagation conditional on an elevated-displacement state, not the response during a single sustained historical episode. Table S9 confirms that both regime-specific VAR dynamics satisfy the stability condition (maximum eigenvalue 42 Value Threshold variable TI level Delay d 1Lag order p 4Criterion BIC ˆγ 518.2384 Low regime obs 1510 High regime obs 755 Low share 0.6667 High share 0.3333 Quantile of ˆ γ 0.6667 Regime switches 708       
+
+> Table S8: Threshold selection and regime composition for the two-regime TVAR. The threshold ˆ γis estimated by grid search using the Bayesian Information Criterion (BIC) and applied to the turbulence index in levels T I t−dwith delay d=1. The table reports regime sample sizes, regime shares, and the number of regime switches in the resulting state sequence.
+
+Regime max |λ| Stable ( <1) Low 0.860 True High 0.946 True 
+
+> Table S9: Stability diagnostics for regime-specific VAR dynamics. The table reports the maximum modulus of the companion-matrix eigenvalues for the low- and high-turbulence regimes. Values below one indicate that each regime VAR is stable (covariance-stationary), ensuring that impulse responses and variance decompositions are well-defined.
+
+modulus below unity), implying that the regime-conditional impulse responses and FEVD-based connectedness mea-sures are well-defined. Table S10 shows that the regime contrast in total connectedness is robust to the forecast horizon across H = 30 −90 days, the high-turbulence regime exhibits consistently higher spillovers (approximately three times the low-regime level), indicating that the state dependence is not driven by horizon choice. Figure S5 reports the complementary regime-conditional GIRFs from network topology shocks to market turbu-lence. In the low-turbulence regime, shocks to ⟨cc ⟩, Q, and ⟨D⟩ generate small and short-lived responses in all three market turbulence indices. This is consistent with the main-text result that network measures play a limited initiating role under tranquil conditions. In the high-turbulence regime, the same topology shocks generate larger and more volatile short-run responses, especially for fiat and cryptocurrency turbulence. The responses remain transitory, but H TSI Low TSI High Ratio (High /Low) 30 8.617 24.345 2.825 60 8.618 24.398 2.831 90 8.618 24.399 2.831      
+
+> Table S10: Horizon robustness of regime-dependent connectedness. Total Spillover Index (TSI) estimates are reported for forecast horizons
+> H∈ { 30 ,60 ,90 }days under each regime. The ratio column summarises the multiplicative di ff erence in system-wide connectedness between high-and low-turbulence regimes.
+
+43 0 5 10 15 20 25 30             
+
+> Horizon (days)
+> 0.06
+> 0.04
+> 0.02
+> 0.00
+> 0.02
+> 0.04
+> 0.06
+> Response (std. units)
+> A
+> cc
+> Q
+> D
+> 0510 15 20 25 30
+> Horizon (days)
+> B
+> 0510 15 20 25 30
+> Horizon (days)
+> C
+
+Figure S5: Regime-conditional generalised impulse response functions (GIRFs) from network topology shocks to market turbulence under the threshold VAR. Panels A–C report the responses of (A) TI S&P500 , (B) TI fiat , and (C) TI crypto to one-standard-deviation shocks in network clustering 
+
+⟨cc ⟩, modularity Q, and diversity ⟨D⟩ in the low-turbulence regime. Panels D–F report the corresponding responses of (D) TI S&P500 , (E) TI fiat , and (F) TI crypto in the high-turbulence regime. All responses are computed over a horizon of H = 30 days. Shaded areas denote bootstrap confidence bands, and responses are expressed in standardised units. 
+
+their larger magnitude indicates that, once the system is already in an elevated-displacement state, changes in net-work topology contain more information about subsequent market-turbulence dynamics. This supports a feedback interpretation, where market stress reshapes network structure, and under high turbulence, the reconfigured topology becomes more involved in short-run propagation. These results should be interpreted as reduced-form evidence of state-dependent transmission, not as structural proof that topology independently causes turbulence. 
+
+4.7. Robustness to correlation-distance transformation 
+
+The baseline network measures are computed from the positive-correlation weighted adjacency matrix. As a ro-bustness check, we recompute the modularity series using the correlation-distance transformation di j ,t = p2(1 − ρi j ,t), retaining links with di j ,t < √2, which is equivalent to ρi j ,t > 0. Because weighted modularity treats larger weights as stronger connections, distances are converted into proximity weights before computing modularity. As shown in Fig. S6, the distance-transformed modularity series di ff ers in level from the baseline correlation-weighted series but displays a broadly similar temporal pattern. This supports the interpretation that the main modularity dynamics are not driven solely by the choice between correlation weights and distance-based proximity weights. 44 Figure S6: Modularity evolution under the correlation-distance network representation. The solid line shows the modularity Qt of the largest connected component over time, and the dashed horizontal line indicates the time average of the modularity series. 
+
+45

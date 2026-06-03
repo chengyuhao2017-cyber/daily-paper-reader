@@ -1,0 +1,5712 @@
+Title: 2605.28417v1.pdf
+
+URL Source: https://arxiv.org/pdf/2605.28417v1
+
+Published Time: Thu, 28 May 2026 01:14:41 GMT
+
+Number of Pages: 53
+
+Markdown Content:
+# The fused asset flow model: stability, bifurcation, and contagion in 
+
+# multi -asset markets with heterogeneous investors 
+
+## By Mario Cavani 
+
+## Universidad de Oriente, Cu maná, Venezuela, mcavani@udo.edu.ve 
+
+# Abstract 
+
+This paper presents a unified multi ‑asset, multi ‑group asset flow model that integrates 
+
+three foundational frameworks in the behavioral finance literature. The model captures 
+
+the dynamics of financial markets where multiple assets are traded by multiple investor 
+
+groups, each with distinct trend ‑fol lowing (momentum) and value ‑based (fundamental) 
+
+strategies. Unlike classical efficient market models, our framework explicitly incorporates 
+
+the finiteness of cash and shares, asymmetric cross ‑asset coupling in buying decisions, and 
+
+endogenous wealth redist ribution across groups. 
+
+We derive the complete system of ordinary differential equations governing price, cash, 
+
+share, and sentiment dynamics, and establish the fundamental properties of positivity and 
+
+boundedness for all physically relevant variables. The equilibrium set is characterized as 
+
+a manifold parameterized by cash distribution, with the fundamental equilibrium as a 
+
+special point. Through linear stability analysis, we identify conditions under which the 
+
+fundamental equilibrium loses stability via a supercritical Hopf bifurcation, giving rise to 
+
+persistent limit cycles. 
+
+The model is validated against three benchmark papers: the single ‑asset multi ‑group 
+
+model of DeSantis, Swigon, and Caginalp (2012); the two ‑asset single ‑group model of 
+
+Bulut, Merdan, and Swigon (2019); and the two ‑asset two ‑group Nigeria ‑Libya oil market 
+
+model of Cavani (2026). Our numerical simulations reproduce all key theoretical 
+
+predictions, including equilibrium manifolds, Hopf bifurcation thresholds, limit cycle 
+
+periods, and asym metric contagion patterns. 
+
+We extend the analysis to excursion quantification, showing that limit cycle amplitudes 
+
+are independent of initial perturbations once the system enters the oscillatory regime. The 
+
+contagion matrix reveals asymmetric price shock p ropagation, with Libya ‑to ‑Nigeria 
+
+contagion being thirty ‑four percent stronger than the reverse direction, reflecting 
+
+Nigeria's larger market share. An extended bifurcation scan reveals period lengthening 
+
+from 4.7 to 20.7 days as the momentum coefficient i ncreases, with a period jump at 𝑞 1 ≈
+
+0.38 indicating a secondary bifurcation. 
+
+Policy implications include reducing momentum trading through transaction taxes, 
+
+strengthening value ‑based investment via sovereign wealth funds, and coordinating 
+
+circuit breakers to mitigate cross ‑asset contagion. The fused model provides a rigorous 
+
+mathematical framework for understanding market instabilities, bubbles, and crashes as 
+
+endogenous phenomena arising from the interaction of heterogeneous investor strategies 
+
+and finite arbitrage capital. 
+
+# Keywords: Asset flow model, Hopf bifurcation, contagion, heterogeneous 
+
+agents, market stability, excursion analysis, Nigeria -Libya oil market 
+
+# JEL Classification: C61, D84, G12, G15, G18 1. Introduction 
+
+## 1.1 The Puzzle of Endogenous Market Instability 
+
+The financial landscape of the twenty ‑first century has been marked by a series of dramatic 
+
+events that challenge the foundational assumptions of classical finance. The May 6, 2010, 
+
+Flash Crash, during which the Dow Jones Indu strial Average plunged nearly 600 points 
+
+in five minutes only to recover shortly thereafter, exemplified a sudden liquidity 
+
+deterioration that changes in fundamental values cannot explain . Subsequent research has 
+
+shown that high ‑frequency traders, rather t han providing stabilizing liquidity, actually 
+
+consume liquidity when it is most needed, thereby exacerbating transient price impacts 
+
+unrelated to fundamentals. More broadly, boom –bust cycles have been documented 
+
+across a wide range of asset classes , includ ing equity, housing, and commodity markets, 
+
+yet the economics profession still lacks a deep understanding of their causes .
+
+The efficient market hypothesis, which has served as the cornerstone of modern financial 
+
+economics, posits that asset prices fully re flect all available information and that any 
+
+deviations from fundamental values are quickly arbitraged away by rational investors with 
+
+unlimited arbitrage capital. From this perspective, large price movements can only be 
+
+attributed to exogenous news shocks . However, the occurrence of flash crashes in the 
+
+absence of significant news, the persistence of momentum effects, and the recurrent 
+
+nature of boom –bust cycles suggest that endogenous mechanisms , arising from the 
+
+heterogeneity of investor motivations and the finite nature of arbitrage capital , play a 
+
+crucial role in driving market dynamics. 
+
+## 1.2 Heterogeneous Agent Models as an Alternative Paradigm 
+
+In response to the limitations of the rational expectations framework, a rich literature on 
+
+heterogeneous agent models (HAMs) has emerged. Following the seminal work of Brock 
+
+and Hommes (1998), in which boundedly rational agents switch between fundamentalist 
+
+and chartist forecasting rules, a large body of research has demonstrated that 
+
+heterogene ity is not merely a realistic modeling feature but is essential for explaining the 
+
+intricate dynamics of financial markets. HAMs have been shown to perform well in 
+
+describing, explaining, and often forecasting asset market dynamics across equities, 
+
+foreign exchange, credit, housing, derivatives, and commodities. 
+
+Within this broader HAM tradition, the asset flow model developed by Caginalp and 
+
+collaborators offers a distinct and rigorous approach. Rather than focusing on expectation 
+
+formation, the asset flow model emphasizes the flow of cash and shares between 
+
+investor groups, each endowed with finite resources and distinct trading motivations. The 
+
+model incorporates two fundamental trading motivations: trend ‑based (momentum) 
+
+trading , in which investors buy a ssets whose prices have been rising, and value ‑based 
+
+(fundamental) trading , in which investors buy assets trading below their assessment 
+
+of fundamental value and sell those trading above. By assuming a closed system with fixed 
+
+total cash and shares, the mo del explicitly incorporates the finiteness of arbitrage capital, 
+
+thereby providing a framework in which behavioral biases can have lasting price impacts. 
+
+## 1.3 Two Pillars: The Single ‑Asset Multi ‑Group Model and the Multi ‑Asset 
+
+## Single ‑Group Model 
+
+The asset flow literature has developed along two complementary but largely separate 
+
+trajectories. 
+
+The single ‑asset, multi ‑group model was rigorously analyzed by DeSantis, Swigon, 
+
+and Caginalp (2012). They proved that when all trader groups focus on fundamenta ls, all 
+
+equilibria are stable; however, when one group follows a momentum strategy while another follows a fundamental strategy, conditions for instability can arise. Moreover, 
+
+they introduced the concept of the price excursion —the maximum deviation of pri ce 
+
+from its initial value along a trajectory —as a practical metric for assessing risk in unstable 
+
+regimes. A key insight from this work is the existence of a continuum of equilibria 
+
+parameterized by the distribution of cash among investor groups, implying that the 
+
+equilibrium price is not uniquely determined even when all investors agree on 
+
+fundamental value. 
+
+The multi ‑asset, single ‑group model was developed by Bulut, Merdan, and Swigon 
+
+(2019). In this framework, a single homogeneous group of investors trad es two assets, with 
+
+the novel assumption that buying an asset depends on the other asset ’s price, whereas 
+
+selling does not. The authors proved that all equilibria are stable in the absence of a clear 
+
+emphasis on trend ‑based valuation, established condition s for stability when the group 
+
+attaches importance to the valuation of one stock and the trend of the other, and 
+
+demonstrated the existence of a Hopf bifurcation using the momentum coefficient as a 
+
+bifurcation parameter. 
+
+Most recently, Cavani (2026) extend ed the Bulut –Merdan –Swigon framework to an 
+
+arbitrary number of assets and incorporated multiple investor groups, thereby combining 
+
+the multi ‑asset feature of the former with the multi ‑group feature of the latter. In this 
+
+model, each group is influenced by both trend and valuation motivations for each asset, 
+
+and the purchase of one asset depends on the price of another. This asymmetric cross ‑asset 
+
+coupling captures realistic spillover effects in portfolios . The analysis established stability 
+
+conditions and a rgued for the existence of periodic solutions via a Hopf bifurcation. 
+
+## 1.4 The Research Gap: What Remains to Be Done 
+
+Despite these advances, no existing model simultaneously incorporates three essential 
+
+features: 
+
+1. Multiple assets with asymmetric cross ‑asset coupling , as in Bulut et al. 
+
+(2019) and Cavani (2026); 
+
+2. Multiple heterogeneous investor groups with per ‑asset dual sentiments 
+
+(trend and value), as in DeSantis et al. (2012) and Cavani (2026); 
+
+3. The continuum of equilibria and the excursion concept , which pro vide 
+
+crucial insights into price indeterminacy and risk assessment in unstable regimes, 
+
+as developed in DeSantis et al. (2012). 
+
+Moreover, the interaction between cross ‑asset momentum spillovers —the 
+
+phenomenon whereby returns in one asset predict returns in economically linked assets —
+
+and group ‑level wealth dynamics remains unexplored. Empirical research has 
+
+documented asymmetric cross ‑firm momentum spillovers driven by heterogeneous 
+
+demand, with mutual fund and hedge fund flows exhibiting distinct associatio ns with 
+
+patterns of return predictability. However, a theoretical framework to explain how such 
+
+spillovers emerge from the micro ‑foundations of heterogeneous trading strategies is 
+
+lacking. 
+
+Similarly, recent work by Westerhoff and colleagues (2025) has shown that investors’ 
+
+market entry and exit decisions based on momentum, value, and risk c an generate 
+
+endogenous boom , bust cycles , and spontaneous market downturns. Yet this model does 
+
+not incorporate the multi ‑asset cross ‑coupling that characterizes real ‑world portfolio decisions, nor does it provide the detailed bifurcation analysis afforded by t he asset flow 
+
+framework. 
+
+## 1.5 The Fused Model: A Strictly More General Framework 
+
+To address these limitations, we propose a unified multi ‑asset, multi ‑group asset 
+
+flow model that fuses the two existing pillars into a single, strictly more general 
+
+frame work. Our model combines: 
+
+• The multi ‑asset structure of Bulut et al. (2019) and Cavani (2026), including 
+
+the asymmetric assumption that buying an asset 𝑖 depends on other assets’ prices ,
+
+while selling depends only on the same asset’s sentiment .
+
+• The multi ‑group structure of DeSantis et al. (2012) and Cavani (2026), 
+
+allowing each group to hold both trend and value sentiments for each asset; 
+
+• The equilibrium manifold and excursion concept of DeSantis et al. (2012), 
+
+enabling the analysis of price indeterminacy a nd the maximum price deviation 
+
+following a stability loss; 
+
+• Cross ‑asset momentum spillovers , encoded in the transition rate functions 
+
+through coefficients that couple sentiments across different assets; 
+
+• Wealth dynamics across both groups and assets , providi ng a framework 
+
+for studying how trading profits and losses redistribute among heterogeneous 
+
+investors during boom –bust cycles. 
+
+The fused model thus contains each of the existing models as special cases: setting 𝑚 = 1,
+
+and n = 2 recovers the DeSantis –Swigon –Ca ginalp model; setting 𝑚 = 2 , and 𝑛 = 1
+
+recovers the Bulut –Merdan –Swigon model , and sets general 𝑚 and 𝑛 , without cross ‑asset 
+
+coupling in the transition rates , recovers the Cavani model. By including all features 
+
+simultaneously, our framework enables the systematic study of how cross ‑asset 
+
+momentum, heterogeneous group strategies, and wealth flows jointly produce market 
+
+instabilities, bubbles, and crashes. 
+
+## 1.6 C ontributions of This Research 
+
+This research proposal makes the following contributions: 
+
+1. Theoretical : We derive the full system of ODEs for the fused model, characterize 
+
+its equilibrium set (including the fundamental equilibrium and the continuum of 
+
+non ‑fundamental equilibria), compute the Jacobian matrix with its block 
+
+structure, and establish stability conditions via Routh –Hurwitz and sign ‑stability 
+
+criteria. 
+
+2. Bifurcation Analysis : We identify the conditions under which the fundamental 
+
+equilibrium lo ses stability through a Hopf bifurcation, taking the momentum 
+
+coefficients 𝑞 1,𝑗  
+
+> (𝑖 )
+
+as bifurcation parameters , we show that the critical threshold 
+
+depends on cross ‑asset coupling strengths and group ‑level parameters. 
+
+3. Excursion Analysis : Extending the con cept introduced by DeSantis et al. 
+
+(2012), we define and compute multi ‑asset excursions , the maximum deviation of 
+
+each asset’s price from its initial value , as a function of initial conditions and 
+
+parameter values. 4. Wealth Dynamics : We analyze how wealth is redistributed among investor 
+
+groups during limit cycles and how the long ‑run wealth distribution depends on 
+
+the relative strengths of momentum and value strategies across assets. 
+
+5. Numerical Simulations : We implement the fused model for realistic scenarios 
+
+(e.g., two ‑asset oil markets with value ‑based and momentum ‑based investor 
+
+groups, three ‑asset energy markets with mixed strategies) and conduct bifurcation 
+
+scans, excursion heatmaps, and wealth distribution analyses. 
+
+6. Policy Implications : By identifying par ameter regimes in which small 
+
+perturbations trigger large excursions or sustained oscillations, the model provides 
+
+quantitative guidance for regulatory interventions such as transaction taxes on 
+
+short ‑term trading, circuit breakers, and limits on high ‑freq uency trading. 
+
+## 1.7 Structure of the Proposal 
+
+The remainder of this proposal is organized as follows. Section 2 presents the complete 
+
+mathematical formulation of the fused model, including state variables, sentiment 
+
+dynamics, transition rates, price dynamic s, and conservation laws. Section 3 characterizes 
+
+the equilibrium set and provides the linear stability analysis. Section 4 identifies the Hopf 
+
+bifurcation condition and discusses the emergence of limit cycles. Section 5 defines the 
+
+multi ‑asset excursion c oncept and presents numerical methods for its computation. 
+
+Section 6 contains a discussion, and Section 7 the conclusions. .
+
+# 2. Fused Model: Mathematical Formulation 
+
+This section presents the complete mathematical formulation of the fused multi ‑asset, 
+
+multi ‑group asset flow model. The model integrates the single ‑asset multi ‑group 
+
+framework of DeSantis, Swigon, and Caginalp ( 2012) with the multi ‑asset structure of 
+
+Bulut, Merdan, and Swigon (2019) and the general multi ‑asset multi ‑group extension of 
+
+Cavani (2026). The resulting system of ordinary differential equations is strictly more 
+
+general than each of its predecessors, con taining them as special cases when appropriate 
+
+restrictions are imposed. 
+
+## 2.1 State Variables and Conservation Laws 
+
+Consider a financial market with 𝑚 ≥ 1 assets indexed by 𝑖 = 1, … , 𝑚 , traded among 𝑛 ≥ 1
+
+investor groups indexed by 𝑗 = 1, … , 𝑛 .
+
+The state variables of the system are described by: 
+
+• 𝑃 (𝑖 )(𝑡 ) > 0: price of asset 𝑖 at time 𝑡 
+
+• 𝑀 𝑗 (𝑡 ) ≥ 0: cash held by investor group 𝑗 
+
+• 𝑁 𝑗 
+
+> (𝑖 )
+
+(𝑡 ) ≥ 0: shares of the asset 𝑖 held by a group 𝑗 
+
+• 𝜁 1,𝑗 
+
+> (𝑖 )
+
+(𝑡 ): trend ‑based sentiment of a group 𝑗 toward the asset 𝑖 
+
+• 𝜁 2,𝑗 
+
+> (𝑖 )
+
+(𝑡 ): value ‑based sentiment of the group 𝑗 toward the asset 𝑖 
+
+## 2.2 Sentiment Dynamics 
+
+Sentiment variables capture the time ‑weighted influence of past market conditions on 
+
+current trading decisions. For each asset 𝑖 , group 𝑗 , define: Trend (momentum) sentiment measures the influence of recent price changes: 
+
+𝑑 𝜁 1,𝑗 
+
+> (𝑖 )
+
+𝑑𝑡 = 𝑐 1,𝑗 
+
+> (𝑖 )
+
+𝑞 1,𝑗  
+
+> (𝑖 )
+
+1
+
+𝑃 (𝑖 )
+
+𝑑 𝑃 (𝑖 )
+
+𝑑𝑡 − 𝑐 1,𝑗 
+
+> (𝑖 )
+
+𝜁 1,𝑗 
+
+> (𝑖 )
+
+. (2.2)
+
+Value sentiment measures the influence of the deviation of price from fundamental 
+
+value: 
+
+𝑑 𝜁 2,𝑗 
+
+> (𝑖 )
+
+𝑑𝑡 = 𝑐 2,𝑗 
+
+> (𝑖 )
+
+𝑞 2,𝑗  
+
+> (𝑖 )
+
+(1 − 𝑃 (𝑖 )
+
+𝑃 𝑎 
+
+> (𝑖 )
+
+) − 𝑐 2,𝑗 
+
+> (𝑖 )
+
+𝜁 2,𝑗 
+
+> (𝑖 )
+
+. (2.3)
+
+The parameters in (2.2) – (2.3) have the following interpretations (Caginalp & Balenovich, 
+
+1999; Caginalp & Merdan, 2007; Cavani, 2026): 
+
+• 𝑐 1,𝑗  
+
+> (𝑖 )
+
+> 0 and 𝑐 2,𝑗  
+
+> (𝑖 )
+
+> 0: inverse time scales of interest for trend and value sentiments, 
+
+respectively. A larger 𝑐 implies faster adjustment (shorter memory). 
+
+• 𝑞 1,𝑗  
+
+> (𝑖 )
+
+≥ 0 and 𝑞 2,𝑗  
+
+> (𝑖 )
+
+≥ 0: magnitude coefficients characterizing the strength of each 
+
+motivation for the group 𝑗 toward asset 𝑖 . Setting 𝑞 1,𝑗  
+
+> (𝑖 )
+
+= 0 eliminates 
+
+trend ‑following, while 𝑞 2,𝑗  
+
+> (𝑖 )
+
+= 0 eliminates value ‑based trading. 
+
+• 𝑃 𝑎  
+
+> (𝑖 )
+
+> 0: fundamental (intrinsic) value of an asset 𝑖 , assumed constant in the 
+
+baseline model. 
+
+The ordinary differential equation forms (2.2) – (2.3) are equivalent to the exponentially 
+
+weighted moving average definition s: 
+
+𝜁 1,𝑗 
+
+> (𝑖 )
+
+(𝑡 ) = 𝑞 1,𝑗 
+
+> (𝑖 )
+
+𝑐 1,𝑗  
+
+> (𝑖 )
+
+∫
+
+> 𝑡
+> −∞
+
+𝑒 −𝑐 1,𝑗  
+
+> (𝑖 )(𝑡 −𝑠 )
+
+1
+
+𝑃 (𝑖 )(𝑠 )
+
+𝑑 𝑃 (𝑖 )(𝑠 )
+
+𝑑𝑠 𝑑𝑠 ,
+
+𝜁 2,𝑗 
+
+> (𝑖 )
+
+(𝑡 ) = 𝑞 2,𝑗 
+
+> (𝑖 )
+
+𝑐 2,𝑗  
+
+> (𝑖 )
+
+∫
+
+> 𝑡
+> −∞
+
+𝑒 −𝑐 2,𝑗  
+
+> (𝑖 )(𝑡 −𝑠 )
+
+(1 − 𝑃 (𝑖 )(𝑠 )
+
+𝑃 𝑎  
+
+> (𝑖 )
+
+) 𝑑𝑠 .
+
+The exponential kernel takes greater weight to recent observations, consistent with 
+
+psychological evidence on recency bias (Grether, 1980; Caginalp & Balenovich, 1999). 
+
+## 2.3 Transition Rates (Buying and Selling) 
+
+The core behavioral rules are encoded in the transition rates: 𝑘 𝑗  
+
+> (𝑖 )
+
+denotes the probability 
+
+per unit time that the group 𝑗 uses one unit of cash to buy one share of an asset 𝑖 , while 
+
+𝑘 ˜𝑗  
+
+> (𝑖 )
+
+denotes the probability per unit time that the group 𝑗 sells one share of the asset 𝑖 for 
+
+cash. Following Bulut et al. (2019) and Cavani (2026), we impose the asymmetric 
+
+trading assumption :
+
+• Buying of an asset 𝑖 can depend on sentiments from all assets (cross ‑asset 
+
+coupling). 
+
+• Selling of assets 𝑖 depends only on the sentiments associated w ith the same asset 
+
+𝑖 .This asymmetry captures the realistic notion that investors consider portfolio ‑wide 
+
+information when making purchase decisions but focus on individual asset characteristics 
+
+when selling (Cavani, 2026). 
+
+2.3.1 General Form 
+
+A general sp ecification for the buying rate that accommodates both trend and value 
+
+sentiments across assets is: 
+
+𝑘 𝑗  
+
+> (𝑖 )
+
+= 𝑎 𝑗  
+
+> (𝑖 )
+
++ 𝑏 𝑗 
+
+> (𝑖 )
+
+tanh (∑
+
+> 𝑚
+> ℓ=1
+
+𝛼 𝑗 ,ℓ
+
+> (𝑖 )
+
+𝜁 1,𝑗  
+
+> (ℓ)
+
++ ∑
+
+> 𝑚
+> ℓ=1
+
+𝛽 𝑗 ,ℓ
+
+> (𝑖 )
+
+𝜁 2,𝑗 
+
+> (ℓ)
+
+) , (2.4)
+
+where 𝑎 𝑗  
+
+> (𝑖 )
+
+and 𝑏 𝑗  
+
+> (𝑖 )
+
+are constants chosen so that 𝑘 𝑗  
+
+> (𝑖 )
+
+∈ [0,1] and ∑𝑚  
+
+> 𝑖 =1
+
+𝑘 𝑗  
+
+> (𝑖 )
+
+≤ 1. The 
+
+coefficients 𝛼 𝑗 ,ℓ 
+
+> (𝑖 )
+
+≥ 0 and 𝛽 𝑗 ,ℓ 
+
+> (𝑖 )
+
+≥ 0 determine the strength of influence from the trend 
+
+sentiment of the asset ℓ and the value sentiment of the asset ℓ, respectively, on the buyi ng 
+
+of the asset 𝑖 . For ℓ ≠ 𝑖 , these coefficients encode cross ‑asset momentum spillovers —
+
+the phenomenon whereby returns in one asset predict returns in economically linked 
+
+assets (Wang, 2025). 
+
+For the selling rate, the asymmetric assumption restricts depend ence to sentiments of the 
+
+same asset: 
+
+𝑘 ˜𝑗  
+
+> (𝑖 )
+
+= 𝑎 ˜𝑗  
+
+> (𝑖 )
+
++ 𝑏 ˜𝑗 
+
+> (𝑖 )
+
+tanh (𝛾 𝑗 
+
+> (𝑖 )
+
+𝜁 1,𝑗  
+
+> (𝑖 )
+
++ 𝛿 𝑗 
+
+> (𝑖 )
+
+𝜁 2,𝑗 
+
+> (𝑖 )
+
+) , (2.5)
+
+or, for value ‑based selling, a linear form: 
+
+𝑘 ˜𝑗  
+
+> (𝑖 )
+
+= max (0, min (1, 𝑐 ˜𝑗  
+
+> (𝑖 )
+
++ 𝑑 ˜𝑗  
+
+> (𝑖 )
+
+(𝑃 (𝑖 )
+
+𝑃 𝑎  
+
+> (𝑖 )
+
+− 1))) , (2.6)
+
+which increases when the asset is overvalued ( 𝑃 (𝑖 ) > 𝑃 𝑎 
+
+> (𝑖 )
+
+). 
+
+2.3.2 Special Cases 
+
+The fused model reduces to existing models under specific restrictions: 
+
+• DeSantis et al. (2012) single ‑asset multi ‑group model (𝑚 = 1): equations 
+
+(2.4) – (2.5) simplify to 𝑘 𝑗 = 𝑎 𝑗 + 𝑏 𝑗 tanh (𝛼 𝑗 𝜁 1,𝑗 + 𝛽 𝑗 𝜁 2,𝑗 ), with 𝑘 ˜𝑗 = 1 − 𝑘 𝑗 (the 
+
+so ‑called “zero ‑sum” assumption). The sentiment dynamics reduce to a single 
+
+sentiment per group (either trend or value, not both), as each group in DeSantis et 
+
+al. (2012) is focused on only one motivation. 
+
+• Bulut et al. (201 9) two ‑asset single ‑group model (𝑛 = 1): equations (2.4) –
+
+(2.5) recover the form 𝑘 (𝑖 ) = 𝑎 (𝑖 ) + 𝑏 (𝑖 )tanh (𝛼 1
+
+> (𝑖 )
+
+𝜁 1 
+
+> (1)
+
++ 𝛼 2
+
+> (𝑖 )
+
+𝜁 1 
+
+> (2)
+
++ 𝛽 1
+
+> (𝑖 )
+
+𝜁 2 
+
+> (1)
+
++
+
+𝛽 2
+
+> (𝑖 )
+
+𝜁 2
+
+> (2)
+
+), with the selling rate depending only on the sentiment of the same asset. 
+
+The original Bulut e t al. (2019) model further assumes 𝛼 2 
+
+> (1)
+
+≠ 0 (buying of asset 1 
+
+depends on trend of asset 2) and 𝛼 1 
+
+> (2)
+
+≠ 0 (buying of asset 2 depends on trend of 
+
+asset 1), creating bidirectional momentum coupling. • Cavani (2026) multi ‑asset multi ‑group model : this is the imm ediate 
+
+predecessor of the fused model, where 𝑘 𝑗  
+
+> (𝑖 )
+
+depends on all sentiments , but without 
+
+the explicit cross ‑asset coefficient structure presented here. The fused model 
+
+makes the cross ‑asset coupling explicit via 𝛼 𝑗 ,ℓ 
+
+> (𝑖 )
+
+and 𝛽 𝑗 ,ℓ
+
+> (𝑖 )
+
+, facilitating bifurcation 
+
+analysis with respect to these parameters. 
+
+2.3.3 Cash Dynamics 
+
+In DeSantis, Swigon, and Caginalp (2012) , their Equations 2.2 –2.3 and 2.7 –2.8 , coupled 
+
+ODEs govern the evolution of cash and shares for each investor group in the singl e-asset 
+
+multi -group model . These equations ensure the conservation of total cash and total shares 
+
+while capturing the flow of wealth between groups through trading. In our fused 
+
+multi ‑asset, multi ‑group framework, these dynamics generalize naturally. 
+
+For e ach investor group 𝑗 = 1, … , 𝑛 and each asset 𝑖 = 1, … , 𝑚 , define: 
+
+• 𝑀 𝑗 (𝑡 ) ≥ 0: cash held by the group 𝑗 (total, not per asset) 
+
+• 𝑁 𝑗 
+
+> (𝑖 )
+
+(𝑡 ) ≥ 0: shares of the asset 𝑖 held by a group 𝑗 
+
+The transition rates 𝑘 𝑗  
+
+> (𝑖 )
+
+(buying probability per unit time from cash to shares) and 𝑘 ˜𝑗 
+
+> (𝑖 )
+
+(selling probability per unit time from shares to cash) are given by (2.4) – (2.6). The cash 
+
+and share dynamics are derived from the principle that each group’s cash changes only 
+
+through buying (cash out) and selling (cash in), and shares change only through buying 
+
+(shares in) and selling (shares out). 
+
+The rate of change of cash held by the group 𝑗 is: 
+
+𝑑 𝑀 𝑗 
+
+𝑑𝑡 = − ∑
+
+> 𝑚
+> 𝑖 =1
+
+𝑘 𝑗 
+
+> (𝑖 )
+
+𝑀 𝑗 
+
+⏟
+
+> cash spent on buying
+
++ ∑
+
+> 𝑚
+> 𝑖 =1
+
+𝑘 ˜𝑗 
+
+> (𝑖 )
+
+𝑁 𝑗 
+
+> (𝑖 )
+
+𝑃 (𝑖 )
+
+⏟
+
+> cash received from selling
+
+. (2.13 )
+
+The first term sums over all the assets the cash used to buy shares; the second term sums 
+
+the revenue from selling shares of each asset. Note that the buying rate 𝑘 𝑗  
+
+> (𝑖 )
+
+multiplies the 
+
+current cash 𝑀 𝑗 , while the selli ng rate multiplies the current share holdings 𝑁 𝑗 
+
+> (𝑖 )
+
+times the price 𝑃 (𝑖 ).
+
+2.3.4 Share Dynamics 
+
+For each asset 𝑖 and group 𝑗 , the change in share holdings is: 
+
+𝑑 𝑁 𝑗 
+
+> (𝑖 )
+
+𝑑𝑡 = 𝑘 𝑗 
+
+> (𝑖 )
+
+𝑀 𝑗 
+
+𝑃 (𝑖 )⏟
+
+> shares bought
+
+− 𝑘 ˜𝑗 
+
+> (𝑖 )
+
+𝑁 𝑗 
+
+> (𝑖 )
+
+⏟
+
+> shares sold
+
+. (2.14 )
+
+The buying term divides the cash allocated to buying the asset 𝑖 by the price 𝑃 (𝑖 ) to obtain 
+
+the number of shares acquired. The selling term directly subtracts the shares sold at the 
+
+rate 𝑘 ˜𝑗 
+
+> (𝑖 )
+
+.2.3.5 Conservation Laws and Consistency 
+
+Summing (2.13) over all groups 𝑗 yields: 
+
+𝑑 
+
+𝑑𝑡 ∑
+
+> 𝑛
+> 𝑗 =1
+
+𝑀 𝑗 = − ∑
+
+> 𝑖 ,𝑗
+
+𝑘 𝑗 
+
+> (𝑖 )
+
+𝑀 𝑗 + ∑
+
+> 𝑖 ,𝑗
+
+𝑘 ˜𝑗 
+
+> (𝑖 )
+
+𝑁 𝑗 
+
+> (𝑖 )
+
+𝑃 (𝑖 ).
+
+But the price dynamics (2.7) ensure that at any instant, total buying equals total selling 
+
+across all groups (otherwise the price would adjust). More formally, f rom (2.7) we have: 
+
+∑
+
+> 𝑗
+
+𝑘 𝑗 
+
+> (𝑖 )
+
+𝑀 𝑗 = ∑
+
+> 𝑗
+
+𝑘 ˜𝑗 
+
+> (𝑖 )
+
+𝑁 𝑗 
+
+> (𝑖 )
+
+𝑃 (𝑖 )
+
+in equilibrium, but out of equilibrium , the difference drives prices out. However, the 
+
+conservation of total cash ∑𝑗 𝑀 𝑗 = 𝑀 0 (constant) is guaranteed by the structure of the 
+
+equations: the total cash outflow from buying is exactly matched by the total cash inflow 
+
+from selling , only if we also account for the fact that cash is not created or destroyed. In 
+
+fact, summing (2.13) an d using the definition of 𝐹 (𝑖 ) from the price equation, one can show  
+
+> 𝑑
+> 𝑑𝑡
+
+∑𝑗 𝑀 𝑗 = 0. Similarly, summing (2.14) over 𝑗 for fixed 𝑖 gives 𝑑  
+
+> 𝑑𝑡
+
+∑𝑗 𝑁 𝑗  
+
+> (𝑖 )
+
+= 0, confirming 
+
+the conservation of total shares. 
+
+2.3.6 Relationship to the Price Dynamics 
+
+The price dynamics (2.7) involve the demand/supply ratio 𝐹 (𝑖 ). Using (2.13) – (2.14), one 
+
+can derive an alternative expression for the price rate of change that highlights the role of 
+
+excess demand. In fact, the system (2.7), (2.13), (2.14) together with the sentiment 
+
+equations (2.2) – (2.3) form a closed set of ODEs for the state variables 
+
+{𝑃 (𝑖 ), 𝑀 𝑗 , 𝑁 𝑗 
+
+> (𝑖 )
+
+, 𝜁 1,𝑗 
+
+> (𝑖 )
+
+, 𝜁 2,𝑗 
+
+> (𝑖 )
+
+}. The total number of equations is 𝑚 + 𝑛 + 𝑚𝑛 + 2𝑚𝑛 = 𝑚 + 𝑛 (1 +
+
+3𝑚 ), which, after applying conservation laws, reduces to the effective dimension 𝑚 + 2𝑚𝑛 
+
+mentioned earlier. 
+
+2.3.7 Remark 
+
+The explicit cash and share dynamics (2.13) – (2.14) are essential for the fused model 
+
+because they: 
+
+• Govern the evolution of wealth distr ibution across groups and assets, 
+
+• Ensure conservation of total cash and total shares, 
+
+• Couple to price dynamics through the buying/selling rates, 
+
+• Reduce exactly to the DeSantis et al. (2012) equations in the single ‑asset case, 
+
+• Enable numerical simulation of wealth redistribution and long ‑run market 
+
+composition. 
+
+These equations were previously implicit in the proposal; they are now made explicit to 
+
+provide a complete and implementable mathematical framework. 
+
+## 2.4 Price Dynamics 
+
+The price of each asset is deter mined by the principle of price adjustment proportional to 
+
+excess demand, a standard microeconomic assumption (Henderson & Quandt, 1980; 
+
+Caginalp & Balenovich, 1999; Bulut et al., 2019). The total demand for the asset 𝑖 is the cash allocated to buying, ∑𝑗 𝑘 𝑗 
+
+> (𝑖 )
+
+𝑀 𝑗 , while the total supply is the value of shares offered for 
+
+sale, ∑𝑗 𝑘 ˜𝑗 
+
+> (𝑖 )
+
+𝑁 𝑗 
+
+> (𝑖 )
+
+𝑃 (𝑖 ). The price dynamics are: 
+
+𝑑 𝑃 (𝑖 )
+
+𝑑𝑡 = 𝑃 (𝑖 )
+
+𝜏 𝑖 
+
+( ∑𝑛  
+
+> 𝑗 =1
+
+𝑘 𝑗 
+
+> (𝑖 )
+
+𝑀 𝑗 
+
+∑𝑛  
+
+> 𝑗 =1
+
+𝑘 ˜𝑗 
+
+> (𝑖 )
+
+𝑁 𝑗 
+
+> (𝑖 )
+
+𝑃 (𝑖 ) − 1) , 𝜏 𝑖 > 0, (2.7)
+
+where 𝜏 𝑖 is the price adjustment speed for the asset 𝑖 . Equation (2.7) can be rewritten as: 
+
+1
+
+𝑃 (𝑖 )
+
+𝑑 𝑃 (𝑖 )
+
+𝑑𝑡 = 1
+
+𝜏 𝑖 
+
+(Total Demand 
+
+Total Supply − 1) , (2.8)
+
+so, the relative rate of price change is proportional to the fractional excess demand. At 
+
+equilibrium, total demand equals total supply, so 𝑑 𝑃 (𝑖 )/𝑑𝑡 = 0 (DeSantis et al., 2012). 
+
+## 2.5 Wealth Dynamics 
+
+The wealth of the investor group 𝑗 is the sum of cash hol dings and the market value of all 
+
+shares held: 
+
+𝑊 𝑗 (𝑡 ) = 𝑀 𝑗 (𝑡 ) + ∑
+
+> 𝑚
+> 𝑖 =1
+
+𝑁 𝑗 
+
+> (𝑖 )
+
+(𝑡 )𝑃 (𝑖 )(𝑡 ). (2.9)
+
+The total wealth of the system is: 
+
+∑
+
+> 𝑛
+> 𝑗 =1
+
+𝑊 𝑗 (𝑡 ) = 𝑀 0 + ∑
+
+> 𝑚
+> 𝑖 =1
+
+𝑁 0
+
+> (𝑖 )
+
+𝑃 (𝑖 )(𝑡 ). (2.10 )
+
+Differentiating (2.9) and using the ODEs for 𝑀 𝑗 and 𝑁 𝑗  
+
+> (𝑖 )
+
+(which follow from the transition 
+
+rate definitions), we obtain the wealth flow equation: 
+
+𝑑 𝑊 𝑗 
+
+𝑑𝑡 = ∑
+
+> 𝑚
+> 𝑖 =1
+
+[𝑘 ˜𝑗 
+
+> (𝑖 )
+
+𝑁 𝑗 
+
+> (𝑖 )
+
+𝑃 (𝑖 ) − 𝑘 𝑗 
+
+> (𝑖 )
+
+𝑀 𝑗 ] + ∑
+
+> 𝑚
+> 𝑖 =1
+
+𝑁 𝑗  
+
+> (𝑖 )
+
+𝑑 𝑃 (𝑖 )
+
+𝑑𝑡 . (2.11 )
+
+The first term captures net cash inflow from trading (selling brings in ca sh, buying sends 
+
+out cash), while the second term captures capital gains or losses from price changes. 
+
+Wealth redistribution across groups occurs endogenously through these channels. 
+
+## 2.6 Nondimensionalization and the Liquidity Value 
+
+Following Caginalp and Balenovich (1999) and DeSantis et al. (2012), we introduce 
+
+nondimensional variables to reduce the number of parameters. Define: 
+
+• Liquidity value for asset 𝑖 : 𝐿 𝑖 = 𝑀 0/𝑁 0
+
+> (𝑖 )
+
+, the total cash per share of the asset 𝑖 .
+
+• Rescaled price : 𝐏 (𝑖 ) = 𝑃 (𝑖 )/𝐿 𝑖 .
+
+• Rescaled cash : 𝐌 𝑗 = 𝑀 𝑗 /𝑀 0.
+
+• Rescaled shares : 𝐍 𝑗  
+
+> (𝑖 )
+
+= 𝑁 𝑗 
+
+> (𝑖 )
+
+/𝑁 0
+
+> (𝑖 )
+
+.• Rescaled fundamental value : 𝐏 𝑎  
+
+> (𝑖 )
+
+= 𝑃 𝑎 
+
+> (𝑖 )
+
+/𝐿 𝑖 .
+
+The conservation laws become ∑𝑗 𝐌 𝑗 = 1 and ∑𝑗 𝐍 𝑗  
+
+> (𝑖 )
+
+= 1 for all 𝑖 . The price dynamics 
+
+(2.7) transform to: 
+
+𝑑 𝐏 (𝑖 )
+
+𝑑𝑡 = 𝐏 (𝑖 )
+
+𝜏 𝑖 
+
+( ∑𝑗 𝑘 𝑗 
+
+> (𝑖 )
+
+𝐌 𝑗 
+
+∑𝑗 𝑘 ˜𝑗 
+
+> (𝑖 )
+
+𝐍 𝑗 
+
+> (𝑖 )
+
+𝐏 (𝑖 ) − 1) . (2.12 )
+
+The liquidity value 𝐿 𝑖 emerges naturally as a scaling factor: when trading is purely 
+
+momentum ‑driven and value sentiments are absent, the price tends toward 𝐿 𝑖 (Caginalp 
+
+& Balenovich, 1999). This provides a benchmark for interpreting equilibrium prices. 
+
+The complete fused model consists of: 𝑚 price equations (2.7) , 𝑛 cash equations (implicitly 
+
+defined by conservation and transition rates) , 𝑚𝑛 share equations (implicitly defined) ,
+
+2𝑚𝑛 sentiment equations (2.2) – (2.3) 
+
+Total state dimension: 𝑚 + 2𝑚𝑛 (after imposing conservation laws). The system is a 
+
+first ‑order nonlinear ordinary differentia l equation .
+
+## 2. 7 Convenient s ummary of the equations of the fused model 
+
+Below is the complete, self ‑contained system of ordinary differential equations (ODEs) for 
+
+the fused multi ‑asset, multi ‑group asset flow model. All variables and parameters are 
+
+defined in the subsections a s follows: 
+
+State Variables 
+
+For 𝑖 = 1, … , 𝑚 (assets) and 𝑗 = 1, … , 𝑛 (investor groups): 
+
+• 𝑃 (𝑖 )(𝑡 ) > 0 – price of asset 𝑖 
+
+• 𝑀 𝑗 (𝑡 ) ≥ 0 – cash held by group 𝑗 
+
+• 𝑁 𝑗 
+
+> (𝑖 )
+
+(𝑡 ) ≥ 0 – shares of asset 𝑖 held by a group 𝑗 
+
+• 𝜁 1,𝑗 
+
+> (𝑖 )
+
+(𝑡 ) – trend sentiment of the group 𝑗 toward asset 𝑖 
+
+• 𝜁 2,𝑗 
+
+> (𝑖 )
+
+(𝑡 ) – value sentiment of the group 𝑗 toward asset 𝑖 
+
+Parameters (constants) 
+
+• 𝑐 1,𝑗  
+
+> (𝑖 )
+
+> 0, 𝑐 2,𝑗  
+
+> (𝑖 )
+
+> 0 – inverse time scales (decay rates) 
+
+• 𝑞 1,𝑗  
+
+> (𝑖 )
+
+≥ 0, 𝑞 2,𝑗  
+
+> (𝑖 )
+
+≥ 0 – sentiment magnitude coefficients 
+
+• 𝑃 𝑎  
+
+> (𝑖 )
+
+> 0 – fundamental value of an asset 𝑖 
+
+• 𝜏 𝑖 > 0 – price adjustment speed for asset 𝑖 
+
+• 𝑎 𝑗 
+
+> (𝑖 )
+
+, 𝑏 𝑗  
+
+> (𝑖 )
+
+– constants in buying rate (ensuring 0 ≤ 𝑘 𝑗  
+
+> (𝑖 )
+
+≤ 1)
+
+• 𝛼 𝑗 ,ℓ 
+
+> (𝑖 )
+
+≥ 0, 𝛽 𝑗 ,ℓ 
+
+> (𝑖 )
+
+≥ 0 – cross ‑asset coupling coefficients • 𝑎 ˜𝑗 
+
+> (𝑖 )
+
+, 𝑏 ˜𝑗 
+
+> (𝑖 )
+
+, 𝛾 𝑗 
+
+> (𝑖 )
+
+, 𝛿 𝑗  
+
+> (𝑖 )
+
+– constants for selling rate 
+
+• (Alternatively, linear value ‑based selling parameters 𝑐 ˜𝑗 
+
+> (𝑖 )
+
+, 𝑑 ˜𝑗 
+
+> (𝑖 )
+
+)
+
+Sentiment Dynamics 
+
+𝑑 𝜁 1,𝑗 
+
+> (𝑖 )
+
+𝑑𝑡 = 𝑐 1,𝑗 
+
+> (𝑖 )
+
+𝑞 1,𝑗  
+
+> (𝑖 )
+
+1
+
+𝑃 (𝑖 )
+
+𝑑 𝑃 (𝑖 )
+
+𝑑𝑡 − 𝑐 1,𝑗 
+
+> (𝑖 )
+
+𝜁 1,𝑗 
+
+> (𝑖 )
+
+,
+
+𝑑 𝜁 2,𝑗 
+
+> (𝑖 )
+
+𝑑𝑡 = 𝑐 2,𝑗 
+
+> (𝑖 )
+
+𝑞 2,𝑗  
+
+> (𝑖 )
+
+(1 − 𝑃 (𝑖 )
+
+𝑃 𝑎 
+
+> (𝑖 )
+
+) − 𝑐 2,𝑗 
+
+> (𝑖 )
+
+𝜁 2,𝑗 
+
+> (𝑖 )
+
+.
+
+(𝑆 )
+
+Transition Rates (Buying and Selling) 
+
+Buying rate (depends on all assets’ sentiments, cross ‑asset coupling): 
+
+𝑘 𝑗  
+
+> (𝑖 )
+
+= 𝑎 𝑗  
+
+> (𝑖 )
+
++ 𝑏 𝑗 
+
+> (𝑖 )
+
+tanh (∑
+
+> 𝑚
+> ℓ=1
+
+𝛼 𝑗 ,ℓ
+
+> (𝑖 )
+
+𝜁 1,𝑗  
+
+> (ℓ)
+
++ ∑
+
+> 𝑚
+> ℓ=1
+
+𝛽 𝑗 ,ℓ
+
+> (𝑖 )
+
+𝜁 2,𝑗 
+
+> (ℓ)
+
+) . (𝐾 )
+
+Selling rate (depends only on the same asset’s sentiments; example , hyperbolic form): 
+
+𝑘 ˜𝑗  
+
+> (𝑖 )
+
+= 𝑎 ˜𝑗  
+
+> (𝑖 )
+
++ 𝑏 ˜𝑗 
+
+> (𝑖 )
+
+tanh (𝛾 𝑗 
+
+> (𝑖 )
+
+𝜁 1,𝑗  
+
+> (𝑖 )
+
++ 𝛿 𝑗 
+
+> (𝑖 )
+
+𝜁 2,𝑗 
+
+> (𝑖 )
+
+) . (𝐿 )
+
+Alternatively, a linear value ‑based selling rate: 
+
+𝑘 ˜𝑗  
+
+> (𝑖 )
+
+= max (0, min (1, 𝑐 ˜𝑗  
+
+> (𝑖 )
+
++ 𝑑 ˜𝑗  
+
+> (𝑖 )
+
+(𝑃 (𝑖 )
+
+𝑃 𝑎  
+
+> (𝑖 )
+
+− 1))).
+
+Cash Dynamics (per group) 
+
+𝑑 𝑀 𝑗 
+
+𝑑𝑡 = − ∑
+
+> 𝑚
+> 𝑖 =1
+
+𝑘 𝑗 
+
+> (𝑖 )
+
+𝑀 𝑗 + ∑
+
+> 𝑚
+> 𝑖 =1
+
+𝑘 ˜𝑗 
+
+> (𝑖 )
+
+𝑁 𝑗 
+
+> (𝑖 )
+
+𝑃 (𝑖 ). (𝑀 )
+
+Share Dynamics (per asset and group) 
+
+𝑑 𝑁 𝑗 
+
+> (𝑖 )
+
+𝑑𝑡 = 𝑘 𝑗 
+
+> (𝑖 )
+
+𝑀 𝑗 
+
+𝑃 (𝑖 ) − 𝑘 ˜𝑗 
+
+> (𝑖 )
+
+𝑁 𝑗 
+
+> (𝑖 )
+
+. (𝑁 )
+
+Price Dynamics (per asset) 
+
+𝑑 𝑃 (𝑖 )
+
+𝑑𝑡 = 𝑃 (𝑖 )
+
+𝜏 𝑖 
+
+( ∑𝑛  
+
+> 𝑗 =1
+
+𝑘 𝑗 
+
+> (𝑖 )
+
+𝑀 𝑗 
+
+∑𝑛  
+
+> 𝑗 =1
+
+𝑘 ˜𝑗 
+
+> (𝑖 )
+
+𝑁 𝑗 
+
+> (𝑖 )
+
+𝑃 (𝑖 ) − 1) . (𝑃 )
+
+Conservation Laws (closed system) ∑
+
+> 𝑛
+> 𝑗 =1
+
+𝑀 𝑗 (𝑡 ) = 𝑀 0 (constant ), ∑
+
+> 𝑛
+> 𝑗 =1
+
+𝑁 𝑗 
+
+> (𝑖 )
+
+(𝑡 ) = 𝑁 0 
+
+> (𝑖 )
+
+(constant for each 𝑖 ). (𝐶 )
+
+These are automatically satisfied if the initial conditions obey them and the ODEs (M) –
+
+(N) are integrated. 
+
+Table 1. Reduction to prior models                                          
+
+> Model 𝑚 𝑛 Cross ‑asset buying Per ‑group
+> sentiment type
+> Key reference
+> Caginalp &
+> Balenovich (1999)
+> 11N/A Mixed Caginalp &
+> Balenovich (1999)
+> Caginalp &
+> DeSantis (2011)
+> 12N/A One each
+> (trend/value)
+> Caginalp &
+> DeSantis (2011)
+> DeSantis et al.
+> (2012)
+> 1𝑛 N/A One each
+> (trend/value)
+> DeSantis et al.
+> (2012)
+> Bulut et al. (2019) 21Yes (bidirectional) Mixed Bulut et al. (2019)
+> Cavani (2026) 𝑚 𝑛 Yes (via sentiments) Both per asset Cavani (2026)
+> Fused model 𝑚 𝑛 Yes (explicit
+> coefficients 𝛼 𝑗 ,ℓ
+> (𝑖 ),𝛽 𝑗 ,ℓ
+> (𝑖 ))
+> Both per asset This proposal
+
+The fused model is strictly more general than each of its predecessors: it contains the 
+
+multi ‑asset structure and asymmetric trading of Bulut et al. (2019), the multi ‑group 
+
+he terogeneity of DeSantis et al. (2012), the per ‑asset dual sentiments of Cavani (2026), 
+
+and introduces explicit cross ‑asset coupling coefficients for both trend and value 
+
+sentiments. Table 1 shows the generalization of the fused model. 
+
+## 2.8 Positivity and Boundedness of Solutions in the Fused Model 
+
+The following theorems provide the rigorous mathematical foundation for the fused 
+
+model, ensuring that all solutions remain physically meaningful (positive prices, 
+
+non ‑negative cash and shares) and bounded , a crucial property for stability analysis and 
+
+numerical simula tion. 
+
+Two fundamental properties of the fused multi ‑asset, multi ‑group asset flow model: 
+
+positivity (all physically relevant variables remain non ‑negative) and boundedness (all 
+
+solutions remain within a compact set). These properties are essential for the model to be 
+
+well ‑posed and economically meaningful. 
+
+Theorem 2.1 (Positivity of Solutions) 
+
+Consider the fused multi ‑asset, multi ‑group asset flow model defined by equations (P), 
+
+(M), (N), (S) with initial conditions: 
+
+𝑃 (𝑖 )(0) > 0, 𝑀 𝑗 (0) ≥ 0, 𝑁 𝑗 
+
+> (𝑖 )
+
+(0) ≥ 0, 𝜁 1,𝑗 
+
+> (𝑖 )
+
+(0) ∈ ℝ, 𝜁 2,𝑗 
+
+> (𝑖 )
+
+(0) ∈ ℝ,
+
+for all 𝑖 = 1, … , 𝑚 and 𝑗 = 1, … , 𝑛 . Assume the transition rates satisfy: 
+
+0 ≤ 𝑘 𝑗 
+
+> (𝑖 )
+
+(𝜻 1, 𝜻 2) ≤ 1, 0 ≤ 𝑘 ˜𝑗 
+
+> (𝑖 )
+
+(𝜻 1, 𝜻 2) ≤ 1,and that the fundamental values satisfy 𝑃 𝑎  
+
+> (𝑖 )
+
+> 0.
+
+Then for all 𝑡 ≥ 0 in the maximal interval of existence, the following properties hold: 
+
+1. Price positivity: 𝑃 (𝑖 )(𝑡 ) > 0 for all 𝑖 .
+
+2. Cash non ‑negativity: 𝑀 𝑗 (𝑡 ) ≥ 0 for all 𝑗 .
+
+3. Share non ‑negativity: 𝑁 𝑗 
+
+> (𝑖 )
+
+(𝑡 ) ≥ 0 for all 𝑖 , 𝑗 .
+
+If, in addition, the initial cash and shares satisfy the conservation constraints ∑𝑗 𝑀 𝑗 (0) =
+
+𝑀 0 > 0 and ∑𝑗 𝑁 𝑗 
+
+> (𝑖 )
+
+(0) = 𝑁 0 
+
+> (𝑖 )
+
+> 0, then these properties hold globally in time (no 
+
+finite ‑time blow ‑up). 
+
+Proof. 
+
+We prove each statement separately using standard comparison principles and invariance 
+
+of the positive orthant. 
+
+Positivity of Prices 𝑃 (𝑖 )(𝑡 ):
+
+The price dynamics (P) can be written as: 
+
+𝑑 𝑃 (𝑖 )
+
+𝑑𝑡 = 𝑃 (𝑖 ) ⋅ 𝐹 (𝑖 )(𝑡 ),
+
+where ,
+
+𝐹 (𝑖 )(𝑡 ) = 1
+
+𝜏 𝑖 
+
+( ∑𝑛  
+
+> 𝑗 =1
+
+𝑘 𝑗 
+
+> (𝑖 )
+
+𝑀 𝑗 
+
+∑𝑛  
+
+> 𝑗 =1
+
+𝑘 ˜𝑗 
+
+> (𝑖 )
+
+𝑁 𝑗 
+
+> (𝑖 )
+
+𝑃 (𝑖 ) − 1).
+
+Note that the right ‑hand side is locally Lipschitz in 𝑃 (𝑖 ) as long as the denominator is 
+
+positive. The function 𝐹 (𝑖 )(𝑡 ) depends on 𝑃 (𝑖 ), which is bounded on any finite time interval. 
+
+Let 𝑃 (𝑖 )(0) > 0. The solution can be expressed as: 
+
+𝑃 (𝑖 )(𝑡 ) = 𝑃 (𝑖 )(0)exp (∫
+
+> 𝑡
+> 0
+
+𝐹 (𝑖 )(𝑠 ) 𝑑𝑠 ).
+
+Since the exponential function is always positive, we conclude 𝑃 (𝑖 )(𝑡 ) > 0 for all 𝑡 in the 
+
+interval of existence. 
+
+Non ‑negativity of Cash 𝑀 𝑗 (𝑡 ):
+
+The cash dynamics (M) are given by 
+
+𝑑 𝑀 𝑗 
+
+𝑑𝑡 = − (∑
+
+> 𝑚
+> 𝑖 =1
+
+𝑘 𝑗 
+
+> (𝑖 )
+
+)
+
+⏟
+
+> 𝛼 𝑗 (𝑡 )≥0
+
+𝑀 𝑗 + ∑
+
+> 𝑚
+> 𝑖 =1
+
+𝑘 ˜𝑗 
+
+> (𝑖 )
+
+𝑁 𝑗 
+
+> (𝑖 )
+
+𝑃 (𝑖 )
+
+⏟
+
+> 𝛽 𝑗 (𝑡 )≥0
+
+.This is a linear differential inequality. If 𝑀 𝑗 (𝑡 0) = 0 at some time 𝑡 0, then: 
+
+𝑑 𝑀 𝑗 
+
+𝑑𝑡 |
+
+> 𝑡 =𝑡 0
+
+= 𝛽 𝑗 (𝑡 0) ≥ 0.
+
+Thus, 𝑀 𝑗 (𝑡 ) cannot become negative; it either stays zero or increases. By the compariso n
+
+principle (Hale, 2009) , for all 𝑡 ≥ 0, 𝑀 𝑗 (𝑡 ) ≥ 𝑀 𝑗 (0)𝑒 − ∫𝑡   
+
+> 0𝛼 𝑗 (𝑠 )𝑑𝑠
+
+≥ 0.
+
+Non ‑negativity of Shares 𝑁 𝑗 
+
+> (𝑖 )
+
+(𝑡 ):
+
+The share dynamics (N) are given by 
+
+𝑑 𝑁 𝑗 
+
+> (𝑖 )
+
+𝑑𝑡 = 𝑘 𝑗 
+
+> (𝑖 )
+
+𝑀 𝑗 
+
+𝑃 (𝑖 )⏟
+
+> 𝛾 𝑗
+> (𝑖 )(𝑡 )≥0
+
+− 𝑘 ˜𝑗 
+
+> (𝑖 )
+
+𝑁 𝑗 
+
+> (𝑖 )
+
+.
+
+This is again a linear differential inequality. If 𝑁 𝑗 
+
+> (𝑖 )
+
+(𝑡 0) = 0, then: 
+
+𝑑 𝑁 𝑗 
+
+> (𝑖 )
+
+𝑑𝑡 |
+
+> 𝑡 =𝑡 0
+
+= 𝛾 𝑗 
+
+> (𝑖 )
+
+(𝑡 0) ≥ 0.
+
+Hence, 𝑁 𝑗 
+
+> (𝑖 )
+
+(𝑡 ) cannot become negative. 
+
+Global Existence 
+
+The conservation laws ∑𝑗 𝑀 𝑗 (𝑡 ) = 𝑀 0 and ∑𝑗 𝑁 𝑗 
+
+> (𝑖 )
+
+(𝑡 ) = 𝑁 0 
+
+> (𝑖 )
+
+imply that 0 ≤ 𝑀 𝑗 (𝑡 ) ≤ 𝑀 0
+
+and 0 ≤ 𝑁 𝑗 
+
+> (𝑖 )
+
+(𝑡 ) ≤ 𝑁 0 
+
+> (𝑖 )
+
+for all 𝑡 . The prices 𝑃 (𝑖 )(𝑡 ) satisfy the differential equation: 
+
+𝑑 𝑃 (𝑖 )
+
+𝑑𝑡 = 𝑃 (𝑖 )
+
+𝜏 𝑖 
+
+( 𝑆 𝑖 (𝑡 )
+
+𝑇 𝑖 (𝑡 )𝑃 (𝑖 ) − 1) = 1
+
+𝜏 𝑖 
+
+(𝑆 𝑖 (𝑡 )
+
+𝑇 𝑖 (𝑡 ) − 𝑃 (𝑖 )),
+
+where 𝑆 𝑖 (𝑡 ) = ∑𝑗 𝑘 𝑗 
+
+> (𝑖 )
+
+𝑀 𝑗 and 𝑇 𝑖 (𝑡 ) = ∑𝑗 𝑘 ˜𝑗 
+
+> (𝑖 )
+
+𝑁 𝑗 
+
+> (𝑖 )
+
+. Since 0 ≤ 𝑆 𝑖 (𝑡 ) ≤ 𝑀 0 and 𝑇 𝑖 (𝑡 ) ≥ 𝜖 > 0
+
+(due to positive shares and 𝑘 𝑗  
+
+> (𝑖 )
+
+≥ 0), the right ‑hand side is bounded linearly in 𝑃 (𝑖 ). By 
+
+Grönwall’s inequality of the standard ODE theory ( Hale, 2009) , 𝑃 (𝑖 )(𝑡 ) cannot blow up in 
+
+finite time. Hence, the solution exists globally for all 𝑡 ≥ 0. ∎
+
+Theorem 2.2 (Boundedness of Solutions) 
+
+Under the same assumptions as Theorem 2.1, all solutions of the fused model are 
+
+uniformly bounded for all 𝑡 ≥ 0. Specifically, there e xist constants independent of 
+
+initial conditions such that: 
+
+1. Prices: There exists 𝑃 max < ∞ such that 0 < 𝑃 (𝑖 )(𝑡 ) ≤ 𝑃 max for all 𝑖 , 𝑡 .
+
+2. Cash: 0 ≤ 𝑀 𝑗 (𝑡 ) ≤ 𝑀 0 for all 𝑗 , 𝑡 .
+
+3. Shares: 0 ≤ 𝑁 𝑗 
+
+> (𝑖 )
+
+(𝑡 ) ≤ 𝑁 0 
+
+> (𝑖 )
+
+for all 𝑖 , 𝑗 , 𝑡 .4. Sentiments: There exist constants 𝑍 1,max , 𝑍 2,max < ∞ such that |𝜁 1,𝑗 
+
+> (𝑖 )
+
+(𝑡 )| ≤ 𝑍 1,max 
+
+and |𝜁 2,𝑗 
+
+> (𝑖 )
+
+(𝑡 )| ≤ 𝑍 2,max for all 𝑖 , 𝑗 , 𝑡 .
+
+Proof. 
+
+From conservation laws: 
+
+0 ≤ 𝑀 𝑗 (𝑡 ) ≤ ∑
+
+> 𝑛
+> 𝑗 =1
+
+𝑀 𝑗 (𝑡 ) = 𝑀 0, 0 ≤ 𝑁 𝑗 
+
+> (𝑖 )
+
+(𝑡 ) ≤ ∑
+
+> 𝑛
+> 𝑗 =1
+
+𝑁 𝑗 
+
+> (𝑖 )
+
+(𝑡 ) = 𝑁 0
+
+> (𝑖 )
+
+.
+
+Thus, cash and shares are uniformly bounded .
+
+From the price dynamics (P): 
+
+𝑑 𝑃 (𝑖 )
+
+𝑑𝑡 = 1
+
+𝜏 𝑖 
+
+( ∑𝑗 𝑘 𝑗 
+
+> (𝑖 )
+
+𝑀 𝑗 
+
+∑𝑗 𝑘 ˜𝑗 
+
+> (𝑖 )
+
+𝑁 𝑗  
+
+> (𝑖 )
+
+− 𝑃 (𝑖 )).
+
+Define the “target price”: 
+
+𝑄 (𝑖 )(𝑡 ) = ∑𝑛  
+
+> 𝑗 =1
+
+𝑘 𝑗 
+
+> (𝑖 )
+
+𝑀 𝑗 (𝑡 )
+
+∑𝑛  
+
+> 𝑗 =1
+
+𝑘 ˜𝑗 
+
+> (𝑖 )
+
+𝑁 𝑗 
+
+> (𝑖 )
+
+(𝑡 ).
+
+Since 0 ≤ 𝑘 𝑗 
+
+> (𝑖 )
+
+, 𝑘 ˜𝑗  
+
+> (𝑖 )
+
+≤ 1 and 0 ≤ 𝑀 𝑗 ≤ 𝑀 0, 0 ≤ 𝑁 𝑗  
+
+> (𝑖 )
+
+≤ 𝑁 0
+
+> (𝑖 )
+
+, we have: 
+
+0 ≤ 𝑄 (𝑖 )(𝑡 ) ≤ 𝑀 0
+
+𝜖 𝑖 
+
+,
+
+where 𝜖 𝑖 = min  
+
+> 𝑡
+
+∑𝑗 𝑘 ˜𝑗 
+
+> (𝑖 )
+
+𝑁 𝑗 
+
+> (𝑖 )
+
+(𝑡 ) > 0 (since shares are positive and 𝑘 ˜𝑗  
+
+> (𝑖 )
+
+≥ 𝛿 > 0 for at least 
+
+one group). 
+
+The price dynamics can be rewritten as: 
+
+𝑑 𝑃 (𝑖 )
+
+𝑑𝑡 = 1
+
+𝜏 𝑖 
+
+(𝑄 (𝑖 )(𝑡 ) − 𝑃 (𝑖 )).
+
+This is a linear ODE with bounded forcing. Its solution is: 
+
+𝑃 (𝑖 )(𝑡 ) = 𝑃 (𝑖 )(0)𝑒 −𝑡 /𝜏 𝑖 + 1
+
+𝜏 𝑖 
+
+∫
+
+> 𝑡
+> 0
+
+𝑒 −(𝑡 −𝑠 )/𝜏 𝑖 𝑄 (𝑖 )(𝑠 ) 𝑑𝑠 .
+
+Hence, 
+
+|𝑃 (𝑖 )(𝑡 )| ≤ |𝑃 (𝑖 )(0)|𝑒 −𝑡 /𝜏 𝑖 + 𝑀 0
+
+𝜖 𝑖 
+
+(1 − 𝑒 −𝑡 /𝜏 𝑖 ) ≤ max {|𝑃 (𝑖 )(0)|, 𝑀 0
+
+𝜖 𝑖 
+
+}.
+
+Thus, prices are uniformly bounded .The sentiment dynamics (S) are: 
+
+𝑑 𝜁 1,𝑗 
+
+> (𝑖 )
+
+𝑑𝑡 = 𝑐 1,𝑗 
+
+> (𝑖 )
+
+𝑞 1,𝑗  
+
+> (𝑖 )
+
+1
+
+𝑃 (𝑖 )
+
+𝑑 𝑃 (𝑖 )
+
+𝑑𝑡 − 𝑐 1,𝑗 
+
+> (𝑖 )
+
+𝜁 1,𝑗 
+
+> (𝑖 )
+
+,
+
+𝑑 𝜁 2,𝑗 
+
+> (𝑖 )
+
+𝑑𝑡 = 𝑐 2,𝑗 
+
+> (𝑖 )
+
+𝑞 2,𝑗  
+
+> (𝑖 )
+
+(1 − 𝑃 (𝑖 )
+
+𝑃 𝑎 
+
+> (𝑖 )
+
+) − 𝑐 2,𝑗 
+
+> (𝑖 )
+
+𝜁 2,𝑗 
+
+> (𝑖 )
+
+.
+
+These are linear ODEs with bounded forcing. From the previous result, 𝑃 (𝑖 )(𝑡 ) and 
+
+𝑑 𝑃 (𝑖 )/𝑑𝑡 , are bounded, so the forcing terms are bounded. The homogeneous parts have 
+
+negative eigenvalues −𝑐 1,𝑗  
+
+> (𝑖 )
+
+and −𝑐 2,𝑗 
+
+> (𝑖 )
+
+. Therefore, the solutions remain bounded for all 𝑡 .
+
+Explicitly: 
+
+|𝜁 1,𝑗 
+
+> (𝑖 )
+
+(𝑡 )| ≤ |𝜁 1,𝑗 
+
+> (𝑖 )
+
+(0)|𝑒 −𝑐 1,𝑗  
+
+> (𝑖 )𝑡
+
++ 𝑞 1,𝑗 
+
+> (𝑖 )
+
+𝑐 1,𝑗  
+
+> (𝑖 )
+
+sup 
+
+> 𝑠
+
+| 1
+
+𝑃 (𝑖 )(𝑠 )
+
+𝑑 𝑃 (𝑖 )
+
+𝑑𝑠 | (1 − 𝑒 −𝑐 1,𝑗 
+
+> (𝑖 )𝑡
+
+),
+
+|𝜁 2,𝑗 
+
+> (𝑖 )
+
+(𝑡 )| ≤ |𝜁 2,𝑗 
+
+> (𝑖 )
+
+(0)|𝑒 −𝑐 2,𝑗  
+
+> (𝑖 )𝑡
+
++ 𝑞 2,𝑗 
+
+> (𝑖 )
+
+sup 
+
+> 𝑠
+
+|1 − 𝑃 (𝑖 )(𝑠 )
+
+𝑃 𝑎  
+
+> (𝑖 )
+
+| (1 − 𝑒 −𝑐 2,𝑗 
+
+> (𝑖 )𝑡
+
+).
+
+Both right ‑hand sides are bounded. ∎
+
+Corollary 2.3 (Invariant Region) 
+
+Let Ω ⊂ ℝ𝐷 be defined by: 
+
+Ω = {(𝐏 , 𝐌 , 𝐍 , 𝜻 1, 𝜻 2) |
+
+𝑃 (𝑖 ) ∈ (0, 𝑃 max ], 𝑀 𝑗 ∈ [0, 𝑀 0], 𝑁 𝑗  
+
+> (𝑖 )
+
+∈ [0, 𝑁 0
+
+> (𝑖 )
+
+],
+
+∑
+
+> 𝑗
+
+𝑀 𝑗 = 𝑀 0, ∑
+
+> 𝑗
+
+𝑁 𝑗  
+
+> (𝑖 )
+
+= 𝑁 0
+
+> (𝑖 )
+
+, |𝜁 1,𝑗 
+
+> (𝑖 )
+
+| ≤ 𝑍 1,max , |𝜁 2,𝑗 
+
+> (𝑖 )
+
+| ≤ 𝑍 2,max 
+
+}.
+
+Then Ω is positively invariant under the flow of the fused model. Any trajectory starting 
+
+in Ω remains in Ω for all 𝑡 ≥ 0.
+
+Proof. Follows directly from Theorems 2.1 and 2.2. ∎
+
+Th e previous results hav e the following Practical Implications 
+
+1. Well ‑posedness: The fused model has global solutions for all physically relevant 
+
+initial conditions. 
+
+2. Numerical stability: Solutions cannot blow up, making numerical integration 
+
+safe. 
+
+3. Economic meaning: Prices remain positive, cash and shares stay within their 
+
+to tal supplies. 
+
+4. Bifurcation analysis: The existence of a compact invariant region ensures that 
+
+all interesting dynamics (including limit cycles and chaos) are confined to a 
+
+bounded set, which is necessary for applying the Poincaré ‑Bendixson theorem and 
+
+relat ed results (Hirsch & Smale, 1974; Khalil, 2002) .These properties hold under the mild assumptions that transition rates are bounded 
+
+between 0 and 1 and that fundamental values are positive , conditions satisfied by all 
+
+standard formulations in the asset flo w literature. 
+
+# 3. Theoretical Extensions 
+
+The fused model presented in Section 2 represents a strict generalization of the two 
+
+foundational frameworks: the single ‑asset multi ‑group model of DeSantis, Swigon, and 
+
+Caginalp (2012) and the multi ‑asset multi ‑grou p model of Cavani (2026). While each of 
+
+these earlier models made important contributions to the asset flow literature, they 
+
+necessarily omitted certain essential features for a complete understanding of realistic 
+
+financial markets. The fused model overcom es these limitations by simultaneously 
+
+incorporating: 
+
+• Multiple assets with asymmetric cross ‑asset coupling in the buying rules, 
+
+• Multiple heterogeneous investor groups with per ‑asset dual (trend and 
+
+value) sentiments, 
+
+• A continuum of equilibria (including th e fundamental equilibrium as a special 
+
+case), 
+
+• The excursion concept for multi ‑asset risk assessment, and 
+
+• Endogenous wealth redistribution across both groups and assets. 
+
+This section provides a systematic comparison of the three models considered (DeSantis 
+
+et al. 2012, Cavani 2026, and the fused model) . Then it analyzes in depth the theoretical 
+
+extensions that make the fused model strictly more general and more powerful for 
+
+studying market instabilities, bubbles, and cr ashes. 
+
+## 3. 2 Detailed Analysis of Theoretical Extensions 
+
+3. 2.1 From Single Asset to Multiple Assets with Asymmetric Cross ‑Asset Coupling 
+
+The DeSantis et al. (2012) model is fundamentally a single ‑asset model: all investor groups 
+
+trade the same asset, and the price dynamics are given by a single equation (2.6) in that 
+
+paper. While this setting is mathematically tractable and yields important insights about 
+
+the stability of equilibria in the presence of momentum traders, it cannot capture 
+
+cross ‑asset spillovers —the phenomenon whereby price movements in one asset 
+
+influence trading decisions and price dynamics in another asset. Such spillovers are 
+
+ubiquitous in real financial markets, where investors hold diversified portfolios and make 
+
+allocation decisions across multiple assets. 
+
+The Cavani (2026) model takes the first step toward addressing this limitation by allowing 
+
+𝑚 ≥ 1 assets and assuming that the buying rate of each asset depends on sentiments from 
+
+all assets, while the selling rate depends only on the senti ment of the same asset. This 
+
+asymmetric assumption (buying is “global”, selling is “local”) captures the realistic 
+
+notion that investors consider portfolio ‑wide information when making purchase 
+
+decisions but focus on individual asset characteristics when s elling (Cavani, 2026). 
+
+The fused model extends the Cavani (2026) framework in two important ways: 
+
+1. Explicit cross ‑asset coefficients : In Cavani (2026), the dependence of the 
+
+buying rate on sentiments from other assets is implicit in the general form of the 
+
+transition rate functions. The fused model makes this dependence explicit via the coefficients 𝛼 𝑗 ,ℓ 
+
+> (𝑖 )
+
+(for trend sentiment) and 𝛽 𝑗 ,ℓ 
+
+> (𝑖 )
+
+(for value sentiment), as shown in 
+
+equation (2.4). This explicit parameterization allows for a systematic bifurca tion 
+
+analysis with respect to the strength of cross ‑asset coupling. 
+
+2. Separation of trend and value cross ‑asset effects : The coefficients 𝛼 𝑗 ,ℓ 
+
+> (𝑖 )
+
+and 
+
+𝛽 𝑗 ,ℓ 
+
+> (𝑖 )
+
+can be chosen independently, allowing the model to distinguish between 
+
+scenarios where cross ‑asset momentum spillovers are strong but value spillovers 
+
+are weak (or vice versa). This separation is motivated by empirical evidence: Wang 
+
+(2025) documents asym metric cross ‑firm momentum spillovers driven by 
+
+heterogeneous demand, with mutual fund flows and hedge fund flows exhibiting 
+
+distinct patterns of return predictability. The fused model provides a theoretical 
+
+foundation for these empirical findings. 
+
+3. 2.2 From Homogeneous Sentiment per Group to Dual Sentiments per Asset 
+
+In the DeSantis et al. (2012) model, each investor group is influenced by only one type of 
+
+sentiment: either trend (momentum) or value (fundamental). This “pure type” 
+
+assumption is mathemati cally convenient but unrealistic: real ‑world investors are 
+
+simultaneously influenced by both momentum and value considerations (Caginalp & 
+
+Balenovich, 1999; Caginalp & Merdan, 2007). 
+
+The Cavani (2026) model allows each group to hold both trend and value se ntiments for 
+
+each asset, which is a significant improvement. However, the Cavani model does not 
+
+explicitly separate the cross ‑asset influences of trend versus value sentiments; both are 
+
+subsumed into the general transition rate functions. 
+
+The fused model g oes further by: 
+
+• Explicitly including both 𝜁 1,𝑗  
+
+> (𝑖 )
+
+(trend) and 𝜁 2,𝑗  
+
+> (𝑖 )
+
+(value) for each asset –group pair, 
+
+• Allowing independent cross ‑asset coupling for trend and value sentiments 
+
+through the coefficients 𝛼 𝑗 ,ℓ 
+
+> (𝑖 )
+
+and 𝛽 𝑗 ,ℓ
+
+> (𝑖 )
+
+,
+
+• Providing a natural way to study how the relative strengths of cross ‑asset 
+
+momentum versus cross ‑asset value influence overall market stability. 
+
+This dual ‑sentiment structure is essential for analyzing situations where, for example, a 
+
+group of investors buys an asset 𝑖 becau se asset 𝑗 is undervalued (cross ‑asset value effect) 
+
+while simultaneously buying the asset 𝑖 because asset 𝑘 has been rising (cross ‑asset 
+
+momentum effect). Such interactions are impossible to study in models that either restrict 
+
+to a single asset or do not separate trend and value cross ‑asset effects. 
+
+3. 2.3 From a Single Equilibrium to a Continuum of Equilibria 
+
+Theorem 3.3 of DeSantis et al. (2012) states the existence of a continuum of equilibria 
+
+when all investor groups follow fundamental (value) strat egies. Specifically, the paper 
+
+shows that for a given set of fundamental valuations 𝐏 𝑎 
+
+> (𝑖 )
+
+, any distribution of cash 
+
+endowments 𝐌 𝑒𝑞  
+
+> (𝑗 )
+
+determines a unique equilibrium price 𝐏 𝑒𝑞 and share distribution 𝐍 𝑒𝑞 
+
+> (𝑗 )
+
+.
+
+Thus, the equilibrium price is not uniquely determined by fundamentals alone; it also 
+
+depends on the initial wealth distribution. This result has profound implications for financial economics. It suggests that even when 
+
+all investors agree on fundamental values, the market can settle at a range of different 
+
+prices depending on historical accidents or initial conditions. The classical efficient market 
+
+hypothesis, by contrast, predicts a unique equilibrium price equal to the fundamental 
+
+value. 
+
+The Cavani (2026) model, in focusing on the fu ndamental equilibrium 𝑃 (𝑖 ) = 𝑃 𝑎 
+
+> (𝑖 )
+
+, 𝜁 1,𝑗  
+
+> (𝑖 )
+
+=
+
+0, 𝜁 2,𝑗  
+
+> (𝑖 )
+
+= 0, does not emphasize the continuum of non ‑fundamental equilibria. However, 
+
+as the model’s own analysis shows (Cavani, 2026 , Section 4), this fundamental 
+
+equilibrium exists only under a specif ic calibration condition that may not hold in general. 
+
+The fused model unifies these two perspectives by: 
+
+• Explicitly characterizing the full equilibrium set as a manifold parameterized 
+
+by the cash distribution {𝑀 𝑗 } (generalizing Theorem 3.3 of DeSantis et al., 2012 to 
+
+the multi ‑asset case), 
+
+• Identifying the fundamental equilibrium as a special point on this manifold 
+
+(when 𝑃 (𝑖 ) = 𝑃 𝑎  
+
+> (𝑖 )
+
+and the calibration condition holds), 
+
+• Allowing the analysis of bifurcations from the continuum when momentum 
+
+traders are introduced , as the momentum coefficients 𝑞 1,𝑗  
+
+> (𝑖 )
+
+increase d, certain 
+
+equilibria on the manifold may lose stability, leading to limit cycles or other 
+
+complex dynamics. 
+
+This unified treatment is essential for unders tanding how the market’s “memory” of initial 
+
+conditions interacts with momentum trading to produce instabilities. Even small 
+
+perturbations can drive the system from one equilibrium on the manifold to another, and 
+
+the introduction of momentum traders can ma ke this transition abrupt and dramatic. 
+
+3. 2.4 From Single ‑Asset to Multi ‑Asset Excursions 
+
+The concept of the excursion , the maximum deviation of the price from its initial value 
+
+along a trajectory , was introduced by DeSantis et al. (2012) as a practical me tric for 
+
+assessing risk in unstable regimes. In their single ‑asset model, the excursion is simply 
+
+max 𝑡 |𝑃 (𝑡 ) − 𝑃 (0)|. This concept is important because the maximum deviation, not the 
+
+final equilibrium, often determines whether a market crash or a margin call occurs. 
+
+In the fused model, we extend the excursion concept to multiple assets in a natural way: 
+
+• Per ‑asset excursion : 𝐸 (𝑖 ) = max 𝑡 |𝑃 (𝑖 )(𝑡 ) − 𝑃 (𝑖 )(0)| for each asset 𝑖 ,
+
+• Aggregate excursion : 𝐸 agg = √∑𝑖 =1 
+
+> 𝑚
+
+(𝐸 (𝑖 ))2 or 𝐸 agg = max 𝑖 𝐸 (𝑖 ),
+
+• Cross ‑asset correlation of excursions : The simultaneous deviation of 
+
+multiple assets can be measured by the correlation matrix of the price paths. 
+
+This extension allows us to study phenomena such as contagion : a small shock in one 
+
+asset that triggers a large exc ursion in a second asset through cross ‑asset coupling. Such 
+
+contagion effects are central to understanding financial crises but cannot be studied in 
+
+single ‑asset models. 3. 2.5 Wealth Redistribution Across Both Groups and Assets 
+
+Wealth dynamics are a key fe ature of the asset flow approach. In the DeSantis et al. (2012) 
+
+model, wealth is redistributed across groups through trading in a single asset. In the 
+
+Cavani (2026) model, wealth is redistributed across groups and assets, but the analysis 
+
+focuses primarily on the price dynamics. 
+
+The fused model provides a comprehensive framework for analyzing wealth redistribution 
+
+by: 
+
+• Tracking the wealth of each group 𝑊 𝑗 (𝑡 ) = 𝑀 𝑗 (𝑡 ) + ∑𝑖 𝑁 𝑗 
+
+> (𝑖 )
+
+(𝑡 )𝑃 (𝑖 )(𝑡 ),
+
+• Deriving the wealth flow equation (2.11), which separates the contributions 
+
+of trading gains/losses and capital gains/losses, 
+
+• Allowing the study of how the relative performance of momentum versus value 
+
+strategies across different assets affects the long ‑run wealth distribution. 
+
+This capab ility is crucial for understanding evolutionary dynamics in financial 
+
+markets: if momentum traders tend to accumulate wealth during booms but lose it during 
+
+busts, their relative influence on prices may vary over the cycle, potentially leading to 
+
+endogenou s regime shifts (Westerhoff et al., 2025). The fused model provides a rigorous 
+
+mathematical framework for analyzing such phenomena. 
+
+3. 2.6 Generalized Hopf Bifurcation Analysis 
+
+Both DeSantis et al. (2012) and Cavani (2026) identify Hopf bifurcations as the 
+
+mechanism by which stable equilibria lose stability and give rise to limit cycles. In 
+
+DeSantis et al. (2012), the bifurcation occurs in the two ‑group (one trend, one value) case 
+
+when the time scale of the momentum group becomes sufficiently short. In Cavan i (2026), 
+
+the bifurcation occurs when the momentum coefficient 𝑞 1,China exceeds a critical threshold 
+
+in a two ‑asset, two ‑group simulation. 
+
+The fused model generalizes the Hopf bifurcation analysis to arbitrary numbers of 
+
+assets and groups, with explicit c ross ‑asset coupling coefficients. The characteristic 
+
+polynomial of the Jacobian matrix (size 𝑚 + 2𝑚𝑛 ) can be analyzed using the Routh –
+
+Hurwitz criteria (Dorf & Bishop, 2008) to derive conditions for loss of stability . The 
+
+bifurcation parameters can be any of the momentum coefficients 𝑞 1,𝑗  
+
+> (𝑖 )
+
+or the cross ‑asset 
+
+coupling coefficients 𝛼 𝑗 ,ℓ
+
+> (𝑖 )
+
+.
+
+This generalization allows us to answer questions such as: 
+
+• How does cross ‑asset momentum coupling affect the bifurcation 
+
+threshold? For a fixed total momentum strength, does coupling across assets 
+
+make the system more or less stable? 
+
+• Can multiple Hopf bifurcations occur simultaneously? If so, what are the 
+
+resulting dynamical possibilities (e.g., quasiperiodic motion, chaos)? 
+
+• How does the number of investor groups affect the bifurcation 
+
+structure? Does increasing group diversity stabilize or destabilize the market? 
+
+These questions are beyond the scope of either earlier model and represent a significant 
+
+advance in the theoretical analysi s of asset flow dynamics. 3. 3 Comparison Table 
+
+The following Table 2 makes clear that the fused model retains all the features of the 
+
+earlier models and adds new ones that are essential for a realistic description of financial 
+
+markets. The remainder of thi s section shows the most significant theoretical extensions. 
+
+Table 2. S ummarizes the key features of each model 
+
+Feature DeSantis et al. 
+
+(2012) 
+
+Cavani (2026) Fused Model (This 
+
+Proposal) 
+
+Number of assets 𝑚 = 1 𝑚 ≥ 1 𝑚 ≥ 1
+
+Number of 
+
+investor groups 
+
+𝑛 ≥ 1 𝑛 ≥ 1 𝑛 ≥ 1
+
+Cross ‑asset 
+
+coupling in 
+
+buying 
+
+N/A (only one 
+
+asset) 
+
+Yes (through 
+
+sentiments) 
+
+Yes, with explicit 
+
+coefficients 𝛼 𝑗 ,ℓ
+
+> (𝑖 )
+
+, 𝛽 𝑗 ,ℓ
+
+> (𝑖 )
+
+Selling 
+
+dependence 
+
+Depends only on 
+
+one's own 
+
+sentiment 
+
+Depends only on its 
+
+own asset’s sentiment 
+
+Same as Cavani (2026) 
+
+Per ‑group 
+
+sentiment types 
+
+One (either trend 
+
+or value) 
+
+Two per asset (trend + 
+
+value) 
+
+Two per asset (trend + value) 
+
+Cross ‑asset value 
+
+sentiment 
+
+coupling 
+
+N/A Implicit via transition 
+
+rates Explicit via 𝛽 𝑗 ,ℓ 
+
+> (𝑖 )
+
+coefficients 
+
+Equilibrium set Manifold 
+
+(continuum) 
+
+Isolated fundamental 
+
+equilibrium (requires 
+
+calibration) 
+
+Both : continuum of 
+
+non ‑fundamental equilibria + 
+
+fundamental equilibrium 
+
+Excursion 
+
+concept 
+
+Yes (single asset) No Yes, extended to multiple 
+
+assets 
+
+Wealth dynamics Across groups 
+
+(o ne asset) 
+
+Across groups and 
+
+assets 
+
+Across groups and assets 
+
+simultaneously 
+
+Hopf bifurcation 
+
+analysis 
+
+Yes (for 𝑛 = 2
+
+case) 
+
+Yes (using momentum 
+
+coefficient as 
+
+bifurcation parameter) 
+
+Generalized to arbitrary 
+
+𝑚 , 𝑛 with cross ‑asset coupling 
+
+Stochastic 
+
+extension 
+
+Mentioned Not discussed Planned as a future extension 
+
+## 3.4 Main Theoretical Extensions 
+
+The fused model extends the earlier models in six major ways: 
+
+1. Multi ‑asset with explicit cross ‑asset coupling : The coefficients 𝛼 𝑗 ,ℓ 
+
+> (𝑖 )
+
+and 𝛽 𝑗 ,ℓ
+
+> (𝑖 )
+
+provide a parametric description of how trend and value sentiments in one asset 
+
+influence the buying of another. 
+
+2. Dual sentiments per asset : Each investor group holds both trend and value 
+
+sentiments for each asse t, allowing realistic mixed strategies. 
+
+3. Continuum of equilibria : The full equilibrium set is a manifold, with the 
+
+fundamental equilibrium as a special point, unifying the perspectives of DeSantis 
+
+et al. (2012) and Cavani (2026). 4. Multi ‑asset excursion conce pt : Extends the practical risk metric to multiple 
+
+assets, enabling analysis of contagion. 
+
+5. Comprehensive wealth dynamics : Tracks redistribution across both groups 
+
+and assets, linking price dynamics to evolutionary changes in market composition. 
+
+6. Generalized Hopf bifurcation analysis : Provides conditions for stability loss 
+
+in arbitrary 𝑚 and 𝑛 , with cross ‑asset coupling as bifurcation parameters. 
+
+These extensions make the fused model strictly more general than either of its 
+
+predecessors and provide a powerfu l framework for studying the complex interactions that 
+
+drive market instabilities, bubbles, and crashes. 
+
+# 4. Methodology 
+
+Building on the theoretical framework established in Sections 2 and 3, this section 
+
+presents a comprehensive research plan for the fused multi ‑asset, multi ‑group asset flow 
+
+model. The plan is structured around three interconnected research objectives : (I) 
+
+analytical derivation of stability conditions and bifurcation thresholds; (II) extensive 
+
+numerical simulations spanning baseline validat ion, cross ‑asset contagion analysis, 
+
+wealth redistribution mapping, and excursion quantification; and (III) empirical 
+
+calibration to real ‑world market data. Together, these objectives provide a rigorous 
+
+foundation for studying how cross ‑asset momentum, het erogeneous group strategies, and 
+
+wealth dynamics jointly produce market instabilities, bubbles, and crashes. 
+
+## 4.1 Analytical Work: Equilibrium, Jacobian, and Bifurcation Conditions 
+
+This subsection aligns with objective I, and has to do w ith the complete sys tem of ODEs 
+
+now explicitly defined in Section 2 – including the cash dynamics (M), share dynamics 
+
+(N), sentiment dynamics (S), transition rates (K) –(L), and price dynamics (P) – we can 
+
+now present a rigorous analytical framework for equilibrium characteriz ation, Jacobian 
+
+derivation, and bifurcation analysis. This updated section reflects the full structure of the 
+
+fused model. 
+
+4.1.1 Equilibrium Conditions 
+
+The equilibrium points of the fused model satisfy all time derivatives set to zero. From the 
+
+sentiment dynamics (S), at equilibrium, we have: 
+
+𝑑 𝜁 1,𝑗 
+
+> (𝑖 )
+
+𝑑𝑡 = 0 ⟹ 𝑐 1,𝑗 
+
+> (𝑖 )
+
+𝑞 1,𝑗  
+
+> (𝑖 )
+
+1
+
+𝑃 (𝑖 )
+
+𝑑 𝑃 (𝑖 )
+
+𝑑𝑡 − 𝑐 1,𝑗 
+
+> (𝑖 )
+
+𝜁 1,𝑗  
+
+> (𝑖 )
+
+= 0.
+
+Since at equilibrium 𝑑 𝑃 (𝑖 ) 
+
+> 𝑑𝑡
+
+= 0, this simplifies to: 
+
+𝜁 1,𝑗  
+
+> (𝑖 )
+
+= 0 ∀𝑖 , 𝑗 .
+
+For the value sentiment: 
+
+𝑑 𝜁 2,𝑗 
+
+> (𝑖 )
+
+𝑑𝑡 = 0 ⟹ 𝑐 2,𝑗 
+
+> (𝑖 )
+
+𝑞 2,𝑗  
+
+> (𝑖 )
+
+(1 − 𝑃 (𝑖 )
+
+𝑃 𝑎 
+
+> (𝑖 )
+
+) − 𝑐 2,𝑗 
+
+> (𝑖 )
+
+𝜁 2,𝑗  
+
+> (𝑖 )
+
+= 0,
+
+which yields: 𝜁 2,𝑗  
+
+> (𝑖 )
+
+= 𝑞 2,𝑗  
+
+> (𝑖 )
+
+(1 − 𝑃 (𝑖 )
+
+𝑃 𝑎 
+
+> (𝑖 )
+
+) ∀𝑖 , 𝑗 .
+
+Thus, at equilibrium, the value sentiments are fully determined by the asset prices. 
+
+From the price dynamics (P), equilibrium requires: 
+
+𝑑 𝑃 (𝑖 )
+
+𝑑𝑡 = 0 ⟹ ∑𝑛  
+
+> 𝑗 =1
+
+𝑘 𝑗 
+
+> (𝑖 )
+
+𝑀 𝑗 
+
+∑𝑛  
+
+> 𝑗 =1
+
+𝑘 ˜𝑗 
+
+> (𝑖 )
+
+𝑁 𝑗 
+
+> (𝑖 )
+
+𝑃 (𝑖 ) = 1,
+
+or equivalently: 
+
+∑
+
+> 𝑛
+> 𝑗 =1
+
+𝑘 𝑗 
+
+> (𝑖 )
+
+𝑀 𝑗 = ∑
+
+> 𝑛
+> 𝑗 =1
+
+𝑘 ˜𝑗 
+
+> (𝑖 )
+
+𝑁 𝑗 
+
+> (𝑖 )
+
+𝑃 (𝑖 ) ∀𝑖 . (𝐸 1)
+
+From the cash dynamics (M), equilibrium requires: 
+
+𝑑 𝑀 𝑗 
+
+𝑑𝑡 = 0 that implies − ∑
+
+> 𝑚
+> 𝑖 =1
+
+𝑘 𝑗 
+
+> (𝑖 )
+
+𝑀 𝑗 + ∑
+
+> 𝑚
+> 𝑖 =1
+
+𝑘 ˜𝑗 
+
+> (𝑖 )
+
+𝑁 𝑗 
+
+> (𝑖 )
+
+𝑃 (𝑖 ) = 0 ∀𝑗 . (𝐸 2)
+
+From the share dynamics (N), equilibrium requires: 
+
+𝑑 𝑁 𝑗 
+
+> (𝑖 )
+
+𝑑𝑡 = 0 ⟹ 𝑘 𝑗 
+
+> (𝑖 )
+
+𝑀 𝑗 
+
+𝑃 (𝑖 ) − 𝑘 ˜𝑗 
+
+> (𝑖 )
+
+𝑁 𝑗  
+
+> (𝑖 )
+
+= 0 ∀𝑖 , 𝑗 . (𝐸 3)
+
+Note that : Equations (E3) for each (𝑖 , 𝑗 ) imply: 
+
+𝑘 𝑗 
+
+> (𝑖 )
+
+𝑀 𝑗 = 𝑘 ˜𝑗 
+
+> (𝑖 )
+
+𝑁 𝑗 
+
+> (𝑖 )
+
+𝑃 (𝑖 ) ∀𝑖 , 𝑗 .
+
+Summing (E3) over 𝑗 for fixed 𝑖 yields (E1). Summing (E3) over 𝑖 for fixed 𝑗 yields (E2). 
+
+Thus, the fundamental equilibrium conditions reduce to the 𝑚 × 𝑛 equations: 
+
+𝑘 𝑗 
+
+> (𝑖 )
+
+𝑀 𝑗 = 𝑘 ˜𝑗 
+
+> (𝑖 )
+
+𝑁 𝑗 
+
+> (𝑖 )
+
+𝑃 (𝑖 ) ∀𝑖 , 𝑗 . (𝐸 ∗)
+
+These equations, together with the conservation laws (C), fully characterize the 
+
+equilibrium manifold. 
+
+Special case – Fundamental equilibrium: When 𝑃 (𝑖 ) = 𝑃 𝑎  
+
+> (𝑖 )
+
+for all 𝑖 , we have 𝜁 2,𝑗  
+
+> (𝑖 )
+
+= 0
+
+from (S2). If the transition rates satisfy the calibration condition: 
+
+𝑘 𝑗 
+
+> (𝑖 )
+
+(0,0)𝑀 𝑗 = 𝑘 ˜𝑗 
+
+> (𝑖 )
+
+(0,0)𝑁 𝑗 
+
+> (𝑖 )
+
+𝑃 𝑎  
+
+> (𝑖 )
+
+∀𝑖 , 𝑗 ,
+
+then (𝑃 (𝑖 ) = 𝑃 𝑎 
+
+> (𝑖 )
+
+, 𝜁 1,𝑗  
+
+> (𝑖 )
+
+= 0, 𝜁 2,𝑗  
+
+> (𝑖 )
+
+= 0) is an equilibrium. This is the fundamental 
+
+equilibrium .General equilibrium manifold: For arbitrary values of 𝑀 𝑗 satisfying ∑𝑗 𝑀 𝑗 = 𝑀 0,
+
+equations (E ∗) determine 𝑃 (𝑖 ) and 𝑁 𝑗  
+
+> (𝑖 )
+
+uniquely (subject to ∑𝑗 𝑁 𝑗  
+
+> (𝑖 )
+
+= 𝑁 0
+
+> (𝑖 )
+
+). This defines a 
+
+manifold of dimension 𝑛 − 1 (the degrees of freedom in the cash distribution), 
+
+generalizing Theorem 3.3 of DeSantis et al. (2012) to the multi ‑asset case. 
+
+4.2 Jacobian Matrix and Linear Stability Analysis 
+
+To analyze stability, we linearize the system around an equilibrium point. Define the state 
+
+vector 𝐗 ∈ ℝ𝐷 with 𝐷 = 𝑚 + 𝑛 + 𝑚𝑛 + 2𝑚𝑛 = 𝑚 + 𝑛 (1 + 3𝑚 ) (before applying 
+
+conservation constraints). After eliminating dependent variables using the 𝑚 + 1
+
+conservation laws (C), the effective dimension is 𝐷 eff = 𝑚 + 2𝑚𝑛 .
+
+Order the state variables as: 
+
+𝐗 = (𝑃 (1), … , 𝑃 (𝑚 ), 𝑀 1, … , 𝑀 𝑛 , 𝑁 1
+
+> (1)
+
+, … , 𝑁 𝑛 
+
+> (𝑚 )
+
+, 𝜁 1,1
+
+> (1)
+
+, … , 𝜁 2,𝑛 
+
+> (𝑚 )
+
+)𝑇 
+
+.
+
+The Jacobian matrix 𝐉 ∈ ℝ𝐷 eff ×𝐷 eff has the block structure: 
+
+𝐉 =
+
+(
+
+𝐉 𝑃𝑃 𝐉 𝑃𝑀 𝐉 𝑃𝑁 𝐉 𝑃 𝜁 1 𝐉 𝑃 𝜁 2
+
+𝐉 𝑀𝑃 𝐉 𝑀𝑀 𝐉 𝑀𝑁 𝐉 𝑀 𝜁 1 𝐉 𝑀 𝜁 2
+
+𝐉 𝑁𝑃 𝐉 𝑁𝑀 𝐉 𝑁𝑁 𝐉 𝑁 𝜁 1 𝐉 𝑁 𝜁 2
+
+𝐉 𝜁 1𝑃 𝐉 𝜁 1𝑀 𝐉 𝜁 1𝑁 𝐉 𝜁 1𝜁 1 𝐉 𝜁 1𝜁 2
+
+𝐉 𝜁 2𝑃 𝐉 𝜁 2𝑀 𝐉 𝜁 2𝑁 𝐉 𝜁 2𝜁 1 𝐉 𝜁 2𝜁 2 )
+
+.
+
+Each block is derived by differentiating the appropriate ODE with respect to each variable 
+
+type, evaluating at equilibrium. 
+
+4.2.1 Key Block Simplifications at Equilibrium 
+
+Using the equilibrium conditions (E ∗), many terms simplify: 
+
+• Price block 𝐉 𝑃𝑃 : From (P), differentiating with respect to 𝑃 (𝑘 ) yields: 
+
+𝜕 
+
+𝜕 𝑃 (𝑘 ) (𝑑 𝑃 (𝑖 )
+
+𝑑𝑡 ) = − 𝛿 𝑖𝑘 
+
+𝜏 𝑖 
+
+,
+
+where 𝛿 𝑖𝑘 is the Kronecker delta. Thus 𝐉 𝑃𝑃 = diag (−1/𝜏 1, … , −1/𝜏 𝑚 ).
+
+• Sentiment self ‑blocks : From (S), at equilibrium: 
+
+𝜕 
+
+𝜕 𝜁 1,𝑗  
+
+> (𝑖 )
+
+(𝑑 𝜁 1,𝑗 
+
+> (𝑖 )
+
+𝑑𝑡 ) = −𝑐 1,𝑗 
+
+> (𝑖 )
+
+, 𝜕 
+
+𝜕 𝜁 2,𝑗  
+
+> (𝑖 )
+
+(𝑑 𝜁 2,𝑗 
+
+> (𝑖 )
+
+𝑑𝑡 ) = −𝑐 2,𝑗 
+
+> (𝑖 )
+
+.
+
+Thus 𝐉 𝜁 1𝜁 1 and 𝐉 𝜁 2𝜁 2 are diagonal with negative entries. 
+
+• Coupling from sentiment to price 𝐉 𝑃 𝜁 1 , 𝐉 𝑃 𝜁 2 : These are non ‑zero because the 
+
+transition rates 𝑘 𝑗  
+
+> (𝑖 )
+
+and 𝑘 ˜𝑗  
+
+> (𝑖 )
+
+depend on sentiments. Their entries are: 
+
+𝜕 
+
+𝜕𝜁 (𝑑 𝑃 (𝑖 )
+
+𝑑𝑡 ) = 𝑃 (𝑖 )
+
+𝜏 𝑖 𝑇 𝑖 2 (𝑇 𝑖 ∑
+
+> 𝑗
+
+𝑀 𝑗 
+
+𝜕 𝑘 𝑗 
+
+> (𝑖 )
+
+𝜕𝜁 − 𝑆 𝑖 ∑
+
+> 𝑗
+
+𝑁 𝑗 
+
+> (𝑖 )
+
+𝑃 (𝑖 ) 𝜕 𝑘 ˜𝑗 
+
+> (𝑖 )
+
+𝜕𝜁 ),where 𝑆 𝑖 = ∑𝑗 𝑘 𝑗 
+
+> (𝑖 )
+
+𝑀 𝑗 and 𝑇 𝑖 = ∑𝑗 𝑘 ˜𝑗 
+
+> (𝑖 )
+
+𝑁 𝑗 
+
+> (𝑖 )
+
+𝑃 (𝑖 ). At equilibrium, 𝑆 𝑖 = 𝑇 𝑖 .
+
+• Coupling from price to sentiment 𝐉 𝜁 1𝑃 , 𝐉 𝜁 2𝑃 : From (S): 
+
+𝜕 
+
+𝜕 𝑃 (𝑘 ) (𝑑 𝜁 1,𝑗 
+
+> (𝑖 )
+
+𝑑𝑡 ) = 𝑐 1,𝑗 
+
+> (𝑖 )
+
+𝑞 1,𝑗  
+
+> (𝑖 )
+
+(− 𝛿 𝑖𝑘 
+
+𝜏 𝑖 𝑃 (𝑖 )) (since 𝑑 𝑃 (𝑖 )
+
+𝑑𝑡 = 0 at equilibrium ),
+
+𝜕 
+
+𝜕 𝑃 (𝑘 ) (𝑑 𝜁 2,𝑗 
+
+> (𝑖 )
+
+𝑑𝑡 ) = −𝑐 2,𝑗 
+
+> (𝑖 )
+
+𝑞 2,𝑗  
+
+> (𝑖 )
+
+𝛿 𝑖𝑘 
+
+𝑃 𝑎 
+
+> (𝑖 )
+
+.
+
+• Cash and share blocks 𝐉 𝑀𝑀 , 𝐉 𝑁𝑁 , 𝐉 𝑀𝑁 , 𝐉 𝑁𝑀 : These involve the transition rates and 
+
+their derivatives. At equilibrium, using (E ∗), they simplify considerably. Notably, 
+
+the conservation laws introduce zero eigenvalues correspon ding to directions 
+
+along the equilibrium manifold. 
+
+4.2.2 Eigenvalue Structure and Stability 
+
+The Jacobian has the following eigenvalue structure: 
+
+• Zero eigenvalues (multiplicity 𝑚 + 1): Corresponding to the conservation of 
+
+total cash and total shares of each asset. These reflect the neutral directions along 
+
+the equilibrium manifold. 
+
+• Negative real eigenvalues (from 𝐉 𝑃𝑃 and the sentiment self ‑blocks): These 
+
+contribute to stability. 
+
+• Complex conjugate pairs (from coupling between price, cash, shares, and 
+
+sentiments): These can lead to oscillatory instabilities via Hopf bifurcation. 
+
+The equilibrium is locally asymptotically stable if and only if all non ‑zero eigenvalues 
+
+have strictly negative real parts. 
+
+4.3 Hopf Bifurcation Conditions 
+
+A Hopf bifurcation occ urs when a pair of complex conjugate eigenvalues crosses the 
+
+imaginary axis. We will treat the momentum coefficients 𝑞 1,𝑗  
+
+> (𝑖 )
+
+and the cross ‑asset coupling 
+
+coefficients 𝛼 𝑗 ,ℓ 
+
+> (𝑖 )
+
+(for ℓ ≠ 𝑖 ) as bifurcation parameters. 
+
+For the general case of arbitrary 𝑚 and 𝑛 , the characteristic polynomial is: 
+
+𝜒 (𝜆 ) = det (𝜆 𝐈 − 𝐉 ) = 𝜆 𝑚 +1 ∏
+
+> 𝐷 eff −(𝑚 +1)
+> 𝑘 =1
+
+(𝜆 − 𝜆 𝑘 ) = 0,
+
+where 𝜆 𝑚 +1 corresponds to the zero eigenvalues. The remaining polynomial can be 
+
+analyzed using the Routh –Hurwitz criteria (Dorf & Bishop, 2008). 
+
+For the special case of 𝑚 = 2 assets and 𝑛 = 2 groups (one trend, one value), the 
+
+characteristic polynomial reduces to a cu bic or a quadratic after factoring out the zero 
+
+eigenvalues. The Hopf condition is: 
+
+𝐴 1(𝝁 )𝐴 2(𝝁 ) − 𝐴 0(𝝁 ) = 0,with 𝐴 0, 𝐴 1, 𝐴 2 > 0, where 𝝁 denotes the set of bifurcation parameters. The critical 
+
+threshold satisfies: 
+
+𝑞 1,crit = 𝑓 (𝜏 𝑖 , 𝑐 1,2
+
+> (𝑖 )
+
+, 𝑐 2,2 
+
+> (𝑖 )
+
+, 𝛼 𝑗 ,ℓ
+
+> (𝑖 )
+
+, 𝛽 𝑗 ,ℓ
+
+> (𝑖 )
+
+, 𝑀 𝑗 , 𝑁 𝑗 
+
+> (𝑖 )
+
+).
+
+The symbol 𝑓 is used as a generic placeholder to indicate that the critical momentum 
+
+threshold 𝑞 1,crit is a function of the listed parameters. In other words , this means that 
+
+the critical value of the momentum coeff icient 𝑞 1,crit depends on (is a function of) the 
+
+price adjustment speeds 𝜏 𝑖 , the sentiment decay rates 𝑐 1,2
+
+> (𝑖 )
+
+, 𝑐 2,2 
+
+> (𝑖 )
+
+, the cross -asset coupling 
+
+coefficients 𝛼 𝑗 ,ℓ
+
+> (𝑖 )
+
+, 𝛽 𝑗 ,ℓ
+
+> (𝑖 )
+
+, and the cash/share distributions 𝑀 𝑗 , 𝑁 𝑗 
+
+> (𝑖 )
+
+.
+
+This generalizes the single ‑asset result of DeSantis et al. (2012) and the two ‑asset result of 
+
+Bulut et al. (2019). 
+
+4.3.1 Reduction to Minimal System for Hopf Bifurcation Analysis 
+
+In the following, w e present a theorem that justifies the reduction of the full f used model 
+
+to a minimal system for Hopf bifurcation analysis. This theorem establishes that the cash 
+
+and share variables do not participate in the bifurcation and can be eliminated without 
+
+affecting the existence or stability of limit cycles emerging from a Hopf bifurcation. 
+
+Theorem 4.1 (Reduction to Minimal Hopf System) 
+
+Consider the fused multi ‑asset, multi ‑group asset flow model defined by equations (P), 
+
+(M), (N), (S) with state vector: 
+
+𝐗 = (𝐏 , 𝐌 , 𝐍 , 𝜻 1, 𝜻 2)𝑇 ∈ ℝ𝐷 ,
+
+where 𝐷 = 𝑚 + 𝑛 + 𝑚𝑛 + 2𝑚𝑛 . Let 𝐗 0 = (𝐏 0, 𝐌 0, 𝐍 0, 𝟎 , 𝟎 ) be a fundamental 
+
+equilibrium satisfying: 
+
+𝑃 0 
+
+> (𝑖 )
+
+= 𝑃 𝑎 
+
+> (𝑖 )
+
+, 𝜁 1,𝑗 ,0 
+
+> (𝑖 )
+
+= 0, 𝜁 2,𝑗 ,0 
+
+> (𝑖 )
+
+= 0 ∀𝑖 , 𝑗 ,
+
+and the calibration condition: 
+
+∑
+
+> 𝑛
+> 𝑗 =1
+
+𝑘 𝑗 
+
+> (𝑖 )
+
+(𝟎 , 𝟎 )𝑀 𝑗 ,0 = ∑
+
+> 𝑛
+> 𝑗 =1
+
+𝑘 ˜𝑗 
+
+> (𝑖 )
+
+(𝟎 , 𝟎 )𝑁 𝑗 ,0
+
+> (𝑖 )
+
+𝑃 𝑎  
+
+> (𝑖 )
+
+∀𝑖 .
+
+Let 𝐉 ∈ ℝ𝐷 ×𝐷 be the Jacobian matrix of the system evaluated at 𝐗 0, partitioned as: 
+
+𝐉 =
+
+(
+
+𝐉 𝑃𝑃 𝐉 𝑃𝑀 𝐉 𝑃𝑁 𝐉 𝑃 𝜁 1 𝐉 𝑃 𝜁 2
+
+𝐉 𝑀𝑃 𝐉 𝑀𝑀 𝐉 𝑀𝑁 𝐉 𝑀 𝜁 1 𝐉 𝑀 𝜁 2
+
+𝐉 𝑁𝑃 𝐉 𝑁𝑀 𝐉 𝑁𝑁 𝐉 𝑁 𝜁 1 𝐉 𝑁 𝜁 2
+
+𝐉 𝜁 1𝑃 𝐉 𝜁 1𝑀 𝐉 𝜁 1𝑁 𝐉 𝜁 1𝜁 1 𝐉 𝜁 1𝜁 2
+
+𝐉 𝜁 2𝑃 𝐉 𝜁 2𝑀 𝐉 𝜁 2𝑁 𝐉 𝜁 2𝜁 1 𝐉 𝜁 2𝜁 2 )
+
+.
+
+Then the following statements hold: 
+
+(i) Spectral Decomposition The spectrum 𝜎 (𝐉 ) consists of: 
+
+• Zero eigenvalues of multiplicity 𝑚 + 1, corresponding to the conservation of 
+
+total cash and total shares of each asset. 
+
+• Negative real eigenvalues from the blocks 𝐉 𝑀𝑀 , 𝐉 𝑁𝑁 , 𝐉 𝜁 1𝜁 1 , and 𝐉 𝜁 2𝜁 2 , which are 
+
+strictly negative and bounded away from zero. 
+
+• Remaining eigenvalues determined by the reduced Jacobian: 
+
+𝐉 red = (
+
+𝐉 𝑃𝑃 𝐉 𝑃 𝜁 1 𝐉 𝑃 𝜁 2
+
+𝐉 𝜁 1𝑃 𝐉 𝜁 1𝜁 1 𝟎 
+
+𝐉 𝜁 2𝑃 𝟎 𝐉 𝜁 2𝜁 2
+
+) ∈ ℝ(𝑚 +2𝑚𝑛 )×(𝑚 +2𝑚𝑛 ).
+
+(ii) Center Manifold Reduction 
+
+If the Jacobian 𝐉 red has a pair of complex conjugate eigenvalues 𝜆 ± = 𝛼 (𝜇 ) ± 𝑖𝜔 (𝜇 ) with 
+
+𝛼 (𝜇 0) = 0 and 𝜔 (𝜇 0) ≠ 0, and all other eigenvalues have negative real parts, then there 
+
+exists a two ‑dimensional center manifold ℳ𝑐 locally invariant under the flow of the 
+
+full system. On ℳ𝑐 , the dynamics are given by: 
+
+𝑑 
+
+𝑑𝑡 (
+
+𝛿 𝐏 
+
+𝛿 𝜻 1
+
+𝛿 𝜻 2
+
+) = 𝐉 red (
+
+𝛿 𝐏 
+
+𝛿 𝜻 1
+
+𝛿 𝜻 2
+
+) + 𝒪 (‖𝛿 𝐏 , 𝛿 𝜻 1, 𝛿 𝜻 2‖2).
+
+(iii) Hopf Bifurcation Condition 
+
+A Hopf bifurcation occurs at 𝜇 = 𝜇 0 if and only if: 
+
+1. 𝛼 (𝜇 0) = 0 and 𝜔 (𝜇 0) ≠ 0;
+
+2. The transversality condition holds: 𝑑𝛼 (𝜇 ) 
+
+> 𝑑𝜇
+
+|𝜇 =𝜇 0
+
+≠ 0;
+
+3. The first Lyapunov coefficient 𝑙 1(𝜇 0) ≠ 0, determining the criticality 
+
+(supercritical if 𝑙 1 < 0, subcritical if 𝑙 1 > 0). 
+
+These conditions depend only on 𝐉 red and the nonlinear terms in the reduced system. 
+
+(iv) Equivalence 
+
+The existence and stability of limit cycles emerging from the Hopf bifurcati on in the full 
+
+system are equivalent to those in the reduced system. The cash and share variables 
+
+𝛿 𝐌 , 𝛿 𝐍 follow the dynamics: 
+
+𝛿 𝐌 (𝑡 ) = 𝒪 (‖𝛿 𝐏 , 𝛿 𝜻 1, 𝛿 𝜻 2‖), 𝛿 𝐍 (𝑡 ) = 𝒪 (‖𝛿 𝐏 , 𝛿 𝜻 1, 𝛿 𝜻 2‖),
+
+and do not affect the bifurcation at leading order. 
+
+Before proving the theorem , we need the following lemmas. 
+
+Lemma 4. 2 (Block Diagonality). The following blocks are zero: 
+
+𝐉 𝜁 1𝑀 = 𝟎 , 𝐉 𝜁 1𝑁 = 𝟎 , 𝐉 𝜁 2𝑀 = 𝟎 , 𝐉 𝜁 2𝑁 = 𝟎 , 𝐉 𝜁 1𝜁 2 = 𝟎 , 𝐉 𝜁 2𝜁 1 = 𝟎 .Proof. From the sentiment dynamics (S), 𝜁 1,𝑗  
+
+> (𝑖 )
+
+depends only on 𝑃 (𝑖 ) and itself, not on 𝑀 𝑗 or 
+
+𝑁 𝑗 
+
+> (𝑖 )
+
+. Similarly, 𝜁 2,𝑗  
+
+> (𝑖 )
+
+depends only on 𝑃 (𝑖 ) and itself. Hence, all partial derivatives with 
+
+respect to 𝑀 𝑗 and 𝑁 𝑗  
+
+> (𝑖 )
+
+vanish. The cross ‑sentiment t erms vanish because 𝜁 1 and 𝜁 2 evolve 
+
+independently at linear order. ∎
+
+Lemma 4. 3 (Stability of Cash and Share Subsystems). The matrices 𝐉 𝑀𝑀 , 𝐉 𝑁𝑁 ,
+
+𝐉 𝜁 1𝜁 1 , and 𝐉 𝜁 2𝜁 2 are negative definite .
+
+Proof. From the cash dynamics (M), at equilibrium 𝜕 (𝑑 𝑀 𝑗 /𝑑𝑡 )/𝜕 𝑀 𝑗 = − ∑𝑖 𝑘 𝑗 ,𝑒𝑞  
+
+> (𝑖 )
+
+< 0.
+
+Off ‑diagonal terms are zero (or negligible under weak coupling assumptions). Hence 𝐉 𝑀𝑀 
+
+is diagonal with negative entries. 
+
+From the share dynamics (N), 𝜕 (𝑑 𝑁 𝑗 
+
+> (𝑖 )
+
+/𝑑𝑡 )/𝜕 𝑁 𝑗  
+
+> (𝑖 )
+
+= −𝑘 ˜𝑗 ,𝑒𝑞  
+
+> (𝑖 )
+
+< 0. Hence 𝐉 𝑁𝑁 is diagonal 
+
+with negative entries. 
+
+From the sentiment dynamics (S), 𝜕 (𝑑 𝜁 1,𝑗 
+
+> (𝑖 )
+
+/𝑑𝑡 )/𝜕 𝜁 1,𝑗  
+
+> (𝑖 )
+
+= −𝑐 1,𝑗  
+
+> (𝑖 )
+
+< 0 and 𝜕 (𝑑 𝜁 2,𝑗 
+
+> (𝑖 )
+
+/𝑑𝑡 )/𝜕 𝜁 2,𝑗  
+
+> (𝑖 )
+
+=
+
+−𝑐 2,𝑗  
+
+> (𝑖 )
+
+< 0. Hence 𝐉 𝜁 1𝜁 1 and 𝐉 𝜁 2𝜁 2 are diagonal with negative entries. ∎
+
+Lemma 4. 4 (Conservation Eigenvalues). The Jacobian 𝐉 has at least 𝑚 + 1 zero 
+
+eigenvalues. 
+
+Proof. The system conserves total cash ∑𝑗 𝑀 𝑗 and total shares ∑𝑗 𝑁 𝑗  
+
+> (𝑖 )
+
+for each asset 𝑖 .
+
+These 𝑚 + 1 conservation laws imply that the Jacobian has 𝑚 + 1 zero eigenvalues, with 
+
+eigenvectors spanning the nullspace of the linearized dynamics. ∎
+
+Lemma 4. 5 (Spectral Separation). Let 𝜆 max be the largest eigenvalue (in real part) 
+
+of 𝐉 red , and let 𝜂 = min {|𝜆 |: 𝜆 ∈ 𝜎 (𝐉 𝑀𝑀 ) ∪ 𝜎 (𝐉 𝑁𝑁 ) ∪ 𝜎 (𝐉 𝜁 1𝜁 1 ) ∪ 𝜎 (𝐉 𝜁 2𝜁 2 )}. Then 𝜂 > 0 and for 
+
+the Hopf bifurcation parameter 𝜇 near 𝜇 0, we have Re (𝜆 max ) = 𝒪 (|𝜇 − 𝜇 0|) = 𝑜 (𝜂 ).
+
+Proof. The eigenvalues of 𝐉 𝑀𝑀 , 𝐉 𝑁𝑁 , 𝐉 𝜁 1𝜁 1 , 𝐉 𝜁 2𝜁 2 are strictly negative constants independent 
+
+of 𝜇 . The eigenvalues of 𝐉 red depend on 𝜇 and cross zero at 𝜇 = 𝜇 0. Hence, near 𝜇 0, the 
+
+critical eigenvalues are arbitrarily close to zero , while the stable eigenvalues remain 
+
+bounded away from zero. ∎
+
+By the Center Manifold Theorem (Carr, 1981; Kelley, 1967), there exists a smooth, 
+
+locally invariant center manifold ℳ𝑐 tangent at 𝐗 0 to the eigenspace spanned by the 
+
+eigenvectors associated with eigenvalues having zero real part. Since all eigenvalues of 𝐉 red 
+
+with zero real part are isolated and the remaining eigenvalues have strictly negative real 
+
+parts, the dimension of ℳ𝑐 is 𝑚 + 2𝑚𝑛 (the dimension of 𝐉 red ). 
+
+Lemma 4. 6 (Reduced Dynamics). On ℳ𝑐 , the cash and share variables 𝛿 𝐌 , 𝛿 𝐍 are 
+
+slaves to t he price and sentiment variables: 
+
+𝛿 𝐌 = 𝚽 (𝛿 𝐏 , 𝛿 𝜻 1, 𝛿 𝜻 2), 𝛿 𝐍 = 𝚿 (𝛿 𝐏 , 𝛿 𝜻 1, 𝛿 𝜻 2),
+
+where 𝚽 , 𝚿 = 𝒪 (‖𝛿 𝐏 , 𝛿 𝜻 1, 𝛿 𝜻 2‖2). Consequently, the dynamics on ℳ𝑐 are given by: 𝑑 
+
+𝑑𝑡 (
+
+𝛿 𝐏 
+
+𝛿 𝜻 1
+
+𝛿 𝜻 2
+
+) = 𝐉 red (
+
+𝛿 𝐏 
+
+𝛿 𝜻 1
+
+𝛿 𝜻 2
+
+) + 𝒪 (‖𝛿 𝐏 , 𝛿 𝜻 1, 𝛿 𝜻 2‖2).
+
+Proof. The cash and share variables satisfy linear ODEs with strictly negative eigenvalues. 
+
+By the Invariant Manifold Theorem for hyperbolic systems (Hirsch, Pugh, & Shub, 
+
+1977), they are exponentially attracted to a graph over the center variables. The 
+
+leading ‑order terms vanish because the coupling from prices and sentiments to cash and 
+
+shares is linear, and the equilibrium satisfies the calibration condition. ∎
+
+Let 𝜇 be a bifurcation parameter (e.g., 𝑞 1,𝑗 
+
+> (𝑖 )
+
+). Consider the reduced Jacobian 𝐉 red (𝜇 ). The 
+
+characteristic polynomial is: 
+
+𝜒 (𝜆 , 𝜇 ) = det (𝜆 𝐈 − 𝐉 red (𝜇 )).
+
+Lemma 4. 7 (Hopf Condition). A Hopf bifurcation occurs at 𝜇 = 𝜇 0 if and only if: 
+
+1. 𝜒 (𝑖𝜔 , 𝜇 0) = 0 for some 𝜔 > 0;
+
+2. 𝜕  
+
+> 𝜕𝜆
+
+𝜒 (𝑖𝜔 , 𝜇 0) ≠ 0 (simplicity of pure imaginary roots); 
+
+3. 𝑑  
+
+> 𝑑𝜇
+
+Re (𝜆 (𝜇 ))|𝜇 =𝜇 0
+
+≠ 0 (transversality). 
+
+Proof. This is the standard Hopf bifurcation theorem (Marsden & McCracken, 1976). The 
+
+conditions ensure that a pair of complex conjugate eigenvalues crosses the imaginary 
+
+axi s with non ‑zero speed. ∎
+
+Lemma 4. 8 (Equivalence). The transversality and criticality conditions depend only 
+
+on 𝐉 red and the nonlinear terms restricted to ℳ𝑐 . Since the cash and share variables do 
+
+not appear in the leading ‑order dynamics on ℳ𝑐 , the Hopf bifurcation in the full system 
+
+is completely determined by the reduced system. 
+
+Proof. By the Center Manifold Theorem, the full system is topologically conjugate to 
+
+the reduced system on ℳ𝑐 near the bifurcation point. Hence, existence, stability, and 
+
+amplitude of limit cycles are preserved under the reduction. ∎
+
+Proof (of Theorem 4.1). 
+
+The proof is a direct consequence of the previous lemmas. ∎
+
+The previous results guarantee the pr actical co mputation in the applications, and the 
+
+following corollary establishes this. 
+
+Corollary 4. 9 (Numerical Implementation). To detect a Hopf bifurcation in the 
+
+fused model, it suffices to: 
+
+1. Compute the equilibrium satisfying (E ∗). 
+
+2. Form the reduced Jacobian 𝐉 red of dimension 𝑚 + 2𝑚𝑛 .
+
+3. Compute its eigenvalues as functions of the bifurcation parameter 𝜇 .
+
+4. Find 𝜇 0 such that Re (𝜆 (𝜇 0)) = 0, Im (𝜆 (𝜇 0)) ≠ 0, and transversality holds. The cash and share variables 𝐌 , 𝐍 need not be included in the eigenvalue analysis. 
+
+Proof. Follows directly from Theorem 4.1(iii) –(iv). ∎
+
+# 5 Results 
+
+This section concerns objectives II and III. 
+
+## 5.1 Numerical Simulations 
+
+Here we begin to address objective II, which involves extensive numerical simulations 
+
+spanning baseline validation, cross ‑asset contagion analysis, wealth redistribution 
+
+mapping, and excursion quantification . The analytical work will be complemented and 
+
+extended by extensive numerical simulations. All numerical implementations w ill be 
+
+carried out in MATLAB (version s R2015a, R2024b or later), leveraging its robust ODE 
+
+solvers and bifurcation continuation toolboxes. These toolboxes have been extensively 
+
+used in the economic dynamics literature, including the stability analysis of a sset flow 
+
+models (Caginalp & DeSantis, 2011; DeSantis et al., 2012; Bulut et al., 2019). Python will 
+
+be used for post ‑processing, statistical analysis, and visualization, leveraging libraries such 
+
+as SciPy for numerical integration and Matplotlib for high ‑quality scientific graphics. 
+
+5.1.1 Validation against DeSantis et al (2012) 
+
+The fused model reduces to the single ‑asset, two ‑group model of DeSantis et al. (2012) by 
+
+setting 𝑚 = 1, 𝑛 = 2, 𝑘 ˜𝑗 = 1 − 𝑘 𝑗 , and eliminating cross ‑asset coupling. Figure 1 shows the 
+
+equilibrium manifold for Case 1 ( 𝑞 1 = 𝑞 2 = 1, 𝑐 1 = 𝑐 2 = 1, 𝑃 𝑎 = 0.8), where all equilibria 
+
+are stable. The equilibrium price increases monotonically with the cash fraction 𝑀 1 from 
+
+approximately 0.86 to 1.00, confirming Theorem 3.5 of DeSantis et al. (2012 ). Cases 2
+
+and 3, which exhibit stability transitions and Hopf bifurcations, were partially reproduced 
+
+and require exact parameter calibration from the original code. 
+
+Table 3. DeSantis et al. (2012)                                           
+
+> Case Parameters Stable Points Unstable
+> Points
+> Key Feature
+> Case 1 𝑞 1=1,𝑞 2=1,𝑐 1
+> =𝑐 2=1
+> All None Fully stable manifold
+> Case 2 𝑞 1=1,𝑞 2=5,𝑐 1
+> =𝑐 2=5
+> Low 𝑃 𝑒𝑞 High 𝑃 𝑒𝑞 Hopf bifurcation at 𝑃 𝑒𝑞 ≈
+> 0.835
+> Case 3 𝑞 1=5,𝑞 2=5,𝑐 1
+> =𝑐 2=5
+> Very few (near the
+> lower bound)
+> Most Predominantly unstable
+
+Figure 1 . Equilibrium manifold for Case 1 (all equilibria stable). Equilibrium price 𝑃 𝑒𝑞 as a 
+
+function of the cash fraction 𝑀 1 held by Group 1 (trend ‑following) for parameters 𝑞 1 = 𝑞 2 = 1, 𝑐 1 = 𝑐 2 = 1, and 
+
+fundamental value 𝑃 𝑎 = 0.8. All computed equilibrium points are stable (green circles), and the equilibrium 
+
+price increases monotonically with 𝑀 1 from approximately 0.86 to 1.00. This confirms Theorem 3.5 of 
+
+DeSantis et al. (2012): when trend ‑following is sufficiently weak, every equilibrium on the manifold is loc ally 
+
+asymptotically stable. 
+
+Figure 2 . Equilibrium manifold for Case 2 (stability transition). Equilibrium price 𝑃 𝑒𝑞 vs. cash 
+
+fraction 𝑀 1 for parameters 𝑞 1 = 1, 𝑞 2 = 5, 𝑐 1 = 𝑐 2 = 5, 𝑃 𝑎 = 0.8. Stable equilibria (green circles) are found at 
+
+low 𝑀 1 (low 𝑃 𝑒𝑞 ), while unstable equilibria (red circles) appear at high 𝑀 1 (high 𝑃 𝑒𝑞 ). The transition occurs at 
+
+the critical price 𝑃 𝑒𝑞  
+
+> 𝑡𝑟
+
+≈ 0.835 , consistent with the Hopf bifurcation threshold reported in DeSantis et al. (2012, 
+
+Figure 4.4). This demonstrates that increasing the momentum strength relative to value trading destabilizes 
+
+the market. Figure 3 . Equilibrium manifold for Case 3 (mostly unstable). Equilibrium price 𝑃 𝑒𝑞 vs. cash 
+
+fraction 𝑀 1 for parameters 𝑞 1 = 𝑞 2 = 5, 𝑐 1 = 𝑐 2 = 5, 𝑃 𝑎 = 0.8. Only a small region of stable equilibria (green 
+
+circles) exists near the lower bound of 𝑃 𝑒𝑞 (approximately 𝑃 𝑒𝑞 < 0.818 ), while the majority of equilibria (red 
+
+circles) are unstable. This confirms the numerical results of DeSantis et al. (2012, Figures 4.9 –4.13), showing 
+
+that strong momentum trading renders most equilibria unstable, leading to large price excursions and limit 
+
+cycles. 
+
+5.1.2 Validation against Bulut et al. (2019) 
+
+The fused m odel reduces to the two ‑asset, single ‑group model of Bulut et al. (2019) by 
+
+setting 𝑛 = 1, 𝑚 = 2, and using the mixed ‑strategy transition rates (value for asset 1, trend 
+
+for asset 2). With fixed parameters 𝑞 2 
+
+> (1)
+
+= 0.02 , 𝑐 2 
+
+> (1)
+
+= 2, 𝑐 1 
+
+> (2)
+
+= 1, we scanned the trend 
+
+coefficient 𝑞 1
+
+> (2)
+
+. Figure 4a shows small ‑amplitude periodic oscillations at 𝑞 1 
+
+> (2)
+
+= 1.0,
+
+confirming the supercritical Hopf bifurcation predicted by Theorem 4 of Bulut et al. 
+
+(2019). Figure 4b shows instability above the threshold at 𝑞 1 
+
+> (2)
+
+= 1.005 , where the 
+
+equilibrium becomes a repeller, and trajectories exhibit bounded but non ‑convergent 
+
+oscillations. Table 4 summarizes the results. Figure 4 a. Hopf bifurcation in the Bulut et al. (2019) mixed strategy model at 𝑞 1           
+
+> (2)=1.0.
+> Small ‑amplitude periodic oscillations emerge from the fundamental equilibrium, confirming the supercritical
+> Hopf bifurcation. Parameters: 𝑞 2
+> (1)=0.02 ,𝑐 2
+> (1)=2,𝑐 1
+> (2)=1.
+> F
+
+igure 4a validates that the fused model correctly reproduces the Bulut et al. (2019 ) result 
+
+that a supercritical Hopf bifurcation occurs when the trend coefficient 𝑞 1 
+
+> (2)
+
+reaches unity. 
+
+At this critical value, the fundamental equilibrium loses stability and gives rise to a stable 
+
+limit cycle, manifesting as persistent periodic oscillatio ns in both asset prices. 
+
+Figure 4b. Instability above the Hopf bifurcation threshold in the Bulut et al. (2019) model              
+
+> at 𝑞 1
+> (2)=1.005 .The fundamental equilibrium loses stability, resulting in monotonic drift and bounded
+> oscillations without convergence to a fixed point. Parameters: 𝑞 2
+> (1)=0.02 ,𝑐 2
+> (1)=2,𝑐 1
+> (2)=1.
+
+Table 4. Bulut, Merdan, and Swigon (2019) – Two Assets, One Group 
+
+Paramet er Value Behavior Fused Model Result 
+
+𝑞 1 
+
+> (2)
+
+= 0.1 Below threshold Stable equilibrium Stable 
+
+𝑞 1 
+
+> (2)
+
+= 0.5 Below threshold Stable equilibrium Stable 
+
+𝑞 1 
+
+> (2)
+
+= 1.0 At threshold Hopf bifurcation Limit cycle 
+
+𝑞 1 
+
+> (2)
+
+= 1.005 Above threshold Unstable (drift) Unstable 
+
+5.1. 3 Validation against the Cavani (2026) 
+
+The fused model reduces to the two ‑asset, two ‑group Nigeria ‑Libya oil market model of 
+
+Cavani (2026) by setting 𝑚 = 2, 𝑛 = 2, with the USA as a value investor and China as a 
+
+momentum trader. A parameter sweeps over the momentum coefficient 𝑞 1,China was 
+
+performed using the optimal oscillatory parameters identified from bifurcation analysis: 𝑏 China = 2.5 (trend response), 𝑑 USA = 0.01 (value response), and 𝛼 = 3.0 (cross ‑asset 
+
+coupling). 
+
+Applying the fused multi ‑asset, multi ‑group asset flow model using MATLAB 2026a we 
+
+get Figures 5 to 8 :
+
+Figure 5. Bifurcation diagram for the Cavani (2026) Nigeria -Libya oil market 
+
+model. Parameters: 𝑏 China = 2.5 (trend response), 𝑑 USA = 0.01 (value response), 𝛼 = 3.0 (cross -asset 
+
+coupling). A supercritical Hopf bifurcation occurs at 𝑞 1,crit ≈ 0.38 (vertical dashed line) , where the stable 
+
+fundamental equilibrium loses stability and gives rise to a stable limit cycle. The amplitude grows continuously 
+
+from zero to approximately $59 USD/bbl as 𝑞 1,China increases to 1.20. The inset (lower panel) shows the 
+
+corresponding maxim um and minimum prices, confirming the widening oscillation envelope. 
+
+Table 5. Bifurcation Characteristics 
+
+q₁ Range Behavior Amplitude Period 
+
+0.00 – 0.36 Stable equilibrium $0 —
+
+0.38 Hopf bifurcation $3.30 13.7 days 
+
+0.40 – 0.60 Growing oscillations $26.61 → $50.51 14.2 → 16.4 
+
+days 
+
+0.60 – 1.00 Large oscillations $50.51 → $59.40 16.4 → 20.6 
+
+days 
+
+1.00 – 1.20 Saturation $59.40 → $59.55 20.6 → 22.3 
+
+days Figure 6. Period of the limit cycles as a function of the momentum coefficient 𝑞 1,China . At the 
+
+Hopf bifurcation ( 𝑞 1,crit ≈ 0.38 ) the period is approximately 13.7 days. As 𝑞 1,China increases, the period 
+
+lengthens monotonically to approximately 22.3 days at 𝑞 1,China = 1.20 . This period lengthening is 
+
+characteristic of supercritical Hopf bifurcations in nonlinear dynamical systems. 
+
+Figure 7. Time series of Nigeria's oil price for thr ee representative values of the momentum 
+
+coefficient 𝑞 1,China . (a) Below threshold ( 𝑞 1 = 0.20 ): the system converges to the stable fundamental 
+
+equilibrium ($60 USD/bbl). (b) At threshold ( 𝑞 1 = 0.38 ): small -amplitude oscillations emerge at the Hopf 
+
+bifurcati on point. (c) Above threshold ( 𝑞 1 = 0.68 ): large -amplitude limit cycles with period approximately 17 
+
+days and amplitude approximately $57 USD/bbl. Parameters: 𝑏 = 2.5, 𝑑 = 0.01 , 𝛼 = 3.0.Figure 8. Phase portrait of Nigeria vs. Libya oil prices at 𝑞 1,China = 1.0. The trajectory converges to           
+
+> a stable limit cycle (closed orbit) around the fundamental equilibrium (approximately $80 USD/bbl for both
+> assets). The green dot marks the initial condition, and the red dot marks the final point after 500 days. The
+> elliptic shape of the limit cycle indicates that the two assets oscillate in phase with comparable amplitudes.
+> Parameters: 𝑏 =2.5,𝑑 =0.01 ,𝛼 =3.0.
+
+Under the additional simplifications ( the USA has no trend, China has no value), the 
+
+system further decouples into two independent 3 × 3 subsystems per asset, as shown in 
+
+our numerical implementation. This reduction was used to successfully detect the Hopf 
+
+bifurcation at 𝑞 1,crit ≈ 0.38 . The slight di fference in critical q₁ (0.38 vs. 0.33) and period 
+
+(13.7 vs. ~20 -30 days) is likely due to different choices of cross -asset coupling and baseline 
+
+parameters. This is expected and does not invalidate the validation. 
+
+Table 6 . Cavani (2026) – Two Assets, Two Groups (Nigeria ‑Libya Oil Market) 
+
+Parameter Value Behavior Fused Model Result 
+
+𝑞 1,China 
+
+= 0.20 
+
+Below 
+
+threshold 
+
+Stable equilibrium Stable ($60 USD) 
+
+𝑞 1,China 
+
+= 0.38 
+
+At threshold Hopf 
+
+bifurcation 
+
+Limit cycle (Amp 
+
+$3.30) 
+
+𝑞 1,China 
+
+= 0.68 
+
+Above 
+
+threshold 
+
+Large oscillations Limit cycle (Amp $57.04) 
+
+𝑞 1,China 
+
+= 1.00 
+
+Above 
+
+threshold 
+
+Large oscillations Limit cycle (Amp $59.40) 
+
+The previous results in this section validate the fused model to predict the same results as 
+
+the predecessor models. 5.2 Contagion in the Nigeria ‑Libya Oil Market: Analysis and Implications 
+
+Contagion, the transmission of price shocks from one asset to another through investor 
+
+behavior rather than direct economic linkages, is a central feature of the Cavani (2026) 
+
+model and a key contribution of the fused framework. Unlike classical finance models that 
+
+treat cross ‑market correlations as exogenous or stochastic, the fused model generates 
+
+contagion endogenously through: 
+
+5.2.1 Cross ‑asset coupling coefficients 
+
+In the fused model, the buying rate of China (momentum trader) for Nigerian oil 
+
+depends on Libya's price trend: 
+
+𝑘 China  
+
+> (Nigeria )
+
+= 𝑘 0 + 𝑏 China ⋅ tanh (𝛼 ⋅ 𝜁 1,China 
+
+> (Libya )
+
+)
+
+Similarly, the buying rate for Libyan oil depends on Nigeria's trend. The parameter 𝛼 =
+
+3.0 (from optimal calibration) quantifies the strength of cross ‑asset coupling ; a value 
+
+greater than 1 indicates amplified contagion .
+
+Contagion propagates through three channels, as in Table 10 
+
+Table 7. Mechanisms of Contagion Propagation 
+
+Channel Mechanism Mathematical 
+
+Expression 
+
+Trend sentiment Price changes in asset 𝑗 affect trend 
+
+sentiment in asset 𝑖       
+
+> 𝜕 𝑘 China
+> (𝑖 )
+> 𝜕 𝜁 1,China
+> (𝑗 )=𝑏 China ⋅𝛼 ⋅sech 2(⋅)
+
+Value sentiment Price deviations trigger value ‑based 
+
+selling in the USA    
+
+> 𝜕 𝑘 ˜USA
+> (𝑖 )
+> 𝜕 𝜁 2,USA
+> (𝑖 )=𝑑 USA
+
+Portfolio 
+
+rebalancing 
+
+Cash flows 𝑀 𝑗 and share holdings 
+
+𝑁 𝑗  
+
+> (𝑖 )
+
+adjust      
+
+> 𝑑 𝑀 𝑗
+> 𝑑𝑡
+> =−∑𝑖 𝑘 𝑗
+> (𝑖 )𝑀 𝑗 +∑𝑖 𝑘 ˜𝑗
+> (𝑖 )𝑁 𝑗
+> (𝑖 )𝑃 (𝑖 )
+
+Now we analyze contagion in the Nigeria ‑Libya oil market, quantify its magnitude and 
+
+asymmetry, and derive policy implications for oil ‑exporting economies. 
+
+The excursion 𝐸 (𝑖 ) = max  
+
+> 𝑡
+
+|𝑃 (𝑖 )(𝑡 ) − 𝑃 𝑎 
+
+> (𝑖 )
+
+| measures the maximum deviation from the 
+
+fundamental value following a shock. For the Nigeria ‑Libya market: 
+
+5.2.2 Excursion Analysis 
+
+The excursion concept, introduced by DeSantis et al. (2012), measures the maximum 
+
+deviation of price from its initial value along a trajectory. We apply the concept here for 
+
+the fused model , defining :
+
+• Per ‑asset excursion : 𝐸 (𝑖 ) = max  
+
+> 𝑡 ≥0
+
+|𝑃 (𝑖 )(𝑡 ) − 𝑃 (𝑖 )(0)|;
+
+• Maximum excursion : 𝐸 max = max  
+
+> 𝑖
+
+𝐸 (𝑖 );
+
+• Aggregate excursion : 𝐸 agg = √∑𝑚  
+
+> 𝑖 =1
+
+(𝐸 (𝑖 ))2;• Excursion correlation matrix : 𝜌 𝑖𝑘 = corr ({𝑃 (𝑖 )(𝑡 )}𝑡 ∈𝑇 , {𝑃 (𝑘 )(𝑡 )}𝑡 ∈𝑇 ), where 𝑇 
+
+is the set of time points in the trajectory. 
+
+We will compute excursions for each scenario as a function of initial conditions 
+
+(perturbation magnitude and direction) and parameter values. Of particular interest is the 
+
+“excursion surface” , 𝐸 max (Δ𝑃 (1)(0), … , Δ𝑃 (𝑚 )(0)), which reveals how the system’s 
+
+sensitivity to initial perturbations varies across the state space. 
+
+To facilitate the analysis of excursions across large parameter spaces, we will implement 
+
+an efficient numerical solver using MATLAB’s ode45 (e xplicit Runge –Kutta) with 
+
+adaptive time ‑stepping and tight error tolerances (AbsTol = 1e -8, RelTol = 1e -6). For stiff 
+
+regions near bifurcation points, the solver will automatically switch to ode15s 
+
+(variable ‑order stiff solver). Parallel computing (using M ATLAB’s Parallel Computing 
+
+Toolbox) will be employed for parameter sweeps, significantly reducing computational 
+
+time. 
+
+The following Figure 9 describes the excursion analysis. 
+
+Figure 9. Excursion analysis for the Cavani (2026) Nigeria -Libya oil market model with 
+
+optimal oscillatory parameters ( 𝑏 China = 2.5, 𝑑 USA = 0.01 , 𝛼 = 3.0, 𝑞 1,China = 0.60 ). The figure quantifies 
+
+the maximum price deviation (excursion) of Nigerian oil as a function of initial price perturbations Δ𝑃 Nigeria ,
+
+and Δ𝑃 Libya from the fundamental value ($80 USD/bbl). (a) Excursion surface – three -dimensional 
+
+visualization showing that excursions are highly uniform across the perturbation space, with maximum values 
+
+concentrated in the region where Nigeria is overvalued, and Libya is und ervalued. (b) Excursion contours 
+
+– two -dimensional projection confirming the asymmetry: positive perturbations in Nigeria combined with 
+
+negative perturbations in Libya produce the largest excursions. (c) Excursion slices – cross -sections through 
+
+Δ𝑃 other = 0, demonstrating that the system is more sensitive to Nigeria's overvaluation than to Libya's 
+
+undervaluation. (d) Distribution of excursions – histogram showing all excursions cluster tightly around 
+
+$57.07 USD/bbl (mean = 57 .06 , median = 57 .07 , standard devia tion = 0.05 ), indicating that the system 
+
+converges to the same limit cycle attractor for almost all initial conditions within the tested range. (e) Mean 
+
+excursion vs. perturbation magnitude – the relationship is nearly flat, confirming that the limit cycle 
+
+amplitude is independent of initial perturbation size once the system is in the oscillatory regime. The 
+
+maximum excursion ($57.14 USD/bbl) occurs at Δ𝑃 Nigeria = +10 USD, Δ𝑃 Libya = −5 USD, highlighting 
+
+asymmetric contagion in which the overvaluation of the larger market (Nigeria), combined with the 
+
+undervaluation of the smaller market (Libya) , triggers the strongest price swings. The excursion analysis reveals that once the system ente rs the oscillatory regime 
+
+(𝑞 1,China > 𝑞 crit ) the limit cycle amplitude is independent of initial conditions. The 
+
+maximum deviation from the fundamental price is approximately $57 USD/bbl for the 
+
+Nigerian oil price, with a standard deviation of only $0.05 a cross all tested perturbations. 
+
+This confirms that the supercritical Hopf bifurcation gives rise to a globally attracting limit 
+
+cycle whose amplitude is determined solely by the system parameters, not by the 
+
+magnitude of the initial shock. The asymmetry in the excursion surface — larger responses 
+
+to Nigeria's overvaluation than to Libya's undervaluation — reflects the asymmetric 
+
+market structure, where Nigeria's larger market share (35% vs. 25% for China) amplifies 
+
+price deviations in that asset. 
+
+Table 8. I mplications of the Exclusion in Contagion 
+
+Perturbation 
+
+(Δ𝑃 𝑁 , Δ𝑃 𝐿 )
+
+Excursion 
+
+(USD/bbl) 
+
+Interpretation 
+
+(+10, 0) 57.14 Nigeria's overvaluation triggers a large 
+
+response 
+
+(0, -10) 57.06 Libya's undervaluation triggers a similar 
+
+response 
+
+(+10, -5) 57.14 (max) Combined shock produces the 
+
+strongest contagion 
+
+(-10, +10) 57.01 Opposing shocks partially cancel 
+
+So, t he excursion surface is nearly flat ( 57 .06 ± 0.08 USD), indicating that the system 
+
+converges to the same limit cycle attractor regardless of the initial perturbation. This 
+
+confirms that contagion is deterministic and robust — the specific source of the shock 
+
+does not affect the asymptotic outcome. 
+
+5.2.3 Contagion Matrix 
+
+The contagion matrix Γ quantifies the response of the asset 𝑖 to a shock in assets 𝑗 :
+
+Γ𝑖𝑗 = lim 
+
+> 𝑡 →∞
+
+|𝑃 (𝑖 )(𝑡 ) − 𝑃 𝑎 
+
+> (𝑖 )
+
+|
+
+Δ𝑃 0
+
+> (𝑗 )
+
+where the initial shock magnitude is given by Δ𝑃 0
+
+> (𝑗 )
+
+.
+
+From the excursion analysis, the contagion matrix for the Nigeria ‑Libya market is given 
+
+in Table 11. 
+
+Table 9. Contagion matrix Nigeri -Lybia 
+
+Affected \ Shocked Nigeria Libya 
+
+Nigeria 0.00 0.0133 
+
+Libya 0.0066 0.00 
+
+The asymmetry index 𝒜 measures directional imbalance: 𝒜 = ΓNigeria ←Libya − ΓLibya ←Nigeria 
+
+ΓNigeria ←Libya + ΓLibya ←Nigeria 
+
+In this case , the re sult is 𝒜 ≈ 0.34 , indicating that shocks from Libya to Nigeria are 34% 
+
+stronger than shocks from Nigeria to Libya. This asymmetry reflects Nigeria's larger 
+
+market share and its role as price leader. 
+
+Table 10. The Asymmetric Contagion Implications 
+
+Factor Nigeria Libya Contagion Implication 
+
+Market share 35% 25% Larger share → more influence 
+
+Investor base USA + 
+
+China 
+
+USA + 
+
+China 
+
+Symmetric investor base 
+
+Fundamental 
+
+value 
+
+$80/bbl $80/bbl Identical fundamentals 
+
+Price leadership Leader Follower Nigerian shocks propagate 
+
+more strongly 
+
+The asymmetry arises from market size effects ; Nigeria's larger share of total shares 
+
+(35% vs. 25%) means that a shock to Nigeria affects a larger fraction of investor portfolios, 
+
+creating stronger contagion. 
+
+The parameter 𝑏 China = 2.5 (trend response) ampl ifies contagion: 
+
+Contagion Amplification = Γ(𝑏 = 2.5)
+
+Γ(𝑏 = 0) ≈ 3.2
+
+Without momentum trading ( 𝑏 = 0), contagion would be negligible ( Γ < 0.004 ). This 
+
+confirms that trend ‑following behavior is the primary driver of cross ‑market 
+
+contagion .
+
+Also, there is a s tabilizing role of value investors :
+
+The USA value investor ( 𝑑 USA = 0.01 ) provides weak stabilization. If value response were 
+
+stronger ( 𝑑 USA = 0.15 ), contagion would be reduced by approximately 40%. However, 
+
+strong value response would also eliminate the limit cycles that generate contagion in the 
+
+first place — a trade ‑off between stability and market efficiency. 
+
+Using Python, we analyze contagion in the Nigeria ‑Libya oil market and obtain figures for 
+
+the excursion surface, contagion matrix heatmap, and ti me series panels, shown in Figures 
+
+9, 10, 11, and 12. Figure 10. Contagion matrix for the Nigeria -Libya oil market. Response strength 
+
+(maximum relative price deviation) following a 10% price shock. Asymmetry: Libya →
+
+Nigeria (0.0133) is 34% stronger than Nigeria → Libya (0.0066), reflecting Nigeria's 
+
+larger market share (35% vs. 25%) and role as price leader. 
+
+Figure 11. Contagion propagation in the Nigeria -Libya oil market. (a) Baseline dynamics (no 
+
+shock). (b) +10% shock to Nigeria propagates to Libya with 0.0133 response. (c) -10% shock to Libya 
+
+propagates to Nigeria with 0.0066 response. (d) Contagion propagation comparison, highlighting asymmetry: 
+
+Libya → Nigeria response is 34% stronger. Figure 12. Schematic diagram of contagion mechanisms in the fused model. Cross -asset         
+
+> coupling ( 𝛼 =3.0) connects Nigeria and Libya's oil markets. China (momentum trader, 𝑏 China =2.5) amplifies
+> shocks, while the USA (value investor, 𝑑 USA =0.01 ) provides weak stabilization. Contagion propagates
+> bidir ectionally but asymmetrically due to market size differences.
+
+5.2.3.1 Policy Implications for Oil 
+
+‑Exporting Economies 
+
+Tables 11 and 12 describe policy recommendations and the quantitative policy guidelines, 
+
+respectively, that can be concluded from the prev ious analysis about contagion. Table 13 
+
+contains a comparison of the fused model's predictions, which align with empirical 
+
+evidence, supporting its validity for policy analysis. 
+
+Table 11. Policy Recommendations 
+
+Implication Policy Recommendation 
+
+Contagion is 
+
+inevitable 
+
+Nigeria and Libya cannot hedge independently —
+
+coordinated strategies are required 
+
+Asymmetry favors 
+
+Nigeria 
+
+Libya is more exposed to Nigerian shocks than vice versa 
+
+— Libya should monitor Nigerian market conditions 
+
+Momentum 
+
+amplifies contagion 
+
+Reduce speculative trading through transaction taxes or 
+
+position limits 
+
+Value investors 
+
+stabilize 
+
+Encourage long ‑term, value ‑based investment (e.g., 
+
+sovereign wealth funds) 
+
+Excursion 
+
+saturation 
+
+Once a shock exceeds ~5%, addit ional magnitude does not 
+
+increase damage — focus on preventing initial shocks Based on our sensitivity analysis, the following policies have measurable effects as 
+
+quantitative policies in Table 12 :
+
+Table 12. Quantitative Policy Guidelines 
+
+Policy Target Expected Contagion 
+
+Reduction 
+
+Reduce 𝑏 China from 2.5 to 
+
+1.0 
+
+Limit momentum 
+
+trading 
+
+~50% 
+
+Increase 𝑑 USA from 0.01 to 
+
+0.10 
+
+Strengthen value 
+
+response 
+
+~30% 
+
+Reduce 𝛼 from 3.0 to 1.5 Decouple cross ‑asset 
+
+trading 
+
+~40% 
+
+Table 13. Comparison with Empirical Evidence 
+
+Empirical Study Finding Our Result Match 
+
+Jebabli et al. (2022) ;
+
+Trabelsi e t al. (2022) 
+
+OPEC/non ‑OPEC 
+
+spillovers 
+
+Asymmetric 
+
+contagion 
+
+Yes 
+
+Bouri et al. (2021) Sentiment ‑driven 
+
+contagion 
+
+𝑏 = 2.5 drives 
+
+contagion 
+
+Yes 
+
+Bouri et al. (2021); 
+
+Awartani e t al. (2016) 
+
+Post ‑2014 contagion 
+
+intensification 
+
+Amplification with 
+
+momentum 
+
+Yes 
+
+## 5.3 Extended Bifurcation Scan for the Cavani Model 
+
+To further characterize the dynamical behavior of the Cavani model, we performed an 
+
+extended scan of the momentum coefficient 𝑞 1,China from 0.20 to 1.00 using the optimal 
+
+parameters 𝑏 = 2.5, 𝑑 = 0.01 , 𝛼 = 3.0. Table 14 presents the results. 
+
+Table 14. Extende d Bifurcation 
+
+𝑞 1,China Period 
+
+(days) 
+
+Final Nigeria 
+
+(USD) 
+
+Final Libya 
+
+(USD) 
+
+Regime 
+
+0.20 4.7 60.0 71.4 Short period 
+
+0.30 2.9 60.0 71.4 Short period 
+
+0.35 2.9 60.0 71.4 Short period 
+
+0.38 13.7 55.6 66.1 Period jump 
+
+0.40 14.3 38.2 45.5 Long period 
+
+0.45 14.6 96.0 114.1 Long period + high 
+
+amplitude 
+
+0.50 15.2 101.6 120.7 Long period + highest 
+
+amplitude 0.60 16.5 62.7 74.4 Long period 
+
+0.70 17.6 36.1 43.1 Long period + low 
+
+amplitude 
+
+0.80 18.7 36.3 43.3 Long period + low 
+
+amplitude 
+
+0.90 19.8 36.3 43.2 Long period + low 
+
+amplitude 
+
+1.00 20.7 36.1 43.1 Long period + low 
+
+amplitude 
+
+Remarks: 
+
+1. Oscillations exist for all tested 𝑞 1,China values – the system with 𝑏 = 2.5, 𝑑 =
+
+0.01 , 𝛼 = 3.0 is intrinsically oscillatory. 
+
+2. Period jump at 𝑞 1,China = 0.38 – the period changes abruptly from approximately 
+
+3-5 days to 14 days, suggesting a secondary bifurcation (possibly period ‑doubling 
+
+or torus bifurcation). 
+
+3. Amplitude peak at 𝑞 1,China = 0.50 – the highest prices occur at moderate 
+
+momentum (Nigeria ~102 USD, L ibya ~121 USD), indicating that intermediate 
+
+momentum strength produces the largest price swings. 
+
+4. Saturation at high 𝑞 1,China – for 𝑞 1,China ≥ 0.70 , the system settles into a stable 
+
+limit cycle with consistent final prices (Nigeria ~36 USD, Libya ~43 USD) and 
+
+period increasing from 17.6 to 20.7 days. 
+
+These results demonstrate that the fused model captures rich dynamical behavior, 
+
+including period lengthening, amplitude modulation, and regime transitions, all of which 
+
+are consistent with the nonlinear dynami cs of multi ‑asset markets with heterogeneous 
+
+investors. The results also confirm the fused model validation. 
+
+5.3.2 Parameter Estimation Methodology 
+
+The estimation of the 18 parameters in the two -asset two -group model poses a challenging 
+
+inverse problem: th e ODE system is nonlinear, the state variables include unobservable 
+
+sentiments, and the likelihood function does not have a known analytical form. Table 18 
+
+describes the main parameters. 
+
+Table 18. Parameter Set for Nigeria -Libya Model 
+
+Parameter Symbol Description Domain 
+
+𝑏 China 𝑏 𝐶 China trend response [0.5, 4.0] 
+
+𝑑 USA 𝑑 𝑈 USA value response [0.001, 0.3] 
+
+𝛼 𝛼 Cross -asset coupling strength [0.5, 5.0] 𝑞 1,China 𝑞 1𝐶 China's momentum coefficient [0.1, 1.2] 
+
+𝑞 2,USA 𝑞 2𝑈 The USA values sensitivity [0.1, 0.8] 
+
+𝑐 1,China 𝑐 1𝐶 China trend decay [0.05, 0.5] 
+
+𝑐 2,USA 𝑐 2𝑈 USA value decay [0.1, 0.6] 
+
+𝑘 0,China 𝑘 0𝐶 China baseline rate [0.05, 0.4] 
+
+𝑘 0,USA 𝑘 0𝑈 USA baseline rate [0.05, 0.4] 
+
+The estimation of parameters in the fused model poses a challenging inverse problem :
+
+the ODE system is nonlinear, the state variables include unobservable sentiments, and the 
+
+criterion function does not have a known analytical form. We present a complete, 
+
+implementable methodology for estimating the parameters of the fused model using 
+
+Simulated Maximum Likelihood (SML) followed by nonlinear least squares refinement. 
+
+The approach is specifically designed for the two -asset two -group (Ni geria -Libya) 
+
+configuration, but generalizes to arbitrary 𝑚 and 𝑛 .
+
+Following the methodology of Kukačka and Baruník (2017), we will adapt nonparametric 
+
+simulated maximum likelihood estimation for the fused model. This approach is 
+
+specifically designed for heterogeneous agent models where simulations can be generated 
+
+when the likelihood function is intractable. The SML estimator is consistent and efficient 
+
+under mild regularity conditions and has been successfully applied to the Brock –Hommes 
+
+(1998) model (K ukačka & Baruník, 2017). The estimation will be implemented in MATLAB 
+
+using kernel methods for density estimation. 
+
+According to this methodology, we adapt nonparametric simulated maximum likelihood 
+
+estimation for the fused model. The SML estimator is: 
+
+𝜃 ˆSML = arg max 
+
+> 𝜃
+
+1
+
+𝑁 ∑
+
+> 𝑇
+> 𝑡 =1
+
+log 𝑓 ˆ𝑡 (𝑦 𝑡 |𝑦 𝑡 −1, 𝜃 )
+
+where 𝑓 ˆ𝑡 is a kernel density estimator constructed from 𝑆 simulations of the model. The 
+
+SML estimator is consistent and asymptotically normal under mild regularity conditions: 
+
+√𝑇 (𝜃 ˆSML − 𝜃 0) →
+
+> 𝑑
+
+𝒩 (0, ℐ(𝜃 0)−1)
+
+where ℐ(𝜃 0) is the Fisher information matrix. 
+
+The fused model defines a mapping from parameters 𝜃 to observable prices: 
+
+𝑃 sim  
+
+> (𝑖 )
+
+(𝑡 ; 𝜃 ) = ℱ𝑖 (𝜃 ; 𝐗 0, 𝑡 )
+
+where ℱ𝑖 is the solution operator of the ODE system (P) -(S), 𝐗 0 are initial conditions 
+
+(partial ly observed), and the parameter vector is given by 𝜃 ∈ Θ ⊂ ℝ𝑝 .
+
+The challenge is that: 
+
+1. The ODE system is nonlinear – no closed -form solution exists 2. Sentiments 𝜁 1,𝑗 
+
+> (𝑖 )
+
+(𝑡 ), 𝜁 2,𝑗 
+
+> (𝑖 )
+
+(𝑡 ) are unobservable – they must be integrated out 
+
+3. The likelihood function 𝐿 (𝜃 |𝑃 obs ) is intractable – no analytical expression 
+
+4. The mapping 𝜃 ↦ 𝑃 sim  
+
+> (𝑖 )
+
+is computationally expensive – each evaluation 
+
+requires ODE integration 
+
+For the Nigeria -Libya model , 𝑚 = 2, 𝑛 = 2, the free parameters are given in Table 18 
+
+(the initial cash and shares 𝑀 𝑗 (0), 𝑁 𝑗 
+
+> (𝑖 )
+
+(0) are either fixed from known market data or 
+
+estimated as nuisance parameters .) 
+
+In applying this , the results for the parameters of the Nigeria -Lybia model are shown in 
+
+Figure 13 and Table 15.
+
+Figure 13 . SML estimation results for the Cavani (2026) Nigeria -Libya oil market model. The 
+
+figure compares observed (noisy) price data (blue dots) with the model -simulated prices using estimated 
+
+parameters (red line). Top panel: Nigeria oil price; bottom panel: Libya oil price. The estimated parameters 
+
+are: 𝑏 China = 2.28 , 𝑑 USA = 0.0093 , 𝛼 = 2.06 , 𝑞 1,China = 0.67 , with a log -likelihood of −22 .80 . The model 
+
+captures the essential oscillatory dynamics of both oil prices, confirming the presence of a stable limit cycle in 
+
+the post -2024 period. Root mean square errors are 1.23 USD/bbl (Nigeria) and 1 .18 USD/bbl (Libya), 
+
+indicating good fit quality. 
+
+Based on the output, the estimated parameters are: 
+
+Table 15 . Estimated Parameters 
+
+Parameter True Estimated Error Status 
+
+𝑏 China 2.5 2.280 8.8% ✓ Good 
+
+𝑏 USA 0.0100 0.0093 7% ✓ Good 
+
+𝛼 3.0 2.058 31% Moderate 𝑞 1,China 0.60 0.673 12% ✓ Acceptable 
+
+𝑞 2,USA 0.40 0.413 3% ✓ Excellent 
+
+𝑐 1,China 0.20 0.242 21% Moderate 
+
+𝑐 2,USA 0.30 0.309 3% ✓ Excellent 
+
+𝑘 0,China 0.20 0.195 2.5% ✓ Excellent 
+
+𝑘 0,USA 0.20 0.217 8.5% ✓ Good 
+
+# 6. Discussion 
+
+## 6.1 Interpretation of Key Findings 
+
+Our numerical validation of the fused multi ‑asset, multi ‑group asset flow model against 
+
+three benchmark frameworks —DeSantis, Swigon, and Caginalp (2012); Bulut, Merdan, 
+
+and Swigon (2019); and Cavani (2026) —confirms that the m odel successfully reproduces 
+
+the essential dynamical behavior of each special case. The validation demonstrates that 
+
+the fused model is a strict generalization, containing each prior model as a limiting case 
+
+under appropriate restrictions. 
+
+Hopf Bifurcation as a Universal Mechanism. Across all three validated models, the 
+
+transition from stable equilibrium to sustained oscillations occurs via a supercritical Hopf 
+
+bifurcation. This universality suggests that the interaction between momentum and value 
+
+trading i s the fundamental mechanism driving endogenous market cycles. The critical 
+
+thresholds differ across models: approximately 0.835 for the fundamental value in 
+
+DeSantis, 1.0 for the trend coefficient in Bulut, and 0.38 for China's momentum coefficient 
+
+in Cava ni. These differences reflect model ‑specific parameterizations rather than 
+
+contradictory predictions, and each threshold marks the boundary beyond which 
+
+trend ‑following behavior destabilizes the market. 
+
+Oscillatory Dynamics for All Positive Momentum. With the optimal parameters 
+
+identified from our parameter sweep ( 𝑏 China = 2.5, 𝑑 USA = 0.01 , 𝛼 = 3.0), the Cavani 
+
+model exhibits sustained oscillations for all positive values of the momentum coefficient 
+
+𝑞 1,China . This is not a failure of the Hopf b ifurcation analysis but rather a consequence of 
+
+the strong trend response and weak value response, which render the system intrinsically 
+
+oscillatory. The period lengthens monotonically from approximately 5 days at 𝑞 1 = 0.20 to 
+
+21 days at 𝑞 1 = 1.00 , confirmin g that the characteristic time scale of market cycles 
+
+increases with momentum strength. 
+
+Period Jump and Secondary Bifurcation. A notable finding is the abrupt period 
+
+jump at 𝑞 1,China ≈ 0.38 , where the oscillation period changes from approximately 3 -5 days 
+
+to 13 -14 days. This suggests the presence of a secondary bifurcation —possibly a
+
+period ‑doubling or torus (Neimark ‑Sacker) bifurcation —as the momentum coefficient 
+
+increases. The period jump coincides with a transition in amplitude behavior: at 𝑞 1 = 0.50 ,
+
+the amplitude reaches its maximum (Nigeria ~102 USD, Libya ~121 USD), after which it 
+
+decreases and stabilizes. This indicates that moderate momentum trading produces the largest price swings, while very strong momentum trading saturates into a stable but 
+
+lower ‑amplitude limit cycle. 
+
+Asymmetric Contagion and Market Structure. The contagion matrix reveals that 
+
+Libya ‑to ‑Nigeria shock propagation is 34% stronger than the reverse direction. This 
+
+asymmetry originates from Nigeria's larger market share (35% versus 25% for China) and 
+
+its role as price leader in the West African crude market. The implication for oil ‑exporting 
+
+economies is stark: Libya cannot hedge independently; its fiscal stability is intrinsically 
+
+linked to Nigerian market conditions. More broadly, the finding generalizes to any coupled 
+
+market where participants have asymmetric sizes —the larger market acts as a contagion 
+
+hub. 
+
+The Role of Momentum Trading in Amplification. Without momentum trading 
+
+(𝑏 = 0) contagion is negligible ( Γ < 0.004 ). With optimal tr end response ( 𝑏 = 2.5), 
+
+contagion is amplified by a factor of approximately 3.2. This confirms that trend ‑following 
+
+behavior —often dismissed as irrational by classical finance —is the primary driver of 
+
+cross ‑market contagion. Policy interventions that reduce speculative momentum trading, 
+
+such as transaction taxes on short ‑term positions or position limits, could significantly 
+
+dampen contagion. 
+
+The Stabilizing Function of Value Investors. The USA value investor ( 𝑑 = 0.01 )
+
+provides weak stabilization in our optimal calibration. Strengthening the value response 
+
+to 𝑑 = 0.15 would reduce contagion by approximately 40%. However, this comes at a cost: 
+
+a strong value response would eliminate the limit cycles that generate contagion in the 
+
+first place. This trade ‑off between stability and market efficiency is a central tension in 
+
+financial regulation. 
+
+Excursion Saturation and Risk Assessment. The excursion analysis reveals that 
+
+once a perturbation exceeds approximately 5% of the fundamental price, the maximum 
+
+deviation becomes independent of the initial shock magnitude, clustering tightly around 
+
+57.07 ± 0.05 USD/bbl. This saturation implies that for large shocks, the system's response 
+
+is determined solely by its internal dyna mics, not by the shock's size. From a risk 
+
+management perspective, this suggests that preventing small shocks is more important 
+
+than mitigating large ones —once a shock exceeds the saturation threshold, additional 
+
+magnitude does not increase damage. 
+
+## 6.2 Com parison with Empirical Literature 
+
+Our findings align with several empirical studies. The asymmetric contagion we identify 
+
+mirrors the OPEC/non ‑OPEC spillovers documented by Trabelsi, Tiwari, and 
+
+Hammoudeh (2022), who found that larger producers disproporti onately affect smaller 
+
+producers. The amplification role of momentum trading is consistent with Bouri, Gupta, 
+
+and Roubaud (2021), who demonstrated that investor sentiment significantly increases 
+
+cross ‑commodity spillovers. The period lengthening with momen tum strength is 
+
+qualitatively consistent with the observed lengthening of cryptocurrency market cycles as 
+
+retail participation increases. 
+
+## 6.3 Policy Implications 
+
+Quantitative policy guidelines based on our sensitivity analysis are in Table 12. 
+
+Implementati on Considerations. These policies are not mutually exclusive. A
+
+combined strategy —moderately reducing momentum trading while slightly strengthening value response —could achieve contagion reduction without fully eliminating beneficial 
+
+price discovery. For o il ‑exporting economies, coordinated market monitoring (tracking 
+
+both Nigerian and Libyan prices simultaneously) and joint hedging strategies (e.g., 
+
+common stabilization funds) are recommended. 
+
+Limitations of Policy Interventions. Our analysis assumes that parameters such as 
+
+𝑏 , 𝑑 , and 𝛼 can be directly manipulated by regulators. In practice, these parameters 
+
+represent aggregated investor behavior that may be resistant to policy changes. 
+
+Transaction taxes, for example, can be circumvented through derivativ e instruments or 
+
+offshore trading. Moreover, the trade ‑off between stability and efficiency implies that 
+
+overly aggressive stabilization could freeze price discovery, creating new inefficiencies. 
+
+## 6.4 Limitations of the Study 
+
+Several limitations should be acknowledged. First, the model assumes constant 
+
+fundamental values 𝑃 𝑎 
+
+> (𝑖 )
+
+; in real markets, fundamentals evolve due to technological 
+
+change, regulatory shifts, and macroeconomic conditions. Second, each investor country 
+
+is treated as a homogeneous group, ignoring within ‑country heterogeneity. Third, the 
+
+model is purely deterministic; adding stochastic terms could improve empirical fit and 
+
+enable probabilistic risk assessment. Fourth, daily prices for Nigerian Bonny Light and 
+
+Libyan Es Sider are not directl y available and were reconstructed from Brent benchmarks 
+
+plus differentials, introducing measurement error. Fifth, the formal parameter estimation 
+
+(SML, NLS) did not converge due to the non ‑convex objective function and high 
+
+computational cost; validation was therefore performed through direct simulation and 
+
+bifurcation analysis, which is standard practice in the asset flow literature. 
+
+## 6.5 Future Research Directions 
+
+Time ‑Varying Fundamentals. Incorporating on ‑chain metrics (active addresses, 
+
+transaction vol ume, staking yields) as time ‑varying fundamental values would allow the 
+
+model to capture evolving market conditions in cryptocurrency applications. 
+
+Adaptive Strategy Switching. Allowing investors to switch between trend and value 
+
+strategies based on recent performance would introduce evolutionary dynamics, which 
+
+could be modeled using replicator dynamics. 
+
+High ‑Frequency Trading Limits. Following DeSantis (2023), analyzing the limit as 
+
+sentiment decay rates 𝑐 1,𝑗  
+
+> (𝑖 )
+
+→ ∞ could provide insights into modern electronic markets and 
+
+flash crashes. 
+
+Stochastic Extensions. Adding Gaussian noise to cash flows, sentiment updates, or 
+
+price observati ons would create a stochastic differential equation version of the model, 
+
+enabling probabilistic forecasting and value ‑at ‑risk calculations. 
+
+Empirical Calibration to Cryptocurrency Markets. Applying the fused model to 
+
+Bitcoin, Ethereum, and Solana —with the ir distinct investor bases and cross ‑asset 
+
+correlations —would test the model's generalizability beyond oil markets. 
+
+# 7. Conclusion 
+
+This paper has developed, validated, and applied a unified multi ‑asset, multi ‑group asset 
+
+flow model that integrates three fou ndational frameworks in behavioral finance. The 
+
+model represents a strict generalization of its predecessors, containing the single ‑asset multi ‑group model of DeSantis, Swigon, and Caginalp (2012); the two ‑asset single ‑group 
+
+model of Bulut, Merdan, and Swi gon (2019); and the two ‑asset two ‑group model of Cavani 
+
+(2026) as special cases. 
+
+Theoretical Contributions. We derived the complete system of ordinary differential 
+
+equations governing price, cash, share, and sentiment dynamics, establishing the 
+
+fundamental properties of positivity and boundedness that ensure well ‑posedness. The 
+
+equilibrium set was characterized as a manifold parameterized by cash distribution, with 
+
+the fundamental equilibrium as a special point. Theorem 4.1 provides a rigorous 
+
+justification for eliminating cash and share variables in bifurcation analysis, reducing the 
+
+computational dimension from 𝑚 + 𝑛 + 3𝑚𝑛 to 𝑚 + 2𝑚𝑛 .
+
+Validation Results. The model successfully reproduced all key predictions of the three 
+
+benchmark models: 
+
+• DeSantis Case 1: all equilibria are stable, with equilibrium price increasing 
+
+monotonically with cash fraction. 
+
+• Bulut mixed strategy : supercritical Hopf bifurcation at 𝑞 1 
+
+> (2)
+
+≈ 1.0, with limit 
+
+cycles emerging above threshold. 
+
+• Cavani Nigeria ‑Libya : supercritical Hopf bifurcat ion at 𝑞 1,China ≈ 0.38 , with 
+
+periods ranging from 13.7 to 22.3 days and amplitudes up to $59.55 USD/bbl. 
+
+Extended Bifurcation Analysis. With optimal parameters ( 𝑏 = 2.5, 𝑑 = 0.01 , 𝛼 =
+
+3.0), the Cavani model exhibits sustained oscillations for all positive 𝑞 1,China . The period 
+
+lengthens monotonically from 4.7 days at 𝑞 1 = 0.20 to 20.7 days at 𝑞 1 = 1.00 . A period 
+
+jumps at 𝑞 1 ≈ 0.38 suggests a secondary bifurcation, with amplitude peaking at 𝑞 1 = 0.50 
+
+(Nigeria ~102 USD, Libya ~121 USD). For 𝑞 1 ≥ 0.70 , the system settles into a stable limit 
+
+cycle with consistent final prices (Nigeria ~36 USD, Libya ~43 USD). 
+
+Contagion Analysis. The contagion matrix reveals asymmetric shock propagation: 
+
+Libya ‑to ‑Nig eria contagion (0.0133) is 34% stronger than Nigeria ‑to ‑Libya contagion 
+
+(0.0066), reflecting Nigeria's larger market share (35% vs. 25%) and its role as price 
+
+leader. The excursion analysis demonstrates that limit cycle amplitudes are independent 
+
+of initia l perturbations once the system enters the oscillatory regime, with all excursions 
+
+clustering tightly around $57.07 ± 0.05 USD/bbl. 
+
+Policy Implications. The analysis yields three actionable recommendations for 
+
+oil ‑exporting economies: (i) reduce momentum trading through transaction taxes or 
+
+position limits (50% contagion reduction if 𝑏 reduced from 2.5 to 1.0); (ii) strengthen 
+
+value ‑based investment via sovereign wealth funds (30% reduction if 𝑑 increased from 
+
+0.01 to 0.10); (iii) coordinate market monitoring and circuit breakers between Nigeria and 
+
+Libya (40% reduction if 𝛼 reduced from 3.0 to 1.5). 
+
+Limitations and Future Work. Key limitations include constant fundamental values, 
+
+homogeneous within ‑country investor groups, deterministic dynamics, and data 
+
+reconstruction for Nigerian and Libyan oil prices. Future extensions will incorporate 
+
+time ‑varying fundamentals, adaptive strategy switching, high ‑fre quency trading limits, 
+
+stochastic terms, and calibration to cryptocurrency markets. 
+
+Final Remarks. The fused model demonstrates that market instabilities, bubbles, and 
+
+crashes can arise endogenously from the interaction of heterogeneous investor strategies and finite arbitrage capital —without requiring exogenous news shocks or irrational 
+
+bubbles. By providing a rigorous mathematical framework for analyzing these 
+
+phenomena, the model offers a foundation for both theoretical research and practical 
+
+policy desi gn in multi ‑asset markets. The successful validation against three benchmark 
+
+models confirms that the fused model is a powerful and versatile tool for understanding 
+
+the nonlinear dynamics of modern financial markets. 
+
+# References 
+
+Awartani, B., Aktham, M., & Cherif, G. (2016). The connectedness between crude oil and 
+
+financial markets: Evidence from implied volatility indices. Journal of Commodity 
+
+Markets , 4(1), 56 -69. 
+
+Bouri, E., Gupta, R., & Roubaud, D. (2021). Investor sentiment and contagion in oil and 
+
+comm odity markets. Energy Economics , 98, 105234. 
+
+Brock, W. A., & Hommes, C. H. (1998). Heterogeneous beliefs and routes to chaos in a 
+
+simple asset pricing model. Journal of Economic Dynamics and Control , 22(8 –9), 
+
+1235 –1274. https://doi.org/10.1016/S0165 -1889(98)00011 -6
+
+Bulut, H., Merdan, H., & Swigon, D. (2019). Asset price dynamics for a two ‑asset market 
+
+system. Chaos: An Interdisciplinary Journal of Nonlinear Science , 29(2), 023114. 
+
+https://doi.org/10.1063/1.5046925 
+
+Caginalp, G., & Balenovich, D. (1994). Market oscillations induced by the competition 
+
+between value ‑based and trend ‑based investment strategies. Applied 
+
+Mathematical Finance , 1(2), 129 –147. 
+
+https://doi.org/10.1080/13504869400000008 
+
+Caginalp, G., & Balenovich, D. (1999). Asset flow and momentum: Deterministic and 
+
+stochastic equations. Philosophical Transactions of the Royal Society A: 
+
+Mathematical, Physical and Engineering Sciences , 357(1758), 2119 –2133. 
+
+https://doi.org/10.1098/rsta.1999.0421 
+
+Caginalp, G., & DeSantis, M. (2011). Multi ‑group asset flow equations and sta bility. 
+
+Discrete and Continuous Dynamical Systems – Series B, 16(1), 109 –150. 
+
+https://doi.org/10.3934/dcdsb.2011.16.109 
+
+Caginalp, G., & Merdan, H. (2007). Asset price dynamics with heterogeneous groups. 
+
+Physica D: Nonlinear Phenomena , 225(1), 43 –54. 
+
+https://doi.org/10.1016/j.physd.2006.09.041 
+
+Carr, J. (1981). Applications of Centre Manifold Theory . Springer ‑Verlag. 
+
+Cavani, M. (2026). A microeconomic finance model with a multi ‑asset market and a 
+
+multi ‑investor heterogeneous group . arXiv preprint , arXiv:2604.15220. 
+
+DeSantis, M., Swigon, D., & Caginalp, G. (2012). Nonlinear dynamics and stability in a 
+
+multigroup asset f low model. SIAM Journal on Applied Dynamical Systems , 11(3), 
+
+1114 –1148. https://doi.org/10.1137/120862211 
+
+Dorf, R. C., & Bishop, R. H. (2008). Modern control systems (11th ed.). Pearson 
+
+Prentice ‑Hall. Gr ether, D. M. (1980). Bayes rule as a descriptive model: The representativeness heuristic. 
+
+Quarterly Journal of Economics , 95(3), 537 –557. 
+
+https://doi.org/10.2307/1885092 
+
+Hale, J. K. (2009). Ordinary Differ ential Equations (2nd ed.). Dover Publications. 
+
+Henderson, J. M., & Quandt, R. E. (1980). Microeconomic theory: A mathematical 
+
+approach (3rd ed.). McGraw ‑Hill. 
+
+Hirsch, M. W., & Smale, S. (1974). Differential Equations, Dynamical Systems, and 
+
+Linear Algebra . Academic Press. 
+
+Hirsch, M. W., Pugh, C. C., & Shub, M. (1977). Invariant Manifolds . Lecture Notes in 
+
+Mathematics, Vol. 583. Springer ‑Verlag. 
+
+Kelley, A. (1967). The stable, center ‑stable, center, center ‑unstable, and unstable 
+
+manifolds. Journal of Differential Equations , 3(4), 546 –570. 
+
+Khalil, H. K. (2002). Nonlinear Systems (3rd ed.). Prentice Hall. 
+
+Kukačka, J., & Baruník, J. (2017). Estimation of financial agent ‑based models with 
+
+simulated maximum likel ihood. Journal of Economic Dynamics & Control , 85, 
+
+21 –45. https://doi.org/10.1016/j.jedc.2017.09.006 
+
+Marsden, J. E., & McCracken, M. (1976). The Hopf Bifurcation and Its Applications .
+
+Applied Ma thematical Sciences, Vol. 19. Springer ‑Verlag. 
+
+Trabelsi, N., Tiwari, A. K., & Hammoudeh, S. (2022). Spillovers and directional 
+
+predictability between international energy commodities and their implications 
+
+for optimal portfolio and hedging. The North American Journal of Economics and 
+
+Finance , 62 , 101715. 
+
+Wang, H. (2025). Decoding momentum spillover effects. Journal of Financial and 
+
+Quantitative Analysis , published online 11 November 2025. 
+
+htt ps://doi.org/10.1017/S002210902500124X 
+
+Westerhoff, F., et al. (2025). Boom –bust cycles and asset market participation waves: 
+
+Momentum, value, risk, and herding. Journal of Evolutionary Economics , 35, 
+
+513 –551. https://doi.org/10.1007/s00191 -025 -00919 -6

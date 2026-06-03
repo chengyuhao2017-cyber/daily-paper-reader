@@ -1,0 +1,221 @@
+Title: Beyond TVL: An Explainable Risk Scoring Framework for Tokenized Real-World Assets
+
+URL Source: https://arxiv.org/pdf/2605.29689v1
+
+Published Time: Fri, 29 May 2026 01:02:10 GMT
+
+Number of Pages: 11
+
+Markdown Content:
+# Beyond TVL: An Explainable Risk Scoring Framework for Tokenized Real-World Assets 
+
+Rischan Mafrur, Khadijah 
+
+> Western Sydney University, CryptoCoinHalal R.Mafrur@westernsydney.edu.au , Khadijah@cryptocoinhalal.com
+
+Abstract 
+
+Tokenized real-world assets (RWAs) are often evaluated through headline indicators such as total value locked (TVL) or on-chain asset value. However, a large asset base does not necessarily imply low risk, since tokenized assets may remain illiquid, weakly traded, or highly concentrated among a small number of holders. Using public data from RWA.xyz, this paper develops an empirical and explainable risk scoring framework for tokenized RWA markets. The framework evaluates three dimensions of risk: liquidity risk L, concentration risk C, and market-quality risk M . These risk dimensions are constructed from observable indicators, including turnover, holder distribution, active-address activity, transfer frequency, and network concentration measured through Herfindahl indices. The analysis shows that several RWA tokens with substantial on-chain value exhibit high empirical risk because they combine limited transfer activity, low turnover, and concentrated ownership structures. In contrast, assets with broader participation and stronger on-chain activity display lower liquidity and concentration risk, even when their headline asset values are smaller. The findings demonstrate that TVL alone can obscure important risks in tokenized asset markets. By providing a transparent and data-driven risk scoring approach, this paper contributes to the empirical assessment of RWA liquidity and offers a practical basis for comparing tokenized assets beyond headline valuation metrics. 
+
+Keywords: tokenized real-world assets, RWA, risk scoring framework 
+
+1. Introduction 
+
+Tokenized real-world assets are moving from a conceptual promise to a measurable market segment. Policymakers and market participants increasingly view tokenisation as a poten-tially important infrastructure layer for money, securities, funds, and collateral management [3, 6, 8]. At the same time, official reports stress that tokenisation does not remove the economic, legal, or operational frictions embedded in the underlying claim structure [9, 7]. In other words, putting an asset on-chain does not automatically make it liquid, transparent, or robust. This point matters acutely for tokenized real-world assets. In market practice, the qual-ity of tokenized RWAs is often summarised with scale metrics such as TVL, market value, assets under management, or circulating supply. Those indicators are useful for measuring adoption, but they are not equivalent to exitability. Market microstructure has long shown 
+
+> arXiv:2605.29689v1 [cs.CE] 28 May 2026
+
+that liquidity is distinct from size, and that depth, breadth, fragmentation, and price im-pact matter for execution quality [10, 2, 11]. Information economics further suggests that where asset quality is difficult to verify, disclosure quality and credible certification become central to market functioning [1]. For tokenized RWAs, those concerns are amplified by the coexistence of on-chain transferability and off-chain reserve, custody, legal, and redemption processes. The empirical challenge is therefore not whether tokenized RWAs are “large”, but whether they are structurally investable. A tokenized treasury fund with billions of dollars in value may still be unsuitable for many investors if it has only a few dozen holders, a narrow dealing window, a high minimum redemption amount, or uncertain legal segregation. Conversely, a somewhat smaller product may be materially more investable if it combines wider holder breadth, frequent reporting, stronger legal form, lower entry barriers, and more consistent activity. To address this, we propose an explainable risk scoring framework focusing on liquidity, concentration, and market-quality dimensions. Each dimension is constructed from publicly measurable RWA.xyz data (holders, transfers, active addresses, network distribution). We compute (a) liquidity risk based on turnover and transfer activity; (b) concentration risk 
+
+based on holder breadth and wealth-per-holder; and (c) market-quality risk based on cross-chain participation and trading concentration. Each component is normalized and averaged for a composite risk score. Our pilot sample of 10 tokenized RWAs (U.S. Treasury funds, credit funds, and gold tokens) illustrates how assets with similar TVL can have very different risk profiles under the L–C–M scores. The key contribution is one of the first empirical, data-driven frameworks to rank to-kenized RWAs by observable liquidity and activity metrics. We emphasize that TVL and static size metrics are insufficient on their own: the observable ease of exiting (turnover and active participation) and ownership dispersion are crucial for assessing investability. By using only public RWA.xyz data, the resulting L, C, M scores are transparent, reproducible, and explainable. We show examples where large funds with many holders have low liquidity risk, while smaller funds with concentrated ownership can score worse. This work targets practitioners and researchers who need to go beyond headline TVL and understand the actual secondary-market dynamics of tokenized assets. 
+
+2. Literature review 
+
+2.1. Tokenisation and financial market structure 
+
+Recent institutional work treats tokenisation as a potentially important redesign of fi-nancial market plumbing rather than a mere repackaging of cryptoassets [3, 6, 8]. The IMF argues that tokenisation may reduce frictions across parts of the asset life cycle, but that the benefits depend on the persistence of market inefficiencies, interoperability limits, and legal design [7]. IOSCO likewise emphasises that investor protection, transfer validity, settlement finality, and legal enforceability remain central risks in tokenized financial assets [9]. These observations are especially relevant for RWAs because tokenisation creates a lay-ered claim. The token is on a public or semi-public ledger, but the asset, the reserve, the bankruptcy waterfall, and redemption processes remain partly or wholly off-chain. As BIS 2has argued, tokenisation sits on a “continuum” in which technical feasibility is only one dimension; legal recognition and operational trust remain binding constraints [3]. 
+
+2.2. Liquidity, exitability, and market quality 
+
+Classical market microstructure distinguishes capitalisation from liquidity. Kyle’s model links liquidity to price impact and informed trading [10]; Amihud formalises an illiquid-ity premium using price impact relative to trading activity [2]; O’Hara and Ye show that fragmentation can affect market quality depending on how order flow and liquidity are dis-tributed [11]. The implication for tokenized RWAs is direct: a large tokenized fund may still be difficult to exit if activity is episodic, fragmented, or dominated by internal rebalancing rather than organic two-sided trading [12]. BIS work on tokenized money market funds reinforces this point. Tokenized MMFs can mirror and in some cases amplify traditional liquidity mismatch and run-dynamics concerns, particularly when they are used as collateral or settlement assets in layered market struc-tures [4]. Related BIS work on tokenized real estate similarly cautions against assuming that tokenisation alone creates deep secondary markets [5]. In short, tokenisation does not automatically create liquidity. 
+
+3. Research gap and contributions 
+
+Existing RWA analyses are mostly descriptive or case-based. Academic studies focus on specific domains (e.g. tokenized real estate) and find generally low trading [13]. However, there has been little prior work on a general, cross-asset risk rating methodology for tokenized RWAs. In particular, we are aware of no published framework that (a) uses public data to score RWA liquidity and concentration, and (b) produces an explainable index combining multiple dimensions. This paper fills that gap. Our contributions are: (1) We develop an explainable, empirical L-C-M scoring frame-work for tokenized RWAs. The dimensions are chosen for data availability and theoretical relevance. (2) We illustrate the framework on 10 diverse RWA tokens using real data from RWA.xyz. (3) We demonstrate that widely reported figures (TVL, market cap) can be mis-leading: e.g. a token with $2B in assets may have turnover and trading risk akin to a token with only $10M market cap if active trading is negligible. (4) We provide sensitivity analysis, showing how the composite score changes if an investor weights liquidity or concentration more heavily. The goal is not to replace expert risk analysis, but to provide a transparent quantitative screening tool. All data used are public and verifiable. We explicitly discuss limitations (e.g. unobserved off-chain trading, legal risk) and treat the framework as a pilot for further research. 
+
+4. Data and methodology 
+
+4.1. Sample selection 
+
+We use publicly accessible data from RWA.xyz, an analytics platform for tokenized as-sets. RWA.xyz aggregates on-chain and issuer-provided data for every listed RWA, including asset value, token supply, holders, and transfer activity. We select 10 representative tokens 3spanning categories: five U.S. Treasury funds ( BUIDL , BENJI , OUSG , USTB , USDY ), one major stablecoin ( USDC ), two private-credit funds ( HLSCOPE , STAC ), and two gold tokens ( PAXG ,
+
+XAUT ). These were chosen for high on-chain value and category diversity which explained in detail in Table 1. 
+
+Table 1: Pilot sample of tokenized RWAs                                                                
+
+> Ticker Category Token form Public access profile Illustrative structural fea-ture BUIDL Tokenized treasury/MMF Fund share token U.S. qualified purchasers Daily dealing, but very high minimum primary-market size BENJI Tokenized treasury/MMF Mutual fund share token U.S. retail and institu-tional investors Registered fund structure with low minimum invest-ment OUSG Tokenized treasury Fund token U.S. qualified purchasers Daily and instant redemp-tion architecture, qualified access only USTB Tokenized treasury Fund token Accredited and qualified purchasers Banking-day dealing and upgradable contract design USYC Tokenized treasury/MMF Fund share token Non-U.S. investors Large asset value with nar-row holder base USDY Yield-bearing treasury-linked note Tokenized note Qualifying non-U.S. in-vestors Strong activity but mean-ingful legal and eligibility restrictions HLSCOPE Private credit Tokenized feeder fund share Accredited investors Monthly subscription and redemption cycle STAC Structured credit Tokenized fund share Reg D / Reg S eligible in-vestors Very concentrated holder base and explicit redemp-tion fee PAXG Gold Commodity-backed token Retail and institutional ac-cess Strong breadth and activ-ity; redemption and cus-tody remain central XAUT Gold Commodity-backed token Non-U.S. investors High redemption minimum despite strong transfer ac-tivity
+
+For each token, we extract all visible variables on its RWA.xyz asset page as of May 2026. Specifically, we collect: ticker, asset name, category, total asset value (on-chain market cap or NAV), net asset value per share, number of holders, number of active addresses (past 30 days), monthly transfer count, monthly transfer volume (USD), 7-day and 30-day APY if listed, management fee, issuer/platform info, investor eligibility, tokenization type, and network distribution of holders/active addresses/volume. Table 2 reports the key raw variables. It shows, for example, that BUIDL has $2.487B asset value with 108 holders and 30-days 24 active addresses, but monthly volume of only $1.092B (8e-4 turnover). By contrast, BENJI has a smaller $823M asset value but 1106 holders and 17 active addresses, with only $10M monthly volume. In the end, we exclude USDC from the main analysis and use it as a benchmark, since it is a large stablecoin with a market value of $72 billion and approximately 42 million holders. 
+
+5. Three-Dimensional Explainable RWA Scoring Framework 
+
+We construct three risk scores Li, C i, M i (higher = more risk) as follows: 4Table 2: Raw RWA.xyz variables used in pilot metric construction 
+
+Ticker Category Asset value Holders Active addr. Transfer vol. Transfer count BUIDL Treasury 2,487 ,654 ,577 108 24 1,092 ,239 ,594 88 
+
+BENJI Treasury 823 ,165 ,231 1,106 17 10 ,063 ,830 19 
+
+OUSG Treasury 612 ,494 ,992 55 15 110 ,807 ,065 34 
+
+USTB Treasury 721 ,054 ,020 99 21 285 ,750 ,617 709 
+
+USDC Stablecoins 72 ,102 ,491 ,659 42 ,268 ,158 18 ,527 ,278 4,204 ,621 ,116 ,056 721 ,150 ,802 
+
+USDY Treasury 2,143 ,889 ,939 14 ,495 4,325 566 ,702 ,395 158 ,269 
+
+HLSCOPE Private credit 4,359 ,598 45 6 123 ,534 3
+
+STAC Structured credit 101 ,323 ,883 4 1 3,549 ,447 1
+
+PAXG Gold 4,215 ,207 ,035 83 ,949 11 ,385 3,765 ,680 ,650 263 ,339 
+
+XAUT Gold 2,591 ,487 ,591 56 ,487 17 ,589 4,239 ,912 ,225 173 ,584 
+
+Table 3: Variable definitions and orientation 
+
+Variable Definition Direction of risk Motivation Turnover T urnover i =
+
+> T ransf erV olume 30 ,i
+> AssetV alue i
+
+Lower turnover ⇒ higher risk Exitability proxy Active ratio AR i = ActiveAddresses 30 ,i  
+
+> Holders i
+
+Lower ratio ⇒ higher risk Breadth of actual use Transfer intensity T I i = T ransf erCount 30 ,i  
+
+> Holders i
+
+Lower intensity ⇒ higher risk Persistence of activity Average transfer size AT S i = T ransf erV olume 30 ,i  
+
+> T ransf erCount 30 ,i
+
+Larger size ⇒ higher risk Blocky rather than broad activ-ity Average value per holder AV H i = AssetV alue i 
+
+> Holders i
+
+Larger value ⇒ higher risk Concentrated ownership proxy Holder HHI HHI i = P 
+
+> h
+
+s2 
+
+> ih
+
+Higher HHI ⇒ higher risk Ownership concentration Network concentration N HHI i = P 
+
+> c
+
+ω2 
+
+> ic
+
+Higher concentration or thin fragmentation can increase risk Cross-chain distribution quality 
+
+5.1. Liquidity Risk ( L)
+
+L combines turnover, active ratio AR , transfer intensity T I , and average transfer size 
+
+AT S . Intuitively, low turnover or low active ratio implies higher liquidity risk. Formally, we first normalize each metric to a 0–100 risk scale by min-max scaling across the 10 assets: RiskNorm (xi) = 
+
+(100 xi−min( x)max( x)−min( x) , if x is risk-increasing (e.g. large ATS means risk) ,
+
+100 max( x)−xi
+
+max( x)−min( x) , if x is protective (e.g. higher turnover lowers risk) .
+
+Concretely, turnover, active ratio, and transfer intensity are treated as protective (higher is lower risk), while average transfer size is risk-increasing (higher block trades = higher risk). We calculate their risk-normalized scores and then average them: 
+
+Li = 14
+
+
+
+RiskNorm( Turnover i) + RiskNorm( ActiveRatio i)+ RiskNorm( TransferIntensity i) + RiskNorm( ATS i)
+
+
+
+.
+
+For example, BENJI has very low turnover (0.012) and active ratio (0.015), yielding high L
+
+(low liquidity). In contrast, XAUT has the highest turnover (1.636), moderate active ratio (0.311), so its L is moderate. 
+
+5.2. Concentration Risk ( C)
+
+C measures holder concentration. We use number of holders (protective: more holders = lower risk), average value per holder (AVH = AssetValue/Holders, risk-increasing if high), 5and holder network concentration (NHHI) as proxies. Again we min-max normalize: 
+
+Ci = RiskNorm( Holders i) + RiskNorm( AVH i) + RiskNorm(NHHI i)3 .
+
+Here RiskNorm( Holders ) uses the protective formula (fewer holders = higher risk). Since network HHI is already a concentration (0 to 1), we scale it to 0–100 (risk increases with HHI). For example, BENJI has 1106 holders (many compared to BUIDL ) so one component is low risk, but its network HHI is 1 (all on Stellar) giving high risk on that dimension. We average all three contributions. 
+
+5.3. Market-Quality Risk ( M )
+
+M captures on-chain trading concentration and fragmentation. We use the Herfindahl index of active addresses by chain and of transfer volume by chain. Both of these are risk-increasing (more concentrated chains → higher M ). Define 
+
+Mi = RiskNorm(HHI active ,i ) + RiskNorm(HHI volume ,i )2 .
+
+E.g. HLSCOPE trades mostly on Polygon (active HHI=1, volume HHI=1) so M = 100 . By contrast, USDC is widely distributed (very low HHIs), so M ≈ 0. Chain fragmentation (many small-chain trades) effectively lowers M .The summary of the variables used in this paper can be seen in Table 3. 
+
+5.4. Composite Score 
+
+We combine the three sub-scores into a single composite risk index. The baseline com-posite is the simple average: Composite i = Li + Ci + Mi
+
+3 .
+
+We also analyze sensitivity by alternative weights: (i) liquidity-heavy (0 .5, 0.25 , 0.25) , (ii) 
+
+concentration-heavy (0 .25 , 0.5, 0.25) , and (iii) market-quality-heavy (0 .25 , 0.25 , 0.5) . Higher composite means empirically higher risk (low liquidity, high concentration or poor market quality). 
+
+6. Empirical Results 
+
+Table 4 reports the derived variables used to construct the empirical liquidity, concentra-tion, and market-quality scores. The results show substantial heterogeneity across tokenized RWA products. USDC records the highest turnover and transfer intensity, reflecting its role as a highly active stablecoin benchmark rather than a fund-type tokenized asset. Among the RWA products, XAUT and PAXG show relatively high turnover, suggesting stronger ob-served transfer circulation than most tokenized Treasury and credit products. By contrast, BENJI, HLSCOPE, and STAC exhibit low turnover and low transfer intensity, indicating limited observed secondary activity relative to their asset value and holder base. The average value per holder also varies sharply, with BUIDL, OUSG, USTB, and STAC showing much 6higher values than commodity tokens, which suggests stronger institutional concentration. Finally, the NHHI values indicate that several products remain highly concentrated across networks, with BENJI, HLSCOPE, STAC, and PAXG recording an NHHI of 1.0000, while USDC and USDY show more dispersed network activity. Overall, the table supports the papers main argument that asset value alone is insufficient to assess tokenized RWA quality because liquidity, holder breadth, and market activity differ substantially across products. 
+
+Table 4: Corrected calculated liquidity, concentration, and market quality variables                                                                   
+
+> Ticker Category Turnover Active ratio Transfer intensity AVH NHHI BUIDL Treasury 0.4391 0.2222 0.8148 23033839 0.4939 BENJI Treasury 0.0122 0.0154 0.0172 744273 1.0000 OUSG Treasury 0.1809 0.2727 0.6182 11136273 0.6626 USTB Treasury 0.3963 0.2121 7.1616 7283374 0.8141 USDC Stablecoins 58.3145 0.4383 17.0613 1706 0.1414 USDY Treasury 0.2643 0.2984 10.9189 147905 0.2660 HLSCOPE Private credit 0.0283 0.1333 0.0667 96880 1.0000 STAC Structured credit 0.0350 0.2500 0.2500 25330971 1.0000 PAXG Gold 0.8934 0.1356 3.1369 50212 1.0000 XAUT Gold 1.6361 0.3114 3.0730 45878 0.9050
+
+Table 5 shows the computed L, C, M and composite scores for the 10 assets. Large institutional issuances like PAXG (gold) have very high holder counts and multi-chain activity, yielding relatively low L and moderate C risk. For instance, PAXG achieves L ≈ 62 .96 (lower risk) due to very high turnover (many transfers) and decent active participation, even though it has only one chain of issuance (raising some concentration). Conversely, BENJI (short-duration bond token) has low turnover (0.012) and tiny active ratio (1.5%), giving it a high liquidity risk L ≈ 76 .06 , despite having many holders which slightly moderates C.Although USDC is included in the raw variable table as a benchmark, it is excluded from the final RWA scoring sample because it is a reserve-backed stablecoin rather than a fund-type tokenized real-world asset. This distinction is important because USDC has a sub-stantially different market function, user base, and transfer profile from tokenized Treasury, credit, and commodity products. If the same liquidity, concentration, and market-quality variables are applied mechanically, USDC receives near-zero risk scores because it has very high turnover, a large active-address base, low average value per holder, and broad cross-chain usage. This result is useful as a benchmark because it shows what a highly active and widely distributed on-chain asset looks like under the proposed metrics. However, including 
+
+USDC in the main RWA sample would distort the normalization because its transfer activity is orders of magnitude larger than the other products. For this reason, USDC is reported as a benchmark but excluded from the final composite RWA ranking. In contrast, private-credit tokens STAC and HLSCOPE score highest. STAC has only 4 holders and minimal trading (only one transfer recently), giving L ≈ 67 .92 , C = 100 , M = 100 , and composite ≈ 89 .3. Even adjusting weights, STAC remains at the top (see Table 6). HLSCOPE 
+
+similarly has very few active trades, so both L and C are high. 
+
+7. Discussion 
+
+Our results underscore the pitfalls of using TVL alone to assess RWA quality. For in-stance, USTB and BENJI are both U.S. Treasury funds of similar asset value ($0.7–0.8B) but 7Table 5: Empirical pilot scores for tokenized RWAs using RWA.xyz data. Higher values indicate higher observed risk under the liquidity, concentration, and market-quality framework. The table is sorted by the equal-weight composite score in descending order. 
+
+Ticker Category L C M Composite (Equal) STAC Structured credit 67.92 100.00 100.00 89.31 BENJI Treasury 76.06 67.64 100.00 81.23 HLSCOPE Private credit 68.02 66.79 100.00 78.27 PAXG Gold 62.96 66.66 100.00 76.54 USTB Treasury 64.58 81.41 83.01 76.50 XAUT Gold 52.37 62.99 92.39 69.26 OUSG Treasury 65.39 68.22 57.68 63.77 BUIDL Treasury 86.42 77.33 22.04 61.93 USDY Yield-bearing Treasury 95.90 40.87 42.54 59.77 
+
+Notes: L denotes liquidity risk, C denotes concentration risk, and M denotes market-quality risk. All scores are normalized on a 0 to 100 scale, where higher values indicate higher observed risk. The composite score is calculated using equal weights across the three dimensions. USDC is excluded from the final RWA scoring sample because it is used as a stablecoin benchmark rather than as a fund-type tokenized real-world asset. Table 6: Sensitivity of composite scores to alternative weighting schemes. Higher values indicate higher observed risk, and the table is sorted by the equal-weight composite score in descending order. 
+
+Ticker Equal weights Liquidity-heavy Concentration-heavy Market-quality-heavy STAC 89.31 83.96 91.98 91.98 BENJI 81.23 79.94 77.84 85.93 HLSCOPE 78.27 75.71 75.42 83.70 PAXG 76.54 73.15 74.07 82.41 USTB 76.50 72.29 78.26 79.85 XAUT 69.26 65.03 67.69 75.03 OUSG 63.77 64.17 64.88 62.24 BUIDL 61.93 68.05 65.78 51.96 USDY 59.77 60.07 59.67 60.01 
+
+Notes: The equal-weight composite gives one-third weight to liquidity risk, concentration risk, and market-quality risk. The liquidity-heavy specification uses weights of 0.50, 0.25, and 0.25 for L, C,and M , respectively. The concentration-heavy specification uses weights of 0.25, 0.50, and 0.25. The market-quality-heavy specification uses weights of 0.25, 0.25, and 0.50. USDC is excluded from the final RWA scoring sample because it is used only as a stablecoin benchmark. 
+
+8have very different profiles. BENJI has many holders but very little transfer activity, leading to high L and moderate C risk. USTB trades more frequently (turnover 0.396 vs 0.012) and thus has lower L, but fewer holders and a concentrated investor base, giving higher C. In our pilot, no asset has high scores on all dimensions except STAC , reflecting its very low liquidity and high concentration. Gold-backed tokens ( PAXG , XAUT ) show interesting patterns: they have large asset values and many holders, but relatively low monthly volume compared to assets like treasury funds. This yields moderate L (gold markets are somewhat active) but high M due to concentration of volume on single chains. Private credit funds ( HLSCOPE , STAC ) have small TVL and extremely low trading, so their liquidity risk is very high. Qualitatively, higher L indicates assets where exiting could be hard. Higher C indicates potential vulnerability to large-holder actions. Higher M indicates reliance on narrow trading venues or chains. 
+
+8. Implications 
+
+For investors , our findings imply that beyond shiny metrics like market cap, one should scrutinize actual trading data. A high-TVL RWA might still trap capital if no one trades it. Our framework offers a quick quantitative check using publicly available data. For issuers , the message is to build genuine market support: encourage broad participation and continuous trading (e.g. via AMMs or approved exchanges), not just focus on asset raise. For example, a token with poor L could lower fees or provide liquidity incentives. Regulators should note that transparency tools (like RWA.xyz) can reveal secondary-market health, but they do not replace due diligence on legal redemption or custody promises. Regulators might mandate disclosure of turnover and holder metrics for token offerings. Finally, data providers should standardize the key metrics we used (transfer counts, holder counts, active addresses, chain splits) so that all market participants can apply similar scoring. 
+
+9. Limitations and Future Research 
+
+This pilot uses only public on-chain data. We do not capture off-chain trades or locked-of records. Some assets may have hidden liquidity (e.g. private bilateral trades) not seen on-chain. Metrics like holder count ignore beneficial owners and do not capture whether many sub-accounts belong to the same entity. Our network HHIs use chain-level aggregates; wallet-level concentration requires proprietary or onchain analysis beyond RWA.xyz. Also, factors like legal enforcement, redemption terms, custody risk, or smart-contract safety are omitted here. These are important RWA risks (e.g. stablecoin issuers flag reserve risk), but they are not quantifiable from the available data. Future work should combine on-chain liquidity metrics with off-chain disclosures (issuer reports, redemption histories) and poten-tially supervised learning when enough risk events (defaults, liquidity crises) have occurred. Extending this scoring to a time series (monthly or quarterly panel) would also allow testing how changes in L, C, M predict actual market outcomes. 910. Conclusion 
+
+This paper develops an explainable, three-dimensional scoring framework for evaluating tokenized real-world assets using publicly observable RWA.xyz market, holder, and activ-ity data. Rather than treating asset value or TVL as sufficient indicators of quality, the framework focuses on three empirically measurable dimensions: liquidity risk, concentration risk, and market-quality risk. The pilot results show that tokenized RWA products differ substantially in observed tradability, holder breadth, average value per holder, and network concentration. In particular, some products with meaningful asset value still show limited transfer intensity, concentrated holder structures, or weak market activity, suggesting that tokenization alone does not automatically create exitability. The findings have practical implications for investors, issuers, data providers, and regu-lators. Investors should evaluate whether a tokenized asset can actually be traded or exited, not only whether it has large reported asset value. Issuers should disclose activity, holder, transfer, and network-distribution metrics alongside AUM or NAV. Regulators and market-data providers may also benefit from standardized public reporting of turnover, active par-ticipation, transfer intensity, and ownership concentration proxies. The framework remains a public-data pilot and does not capture legal enforceability, redemption rights, custody arrangements, reserve verification, or smart-contract governance. Future research should extend the model using panel data, wallet-level holder distributions, redemption records, exchange liquidity, and issuer-level documentation to provide a more complete assessment of tokenized RWA risk. 
+
+References 
+
+[1] Akerlof, G.A., 1970. The market for “lemons”: quality uncertainty and the market mechanism. Quarterly Journal of Economics 84(3), 488–500. [2] Amihud, Y., 2002. Illiquidity and stock returns: cross-section and time-series effects. 
+
+Journal of Financial Markets 5(1), 31–56. [3] Bank for International Settlements, 2023a. The Tokenisation Continuum . BIS Bulletin No. 72. [4] Bank for International Settlements, 2025a. The Rise of Tokenised Money Market Funds .BIS Bulletin No. 115. [5] Bank for International Settlements, 2025b. Does Tokenisation Fill Gaps in Traditional Real Estate Markets? BIS Working Paper No. 1311. [6] Committee on Payments and Market Infrastructures, 2024. Tokenisation in the Context of Money and Other Assets . BIS/CPMI report. [7] International Monetary Fund, 2025. Tokenization and Financial Market Inefficiencies .IMF FinTech Note 2025/001. [8] International Monetary Fund, 2026. Tokenized Finance . IMF Note 2026/001. 10 [9] International Organization of Securities Commissions, 2025. Tokenization of Financial Assets . Final report. [10] Kyle, A.S., 1985. Continuous auctions and insider trading. Econometrica 53(6), 1315– 1335. [11] O’Hara, M., Ye, M., 2011. Is market fragmentation harming market quality? Journal of Financial Economics 100(3), 459–474. [12] Mafrur, R., 2025. Tokenize everything, but can you sell it? RWA liquidity challenges and the road ahead. arXiv preprint arXiv:2508.11651 .[13] Swinkels, L., 2025. Empirical evidence on the ownership and liquidity of real estate tokens. In: Blockchain, Crypto Assets, and Financial Innovation: A Decade of Insights and Advances . Springer, pp. 434–467. 11

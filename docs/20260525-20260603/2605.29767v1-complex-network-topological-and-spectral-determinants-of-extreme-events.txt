@@ -1,0 +1,666 @@
+Title: Complex network topological and spectral determinants of extreme events
+
+URL Source: https://arxiv.org/pdf/2605.29767v1
+
+Published Time: Fri, 29 May 2026 01:24:16 GMT
+
+Number of Pages: 9
+
+Markdown Content:
+# Complex network topological and spectral determinants of extreme events 
+
+Christian Hechler, 1, 2, a) Timo Bröhl, 1, 2, b) Ulrike Feudel, 3, c) and Klaus Lehnertz 1, 2, 4, d) 
+
+> 1)
+
+Department of Epileptology, University of Bonn Medical Centre, Venusberg Campus 1, 53105 Bonn, Germany 
+
+> 2)
+
+Helmholtz Institute for Radiation and Nuclear Physics, University of Bonn, Nussallee 14–16, 53115 Bonn, Germany 
+
+> 3)
+
+Theoretische Physik/Komplexe Systeme, ICBM, Carl von Ossietzky Universität Oldenburg, Carl-von-Ossietzky-Straße 9-11, 26111 Oldenburg, Germany 
+
+> 4)
+
+Interdisciplinary Center for Complex Systems, University of Bonn, Brühler Straße 7, 53175 Bonn, Germany 
+
+(Dated: 29 May 2026) 
+
+We study the impact of the coupling topology on the ability of various networked dynamical systems to generate extreme events. By determining the coupling strength that is necessary to generate an extreme event in the collective dynamics of a given system, we observe a power-law-like relationship between this coupling threshold and both topological (edge density) and spectral (algebraic connectivity) properties of various coupling topologies. Interestingly, this relationship appears to be largely independent of both the investigated system and the underlying mechanism to generate extreme events. This may indicate that the observed relationship is primarily mediated by aspects of the coupling topology. 
+
+When investigating the emergence of extreme events in high-dimensional networked dynamical systems, one often faces the problem of carefully selecting control parameter settings for both node dynamics and coupling topology. Lacking detailed knowledge about the impact of struc-tural and functional aspects of such systems on the gen-eration of extreme events, finding appropriate control pa-rameter settings is often cumbersome. We performed a brute-force search for the threshold of a crucial control pa-rameter, namely the coupling strength, at which extreme events emerge in the dynamics of a variety of networked systems capable of intrinsically generating extreme events due to diverse underlying dynamical mechanisms. Sur-prisingly, we observed that the coupling threshold can eas-ily be derived from power-law-like relationships with easy-to-identify topological and spectral properties of various coupling topologies. The relationships not only provide useful guidance for future model studies to quickly iden-tify control parameter settings, but also highlight the im-portance of considering topological and spectral network properties to further improve our understanding of gener-ation and mitigation of extreme events. 
+
+I. INTRODUCTION 
+
+Extreme climate and weather conditions 1, large-scale dis-ruptions in supply networks (e.g. power outages) 2, market crashes 3, rogue waves in the ocean 4 or in optical systems 5,harmful algal blooms in marine ecosystems 6, or epileptic seizures in the human brain 7 – these are just a few examples 
+
+> a) Electronic mail: christian.hechler@uni-bonn.de
+> b) Electronic mail: timo.broehl@ukbonn.de
+> c) Electronic mail: ulrike.feudel@uni-oldenburg.de
+> d) Electronic mail: klaus.lehnertz@ukbonn.de
+
+of serious and severe phenomena occurring in natural or man-made systems. Such rare and significant extreme events 8 have a lasting impact on system constituents or even the system as a whole. Given the devastating consequences entailed by extreme events, huge efforts are made to minimize their im-pact, mitigate their consequences, or prevent them as well as to identify early warning signs. However, forecasting extreme events remains a major challenge given the complexity of nat-ural systems. Even greater is the scientific interest in understanding ex-treme events and their underlying mechanisms 9–11 . For many real-world systems, active experiments on extreme events are technically infeasible or ethically unacceptable, as even small perturbations may trigger such an event and cause signifi-cant damage. Nevertheless, important insights into dynami-cal mechanisms underlying the generation of extreme events can be gained from investigating the dynamics of model sys-tems capable of undergoing critical transitions. The latter may be related to bifurcations 12–15 , or to other mechanisms that have been less studied to date such as boundary crisis 16,17 ,attractor bubbling 18–20 , intermittency 21,22 , blowout bifurca-tions 23,24 , saddle escape 25 , explosive synchronization 26 , or oscillation death 27,28 . Given the intricate interplay between structure and function in networked dynamical systems 29–31 ,understanding the emergence of extreme events – as a collec-tive phenomenon – in systems with complex coupling topolo-gies has become an active and interdisciplinary field of re-search 32–46 .Although various mechanisms leading to extreme events in coupled dynamical systems have been identified 10 , the spe-cific influence of properties of the coupling topology on these phenomena is only barely investigated. This may be due to the fact that the occurrence of extreme events in complex net-works is not only guided by control parameter settings but also by the size and structure of the network 34 , which con-siderably complicates the derivation of robust estimates in the large-scale limit. Addressing this issue, we here explore the impact of the coupling topology on the ability of various net-worked dynamical systems to generate extreme events, as well 
+
+> arXiv:2605.29767v1 [nlin.CD] 28 May 2026
+
+2as the conditions under which they occur.  
+
+> II. METHODS
+
+We investigate the dynamics of networked systems of the form ˙xi = f (xi) + kN − 1
+
+> N
+
+# ∑
+
+> j=1
+
+Ai j H(xi, x j), (1) where f (xi) describes the eigendynamics of subsystem i (i ∈{1, . . . , N}). In particular, we regard networks of coupled FitzHugh-Nagumo oscillators 33,34 (system S1), of coupled memristive Hindmarsh–Rose neurons 47 (system S2), of cou-pled periodically forced Liénard-type oscillators 48 (system S3), and of coupled Rössler oscillators 49 (system S4) (for de-tails, see Appendix A). While the generation of extreme events in system S4 is related to a bubbling transition that gives rise to sudden desynchronization bursts 18 , the generating mecha-nism in systems S1 and S2 is related to an interior crisis 50 .In system S3, extreme events can occur either via an interior crisis or via intermittency 48 .In Eq. 1, the coupling strength is denoted by k and H
+
+is the coupling function. The symmetric adjacency matrix 
+
+A ∈ { 0, 1}N×N has entries Ai j = A ji = 1, if and only if subsys-tems i and j are coupled. We regard coupling topologies that are based on paradigmatic network models, namely, random networks 51 , small-world networks 52 (with different rewiring probabilities pr), and scale-free networks 53 , each of which connects N vertices with different number of edges. Control parameters for network generation are chosen to allow for a comparable edge density ε = 2E(N(N − 1)) −1 among the coupling topologies, while retaining the respective defining topological properties. E denotes the overall number of edges. Networks are connected and do not possess unconnected sub-networks. We are interested in elucidating whether there exists a dynamics- and coupling-topology-dependent threshold kth for the coupling strength that leads to the emergence of extreme events in a system’s dynamics. Since there is so far no com-monly accepted recipe to determine kth , we here perform a brute-force search: for a given networked system (of size N)with adjacency matrix A and in case of small-wold coupling topology, a given rewiring probability pr, we adaptively deter-mine the minimum coupling strength required for the emer-gence of extreme events in the dynamics of systems S1 – S3, and the maximum coupling strength at which extreme events can still be observed in system S4, since attractor bubbling in this system arises as the coupling strength is decreased. We conjecture that topological and spectral properties of the network structure underlying the coupling play a deci-sive role for the generation of extreme events. As an indi-cator for the former, we consider the edge density ε, which discloses vital aspects of network connectedness. Increasing the edge density improves inter-vertex reachability (due to a decreased network diameter) and can trigger phase transitions and synchronization 54–56 . We have 0 .04 ≤ ε ≤ 0.99 for ran-dom and small-world coupling topologies, and 0 .04 ≤ ε ≤ 0.5for scale-free coupling topologies. For the latter network prop-erty, we consider the algebraic connectivity 57 λ2, which is the second smallest eigenvalue of the corresponding Laplacian matrix L, whose elements are Li j = κiδi j − Ai j , where δi j is the Kronecker delta, and κi denotes the degree of the ith ver-tex. λ2 signifies a network’s intrinsic structural stability and robustness 58 , and it indicates how quickly a connected net-work ( λ2 > 059 ) can diffuse information and synchronize 60 .Although edge density and algebraic connectivity are often             
+
+> FIG. 1. Relation between edge density εand algebraic connectiv-ity λ2for various coupling topologies (left: random (blue); small-world ( pr=0.1; red); scale-free (green) and for small-world topolo-gies (right) with different rewiring probabilities pr. Network size
+> N=100. Note that the generation scheme for scale-free networks used here allows for a maximum edge density ε=0.5.
+
+correlated 61,62 – more edges (higher density) lead to higher algebraic connectivity, in general (cf. Fig. 1) –, edge density only counts how many, while algebraic connectivity reflects how well vertices are connected structurally, thereby reveal-ing hidden vulnerabilities. In order to identify extreme events in a time series of a sys-tem’s observable (see Fig. 2 and Appendix A), we first apply an amplitude criterion. A time series is considered to contain extreme events if it features high-amplitude excursions that exceed a predefined threshold 
+
+Θ = max (Θ0, ⟨P⟩ + ΘRσP). (2) Here, ⟨P⟩ and σP denote mean and standard deviation of all local maxima in the time series. Θ0 is a constant threshold, ensuring that only high-amplitude excursions are character-ized as extreme, while ΘR ensures that excursions exceeding the threshold are highly deviating from the regular dynamics and rare 63 (cf. Tab. I). Eventually, we only assume events to be extreme if they occur non-periodically and relatively rarely. We discard time series with periodic 64 occurrences of extreme events. If an extreme event can not be identified for any of the five different realizations of a networked system, we modify (ei-ther increase or decrease, depending on the investigated sys-tem) the coupling strength k by a small amount ∆k for which we generate a new time series of the system observable using the same coupling topology and the same set of initial condi-tions. This procedure is repeated until a coupling strength is identified, for which the networked system exhibits extreme events. Then, the increment ∆k is decreased adaptively (by a factor of 10) to enhance the accuracy of the estimation of the coupling threshold kth , and the analysis is repeated in a smaller 3  
+
+> FIG. 2. Left: exemplary time series of observables of the regarded systems S1 – S4 exhibiting rare, high-amplitude events, which we consider as extreme events. Observables can be mean values of system components as in S1–S3 or the synchronization error in S4. The red horizontal line indicates the threshold Θ(Eq. 2). Right: excerpts centered around an extreme event.
+
+interval around the previously identified coupling threshold. This process is repeated until a preset resolution ( ∆k < 10 −4)is reached.  
+
+> III. RESULTS
+
+In Fig. 3, we demonstrate how the considered topological and spectral network properties relate to the coupling thresh-old kth to generate extreme events. Surprisingly, we observe for all networked dynamical systems and irrespective of the coupling topology, a similar qualitative relationship between edge density as well as algebraic connectivity and kth . For the most part, this relationship can be described as a power-law in good approximation. There are, however, some peculiarities that we briefly discuss in the following. As can be identified from the ε − kth relationship (Fig. 3, left), the coupling threshold is lowest in the limiting case of globally coupled ( ε → 1) subsystems; S1: 0 .128, S2: ≈ 0.5, S3: 0 .1 − 0.2, and S4: ≈ 0.12. This implies that the denser the network, the higher the reachability of subsystems, which requires only weak network-wide interactions (low coupling strength) for extreme events to emerge. The fluctuations seen for systems S2 - S4 can be traced back to different realizations of the dynamics (choice of initial conditions). For smaller edge densities, the coupling-topology-realization-dependent fluctuations of kth increase across all systems. This is ex-pected, since structural properties of the coupling topology, such as average clustering coefficient or average shortest path length, are sensitive to small changes in topology, especially at low edge densities. As a result, the value of the coupling threshold is affected. For a wide range of edge densities, the coupling thresh-old necessary to generate extreme events is higher for small-world than for the other coupling topologies. This is most pronounced for system S1, for which kth exceeds the corre-sponding value observed for random coupling topologies by a factor of up to four. For the other systems, we observe an exceedance of a factor of up to two. We will address this issue in more detail later in this section. For scale-free and random coupling topologies, the ε −kth relationship is quite similar for sparser networks across systems. In contrast, for denser net-works ( ε ≈ 0.3 − 0.5), we observe kth to be higher for scale-free than for random coupling topologies. For systems S2 -S4, kth for the scale-free topologies even exceeds the respec-tive values for the small-world topologies by about 50%. This is not the case for system S1. We now turn to the λ2 − kth relationship (Fig. 3, right). 4         
+
+> FIG. 3. Relationship between coupling threshold kth to generate ex-treme events by the regarded dynamical systems S1 – S4 and topo-logical (edge density ε; left) as well as spectral network properties (algebraic connectivity λ2; right). Coupling topologies based on ran-dom (blue), small-world ( pr=0.25; red), and scale-free (green) net-works, each of size N=100.
+
+Given the close relationship between edge density ε and al-gebraic connectivity λ2 (cf. Fig. 1), we expect a generally comparable relationship between coupling threshold kth and 
+
+λ2. Nevertheless, there are again some, mostly system-specific peculiarities that we briefly discuss in the following. For all systems, the power-law-like relationship between kth 
+
+and λ2 is most pronounced for small-world coupling topolo-gies, possibly reflecting the well-known phenomenon that small worlds are easier to synchronize 65 . For system S4, the power-law-like relationship holds for all coupling topologies. We hypothesize that the underlying mechanism (desynchro-nization bursts due to attractor bubbling) for a critical transi-tion to occur overrides the possible impact of the coupling topology. For system S3, which approaches complete syn-chronization as the coupling strength increases, the power-law-like relationship is indefinite for random and even more undefined for scale-free coupling topologies. We observe even stronger deviations for systems S2 and S1, although devi-ations decrease for larger network sizes (see Appendix B, Fig. 6). We hypothesize that deviations may be either due to the comparably larger control parameter mismatches (affect-ing the eigendynamics of the respective subsystems) or due to the underlying mechanism (interior crisis) for a critical transi-tion to occur in these systems, or both. Despite these differences the observed relationship between coupling threshold kth and edge density ε, resp., algebraic connectivity λ2 is similar across the different systems and across different coupling topologies. Nevertheless, the small-world coupling topology appears to play a special role, in-dicating that shortcuts in the coupling topology may impact the coupling threshold necessary to generate extreme events. Figure 4 summarizes our findings obtained from varying the rewiring probability pr. We again observe a power-law-like relationship between edge density ε and coupling threshold 
+
+kth for all systems and all rewiring probabilities (Fig. 4, left), however, with different slopes. For a given edge density, a smaller pr tends to result in a higher kth . Particularly for very sparse small-world coupling topologies, the number of shortcuts has, in general, a significant impact on kth (data not shown). As an example, we find for system S1 with ε = 0.04 a coupling threshold kth ≈ 5 for pr = 0.9 but kth ≈ 100 on a small-world coupling topology with only a few shortcuts (pr = 0.05). Even for constant edge densities, the coupling threshold can vary across orders of magnitude for different rewiring probabilities. Interestingly, shortcuts in the coupling  
+
+> FIG. 4. Same as Fig. 3, but for coupling topologies based on small-world networks with different rewiring probabilities pr.
+
+topology appear to have only a very minor influence on the relationship between algebraic connectivity λ2 and coupling threshold kth (Fig. 4, right). Deviations from a power-law-like relationship are mostly system-specific, with more pro-nounced deviations seen for systems S1 and S2. As before, we hypothesize that deviations may be either due to the com-parably larger control parameter mismatches or due to the un-5derlying mechanism (interior crisis) for a critical transition to occur in these systems, or both. Eventually, we quantify the relationship between coupling threshold kth and edge density ε, resp. algebraic connectivity 
+
+λ2 and determine the corresponding power law exponents γε
+
+and γλ2 by fitting a linear function to the logarithmically trans-formed data. Figure 5 summarizes our findings for all model systems. We observe the largest magnitude of γε for very sparse small-world coupling topologies ( pr = 0.05), varying between γε ≈ − 2 for system S1 and γε ≈ − 2.5 for system S4. For these systems, γε steadily increases with increasing the rewiring probability pr, while for systems S2 and S3 γε
+
+increases until pr ≈ 0.5 and then saturates. For pr = 0.9, the exponent varies across systems between γε ≈ − 1.1 for sys-tem S1 and γε ≈ − 1.5 for system S2. The exponents seen for the random and scale-free coupling topologies are, in general, similar to those of the small-world topologies, with pr = 0.9. For systems S3 and S4, however, the magnitude of γε is slightly higher for the random coupling topologies. The expo-nents differ for different network sizes N. For system S1, the difference is only weakly pronounced. For the other systems, 
+
+γε converges as N increases. As already expected from the findings shown in Figs. 3 and 4, we observe γλ2 ≈ − 1 for systems S3 and S4, mostly independent of the coupling topology. Up to some fluctuations in the percent range (that vanish as N increases; cf. Appendix B, Fig. 6), the data reflect a relationship kth ∝
+
+λ −12 , consistent with the assumption of the Master Stability Formalism 66,67 kλ2 = const, which guarantees the stability of the synchronized/near-synchronous state. For systems S1 and S2, the data do not show a power law with similar exponents, independent of the coupling topology. For small-world cou-pling topologies, we observe the magnitude of γλ2 to decrease as pr increases for system S1, while to opposite is true for sys-tem S2. In general, γλ2 appears to converge as N increases. We conjecture that the varying exponents seen for systems S1 and S2 and possibly also for S3 result from the different mecha-nisms leading to extreme events, and aspects of the subsys-tems’ eigendynamics, such as parameter mismatch, may still play a role.  
+
+> IV. DISCUSSION
+
+Improving our understanding of how extreme events emerge in networked dynamical systems through model stud-ies is often hindered by the need to carefully select control parameter settings for both vertex dynamics and coupling topology. Here, we asked whether there exists a dynamics-and coupling-topology-dependent threshold for the coupling strength kth that leads to the emergence of extreme events in the collective dynamics of such systems. To this end, we in-vestigated various networked systems in which extreme events occur via distinct routes, including an interior crisis (with and without intermittency) and a bubbling transition. Across these systems, for different paradigmatic coupling topologies and edge densities, we determined kth by a brute-force search and found robust power-law-like relationships between kth and the network’s edge density ε as well as between kth and the alge-braic connectivity λ2, i. e., the second smallest eigenvalue of the network Laplacian. These relationships emerge largely in-dependently of the specific route by which extreme events are generated, which indicates that topological and spectral prop-erties of the coupling structure play a dominant role in setting the coupling threshold for extreme-event generation. For systems in which extreme events are associated with the (in-)stability of a synchronized or near-synchronized state, we obtained kth ∝ λ −12 with good accuracy. This scaling is con-sistent with expectations from the Master Stability Formal-ism and related linear stability analyses of synchronization, where products of coupling strength and Laplacian eigen-values determine stability 43,68,69 . In contrast, for systems in which extreme events arise from crisis-induced transition, we still observe approximate power-law relationships, but with system-dependent exponents and more pronounced deviations at small λ2. Our inconclusive observations when considering the largest Laplacian eigenvalue λN 70,71 may indicate that the onset of extreme events is more directly constrained by the weakest transverse mode, captured by λ2, than by the overall spectral radius. Although coupling topology and its spectral properties ap-pear to be the primary determinants for kth , our results also reveal systematic differences across the investigated systems, for example in the values of the power-law exponents. These differences suggest that aspects of the intrinsic dynamics at each vertex, such as parameter mismatches or the precise tran-sition scenario underlying the generation of extreme events, modulate the scaling laws rather than being entirely negligi-ble. Clarifying this interplay between topology and local dy-namics, for example by varying parameter mismatches or by analyzing reduced normal forms, is a natural direction for fu-ture work. Our study is restricted to linear diffusive coupling on pair-wise networks. An important next step is to test whether sim-ilar scaling relationships between kth and spectral/topological properties persist for more general coupling architectures, such as higher-order and multilayer networks 72 , or for qual-itatively different collective phenomena, including explosive synchronization 31 or the onset of chimera states 73 . Such ex-tensions would help to delineate which aspects of the observed scaling are generic to the occurrence of extreme events in net-worked dynamical systems and which are specific to the cou-pling form and generating mechanism. Our results also raise interesting questions for real-world networks in which the topology can be modified more easily than the local dynamics. If relationships of the form kth ∝ εγε
+
+or kth ∝ λ γλ2 
+
+> 2
+
+remain qualitatively valid in more realistic set-tings, then relatively coarse structural interventions – such as changing edge density by adding or removing links, or rewiring connections to adjust λ2 – could shift the onset of extreme events by orders of magnitude in coupling strength, even when the vertex dynamics is fixed. In infrastructures, this would mean that choices about redundancy and sparsification (for example, whether to add long-range shortcuts or to con-centrate links on hubs) do not just affect classical robustness measures, but also the range of operating conditions under 6               
+
+> FIG. 5. Power law exponents γεand γλ2extracted from the data shown in Figs. 3 and 4. Different symbols denote different coupling topologies: random (RN)—triangles, scale-free (SF)—squares, small-world—circles. Numbers on the x-axis indicate the rewiring probability prused to generate small-world coupling topologies. Different markers denote networks sizes: N=100 – circles, N=200 – squares, N=300 – triangles. Error bars are smaller than symbol size.
+
+which rare, catastrophic excursions can occur. In neuronal or ecological networks, a similar logic would suggest that plas-ticity or adaptation processes that reshape connectedness of network constituents could strongly modulate the propensity for extreme events, even in the absence of changes in single-unit dynamics. In addition, in various systems the occurrence of self-organized criticality is hypothesized to occur prior to the formation of extreme events. This relationship between network connectedness and the probability of the emergence of extreme events could shed some light on the mechanism of emerging self-organized criticality by reordering connections in the network 74,75 to achieve a critical state in which extreme events can occur. Exploring how such scaling laws manifest in data-driven network models, and how they interact with constraints specific to each domain, is an important step to-ward translating our findings into concrete design and control strategies. Our scaling relationships may also provide infor-mation about the rate of occurrence and about the amplitude distribution of extreme events 76–78 once the system is above the dynamics- and coupling-topology-dependent threshold for the coupling strength. Understanding whether denser or more algebraically connected networks produce more frequent or more intense extreme events could have important practical implications 79 .Taken together, our findings provide quantitative scaling re-lationships that can guide future model studies in selecting control parameter settings that give rise to extreme events in networked dynamical systems. By relati,ng the coupling threshold directly to easily accessible network characteristics, they allow one to obtain order-of-magnitude estimates of kth 
+
+without exhaustive parameter scans, and thereby substantially reduce the computational effort required for exploration. If similar relationships can be established and calibrated for spe-cific real-world systems, they may eventually inform the de-sign or modification of networks 80,81 to mitigate the risk of extreme events or to shift their onset to less critical parameter regimes. 
+
+> ACKNOWLEDGMENTS
+
+The authors acknowledges fruitful discussions with Manuel Adams, Max Potratzki, and Peter Ashwin. KL acknowledges support from the Deutsche Forschungsgemeinschaft. 
+
+> AUTHOR DECLARATIONS Conflict of Interest
+
+The authors have no conflicts of interest to disclose. 
+
+> Data availability
+
+The data that support the findings of this study are available from the corresponding author upon reasonable request. 7
+
+> Appendix A: Model systems S1: Networks of coupled FitzHugh-Nagumo oscillators
+
+Coupled oscillators of the FitzHugh-Nagumo type are a paradigmatic model for neural dynamics and can exhibit rich dynamical behavior, including extreme events 21,33,34,37,43,82–84 and self-induced switching between multiple space-time patterns 35 . We here consider N diffu-sively coupled FitzHugh–Nagumo oscillators (i ∈ { 1, . . . , N})
+
+whose ith oscillator is described by ˙xi = xi(a − xi)( xi − 1) − yi + kN − 1
+
+> N
+
+# ∑
+
+> j=1
+
+Ai j (x j − xi),
+
+˙yi = bixi − cy i.
+
+Here, a = −0.02651, bi = 0.006 + i−1 
+
+> N−1
+
+× 0.008 and c = 0.02 are fixed internal control parameter 33,34 . We chose initial con-ditions for the x variable from N (0.15 , 0.6) and for the y vari-able from N (0.15 , 0.1). The sample average ⟨x⟩ = 1 
+
+> N
+
+∑Ni=1 xi
+
+served as the observable for this system. 
+
+> S2: Networks of coupled memristive Hindmarsh-Rose neurons
+
+The Hindmarsh–Rose model of neuronal activity 85 mim-ics the spiking-bursting behavior of the membrane poten-tial observed in experiments made with a single neuron. The model modification consider here 47 employs an active flux-controlled memristor 86 that takes into account electromag-netic induction effects between coupled neurons. Upon vary-ing the membrane current I, the coupled neuron mode tran-sits from bounded chaotic spiking oscillations to superextreme spiking oscillations 87 . We here consider N diffusively coupled Hindmarsh-Rose neurons (i ∈ { 1, . . . , N}) whose ith neuron is described by ˙xi = yi + bx 2 
+
+> i
+
+− ax 3 
+
+> i
+
++ Ii + gz ixi + kN − 1
+
+> N
+
+# ∑
+
+> j=1
+
+Ai j (x j − xi)
+
+˙yi = c − dx 2 
+
+> i
+
+− yi
+
+˙zi = xi.
+
+Here, a = 1.0, b = 3.2, c = 1.0, d = 5.0, g = 0.9, and Ii =
+
+1.0 + i−1 
+
+> N−1
+
+× 0.01 are fixed internal control parameter 47 . We chose initial conditions for the x variable from N (0.5, 0.5),for the y variable from N (0.2, 0.5), and for the z variable from N (0.1, 0.5). The sample average ⟨y⟩ = 1 
+
+> N
+
+∑Ni=1 yi served as the observable for this system. 
+
+> S3: Networks of coupled periodically forced Liénard-type oscillators
+
+Liénard systems constitute a general class of two-dimensional autonomous systems and can be written as ¨ x +
+
+f (x)x + g(x) = 0. Nonlinear oscillators of Liénard-type have been used to model numerous physical phenomena ranging from atmospheric physics, condensed matter and nonlinear optics to electronics, plasma physics, biophysics, and evolu-tionary biology. Liénard-type oscillators with an external si-nusoidal forcing can generate extreme events for a suitable choice of parameters 48 . We here consider N coupled such os-cillators (i ∈ { 1, . . . , N}) whose ith oscillator is described by ˙xi = yi,
+
+˙yi = −αxiyi − γxi − β x3 
+
+> i
+
++ F sin (ωt) + kN − 1
+
+> N
+
+# ∑
+
+> j=1
+
+Ai j (y j − yi).
+
+Here, α = 0.45, β = 0.5, γ = −0.5, and F = 0.2 are fixed in-ternal control parameter, and with ω = 0.7325 the system is capable of generating extreme events via an interior crisis 48 .We chose initial conditions for x and y randomly from the in-terval [−2, 2]. The sample average ⟨y⟩ = 1 
+
+> N
+
+∑Ni=1 yi served as the observable for this system. 
+
+> S4: Networks of coupled Rössler oscillators
+
+The Rössler oscillator was proposed by Otto E. Rössler 88 
+
+as a simplified Lorenz oscillator 89 that describes convection in the earth’s atmosphere. The oscillator is capable of gener-ating a wide range of dynamical behaviors, including chaos, and a network of nearly identical Rössler oscillators gives rise to desynchronization events, known as bubbling 49 . We here consider N coupled such oscillators (i ∈ { 1, . . . , N}) whose ith oscillator is described by ˙xi = −yi − zi + kN − 1
+
+> N
+
+# ∑
+
+> j=1
+
+Ai j (x j − xi),
+
+˙yi = xi + aiyi + kN − 1
+
+> N
+
+# ∑
+
+> j=1
+
+Ai j (y j − yi),
+
+˙zi = bi + xi(zi − c) + kN − 1
+
+> N
+
+# ∑
+
+> j=1
+
+Ai j (z j − zi).
+
+Here, ai = bi = 0.199 + i−1 
+
+> N−1
+
+× 0.002 and ci = 6.965 + i−1 
+
+> N−1
+
+×
+
+0.07 are fixed internal control parameter 49 . We chose initial conditions for x, y, and z randomly from the interval [0, 1].The synchronization error 
+
+Serr (t) = 
+
+> N
+
+# ∑
+
+> i=1
+
+q
+
+(xi − ⟨ x⟩)2 + ( yi − ⟨ y⟩)2 + ( zi − ⟨ z⟩)2/N,
+
+where ⟨·⟩ denotes the sample average, served as the observable for this system. 
+
+> Generating time series
+
+All systems were integrated using the Dormand-Prince method 90 with an integration step size τ. We generated time series of system observables of length T after discarding Ttrans 
+
+transients. Table I summarizes the corresponding parameters for each system. 8
+
+system T τ Ttrans Θ0 ΘR
+
+S1 2 · 10 5 1.0 0 .5 · 10 5 0.6 8S2 1 · 10 5 0.1 0 .2 · 10 5 15 4S3 1 · 10 5 1.0 0 .2 · 10 5 1.5 8S4 1 · 10 4 0.1 0 .5 · 10 4 1 8TABLE I. Integration parameters for the generation of time series for each investigated system. Θ0 and ΘR are the system-specific control parameters used to identify extreme events. 
+
+Appendix B: Impact of network size 
+
+Fig. 6 shows how the coupling threshold kth varies for dif-ferent realizations of the networked systems S1 – S4 of differ-ent sizes N.
+
+FIG. 6. Estimated coupling threshold kth for the networked systems S1 – S4 with different sizes N and for edge densities ε = 0.2 (upper panel) and ε = 0.5 (bottom panel). Coupling topologies based on random (blue), small-world ( pr = 0.25; red) and scale-free (green) networks. 
+
+> 1
+
+E. M. Fischer, M. Bador, R. Huser, E. J. Kendon, A. Robinson, and S. Sip-pel, “Record-breaking extremes in a warming climate,” Nat. Rev. Earth En-viron. 6, 456–470 (2025). 
+
+> 2
+
+I. Dobson, B. A. Carreras, V. E. Lynch, and D. E. Newman, “Complex systems analysis of series of blackouts: Cascading failure, critical points, and self-organization,” Chaos 17 (2007). 
+
+> 3
+
+J. A. Feigenbaum, “A statistical analysis of log-periodic precursors to fi-nancial crashes,” Quant. Finance 1, 346 (2001). 
+
+> 4
+
+K. Dysthe, H. E. Krogstad, and P. Müller, “Oceanic rogue waves,” Annu. Rev. Fluid Mech. 40 , 287–310 (2008). 
+
+> 5
+
+D. R. Solli, C. Ropers, P. Koonath, and B. Jalali, “Optical rogue waves,” Nature 450 , 1054–1057 (2007). 
+
+> 6
+
+Y. Dai, S. Yang, D. Zhao, C. Hu, W. Xu, D. M. Anderson, Y. Li, X.-P. Song, D. G. Boyce, L. Gibson, et al. , “Coastal phytoplankton blooms expand and intensify in the 21st century,” Nature 615 , 280–284 (2023). 
+
+> 7
+
+K. Lehnertz, T. Broehl, and R. von Wrede, “Epileptic-network-based pre-diction and control of seizures in humans,” Neurobiol. Dis. 181 , 106098 (2023). 
+
+> 8
+
+S. Albeverio, V. Jentsch, and H. Kantz, eds., Extreme events in nature and society , The Frontiers Collection (Springer, Berlin, 2006). 
+
+> 9
+
+M. Ghil, P. Yiou, S. Hallegatte, B. D. Malamud, P. Naveau, A. Soloviev, P. Friederichs, V. Keilis-Borok, D. Kondrashov, V. Kossobokov, O. Mestre, C. Nicolis, H. W. Rust, P. Shebalin, M. Vrac, A. Witt, and I. Zaliapin, “Ex-treme events: dynamics, statistics and prediction,” Nonlinear Process. Geo-phys. 18 , 295–350 (2011). 
+
+> 10
+
+S. N. Chowdhury, A. Ray, S. K. Dana, and D. Ghosh, “Extreme events in dynamical systems and random walkers: A review,” Phys. Rep. 966 , 1–52 (2022). 
+
+> 11
+
+J. Alvre, L. Broska, D. Rübbelke, and S. Vögele, “Studying extreme events: An interdisciplinary review of recent research,” Heliyon 10 , e41024 (2024). 
+
+> 12
+
+W. Horsthemke and R. Lefever, Noise-Induced Transitions. Theory and Ap-plications in Physics, Chemistry and Biology (Springer, Berlin, 1984). 
+
+> 13
+
+C. Kuehn, “A mathematical framework for critical transitions: Bifurcations, fast-slow systems and stochastic dynamics,” Physica D 240 , 1020–1035 (2011). 
+
+> 14
+
+P. Ashwin, S. Wieczorek, R. Vitolo, and P. Cox, “Tipping points in open systems: bifurcation, noise-induced and rate-dependent examples in the cli-mate system,” Philos. Trans. R. Soc. Lond. B Biol. Sci. 370 , 1166–1184 (2012). 
+
+> 15
+
+U. Feudel, “Rate-induced tipping in ecosystems and climate: the role of un-stable states, basin boundaries and transient dynamics,” Nonlinear Process. Geophys. Discuss. 2023 , 1–29 (2023). 
+
+> 16
+
+C. Grebogi, E. Ott, and J. A. Yorke, “Crises, sudden changes in chaotic attractors, and transient chaos,” Physica D 7, 181–200 (1983). 
+
+> 17
+
+H. M. Osinga and U. Feudel, “Boundary crisis in quasiperiodically forced systems,” Physica D 141 , 54–64 (2000). 
+
+> 18
+
+P. Ashwin, J. Buescu, and I. Stewart, “Bubbling of attractors and synchro-nisation of chaotic oscillators,” Phys. Lett. A 193 , 126–139 (1994). 
+
+> 19
+
+S. C. Venkataramani, B. R. Hunt, E. Ott, D. J. Gauthier, and J. C. Bien-fang, “Transitions to bubbling of chaotic systems,” Phys. Rev. Lett. 77 , 5361 (1996). 
+
+> 20
+
+S. C. Venkataramani, B. R. Hunt, and E. Ott, “Bubbling transition,” Phys. Rev. E 54 , 1346 (1996). 
+
+> 21
+
+A. Saha and U. Feudel, “Extreme events in FitzHugh-Nagumo oscillators coupled with two time delays,” Phys. Rev. E 95 , 062219 (2017). 
+
+> 22
+
+A. Mishra, S. Leo Kingston, C. Hens, T. Kapitaniak, U. Feudel, and S. K. Dana, “Routes to extreme events in dynamical systems: Dynamical and sta-tistical characteristics,” Chaos 30 , 063114 (2020). 
+
+> 23
+
+E. Ott and J. C. Sommerer, “Blowout bifurcations: the occurence of riddled basins and on-off intermittency,” Phys. Lett. A 188 , 39–47 (1994). 
+
+> 24
+
+Y. Zhang, Z. G. Nicolaou, J. D. Hart, R. Roy, and A. E. Motter, “Critical switching in globally attractive chimeras,” Phys. Rev. X 10 , 011044 (2020). 
+
+> 25
+
+C. Kuehn, G. Zschaler, and T. Gross, “Early warning signs for saddle-escape transitions in complex networks,” Sci. Rep. 5, 13190 (2015). 
+
+> 26
+
+C. Kuehn and C. Bick, “A universal route to explosive phenomena,” Sci. Adv. 7, eabe3824 (2021). 
+
+> 27
+
+W. Zou, D. Senthilkumar, M. Zhan, and J. Kurths, “Quenching, aging, and reviving in coupled dynamical networks,” Phys. Rep. 931 , 1–72 (2021). 
+
+> 28
+
+A. Koseska, E. Volkov, and J. Kurths, “Oscillation quenching mechanisms: Amplitude vs. oscillation death,” Phys. Rep. 531 , 173–199 (2013). 
+
+> 29
+
+S. Boccaletti, V. Latora, Y. Moreno, M. Chavez, and D.-U. Hwang, “Com-plex networks: Structure and dynamics,” Phys. Rep. 424 , 175–308 (2006). 
+
+> 30
+
+S. Boccaletti, G. Bianconi, R. Criado, C. I. Del Genio, J. Gómez-Gardenes, M. Romance, I. Sendina-Nadal, Z. Wang, and M. Zanin, “The structure and dynamics of multilayer networks,” Phys. Rep. 544 , 1–122 (2014). 
+
+> 31
+
+S. Boccaletti, J. Almendral, S. Guan, I. Leyva, Z. Liu, I. Sendiña-Nadal, Z. Wang, and Y. Zou, “Explosive transitions in complex networks’ struc-ture and dynamics: Percolation and synchronization,” Phys. Rep. 660 , 1–94 (2016). 
+
+> 32
+
+V. Kishore, M. Santhanam, and R. Amritkar, “Extreme events on complex networks,” Phys. Rev. Lett. 106 , 188701 (2011). 
+
+> 33
+
+G. Ansmann, R. Karnatak, K. Lehnertz, and U. Feudel, “Extreme events in excitable systems and mechanisms of their generation,” Phys. Rev. E 88 ,052911 (2013). 
+
+> 34
+
+R. Karnatak, G. Ansmann, U. Feudel, and K. Lehnertz, “Route to extreme events in excitable systems,” Phys. Rev. E 90 , 022917 (2014). 
+
+> 35
+
+G. Ansmann, K. Lehnertz, and U. Feudel, “Self-induced switchings be-tween multiple space-time patterns on complex networks of excitable units,” Phys. Rev. X 6, 011030 (2016). 
+
+> 36
+
+S. N. Chowdhury, S. Majhi, M. Ozer, D. Ghosh, and M. Perc, “Synchro-nization to extreme events in moving agents,” New J. Phys. 21 , 073048 (2019). 
+
+> 37
+
+T. Bröhl and K. Lehnertz, “Identifying edges that facilitate the generation of extreme events in networked dynamical systems,” Chaos 30 , 073113 (2020). 
+
+> 38
+
+N. Malik and U. Ozturk, “Rare events in complex systems: Understanding and prediction,” Chaos 30 , 090401 (2020). 
+
+> 39
+
+A. Ray, A. Mishra, D. Ghosh, T. Kapitaniak, S. K. Dana, and C. Hens, “Extreme events in a network of heterogeneous Josephson junctions,” Phys. Rev. E 101 , 032209 (2020). 9
+
+> 40
+
+A. Ray, T. Bröhl, A. Mishra, S. Ghosh, D. Ghosh, T. Kapitaniak, S. K. Dana, and C. Hens, “Extreme events in a complex network: Interplay between degree distribution and repulsive interaction,” Chaos 32 , 121103 (2022). 
+
+> 41
+
+A. Roy and S. Sinha, “Impact of random links on neuronal extreme events,” Chaos Solit. Fractals 180 , 114568 (2024). 
+
+> 42
+
+T. Bröhl and K. Lehnertz, “Emergence of a tipping subnetwork during a critical transition in networked systems: A new avenue to extreme events,” Phys. Rev. Res. 7, 023109 (2025). 
+
+> 43
+
+J. Cubillos-Cornejo, M. E. Mendoza, and I. Bordeu, “Extreme events at the onset of epileptic-like intermittent activity of FitzHugh–Nagumo oscillators on small-world networks,” Chaos Solit. Fractals 192 , 116000 (2025). 
+
+> 44
+
+M. Mehrabbeik, S. Jafari, and F. Parastesh, “Extreme events in a chaotic map-based higher-order neuronal model,” Int. J. Bifurcation Chaos 35 ,2550056 (2025). 
+
+> 45
+
+M. Ramasamy, S. Dinesh Vijay, A. Karunanidhi, and K. Rajagopal, “Dy-namics of small-world memristive neuronal networks: synchronization and extreme events in the Hindmarsh–Rose model,” Eur. Phys. J. Plus 140 , 1–14 (2025). 
+
+> 46
+
+R. Shashangan, S. Sudharsan, D. Ghosh, and M. Senthilvelan, “Propaga-tion of extreme events in multiplex neuronal networks,” Phys. Rev. E 112 ,014310 (2025). 
+
+> 47
+
+S. D. Vijay, K. Thamilmaran, and A. I. Ahamed, “Transition to extreme events in a coupled memristive Hindmarsh–Rose neuron system,” Eur. Phys. J. Plus 139 , 234 (2024). 
+
+> 48
+
+L. S. Kingston, K. Thamilmaran, P. Pal, U. Feudel, and S. K. Dana, “Ex-treme events in the forced Liénard system,” Phys. Rev. E 96 , 052204 (2017). 
+
+> 49
+
+G. Tirabassi, R. Aristides, C. Masoller, and D. J. Gauthier, “Bubbling in oscillator networks,” arXiv (2025). 
+
+> 50
+
+C. Grebogi, E. Ott, and J. A. Yorke, “Chaos, strange attractors, and fractal basin boundaries in nonlinear dynamics,” Science 238 , 632–638 (1987). 
+
+> 51
+
+P. Erd˝ os and A. Rényi, “On random graphs I,” Publ. Math. Debrecen 6, 18 (1959). 
+
+> 52
+
+D. J. Watts and S. H. Strogatz, “Collective dynamics of ‘small-world’networks,” Nature 393 , 440–442 (1998). 
+
+> 53
+
+R. Albert and A.-L. Barabási, “Statistical mechanics of complex networks,” Rev. Mod. Phys. 74 , 47 (2002). 
+
+> 54
+
+F. Ricci, R. Tonelli, L. Huang, and Y.-C. Lai, “Onset of chaotic phase syn-chronization in complex networks of coupled heterogeneous oscillators,” Phys. Rev. E 86 , 027201 (2012). 
+
+> 55
+
+T. Squartini, I. Van Lelyveld, and D. Garlaschelli, “Early-warning signals of topological collapse in interbank networks,” Sci. Rep. 3, 3357 (2013). 
+
+> 56
+
+S. Rakshit, S. Majhi, and D. Ghosh, “Synchronization in complex networks with long-range interactions,” J. Phys. A: Math. Theor. 53 , 154002 (2020). 
+
+> 57
+
+M. Fiedler, “Algebraic connectivity of graphs,” Czech. Math. J. 23 , 298– 305 (1973). 
+
+> 58
+
+M. Oehlers and B. Fabian, “Graph metrics for network robustness—a sur-vey,” Mathematics 9, 895 (2021). 
+
+> 59
+
+F. M. Atay and T. Biyikoglu, “Graph operations and synchronization of complex networks,” Phys. Rev. E 72 , 016217 (2005). 
+
+> 60
+
+A. Arenas, A. Díaz-Guilera, J. Kurths, Y. Moreno, and C. Zhou, “Synchro-nization in complex networks,” Phys. Rep. 469 , 93–153 (2008). 
+
+> 61
+
+S. M. Fallat, S. Kirkland, and S. Pati, “On graphs with algebraic connec-tivity equal to minimum edge density,” Linear Algebra Appl. 373 , 31–50 (2003). 
+
+> 62
+
+F. Meng, G. Fu, R. Farmani, C. Sweetapple, and D. Butler, “Topological at-tributes of network resilience: A study in water distribution systems,” Water Res. 143 , 376–386 (2018). 
+
+> 63
+
+C. Letellier, L. Kamdjeu Kengne, M. Zhao, and L. Minati, “To be an ex-treme event or not: That is the question,” Chaos 35 , 073119 (2025). 
+
+> 64
+
+G. Ansmann, “A highly specific test for periodicity,” Chaos 25 , 113106 (2015). 
+
+> 65
+
+T. Nishikawa, A. E. Motter, Y.-C. Lai, and F. C. Hoppensteadt, “Hetero-geneity in oscillator networks: Are smaller worlds easier to synchronize?” Phys. Rev. Lett. 91 , 014101 (2003). 
+
+> 66
+
+L. M. Pecora and T. L. Carroll, “Master stability functions for synchronized coupled systems,” Phys. Rev. Lett. 80 , 2109 (1998). 
+
+> 67
+
+J. Sun, E. M. Bollt, and T. Nishikawa, “Master stability functions for cou-pled nearly identical dynamical systems,” Europhys. Lett. 85 , 60011 (2009). 
+
+> 68
+
+C. W. Wu and L. O. Chua, “On a conjecture regarding the synchronization in an array of linearly coupled dynamical systems,” IEEE Trans. Circuits Syst. I Fundam. Theory Appl. 43 , 161–165 (1996). 
+
+> 69
+
+A. Nazerian, J. D. Hart, M. Lodi, and F. Sorrentino, “The efficiency of syn-chronization dynamics and the role of network syncreactivity,” Nat. Com-mun. 15 , 9003 (2024). 
+
+> 70
+
+C. Castellano and R. Pastor-Satorras, “Relating topological determinants of complex networks to their spectral properties: Structural and dynamical effects,” Phys. Rev. X 7, 041024 (2017). 
+
+> 71
+
+S. Faci-Lázaro, J. Soriano, J. J. Mazo, and J. Gømez-Gardeñes, “Dynamical and topological conditions triggering the spontaneous activation of Izhike-vich neuronal networks,” Chaos Solit. Fractals 172 , 113547 (2023). 
+
+> 72
+
+F. Battiston, C. Bick, M. Lucas, A. P. Millán, P. S. Skardal, and Y. Zhang, “Collective dynamics on higher-order networks,” Nat. Rev. Phys. 8,146–159 (2026). 
+
+> 73
+
+S. Majhi, B. K. Bera, D. Ghosh, and M. Perc, “Chimera states in neuronal networks: A review,” Phys. Life Rev. 28 , 100–121 (2019). 
+
+> 74
+
+C. Meisel and T. Gross, “Adaptive self-organization in a realistic neural network model,” Phys. Rev. E 80 , 061917 (2009). 
+
+> 75
+
+Y. A. Sugimoto, H. Yadohisa, and M. S. Abe, “Network structure influences self-organized criticality in neural networks with dynamical synapses,” Front. Syst. Neurosci. 19 , 1590743 (2025). 
+
+> 76
+
+D. Sornette and G. Ouillon, “Dragon-kings: mechanisms, statistical meth-ods and empirical evidence,” Eur. Phys. J.: Spec. Top. 205 , 1–26 (2012). 
+
+> 77
+
+A. Mishra, S. Saha, M. Vigneshwaran, P. Pal, T. Kapitaniak, and S. K. Dana, “Dragon-king-like extreme events in coupled bursting neurons,” Phys. Rev. E 97 , 062311 (2018). 
+
+> 78
+
+D. Das, A. Ray, C. Hens, D. Ghosh, M. K. Hassan, A. Dabrowski, T. Kap-itaniak, and S. K. Dana, “Complexity measure of extreme events,” Chaos: An Interdisciplinary Journal of Nonlinear Science 34 , 121104 (2024). 
+
+> 79
+
+M. Sachs, M. Yoder, D. Turcotte, J. Rundle, and B. Malamud, “Black swans, power laws, and dragon-kings: Earthquakes, volcanic eruptions, landslides, wildfires, floods, and soc models,” Eur. Phys. J.: Spec. Top. 205 ,167–182 (2012). 
+
+> 80
+
+F. D. Sahneh, F. N. Chowdhury, and C. M. Scoglio, “On the existence of a threshold for preventive behavioral responses to suppress epidemic spread-ing,” Sci. Rep. 2, 632 (2012). 
+
+> 81
+
+H. Wang, Q. Li, G. D’Agostino, S. Havlin, H. E. Stanley, and P. Van Mieghem, “Effect of the interconnected network structure on the epidemic threshold,” Phys. Rev. E 88 , 022801 (2013). 
+
+> 82
+
+M. Gerster, R. Berner, J. Sawicki, A. Zakharova, A. Škoch, J. Hlinka, K. Lehnertz, and E. Schöll, “FitzHugh–Nagumo oscillators on complex net-works mimic epileptic-seizure-related synchronization phenomena,” Chaos 
+
+30 , 123130 (2020). 
+
+> 83
+
+S. Hariharan, R. Suresh, and V. Chandrasekar, “Heterogeneous noise-induced extreme events and synchronization in a globally coupled net-work of FitzHugh–Nagumo oscillators,” Chaos Solit. Fractals 203 , 117652 (2026). 
+
+> 84
+
+S. Hariharan, R. Suresh, and V. K. Chandrasekar, “Synchronization and extreme events in multiplex FitzHugh-Nagumo networks under heteroge-neous noise,” Chaos: An Interdisciplinary Journal of Nonlinear Science 36 ,033144 (2026). 
+
+> 85
+
+J. L. Hindmarsh and R. Rose, “A model of neuronal bursting using three coupled first order differential equations,” Proc. R. Soc. Lond. B Biol. Sci. 
+
+221 , 87–102 (1984). 
+
+> 86
+
+L. Chua, “Memristor-the missing circuit element,” IEEE Trans. Circuits Syst. I Fundam. Theory Appl. 18 , 507–519 (2003). 
+
+> 87
+
+S. D. Vijay, K. Thamilmaran, and A. I. Ahamed, “Superextreme spiking os-cillations and multistability in a memristor-based Hindmarsh–Rose neuron model,” Nonlinear Dyn. 111 , 789–799 (2023). 
+
+> 88
+
+O. E. Rössler, “An equation for continuous chaos,” Phys. Lett. A 57 , 397– 398 (1976). 
+
+> 89
+
+E. N. Lorenz, “Deterministic non-periodic flow,” J. Atmos. Sci. 20 , 130– 141 (1963). 
+
+> 90
+
+G. Ansmann, “Efficiently and easily integrating differential equations with JiTCODE, JiTCDDE, and JiTCSDE,” Chaos 28 , 043116 (2018).

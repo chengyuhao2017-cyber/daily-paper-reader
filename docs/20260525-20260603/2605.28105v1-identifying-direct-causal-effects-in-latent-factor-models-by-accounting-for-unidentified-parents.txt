@@ -1,0 +1,2513 @@
+Title: Identifying Direct Causal Effects in Latent Factor Models by Accounting for Unidentified Parents
+
+URL Source: https://arxiv.org/pdf/2605.28105v1
+
+Published Time: Thu, 28 May 2026 00:51:54 GMT
+
+Number of Pages: 48
+
+Markdown Content:
+# Identifying Direct Causal Effects in Latent Factor Models by Accounting for Unidentified Parents 
+
+## Tom Hochsprung ∗1,2 , Nils Sturma †3, Jakob Runge ‡4, Mathias Drton §5,6 , and Andreas Gerhardus ¶1
+
+> 1
+
+German Aerospace Center (DLR), Institute of Data Science, Jena, Germany 
+
+> 2
+
+Technische Universit¨ at Berlin, Berlin, Germany 
+
+> 3
+
+Institute of Mathematics, ´Ecole Polytechnique F´ ed´ erale de Lausanne (EPFL), Lausanne, Switzerland 
+
+> 4
+
+Institute of Computer Science, University of Potsdam, Potsdam, Germany 
+
+> 5
+
+Department of Mathematics, TUM School of Computation, Information and Technology, Technical University of Munich, Munich, Germany 
+
+> 6
+
+Munich Center for Machine Learning, Munich, Germany 
+
+Abstract 
+
+We consider linear structural equation models with explicitly modelled latent variables. In such models, observed and latent variables solve linear equations including stochastic noise terms. The goal of our work is to identify the direct causal effects between the observed variables of interest by providing (rational) formulas in the observed covariances. Most prior identification approaches operate in the latent projection framework, where latent variables are projected away into dependent error terms. However, when the observed variables are densely confounded, even if only by a few latent variables, the projection-based approaches are unable to certify identifiability of most effects. For such problems, approaches that explicitly use the latent variables are more effective, but algorithms that were recently proposed for this purpose often remain inconclusive for denser causal graphs. We develop a new identification criterion that is able to better handle dense graphs by leveraging the key insight that recursive identification schemes can be generalized by explicitly accounting for causal parents with (yet) unidentified direct effects. Combinatorial search problems in our new criterion can be tackled with the help of network-flow computations, leading to a practical useful algorithmic tool that we also make available in software. 
+
+Keywords: causal inference, causal effect identification, latent variables, factor analysis, struc-tural equation model 
+
+# 1 Introduction 
+
+We consider linear structural equation models (LSEMs) with explicitly modelled latent variables. In such LSEMS, structural equations state that the components of the observed random vector X
+
+> ∗
+
+tom.hochsprung@dlr.de 
+
+> †
+
+nils.sturma@epfl.ch 
+
+> ‡
+
+jakob.runge@uni-potsdam.de 
+
+> §
+
+mathias.drton@tum.de 
+
+> ¶
+
+andreas.gerhardus@dlr.de 
+
+1
+
+> arXiv:2605.28105v1 [stat.ME] 27 May 2026
+
+are noisy linear functions of a subset of the other components of X and a vector of latent variables 
+
+L. Solving the equations induces the joint distribution the model postulates for X. For LSEMs with latent variables, it is important to clarify which of the coefficients in the structural equations are identifiable (that is, uniquely recoverable) from the covariance matrix of X and also to derive (rational) identification formulas. This parameter identification problem is relevant for a broad range of applied sciences because one can naturally interpret the coefficients as direct causal effects between different variables (e.g., Spirtes et al., 2000; Pearl, 2009; Runge et al., 2023). The setting in our paper is similar to the one in Barber et al. (2022a). Consider a collection 
+
+X = ( Xv )v∈V of d = |V | observed random variables and a further collection L = ( Lh)h∈L of 
+
+ℓ = |L| latent (unobserved) random variables. We assume that V and L are both finite and that all variables Xv are related by linear equations as 
+
+Xv = X 
+
+> w̸=v
+
+λwv Xw + X
+
+> h∈L
+
+γhv Lh + ϵv , v ∈ V. (1.1) The ϵv constitute noise in the form of jointly independent random variables with zero mean and variances ωvv := E[ϵ2 
+
+> v
+
+] ∈ (0 , ∞). The λwv and γhv are real-valued parameters commonly referred to as the direct causal effects of Xw on Xv and Lh on Xv , respectively. We assume the latent variables (Lh)h∈L to be directly sampled from some underlying distribution with strictly positive and finite variance and that the latent variables ( Lh)h∈L are jointly independent and independent of the noise terms ϵ = ( ϵv )v∈V . Furthermore, without loss of generality we assume that the means of the latent variables ( Lh)h∈L equal 0. Understanding X, L and ϵ as vectors, we can recast (1.1) as the matrix equation 
+
+X = Λ T X + Γ T L + ϵ, (1.2) where Λ = ( λwv ) ∈ Rd×d and Γ = ( γhv ) ∈ Rℓ×d are parameter matrices. The matrix Λ has zero diagonal entries and, to ensure solvability of (1.2), it is assumed that Id − Λ is invertible, where Id
+
+is the d × d-identity matrix. Solving for X in (1.2), we have 
+
+X = ( Id − Λ) −T (Γ T L + ϵ). (1.3) The vector Γ T L + ϵ follows a latent-factor model and has covariance matrix Ω := Var( ϵ + Γ T L) = Ω diag + Γ T VLΓ,
+
+where Ω diag := Var( ϵ) is diagonal, and we write VL := Var( L). From (1.3), we see that X has covariance matrix Σ = ( Id − Λ) −T Ω( Id − Λ) −1. (1.4) The goal of this paper is to derive conditions under which Λ (or some of its entries) can be identified from the observed covariance matrix Σ. We study the identification problem from a graphical perspective and encode the parametrized equation in (1.2) by a graph whose nodes represent the latent and observed variables in L and X.If the model allows an effect λvw or γhw , for v, w ∈ V and h ∈ L , to be non-zero, then the graph contains a directed edge v → w or h → w, respectively. We call this graph a latent-factor graph 
+
+and emphasize that it explicitly shows the latent variables. 2SES     
+
+> IP HS HA TA TC
+
+Figure 1: Latent-factor graph corresponding to an example about the total energy consumption (TC) of a household; see Example 1.1. 
+
+Example 1.1. We consider an example about the total energy consumption (TC) of a household, adapted from Estiri (2014) and Karatasou and Santamouris (2019). Three variables, namely, total heated floor area (TA) , household appliances (HA) and household size (HS) , are assumed to have a direct causal effect on total energy consumption. Additionally, the household size is assumed to have a direct effect on total heated floor area and household appliances. All of these four observed variables are also caused by the unobserved variable social economic status (SES) . Furthermore, one measures a proxy of SES that is conditionally independent of all the other observed variables given SES; for example, this independent observed proxy (IP) could be the car value. The corresponding LSEM with L = ( LSES ) and X = ( XIP , X HS , X HA , X TA , X TC )T is given by 
+
+X =
+
+
+
+0 0 0 0 00 0 0 0 00 λHS ,HA 0 0 00 λHS ,TA 0 0 00 λHS ,TC λHA ,TC λTA ,TC 0
+
+| {z }
+
+> =Λ T
+
+X +
+
+
+
+γSES ,IP 
+
+γSES ,HS 
+
+γSES ,HA 
+
+γSES ,TA 
+
+γSES ,TC 
+
+| {z }
+
+> =Γ T
+
+L + ϵ. 
+
+The induced latent-factor graph is depicted in Figure 1. Explicitly modelling the latent variables is particularly effective when the latent confounding is dense but low-dimensional, that is, when only a few latent variables confound many observed variables. The literature offers several graphical methods that seek to leverage this perspective. For example, Stanghellini and Wermuth (2005) and Leung et al. (2016) consider problems that feature only one latent variable. The conditional instrument approach of Van der Zander et al. (2015) only considers cases where no confounder directly influences all observed variables, and another line of work assumes availability of observed proxies of the latent confounder (Kuroki and Pearl, 2014; Miao et al., 2018; Lee and Bareinboim, 2021; Shpitser et al., 2023; Tchetgen Tchetgen et al., 2024). A criterion that allows the treatment of general latent-factor graphs is the latent-factor half-trek criterion (LF-HTC) of Barber et al. (2022a), which applies exactly to our considered setting with latent variables that are independent and source variables. There also exist recent works such as Ankan et al. (2023), Dong et al. (2024), or Sturma and Drton (2025), which generalize LF-HTC type methods to settings with causal effects among latents. Furthermore, there exist recent identification results from Hochsprung et al. (2025) for linear time series models having explicitly modelled latent confounding time series. Already for our latent-factor graph setting, there exist many graphs that are not identifiable via the LF-HTC, which to our knowledge is currently the most encompassing criterion, despite the fact that (rational) identifiability can be proven with computer algebra methods. In this paper, 3motivated by the aforementioned related results in the time series setting (Hochsprung et al., 2025), we propose a more general criterion for latent-factor graphs that is able to certify identifiability of direct effects for significantly more graphs. 
+
+Example 1.1 (continued) . Consider again the model for total energy consumption of a household, with the graph from Figure 1. It turns out that in this example all direct effects between observed variables (corresponding to the blue edges in the figure) are identifiable. While the LF-HTC is only able to identify the effects for HS → HA and HS → TA and, thus, none of those for edges pointing into the total energy consumption, our new criterion graphically detects identifiability of all effects associated to edges between observed variables. It is worth mentioning that Gr¨ obner basis computations allow one to perfectly decide identifia-bility of causal effects (Garcia-Puente et al., 2010, Section C in Barber et al., 2022b). However, this tends to be feasible only for problems of small to moderate size. While the precise computational complexity of Gr¨ obner basis approaches to LSEM identifiability is unknown, applying complex-ity results for finding Gr¨ obner bases for general polynomial ideals (Huynh, 1986; Mayr, 1997) to our setting yields double exponential time complexity in the size of the graph. In contrast, the LF-HTC has polynomial time complexity when bounding the number of the to-be-searched-over latent factors. While our criterion has a larger than exponential time complexity in the size of the graph, we also achieve polynomial time complexity in the size of the graph under practically useful algorithmic simplifications. 
+
+Remark 1.1. As pioneered by Wright (1921, 1934), there also exists the approach of using latent projections, where the latent variables are merged into error terms that then may become dependent. Such dependence is graphically represented by bidirected edges ( ↔). The latent projection approach allows one to apply results as in Drton et al. (2011), which are connected to nonparametric ap-proaches based on the do-calculus (Tian and Pearl, 2002a,b, 2003; Shpitser and Pearl, 2006a,b; Huang and Valtorta, 2006a,b; Pearl, 2009; Shpitser and Sherman, 2018). Moreover, there exist a host of methods taylored to linear models under latent projection; see the review of Drton (2018). However, as shown by Barber et al. (2022a), these methods not only remain inconclusive under dense confounding, but can also yield incorrect conclusions on (rational/generic) identifiability un-der sparse but low-dimensional confounding. 
+
+We now repeat and highlight main contributions of our new work: 
+
+• we propose a new broadly applicable criterion for identifying direct causal effects in (linear) latent-factor models, which subsumes the previous state-of-the-art methods for this class of models, 
+
+• we provide the accompanying identification formulas, and 
+
+• we provide R-code (R Core Team, 2025) at https://gitlab.com/dlr-dw/elfhtc that allows one to check identifiability, obtain identification formulas in LaTeX-code, and compute estimates of direct causal effects from a given covariance matrix estimate. We structure our paper as follows: Section 2 introduces necessary preliminaries. Section 3 con-tains the main pillar of our identification criterion, namely, a more general version of the LF-HTC from Barber et al. (2022a) that allows for edgewise identification and for auxiliary sets with uniden-tified parents. We term this criterion eLF-HTC. In Section 4 , we present two further identification 4results complementing the eLF-HTC. In Section 5 , we discuss how one can computationally im-plement the results from Sections 3 and 4 yielding a combined identification algorithm/criterion. In Section 6 , we present experiments that demonstrate that our combined algorithm from Section 5 identifies significantly more latent-factor graphs than the LF-HTC. Finally, in Section 7 , we finish with a conclusion. Most proofs are deferred to the Appendix, which also contains further explanations. 
+
+# 2 Preliminaries 
+
+In this section, we introduce required preliminaries: In Section 2.1, we recall basic graphical con-cepts. The exposition hereby bears some similarity to the one in Hochsprung et al. (2025). Then, in Section 2.2, we introduce our notion of rational identifiability. The reader might skip this sec-tion in case they are not interested in algebraic or topological arguments; for the remainder of the paper it suffices to know that rational identifiability roughly means that direct causal effects can be identified by rational functions in the entries of Σ. Finally, in Section 2.3, we briefly state the LF-HTC from Barber et al. (2022a) and introduce further required graphical concepts. 
+
+## 2.1 Basic Graphical Concepts 
+
+One can represent the model from equation (1.1) using a directed graph G = ( V ∪ L , D ). Here, V
+
+and L are finite disjoint sets of observed and latent nodes, respectively, and D ⊆ (V ∪ L ) × (V ∪ L )is the set of directed edges. We assume that the set D partitions as D = DV ∪ DLV , where 
+
+DV = D ∩ (V × V ) contains the directed edges that are just between the observed vertices and where DLV = D ∩ (L × V ) is the set of directed edges that point from a latent vertex to an observed vertex. We frequently write GL instead of G to indicate that G is a latent-factor graph. Besides, we assume that there are no self-loops, that is, v → v / ∈ D for all v ∈ V ∪ L . However, we do not prohibit reciprocal edge pairs, that is, v → w ∈ DV and w → v ∈ DV .We further adopt the following common graphical terminology (see, e.g., Lauritzen, 1996 or Pearl, 2009): For a vertex v ∈ V ∪ L , we define its parents by pa( v) := {w ∈ V ∪ L : w → v}, and for a set of vertices A ⊆ V ∪ L by pa( A) := S 
+
+> v∈A
+
+pa( v). Note that in this paper, pa( L) = ∅. To distinguish between latent and observed parents of some vertex v ∈ V ∪ L (and analogously of a set 
+
+A ⊆ V ∪ L ), we write pa V (v) = {w ∈ V : w → v} and pa L(v) = {w ∈ L : w → v}, respectively. Moreover, for a vertex v ∈ V ∪ L , we define its children by ch( v) := {w ∈ V ∪ L : v → w}, similarly ch( A) := S 
+
+> v∈A
+
+ch( A) for a set of vertices A ⊆ V ∪ L . As vertices in our paper only have observed children, we do not further distinguish the children-notation into observed and latent children. We further call a finite sequence of not necessarily distinct vertices ( v1, v 2, . . . , v n) a walk if every pair of successive vertices in this sequence is connected by a directed edge pointing in any direction. If additionally all vertices with the potential exception of the endpoint vertices v1 and 
+
+vn in this sequence are unique, then we also call a walk a path . We say that a path is trivial if it just consists of a single vertex. We further say that a path is a directed path if every edge in this path is pointing in the same direction and away from the starting vertex v1 towards the end-vertex 
+
+vn. We call a directed path a directed cycle if v1 = vn. We emphasize that our considered setting allows for directed cycles. If for vertices v, w ∈ V ∪ L there is a directed path with at least one edge from v to w, then we say that w is a descendant of v (and that v is an ancestor of w, however, we do not require this notion), so in our terminology, v might be but not necessarily is a descendant of itself. We write dec( v) to denote the set of descendants of v, similarly, dec( A) := S 
+
+> v∈A
+
+dec( v)5for a set of vertices A ⊆ V ∪ L . As vertices in our paper only have observed children and hence observed descendants, we do not further distinguish the descendants-notation into observed and latent descendants. However, we sometimes write dec GL to indicate the graph we are referring to. Besides, we say that a non-endpoint vertex v ∈ V ∪ L is a collider in a triplet of subsequent vertices (u, v, w ) in a walk π if the corresponding edges to that triplet in π are u → v ← w, otherwise, we say that v is a non-collider in that triplet. 
+
+## 2.2 Rational Identifiability 
+
+In this section, we introduce our notion of rational identifiability. For better connectivity to other existing results in Section 4.1, our notion refers to a different underlying space than the notion of rational identifiability from the related LF-HTC paper from Barber et al. (2022a). As we show in Section A.1, both notions are equivalent in our setting. We start this section by recalling some basic required algebraic and topological terms, then continue by introducing further required notation, and then finish by introducing our notion of rational identifiability. We first recall some basic algebraic and topological terms (c.f. Cox et al., 2015): A set A ⊆ Rm := 
+
+{(k1, . . . , k m) : k1, . . . , k m ∈ K} with m ∈ N is called an affine variety or algebraic set if one can for some finite set of polynomials S ⊆ R[x1, . . . , x m] write A = V (S) := {a ∈ Rm : f (a) = 0 ∀f ∈ S}.The Zariski topology over Rm is the topology whose closed sets are exactly all the algebraic subsets of Rm. The Zariski closure of a set A ⊆ Rm is the smallest algebraic subset of Rm which contains 
+
+A, and which we denote by A. An algebraic set is called irreducible if it cannot be written as the union of two proper algebraic subsets. It holds that every proper algebraic subset of an irreducible algebraic set has Lebesgue measure zero; see, for example (for a slightly simpler statement) the lemma in Okamoto (1973). We further employ the following notation (c.f. Barber et al., 2022a): We write RDV to denote the set of all real d × d-matrices Λ = ( λvw ) with support DV , that is, if v → w / ∈ DV , then λvw = 0. Similarly, we write RDV 
+
+> reg
+
+to denote the set of all matrices Λ ∈ RDV for which Id − Λ is invertible. Also, we write RDLV for the set of real ℓ × d matrices Γ = ( γhv ) with support DLV , that is, if 
+
+h → v /∈ DLV , then γhv = 0. Furthermore, we let diag + 
+
+> d
+
+denote the set of all d × d diagonal matrices with positive diagonal indexed by the elements of V , and analogously, diag + 
+
+> ℓ
+
+denotes the set of all ℓ × ℓ diagonal matrices with positive diagonal indexed by the elements of L. Finally, we let PD( d) denote the cone of positive definite symmetric d × d-matrices. We also define the parameter space Θ := RDV 
+
+> reg
+
+× RDLV × diag + 
+
+> d
+
+× diag + 
+
+> ℓ
+
+and the map 
+
+χGL : Θ −→ PD( d), (Λ , Γ, Ωdiag , VL) 7 → (Id − Λ) −T (Ω diag + Γ T VLΓ)( Id − Λ) −1.
+
+We now define our notion of rational identifiability. 
+
+Definition 2.1 (Rational identifiability) .
+
+(a) The latent-factor graph GL is rationally identifiable if there exists a proper algebraic subset 
+
+AΘ ⊊ Θ and a rational map ψ : PD( d) → RDV 
+
+> reg
+
+such that ( ψ ◦ χGL )(Λ , Γ, Ωdiag , VL) = Λ for all (Λ , Γ, Ωdiag , VL) ∈ Θ \ AΘ.(b) The direct causal effect λvw , or also simply the edge v → w ∈ DV , or if the vertex w is clear from the context simply the parent v, is rationally identifiable if there exists a proper algebraic subset AΘ ⊊ Θ and a rational map ψ : PD( d) → R such that ( ψ ◦ χGL )(Λ , Γ, Ωdiag , VL) = λvw 
+
+for all (Λ , Γ, Ωdiag , VL) ∈ Θ \ AΘ.6Because Θ ∼= RmΘ , where mΘ := |DV | + |DLV | + d + ℓ, it follows that Θ is irreducible (see Section A.2 in the Appendix for a more detailed explanation of this fact) and thus that every proper algebraic subset AΘ of Θ has Lebesgue measure zero. Therefore, our notion of rational identifiability implies that an absolutely continuous random choice of (Λ , Γ, Ωdiag , VL) ∈ Θ almost surely results in a covariance matrix Σ from which one can recover Λ or some causal effect λvw by rational formulas in the entries of Σ. Besides, note that rational identifiability of GL is equivalent to rational identifiability of all edges in DV .We now finish this section with the following remark. 
+
+Remark 2.2. As we further explain in Section A.1, all results in this paper are also true when working with the notion of rational identifiability from the related LF-HTC paper from Barber et al. (2022a), which refers to a different underlying space. 
+
+## 2.3 Treks, Latent-Factor Half-Treks and the Latent-Factor Half-Trek Criterion 
+
+In this section, we first define certain types of paths, namely treks and latent-factor half-treks , both of which are essential for the remainder of this work. Treks are related to covariances via the trek rule (e.g., Wright, 1921, Wright, 1934, Section 2 in Sullivant et al., 2010, Section 2 in Foygel et al., 2012a). We then define several further trek-based concepts. Finally, we present the already existing latent-factor half-trek criterion (LF-HTC) from Barber et al. (2022a) which also applies to latent-factor graphs and which to the best of our knowledge is the current most encompassing criterion for this type of graphs. In addition to the just mentioned references for the trek rule, the definitions and results in this section are also further based on Section 3 in Barber et al. (2022a). 
+
+Definition 2.3 (Trek and latent-factor half-trek) . A walk π in the latent-factor graph GL is a trek from source s to target t if it is a walk from s ∈ V ∪ L to t ∈ V ∪ L and does not contain any colliders, that is, if it is of the form 
+
+s = vLl ← vLl−1 ← · · · ← vL 
+
+> 1
+
+← vT → vR 
+
+> 1
+
+→ · · · → vRr−1 → vRr = t, 
+
+where vT , v L 
+
+> 1
+
+, . . . , v Ll , v R 
+
+> 1
+
+, . . . , v Rr ∈ V ∪ L . The left-hand side of π is defined by Left( π) = {vT , v L 
+
+> 1
+
+,. . . , v Ll } and the right-hand side of π is defined by Right( π) = {vT , v R 
+
+> 1
+
+, . . . , v Rr }. The top node of π
+
+is vT . It is allowed that Left( π) = ∅ or Right( π) = ∅. If π just consists of a single vertex, then π is called trivial and in this case, the left and right of π just consist of π’s single vertex. For vertices 
+
+s, t ∈ V ∪ L , we write T (s, t ) to denote the set of all treks from s to t in GL.A latent-factor half-trek from source s to target t is a special type of trek of the form 
+
+s → v1 → · · · → vn → t
+
+or of the form 
+
+s ← h → v1 → · · · → vn → t
+
+for v1, . . . , v n ∈ V and h ∈ L .
+
+Example 2.1. Consider the latent-factor graph in Figure 2a. The path π1 : 2 ← h1 → 3 is a trek because it contains no colliders. The trek π1 is even a latent-factor half-trek because it has the 7h1     
+
+> 123456
+
+(a)  
+
+> h1
+> 1
+> 23
+> 4
+> placeholder
+
+(b) 
+
+Figure 2: Left: Example latent-factor graph which is not identifiable via the LF-HTC but via the eLF-HTC, see Example 3.1. Right: Two-proxy graph for which the edge 2 → 3 (orange) is identifiable via the eLF-HTC but not via the LF-HTC, see Example 3.2. special required form. Similarly, the path π2 : 1 → 2 → 3 is a latent-factor half-trek. The path 
+
+π3 : 1 → 2 ← h1 → 3, however, is not a trek (and hence, also not latent-factor half-trek) because it contains a collider, namely 1 → 2 ← h1.Several treks can be considered together, which gives rise to the following definition. 
+
+Definition 2.4 (System of treks) . A system of treks Π is a set of treks Π = {π1, . . . , π n}. One says that Π has no sided intersection if Left( πi) ∩ Left( πj ) = ∅ = Right( πi) ∩ Right( πj ) for all i, j ∈ { 1, . . . , n } with i̸ = j. 
+
+Example 2.1 (continued) . The system of (latent-factor half-)treks Π := {π1, π 2} has sided inter-section because 3 ∈ Right( π1) ∩ Right( π2). To state the LF-HTC, there is a further concept that we need to introduce. 
+
+Definition 2.5 (Latent-factor half-trek reachability) . For two distinct vertices v, w ∈ V in a latent-factor graph GL and for a set H ⊆ L , we say that w is half-trek reachable from v while avoiding 
+
+H, denoted by w ∈ htr H (v), if there exists a non-trivial latent-factor half-trek from v to w in the latent-factor graph GL which does not pass through any node in H. For a set U ⊆ V , we write 
+
+w ∈ htr H (U ) provided that w ∈ htr H (u) for some u ∈ U .
+
+Example 2.1 (continued) . Again consider the latent-factor graph from Figure 2a. For H = {h1},we have 2 /∈ htr H (3), however, for H = ∅, we have 2 ∈ htr H (3) due to the latent-factor half-trek 3 ← h1 → 2. We are now ready to state the LF-HTC and its accompanying identification result. 
+
+Definition 2.6. For a node v ∈ V , the triple ( Y, Z, H ) ∈ 2V \{ v} × 2V \{ v} × 2L satisfies the latent-factor half-trek criterion (LF-HTC) with respect to v if: (i) |Y | = |pa V (v)| + |H| and |Z| = |H| with Z ∩ { v} = ∅ and Z ∩ pa V (v) = ∅,1
+
+(ii) Y ∩ (Z ∪ { v}) = ∅ and pa L(Y ) ∩ pa L(Z ∪ { v}) ⊆ H, and           
+
+> 1The condition Z∩ { v}=∅does not occur in the original formulation of the LF-HTC in Barber et al. (2022a). However, when v∈Z, the subsequent LF-HTC identification theorem (Theorem 2.7) does not yield any further identification because every observed edge into Zis required to be rationally identifiable.
+
+8(iii) there exists a system of latent-factor half-treks with no sided intersection from Y to Z ∪pa V (v)in GL, such that for each z ∈ Z, the half-trek terminating at z takes the form y ← h → z for some y ∈ Y and some h ∈ H.
+
+Theorem 2.7 (LF-HTC identifiability) . Suppose the triple (Y, Z, H ) ∈ 2V \{ v} ×2V \{ v} ×2L satisfies the LF-HTC with respect to v ∈ V . If all directed edges u → y ∈ DV with head y ∈ Z ∪ (Y ∩
+
+htr H (Z ∪{ v})) are rationally identifiable, then all directed edges in DV with v as head are rationally identifiable. 
+
+Theorem 2.7 lays the foundation for a practical identification algorithm which is able to certify that a given graph is rationally identifiable and which is also able to print out the corresponding rational identification formulas. This algorithm iteratively certifies rational identifiability of the ob-served edges in a given graph by applying Theorem 2.7. This algorithm also iteratively constructs the rational identification formulas for the remaining edge coefficients by reusing the rational iden-tification formulas constructed in previous iterations. Because edges from other observed vertices into the auxiliary set Z must be known to be rationally identifiable and also because the corre-sponding rational formulas must be known, the algorithm must start with auxiliary sets Z that have no observed parents. Our later improvements in Section 3 allow for auxiliary sets Z with a non-empty observed parent set already at the beginning of such an algorithm. 
+
+# 3 Edgewise Latent-Factor Half-Trek Criterion Allowing for Auxiliary Sets with Unidentified Parents 
+
+The LF-HTC requires that all edge coefficients λwz with w ∈ V and z ∈ Z are known to be rationally identifiable thus giving rise to an iterative procedure where one must start with auxiliary sets Z for which pa V (Z) = ∅. For our new criterion which we call eLF-HTC and which we present in this section, we relax that requirement by allowing z ∈ Z for which some λwz are not already known to be rationally identifiable. Furthermore, in comparison to the LF-HTC, we build upon the fact that parents of the target vertex v which are already known to be rationally identifiable need not to be re-identified and can be excluded from pa V (v). For a better intuitive understanding of the following definition of the eLF-HTC, the reader might for now translate the occuring set Wv in the definition of the eLF-HTC with the observed parents of 
+
+v which have not yet been rationally identified. Similarly, each set Wz might for now be translated with the parents of z which have not yet been rationally identified. Afterwards, in Remark 3.4, we will see that this intuition for Wv suffices and does not reduce the number of eLF-HTC identifiable direct causal effects. However, in Remark 3.5 we will see that this intuition for the sets Wz does not suffice as it reduces the number of eLF-HTC identifiable direct causal effects. 
+
+Definition 3.1 (Edgewise latent-factor half-trek criterion allowing for auxiliary sets with uniden-tified parents (eLF-HTC)) . Let v ∈ V and let Wv ⊆ pa V (v). In addition, let Z ⊆ V \ { v} and 
+
+Wz ⊆ pa V (z) for all z ∈ Z. Write WZ := S 
+
+> z∈Z
+
+Wz and Z(1) := {z ∈ Z : Wz ⊊ pa V (z)}
+
+and Z(2) := {z ∈ Z : Wz = pa V (z)}. Furthermore, let Y ⊆ V \ { v} and H ⊆ L . The tuple (Y, Z, (Wz )z∈Z , H ) satisfies the eLF-HTC with respect to ( v, W v ) if (i) |Z| = |H| and |Y | = |Wv ∪ Z ∪ WZ | with Z ∩ { v} = ∅ and Z(1) ∩ (WZ ∪ Wv ) = ∅,(ii) Y ∩ (Z ∪ { v}) = ∅ and pa L(Y ) ∩ pa L(Z ∪ { v}) ⊆ H, and 9(iii) there exists a system of latent-factor half-treks with no sided intersection from Y to Wv ∪ Z ∪
+
+WZ in GL, such that for each z ∈ Z, the half-trek terminating at z takes the form y ← h → z
+
+for some y ∈ Y and some h ∈ H.
+
+Theorem 3.2 (eLF-HTC identification result) . Suppose the tuple (Y, Z, (Wz )z∈Z , H ) satisfies the eLF-HTC with respect to (v, W v ). Also suppose that all directed edges u → y ∈ DV with head 
+
+y ∈ (Y ∩ htr H (Z ∪ { v})) , all directed edges pz → z ∈ DV with pz ∈ pa V (z) \ Wz for all z ∈ Z(1) ,and all directed edges pv → v ∈ DV with pv ∈ pa V (v) \ Wv are rationally identifiable. Then, all directed edges pv → v ∈ DV with pv ∈ Wv \ (Z(2) ∪ WZ ) are rationally identifiable. 
+
+The proof of Theorem 3.2 also gives explicit rational formulas to identify the direct causal effect of interest, which the reader can find in Section B.1. We now explain an example. (We present the rational identification formulas for this example in Section B.4). 
+
+Example 3.1 (eLF-HTC identification example) . Consider the latent-factor graph from Figure 2a with V = {1, 2, 3, 4, 5, 6} and L = {h1}. This latent-factor graph is not LF-HTC identifiable which one can quickly see by using the R-package SEMID (R Core Team, 2025; Barber et al., 2025) in which the LF-HTC is implemented, yet this latent-factor graph is eLF-HTC identifiable (Theorem 3.2) as we now explain: 
+
+v = 4: Take Wv = {3} and ( Y = {1, 2, 3}, Z = {6}, (Wz )z∈Z = ( {5}), H = {h1}). For this choice, we have pa L(Y ) = {h1} and htr H (Z ∪ { v}) = {4, 5, 6} and pa L(Z ∪ { v}) = {h1}. A possible system of latent-factor half-treks is {1 → 5, 2 ← h1 → 6, 3}. In addition, note that no other edges need to be rationally identifiable because Y ∩ (htr H (Z ∪ { v})) = ∅, because Wv = pa V (v) = {3}, and because Z(1) = ∅. The identified edge is 3 → 4. 
+
+v = 6: Take Wv = {5} and ( Y = {1, 2, 3}, Z = {4}, (Wz )z∈Z = ( {3}), H = {h1}). For this choice, we have pa L(Y ) = {h1} and htr H (Z ∪ { v}) = {4, 5, 6} and pa L(Z ∪ { v}) = {h1}. A possible system of latent-factor half-treks is {1 → 5, 2 ← h1 → 4, 3}. In addition, note that no other edges need to be rationally identifiable because Y ∩ (htr H (Z ∪ { v})) = ∅, because Wv = pa V (v) = {5}, and because Z(1) = ∅. The identified edge is 5 → 6. 
+
+v = 2: Take Wv = {1} and ( Y = {1, 6}, Z = {4}, (Wz )z∈Z = ( ∅), H = {h1}). For this choice, we have pa L(Y ) = {h1} and htr H (Z ∪ { v}) = {2, 3, 4, 5, 6} and pa L(Z ∪ { v}) = {h1}. The system of latent-factor half-treks is {1, 6 ← h1 → 4}. In addition, note that Y ∩ (htr H (Z ∪ { v})) = {6}, that 
+
+Wv = pa V (v) = {1}, and that Z(1) = {4} and pa V (z) \ Wz = {3}, and thus all observed edges required to be rationally identifiable, namely 5 → 6 and 3 → 4, are rationally identifiable as argued previously. The identified edge is 1 → 2. 
+
+v = 3: Take Wv = {2} and ( Y = {2, 4}, Z = {1}, (Wz )z∈Z = ( ∅), H = {h1}). For this choice, we have pa L(Y ) = {h1} and htr H (Z ∪ { v}) = {1, 2, 3, 4, 5, 6} and pa L(Z ∪ { v}) = {h1}. The system of latent-factor half-treks is {2, 4 ← h1 → 1}. In addition, note that Y ∩ (htr H (Z ∪ { v})) = {2, 4},that Wv = pa V (v) = {2}, and that Z(1) = ∅, and thus all observed edges required to be rationally identifiable, namely 1 → 2 and 3 → 4, are rationally identifiable as argued previously. The identified edge is 2 → 3. 
+
+v = 5: Take Wv = {1, 4} and ( Y = {1, 3, 4}, Z = {2}, (Wz )z∈Z = ( ∅), H = {h1}). For this choice, we have pa L(Y ) = {h1} and htr H (Z ∪ { v}) = {2, 3, 4, 5, 6} and pa L(Z ∪ { v}) = {h1}. The system of latent-factor half-treks is {1, 3 ← h1 → 2, 4}. In addition, note that Y ∩ (htr H (Z ∪ { v})) = {1, 3, 4},that Wv = pa V (v) = {1, 4}, and that Z(1) = {2} and pa V (z) \ Wz = {1}, and thus all observed edges required to be rationally identifiable, namely 1 → 2 and 2 → 3 and 3 → 4, are rationally identifiable as argued previously. The identified edges are 1 → 5 and 4 → 5. 10 h1     
+
+> 123456
+
+Figure 3: Example graph for Remark 3.5 in Section 3. Our eLF-HTC criterion is also able to identify the edge from treatment to response in the well-known two-proxy graph (Kuroki and Pearl, 2014; Miao et al., 2018), which the LF-HTC is not able to identify. 
+
+Example 3.2 (Two-proxy graph) . Consider the latent-factor graph in Figure 2b. The edge 2 → 3is not identifiable via the LF-HTC which one can again quickly see by using the R-package SEMID (R Core Team, 2025; Barber et al., 2025), however, this edge is eLF-HTC identifiable. To see this fact, take Wv = {2, 4} and ( Y = {1, 2}, Z = {4}, (Wz )z∈Z = ∅, H = {h1}). For the corresponding rational formula for identification, see Section B.5. We now present a proposition stating that the LF-HTC implies the eLF-HTC. 
+
+Proposition 3.3 (Identifiability via LF-HTC = ⇒ Identifiability via eLF-HTC) . Whenever an edge is identifiable via the LF-HTC, it is identifiable via the eLF-HTC. Proof. Choose Wv = pa V (v) and Wz = ∅ for all z ∈ Z. If pa V (z) = ∅, then z ∈ Z(2) , otherwise 
+
+z ∈ Z(1) . Because the condition Z(1) ∩ (WZ ∪ Wv ) = ∅ in the eLF-HTC becomes Z(1) ∩ pa V (v) = ∅
+
+for these choices of Wv and Wz , the conditions in the LF-HTC imply the conditions from the eLF-HTC. We now come back to the intuition behind Wv and the Wz ’s. 
+
+Remark 3.4 (Choosing Wv ). Theorem 3.2 in principle allows Wv to also contain nodes correspond-ing to edges pv → v which are already certified to be rationally identifiable. However, in practice, it is enough to choose the set Wv ⊆ pa V (v) to be equal to the subset of observed parents of v such that each edge pv → v for pv ∈ Wv is not yet certified to be rationally identifiable. To see this, we will now argue that if (Y, Z, (Wz )z∈Z , H ) satisfies the eLF-HTC with respect to 
+
+(v, W v ), then, for all W ′ 
+
+> v
+
+⊆ Wv , there exists Y ′ ⊆ Y such that (Y ′, Z, (Wz )z∈Z , H ) satisfies the eLF-HTC with respect to (v, W ′ 
+
+> v
+
+). For this, let Y ′ contain all the elements of Y that correspond to the latent-factor half-treks ending in W ′ 
+
+> v
+
+∪ Z ∪ WZ . Then, all conditions of the eLF-HTC are still satisfied. Condition (iii) holds by design, and for Condition (i) note that |Y ′| = |W ′ 
+
+> v
+
+∪ Z ∪ WZ |
+
+and Z(1) ∩ (WZ ∪ W ′ 
+
+> v
+
+) = ∅ because W ′ 
+
+> v
+
+⊆ Wv . Finally, Condition (ii) is satisfied because Y ′ ⊆ Y .Furthermore, if the further assumptions in Theorem 3.2 are satisfied for (Y, Z, (Wz )z∈Z , H ) and 
+
+Wv , then the further assumptions in Theorem 3.2 are satisfied for (Y ′, Z, (Wz )z∈Z , H ) and W ′ 
+
+> v
+
+if all edges in pa V (v) \ W ′ 
+
+> v
+
+are rationally identifiable. This fact follows because (Y ′ ∩ htr H (Z ∪ { v})) ⊆
+
+(Y ∩ htr H (Z ∪ { v})) . We conclude that if Wv only contains the observed parents pv of v such that each edge pv → v has not been previously shown to be rationally identifiable, then the number of eLF-HTC identifiable direct causal effects is not reduced. 
+
+11 Remark 3.5 (Choosing Wz ). In contrast, it is not enough to choose the sets Wz ⊆ pa V (z) to be equal to the subset of observed parents of z such that each edge pz → v for pz ∈ Wz is not yet certified to be rationally identifiable. In this case, satisfaction of the eLF-HTC for some choice (Y, Z, (Wz )z∈Z , H ) with respect to (v, W v ) does not necessarily imply satisfaction of the eLF-HTC for 
+
+(Y, Z, (W ′ 
+
+> z
+
+)z∈Z , H ) with respect to (v, W v ) for which each W ′ 
+
+> z
+
+⊆ Wz .We will now construct an example to illustrate this. Consider the latent-factor graph from Figure 3 and suppose that all edges in DV are known to be rationally identifiable except for the edges from pa V (6) = {2, 3, 4, 5} to v = 6 . Then, the eLF-HTC is satisfied for (Y = {1, 2, 3,
+
+5}, Z = {4}, (Wz )z∈Z = ( {2}), H = {h1}) and Wv = {2, 3, 4, 5}. To see this fact, note that Z(1) = ∅
+
+and that a possible system of latent-factor half-treks is {1 ← h → 4, 2, 3, 5}. Furthermore, all edges in DV with head in Y ∩ htr H (Z ∪ { v}) = {5} are rationally identifiable by assumption. Therefore, Theorem 3.2 yields that the edges 3 → 6 and 5 → 6 are rationally identifiable by the eLF-HTC. However, the eLF-HTC for (Y = {1, 2, 3, 5}, Z = {4}, (Wz )z∈Z = ( ∅), H = {h1}) and Wv = {2,
+
+3, 4, 5} is not satisfied because Z(1) = {4} and thus, Z(1) ∩ (WZ ∪ Wv ) is violated. Nor is the eLF-HTC satisfied for any other choice of Y and the same choices of Wv , Z, (Wz )z∈Z and H
+
+because Z(1) ∩ (WZ ∪ Wv ) = ∅ is only possible if Z = {1} and hence Z(1) = ∅, in which case 
+
+Y needs to be a subset of {2, 3, 4, 5} such that it fulfills Y ∩ (Z ∪ { v}) = ∅. Hence, it must be that |Y | < |Wv ∪ Z ∪ WZ |, so Condition (i) of the eLF-HTC is violated. We conclude that if we choose the sets Wz such that each Wz only contains those observed parents pz of z such that each edge pz → z has not been previously shown to be rationally identifiable, the number of eLF-HTC identifiable direct causal effects can be reduced. 
+
+# 4 Further Complementary Identification Results 
+
+In this section, we present two further identification approaches which well complement the eLF-HTC identification result from Section 3. We present the first complementary result in Section 4.1 and the second complementary result in Section 4.2. 
+
+## 4.1 Determinantal Identification Result 
+
+This section revisits an identification result from Weihs et al. (2018) which applies to LSEMs where latent variables are projected away into dependent error terms, and transfers this identification result to our considered setting with explicitly modelled latent variables. This transfer works as follows: The originally considered graphs in Weihs et al. (2018) are mixed graphs potentially including both directed and bidirected edges. We then apply the results from Weihs et al. (2018) to the entire latent-factor graphs including the latent variables; the idea behind doing so is that these latent-factor graphs, forgetting about the latentness of the latent variables for a moment, are just directed graphs corresponding to an LSEM without bidirected edges. Finally, we restrict the occuring variable sets in the resulting theorem to only observed variables, so that the resulting theorem can be applied to latent-factor graphs. Along the way, we need to take care of some subtleties regarding the notion of rational identifiability. The identification result from Weihs et al. (2018) relies on the theory of flow-networks (see, e.g., Section 26 in Cormen et al., 2022 for an introduction). A flow-network is a directed graph whose vertices and edges have a certain given capacity. Weihs et al. (2018) introduce the following flow-network corresponding to each (latent-factor) graph GL; for an example, see Figure 4. 12 Definition 4.1 (Determinantal flow-network) . For a given latent-factor graph GL = ( V ∪ L , D ), the corresponding flow-graph GL 
+
+> flow,det
+
+= ( V f ∪L f , D f ) is a directed graph where V f := V ∪V ′ with 
+
+V ′ being a copy of V , that is, for each v ∈ V there corresponds a v′ ∈ V ′, and where Lf := L ∪ L ′
+
+with L′ being a copy of L, and where Df contains the edges 
+
+i → j if j → i ∈ D, i → i′ for all i ∈ V ∪ L , and 
+
+i′ → j′ if i → j ∈ D. (4.1) Turn GL 
+
+> flow,det
+
+into a network by giving all vertices and edges capacity 1. 
+
+Remark 4.2. The original flow-network framework (as, e.g., layed out in Section 26 in Cormen et al., 2022) does not allow for vertices to have capacities, the presence of multiple sources or targets, or the presence of reciprocal edge pairs (v, w ), that is, both v → w and w → v are in Df , which might occur as we do not prohibit directed cycles. However, extending the original theory to include these further cases is rather straightforward, see, for example, Section 6 in Foygel et al. (2012b). 
+
+Transferred to our setting, the identification result from Weihs et al. (2018) relies on calculating maximum flows in the flow-network GL 
+
+> flow,det
+
+and a version of GL 
+
+> flow,det
+
+where some edges have been deleted. The maximum-flow problem is a well-known problem in computer science, and there exist several standard algorithms for solving it; the oldest one being the Ford-Fulkerson algorithm (Ford Jr. and Fulkerson, 1956, also see Section 26 in Cormen et al., 2022). To state this result, we for vertex sets A = {a1, . . . , a n} ⊆ V and B = {b1, . . . , b n} ⊆ V write Σ A,B to refer to the submatrix of Σ whose ( i, j )-th entry with i, j ∈ { 1, . . . , n } is given by Σ aibj .
+
+Theorem 4.3 (Determinantal identification result) . Let w0, w 1, . . . , w m ∈ V . Let w0 → v ∈ DV
+
+and suppose that the edges w1 → v, . . . , w m → v ∈ DV are rationally identifiable. Let GL
+
+> flow,det
+
+be GL 
+
+> flow,det
+
+with the edges w′ 
+
+> 0
+
+→ v′, . . . , w ′ 
+
+> m
+
+→ v′ removed. Suppose there are sets S ⊆ V and 
+
+T ⊆ V \ { v, w 0} such that |S| = |T | + 1 = k and such that (a) in GL it holds that (dec( v)) ∩ (T ∪ { v}) = ∅,
+
+(b) the max-flow from S to T ′ ∪ { w′
+
+> 0
+
+} in GL 
+
+> flow,det
+
+equals k, and (c) the max-flow from S to T ′ ∪ { v′} in GL 
+
+> flow,det
+
+is < k .Then, w0 → v is rationally identifiable via 
+
+λw0v = det (Σ S,T ∪{ v}) − Pmi=1 λwiv det (Σ S,T ∪{ wi})det (Σ S,T ∪{ w0}) .
+
+We now briefly discuss the following example which illustrates that already Theorem 4.3 alone identifies edges that the LF-HTC identification result (Theorem 2.7) cannot identify. 
+
+Example 4.1 (Determinantal identification example) . Consider the latent-factor graph GL given in Figure 4a with V = {1, 2, 3, 4, 5, 6} and L = {h1}, and also consider the corresponding flow graph GL 
+
+> flow,det
+
+in Figure 4b. This latent-factor graph GL is not LF-HTC identifiable, which one can quickly see, for example, by using the R-package SEMID (R Core Team, 2025; Barber et al., 2025) in which the LF-HTC is implemented. However, one can already identify some edges in 13 h1     
+
+> 123456
+
+(a) Latent-factor graph GL          
+
+> h1
+> 123456
+> h′
+> 1
+> 1’ 2’ 3’ 4’ 5’ 6’
+
+(b) Corresponding flow-graph GL
+
+> flow,det
+
+Figure 4: Example latent-factor graph GL and its corresponding flow graph GL 
+
+> flow,det
+
+of which the former is not rationally identifiable via the LF-HTC but for which already some edges are identifiable via Theorem 4.3 (and all edges are rationally identifiable via an interplay of Theorems 3.2 and 4.3, for example). this graph using Theorem 4.3 as we now explain; as a remark, the entire graph GL can in fact be identified by a combination of Theorems 3.2 and 4.3, for example, which we will not lay out in detail, however. 
+
+v = 5: The only observed parent of v = 5 is w0 = 4. For the sets S and T take S = {2, 3, 4} and 
+
+T = {1, 2}. Then, λ45 is rationally identifiable via 
+
+λ45 = det 
+
+
+
+Σ21 Σ22 Σ25 
+
+Σ31 Σ32 Σ35 
+
+Σ41 Σ42 Σ45 
+
+
+
+det 
+
+
+
+Σ21 Σ22 Σ24 
+
+Σ31 Σ32 Σ34 
+
+Σ41 Σ42 Σ44 
+
+ .v = 6: The only observed parent of v = 6 is w0 = 4. For the sets S and T take S = {2, 3, 4} and 
+
+T = {1, 2}. Then, λ45 is rationally identifiable via 
+
+λ46 = det 
+
+
+
+Σ21 Σ22 Σ26 
+
+Σ31 Σ32 Σ36 
+
+Σ41 Σ42 Σ46 
+
+
+
+det 
+
+
+
+Σ21 Σ22 Σ24 
+
+Σ31 Σ32 Σ34 
+
+Σ41 Σ42 Σ44 
+
+ .
+
+We now finish this section with a remark geared towards a practical implementation. 
+
+Remark 4.4 (Simplification) . Suppose one wants to identify some edge w0 → v. Then, it suffices to check Theorem 4.3 when deleting all already rationally identified edges w′ 
+
+> 1
+
+→ v′, . . . , w ′ 
+
+> m
+
+→ v′
+
+at once. Deleting only subsets of w′ 
+
+> 1
+
+→ v′, . . . , w ′ 
+
+> m
+
+→ v′ and then checking Theorem 4.3 for all different subsets does not yield more direct causal effects that can be identified via Theorem 4.3. To see this fact, note that the assumptions in Theorem 4.3 when deleting all edges w′ 
+
+> 1
+
+→
+
+v′, . . . , w ′ 
+
+> m
+
+→ v′ at once are always satisfied if they are satisfied when only deleting some subset of w′ 
+
+> 1
+
+→ v′, . . . , w ′ 
+
+> m
+
+→ v′. This implication is true because fewer edges in a flow graph can only reduce (and not increase) the maximum flow. 
+
+## 4.2 Recursively Checking Identifiability in Subgraphs 
+
+In this section, we introduce a meta identification result that is about checking different identifi-cation results (such as the eLF-HTC identification result from Theorem 3.2 and the determinantal 14 identification result from Theorem 4.3) in subgraphs of the original latent-factor graph GL. These subgraphs are created by deleting certain edges from GL that are rationally identifiable. Our meta approach is motivated from the deletion-of-edges procedure already discussed in Section 4.1, which itself was based on Weihs et al. (2018). However, our meta approach is more general and we are not aware of it being discussed in the literature. When checking identifiability of GL using some subgraph GL of GL, one must use the covari-ance matrix Σ corresponding to that subgraph GL. In principal, Σ might differ from the original covariance matrix Σ corresponding to GL. However, some entries of Σ can be calculated using the original entries of Σ as the following proposition asserts. We note that similar results about calculable covariances in subgraphs have already occurred in Weihs et al. (2018). 
+
+Proposition 4.5 (Calculable covariances in subgraphs) . Suppose that for a vertex v ∈ V the edges 
+
+w1 → v, w 2 → v, . . . , w m → v are rationally identifiable where {w1, . . . , w m} ⊆ pa V (v). Let GL be the latent-factor graph with all edges w1 → v, w 2 → v, . . . , w m → v deleted from GL and let Σ be the covariance matrix corresponding to GL. Let x, y ∈ V with x, y not necessarily distinct. If 
+
+• Case 1: x, y / ∈ dec GL (v) and x̸ = v and y̸ = v, or 
+
+• Case 2: x, y / ∈ dec GL (v) and x̸ = v and y = v, or 
+
+• Case 3: x, y / ∈ dec GL (v) and x = v and y̸ = v,then the covariance Σxy is given by the rational function 
+
+Σxy =
+
+
+
+Σxy , in Case 1, 
+
+Σxy − Pmi=1 Λwiy Σxw i in Case 2, 
+
+Σxy − Pmi=1 ΛwixΣyw i in Case 3 .
+
+Proposition 4.5 justifies applying any identification result to a subgraph GL of G as long as the covariances Σ xy required in that identification result can be calculated by Proposition 4.5. What remains to be shown is that rational identifiability of an edge in the subgraph GL implies rational identifiability of the same edge in the original graph GL. This implication is indeed true as the following proposition asserts. 
+
+Proposition 4.6 (Rational identifiability in subgraph implies rational identifiability in the original graph) . Suppose that for a latent-factor graph GL = ( V ∪ L , D ) and a vertex v ∈ V the edges 
+
+w1 → v, w 2 → v, . . . , w n → v are rationally identifiable where {w1, . . . , w m} ⊆ pa V (v). Let GL
+
+be the latent-factor graph GL with all edges w1 → v, w 2 → v, . . . , w m → v from GL deleted. Let 
+
+w0 → v0 with w0, v 0 ∈ V be rationally identifiable in GL by just using covariances as specified by Proposition 4.5. Then, w0 → v0 is rationally identifiable in GL.
+
+Propositions 4.5 and 4.6 thus give rise to the following procedure: Recursively delete all already rationally identified edges from a given latent-factor graph GL and check identifiability in the resulting ever smaller subgraphs using any existing identification result. For each new recursion level, the set of allowed covariances, so the set of covariances that any identification result might use, is thereby calculated by applying Proposition 4.5 with only the allowed covariances from the previous recursion level as inputs. This notion of “allowedness” is formalized in the following definition. 15 Definition 4.7 (Allowed covariance) . Consider a latent-factor graph GL = ( V ∪ L , D ). For a sequence of not necessarily distinct vertices v1, . . . , v n ∈ V , consider the ordered sequence of pairwise disjoint edge sets Dv1 , . . . , D vn ⊆ DV , referred to as deletion sequence , such that for all i ∈ { 1, . . . , n }
+
+every edge in Dvi points into vi. Let GL 
+
+> n
+
+denote the latent-factor graph that is defined by deleting from GL all the edges that are in Sni=1 Dvi . Denote the covariance matrix corresponding to GL 
+
+> n
+
+by Σn. Consider x, y ∈ V not necessarily distinct. If n = 1, then a covariance (Σ n)xy is called allowed if Proposition 4.5 applies. If n > 1, then a covariance (Σ n)xy is called allowed (with respect to the deletion sequence Dv1 , . . . , D vn ) if the following three conditions are satisfied: (i) The conditions of one of the three cases from Proposition 4.5 with GL 
+
+> n−1
+
+as input are satisfied, (ii) (Σ n−1)xy is allowed with respect to GL
+
+> n−1
+
+, and (iii) additionally in Case 2 of Proposition 4.5 all (Σ n−1)xw with w → vn ∈ Dvn , and additionally in Case 3 of Proposition 4.5 all (Σ n−1)yw with w → vn ∈ Dvn are allowed with respect to 
+
+GL
+
+> n−1
+
+.As we show in the next proposition, the set of allowed covariances only depends on the union of all deleted edges and neither on their deletion order nor on the amount of edges deleted per step. 
+
+Proposition 4.8. Let GL = ( V, D ) be a latent-factor graph and let Ddel ⊆ DV . Write GL 
+
+> del
+
+for the subgraph of GL with the edges from Ddel removed. Then, every deletion sequence Dv1 , . . . , D vn ⊆
+
+DV (as introduced in Definition 4.7) with n ∈ N and Sni=1 Dvi = Ddel yields the same set of allowed covariances with respect to GL
+
+> del
+
+.
+
+Note that it might be the case that edges in subgraphs are not rationally identifiable while they are in the original supergraph even when the same covariances are allowed for the subgraph as for the supergraph—for example, consider the classical instrumental variables setup when removing the edge between the instrument and the treatment. Therefore, and due to Proposition 4.8, in practice we create the subgraphs by recursively deleting one rationally identified edge at a time and not by deleting several rationally identified edges at once. 
+
+Example 4.1 (continued) . Consider again the latent-factor graph GL from Figure 4a. As argued in Section 4.1, λ45 and λ46 are rationally identifiable via Theorem 4.3. Now, delete the edge 4 → 5from GL. In the new graph GL with corresponding covariance matrix Σ, we can further rationally identify λ23 (first in GL and by Proposition 4.6 then in GL) by applying Theorem 4.3 with S = {1, 2}
+
+and T = {5}, namely 
+
+λ23 = det 
+
+Σ15 Σ13 
+
+Σ25 Σ23 
+
+ 
+
+det 
+
+Σ15 Σ12 
+
+Σ25 Σ22 
+
+
+
+. (4.2) Here, it holds that all occuring covariances in equation (4.2) are allowed and that Σ 15 = Σ 15 −
+
+λ45 Σ14 , Σ 13 = Σ 13 , Σ 25 = Σ 25 − λ45 Σ24 , Σ 23 = Σ 23 , Σ 12 = Σ 12 , Σ 22 = Σ 22 . By applying Theorem 4.3 in a similar recursive fashion, we can identify all further remaining observed edges (which we, however, do not explicitly present). We finish this section by emphasizing that the recursive subgraph idea is not already contained in the determinantal and eLF-HTC identification results: As we show in our numerical experi-ments in Section E, our recursive subgraph procedure yields strictly more identifiable cases both 16 when combined with the determinantal and eLF-HTC identification results, respectively, and when combined with a combination of the determinantal and eLF-HTC identification results. For the determinantal identification result (Theorems 4.3), a combination with the recursive subgraph pro-cedure might yield more identifiability because for this combination rationally identifiable edges pointing into different vertices are allowed to be deleted instead of just edges pointing into the same vertex as in the original determinantal identification result. For the eLF-HTC identification result, deleting edges other than the ones pointing into the target vertex v might yield smaller sets 
+
+Wz potentially making it easier to satisfy the requirements from the eLF-HTC identification result. 
+
+# 5 Computation 
+
+In this section, we present an identification criterion/algorithm, namely Algorithm 1, that com-bines the eLF-HTC identification result from Section 3, the determinantal identification result from Section 4.1, and the recursive subgraph identification result from Section 4.2. This combined identification algorithm repeatedly applies these identification results and up-dates the set of all already rationally identified edges Sedges along the way. If for some node v ∈ V
+
+all incoming observed edges have been rationally identified, then v is called “solved” and in this case the combined identification algorithm adds v to the set of solved nodes Snodes .Hereby, computationally checking the determinantal identification result (Algorithm 2) is rather straightforward. It suffices to say that for a particular vertex v ∈ V \ Snodes one just checks for all not identified edges w0 → v ∈ (pa V (v) × { v}) \ Sedges and for all S ⊆ V and T ⊆ V \ { v, w 0}
+
+with |S| = |T | + 1 whether the requirements from Theorem 4.3 are satisfied and whether the required covariances are allowed in the sense of Proposition 4.5. In particular, recall the suggested simplification from Remark 4.4 in Section 4.1. The determinantal subprocedure then stops if either all w0 → v ∈ (pa V (v) × { v}) \ Sedges have been identified, or when there is w0 → v ∈ (pa V (v) ×{v}) \ Sedges for which all possible sets S and T have been considered. The algorithmic implementation of the eLF-HTC (Algorithm 3) requires more explanation: Similarly to the determinantal identification result, we also make use of max-flow computations to computationally check the eLF-HTC (see, e.g., Section 26 in Cormen et al., 2022 for an introduc-tion). These max-flow computations and accompanying results for the eLF-HTC are modifications of similar max-flow computations and results for the LF-HTC in Barber et al. (2022a), which were itself based on Foygel et al. (2012a), and there are some differences to the max-flow computations for the determinantal results from Section 4.1. To begin with, suppose for a moment that we are given fixed sets H, Z, W v , (Wz )z∈Z as intro-duced in the eLF-HTC such that |Z| = |H|, such that Z ∩{ v} = ∅ and such that Z(1) ∩(WZ ∪Wv ) = 
+
+∅, so such that all requirements in condition (i) of the eLF-HTC not including Y are satisfied. Be-cause the second part of condition (ii) of the eLF-HTC is equivalent to Y ∩ch(pa L(Z ∪{ v})\H) = ∅,the set A = V \ (Z ∪ { v} ∪ ch(pa L(Z ∪ { v}) \ H)) is the set of “allowed” nodes that Y is allowed to contain such that condition (ii) of the eLF-HTC is satisfied. To check condition (iii) in the eLF-HTC, we define the flow graph GL
+
+> flow,eLF-HTC
+
+(v, A, Z, W Z ,Wv ) = ( Vf , D f ) corresponding to the latent-factor graph GL having nodes Vf = ( A ∪ L ) ∪ (V ′ ∪ L ′), where V ′ and L′ are copies of V and L, respectively. The edge set Df is comprised of the edges (a) a → w if a ∈ A and w → a ∈ DLV ,(b) w → w′ for all w ∈ A ∪ L , and 17 Algorithm 1 Combined identification algorithm 
+
+Require: Latent-factor graph GL = ( V ∪ L , D ); set of solved nodes Snodes with Snodes = ∅ in the initial call; set of solved edges Sedges with Sedges = ∅ in the initial call; set of allowed covariances Σallowed ⊆ { Σxy : x, y ∈ V } with equality in the initial call. 
+
+1: repeat 
+
+2: Sedges,old ← Sedges 
+
+3: for v ∈ V \ Snodes do 
+
+4: Sedges ← eLF-HTC subprocedure (GL, v, S edges , S nodes , Σallowed )
+
+5: if all edges w → v ∈ pa V (v) × { v} have been solved then 
+
+6: Snodes ← Snodes ∪ { v}
+
+7: continue 
+
+8: end if 
+
+9: Sedges ← Determinantal subprocedure (GL, v, S edges , Σallowed )
+
+10: if all edges w → v ∈ pa V (v) × { v} have been solved then 
+
+11: Snodes ← Snodes ∪ { v}
+
+12: end if 
+
+13: end for 
+
+14: if Snodes = V then 
+
+15: break 
+
+16: end if 
+
+17: for w → v ∈ Sedges do ▷ Recursive part 
+
+18: GL ← GL with w → v removed 
+
+19: Sedges,sub ← Sedges \ { w → v}
+
+20: Σallowed,sub ← Proposition 4.5 with Σ allowed as input 
+
+21: Sedges ← Combined identification algorithm (GL, Σallowed,sub , S nodes , S edges,sub )
+
+22: if all edges ˜ w → v ∈ pa V (v) × { v} have been solved then 
+
+23: Snodes ← Snodes ∪ { v}
+
+24: end if 
+
+25: if Snodes = V then 
+
+26: break 
+
+27: end if 
+
+28: end for 
+
+29: until Snodes = V or Sedges = Sedges,old 
+
+30: return Sedges 
+
+18 h1        
+
+> 1235
+> h′
+> 1
+> 1’ 2’ 3’ 4’ 5’ 6’
+
+Figure 5: Flow-graph GL
+
+> flow,eLF-HTC
+
+(v = 4 , A = {1, 2, 3, 5}, Z = {6}, W Z = {5}, W v = {3}) corre-sponding to Figure 2a. (c) u′ → w′ for all u → w ∈ DLV and for all u → w ∈ DV such that w / ∈ Z.For a flow graph GL
+
+> flow,eLF-HTC
+
+(v, A, Z, W Z , W v ) corresponding to Figure 2a, see Figure 5. We now turn GL 
+
+> flow,eLF-HTC
+
+into a network by assigning to all edges capacity ∞ and to all nodes capacity 1. In practice, ∞ can be replaced by |Wv ∪ Z ∪ WZ | as no flow can exceed |Wv ∪ Z ∪ WZ |
+
+in size. 
+
+Algorithm 2 Determinantal subprocedure 
+
+Require: Latent-factor graph GL = ( V ∪ L , D ), set of solved edges Sedges , set of solved nodes 
+
+Snodes , target vertex v, set of allowed covariances Σ allowed ⊆ { Σxy : x, y ∈ V }. 
+
+> 1:
+
+for w0 ∈ V with w0 → v / ∈ Sedges do  
+
+> 2:
+
+for S ⊆ V , T ⊆ V \ { v, w 0} with |S| = |T | + 1 do  
+
+> 3:
+
+Construct GL 
+
+> flow,det
+
+and GL 
+
+> flow,det
+
+by removing all edges of the form ˜ w → v ∈ Sedges from 
+
+GL 
+
+> flow,det
+> 4:
+
+Check conditions from Theorem 4.3  
+
+> 5:
+
+if Theorem 4.3 applies and all covariances in Σ S,T ∪{ v,w 0} and Σ S, ˜w with ˜ w → v ∈ Sedges 
+
+are allowed then  
+
+> 6:
+
+Add w0 → v to Sedges  
+
+> 7:
+
+break  
+
+> 8:
+
+end if  
+
+> 9:
+
+end for  
+
+> 10:
+
+end for 
+
+It is now possible to prove the following theorem, which is similar to Theorem 5.1 in Barber et al. (2022a) and which provides a formal connection between the eLF-HTC and the max-flow calculations in GL
+
+> flow,eLF-HTC
+
+(v, A, Z, W Z , W v ). We want to emphasize at this point that Remark 4.2 from Section 4.1 also applies to this following theorem implying that the eLF-HTC max-flow calculations can be easily transferred to a standard format for which there exist standard algorithms in computer science (see, e.g., Ford Jr. and Fulkerson, 1956 or Section 26 in Cormen et al., 2022). 
+
+Theorem 5.1 (Checking the eLF-HTC with max-flow computations) . Let GL = ( V ∪ L , D ) be a latent-factor graph. For a fixed node v ∈ V , a fixed set H ⊆ L , a fixed set Wv ⊆ pa V (v), a fixed 
+
+19 Algorithm 3 eLF-HTC subprocedure 
+
+Require: Latent-factor graph GL = ( V ∪ L , D ), set of solved edges Sedges , set of solved nodes 
+
+Snodes , target vertex v, set of allowed covariances Σ allowed ⊆ { Σxy : x, y ∈ V }.
+
+Ensure: Let Wv contain the not-identified edges in DV into v. 
+
+> 1:
+
+for H ⊆ L ≥4 do  
+
+> 2:
+
+for Z ⊆ ch( H) \ { v} such that |Z| = |H| do  
+
+> 3:
+
+for all ( Wz )z∈Z where Wz ⊆ pa V (z) is a superset of the observed parents for which the corresponding edge into z has not been identified do  
+
+> 4:
+
+WZ ← ∪ z∈Z Wz 
+
+> 5:
+
+Z(1) ← { z ∈ Z : Wz ⊊ pa V (z)} and Z(2) ← { z ∈ Z : Wz = pa V (z)} 
+
+> 6:
+
+if Z(1) ∩ (WZ ∪ Wv )̸ = ∅ then  
+
+> 7:
+
+next  
+
+> 8:
+
+end if  
+
+> 9:
+
+A ← V \ (Z ∪ { v} ∪ ch(pa L(Z ∪ { v}) \ H) ∪ (htr H (Z ∪ { v}) \ Snodes )).  
+
+> 10:
+
+Delete all elements from A yielding covariances not in Σ allowed  
+
+> 11:
+
+if Max-flow in Gflow,eLF-HTC (v, A, Z, W Z , W v ) from A to Wv ∪ Z ∪ WZ equals |Wv ∪
+
+Z ∪ WZ | then  
+
+> 12:
+
+Add all edges pv → v with pv ∈ Wv \ (Z ∪ WZ ) to Sedges  
+
+> 13:
+
+Update Wv to contain the not-identified edges in DV into v 
+
+> 14:
+
+end if  
+
+> 15:
+
+if Wv = ∅ then  
+
+> 16:
+
+break  
+
+> 17:
+
+end if  
+
+> 18:
+
+end for  
+
+> 19:
+
+if Wv = ∅ then  
+
+> 20:
+
+break  
+
+> 21:
+
+end if  
+
+> 22:
+
+end for  
+
+> 23:
+
+if Wv = ∅ then  
+
+> 24:
+
+break  
+
+> 25:
+
+end if  
+
+> 26:
+
+end for  
+
+> 27:
+
+return Sedges 
+
+20 set Z ⊆ ch( H) \ { v} such that |Z| = |H|, and fixed sets Wz ⊆ pa V (z) for all z ∈ Z such that 
+
+Z(1) ∩ (WZ ∪ Wv ) = ∅, and for the set of allowed nodes A = V \ (Z ∪ { v} ∪ ch(pa L(Z ∪ { v}) \ H)) 
+
+it holds: The max-flow in Gflow,eLF-HTC (v, A, Z, W Z , W v ) from A to W ′ 
+
+> v
+
+∪ Z′ ∪ W ′ 
+
+> Z
+
+equals |Wv ∪ Z ∪ WZ |
+
+if and only if there exists Y ⊆ A such that (Y, Z, (Wz )z∈Z , H ) satisfies the eLF-HTC with respect to (v, W v ).
+
+Therefore, to check whether there exists ( Y, Z, (Wz )z∈Z , H ) and Wv such that the eLF-HTC with respect to ( v, W v ) is satisfied, we iterate over all sets H ⊆ L , Z ⊆ ch( H) \ { v}, equate Wv
+
+with the not-already-identified observed parents w of v (which suffices due to Remark 3.4), and iterate over all supersets Wz of the not-identified observed parents of z for each z ∈ Z (which is required due to Remark 3.5). In order to incorporate the recursive identification idea from Section 4.2, one further needs to delete elements from the set A that yield covariances that are not allowed in the sense of Definition 4.7 before applying Theorem 5.1. Also, to ensure that in practice all edges required to be rationally identifiable are already known to be rationally identifiable, we further remove from A the set (htr H (Z ∪ { v}) \ Snodes )). Now, as the following proposition shows (which is again similar to Proposition 5.2 in Barber et al. (2022a)), iterating over H ⊆ L can be simplified to iterating over H ⊆ L ≥4 where L≥4 := 
+
+{h ∈ L : |ch( h)| ≥ 4}.
+
+Proposition 5.2 (Simplification of the eLF-HTC algorithm) . Let GL = ( V ∪ L , D ) be a latent-factor graph and let v ∈ V . If (Y, Z, (Wz )z∈Z , H ) satisfies the eLF-HTC with respect to (v, W v ) and there is a node h ∈ H such that |ch( h)| ≤ 3, then there are strict subsets ˜Y ⊊ Y and ˜Z ⊊ Z such that ( ˜Y , ˜Z, (Wz )z∈˜z , ˜H) with ˜H = H \ { h} satisfies the eLF-HTC for (v, W v ) as well. 
+
+We now briefly go back to the combined identification algorithm (Algorithm 1) and discuss its computational complexity: Some parts of the combined identification algorithm do clearly not scale polynomially with increasing observed node set V or latent node set L. For example, already in the determinantal subprocedure the iteration over the sets S and T scales exponentially in the worst case because one essentially iterates over all potential subsets of V . Similarly, in line 1 of the eLF-HTC subprocedure, one iterates over different sets H ⊆ L ≥4, and in line 3 of the eLF-HTC subprocedure, one iterates over the Wz ’s which also both scales (at least) exponentially. Recursively deleting edges from a subgraph also does not scale polynomially as there are already exponentially many subgraphs. However, as Theorem 5.3 in the following states, the time complexity of the combined iden-tification algorithm (Algorithm 5.3) still is much better than the computer algebra methods that typically have double exponential time complexity and which even for simple graphs do not finish in “reasonable amounts of time” on a standard computer. Furthermore, as we also show in Theorem 5.3, if one is willing to make some simplifying algorithmic assumptions which still yield a sufficient condition for rational identifiability, one is in fact also able to achieve a polynomial time complex-ity. For example and as we also numerically illustrate in Section E, simplifications of Algorithm 1 not including or simplifying the determinantal subprocedure shave off significant computation time while still being effective. In the following, let r ≤ | DV |/2 be the number of reciprocal edge pairs in DV , that is, the number of v, w ∈ V for which v → w ∈ DV and w → v ∈ DV .
+
+Theorem 5.3 (Computational Complexity) . Without any simplifications, Algorithm 1 has a time complexity of O(|V |4|V |2+3 2|L| 2|V |2+|V |(|V | + |L| + r)3). If 
+
+21 h1     
+
+> 123456
+
+(a) Latent structure of unlabeled latent-factor graphs for Table 1       
+
+> h1h2
+> 123456
+
+(b) Latent structure of unlabeled latent-factor graphs for Table 2 
+
+Figure 6: Considered latent structures for Section 6 and Section E. 
+
+• one restricts the number of to-be-searched pairs of sets S and T in determinantal subprocedure to cS ,
+
+• only allows for sets |H| ≤ cH in line 1 of the eLF-HTC subprocedure, 
+
+• one only considers the case where each Wz equals the already identified observed parents of z
+
+in line 3 of the eLF-HTC subprocedure, and 
+
+• bounds the number of edges that can be deleted from GL for the recursive part in lines 14–25 of Algorithm 1 by crec ,then, this simplified version of Algorithm 1 has a time complexity of O(cS |L| cH |V |4crec +cH +3 (|V | +
+
+|L| + r)3).
+
+In practice, it is thus advisable to start checking identifiability of a given latent-factor graph 
+
+GL with the not-simplified version of Algorithm 1. If this not-simplified version of Algorithm 1 does not finish in a reasonable amount of time, then one might try with some or all of the previously mentioned simplifications. We remark that our provided implementation allows for such simplifications. We investigate several such simplifications in terms of runtime and number of identifiable graphs in Section E. 
+
+# 6 Numerical Experiments 
+
+In this section, we numerically compare our criterion to the LF-HTC, which is, to our knowledge, the state-of-the-art criterion for rational identifiability in latent-factor graphs. We consider the same simulation setup as in Barber et al. (2022a). In the first setting (see Figure 6a), there is one latent variable and 6 observed variables and there is a directed edge from the latent variable to each observed variable. For the different subcases |DV | ∈ { 0, 1, . . . , 9}, we then consider all latent-factor graphs (up to topological equivalence) with that respective number of observed edges and with that just mentioned latent structure. We then present the number of rationally identifiable latent-factor graphs for the LF-HTC and for the combined identification algorithm (Algorithm 1) in Table 1. In this table, we also present the number of rationally identifiable graphs which one can obtain using computer algebra, see Section C in Barber et al. (2022b). 2 In Table 
+
+> 2While the approach discussed in Section C in Barber et al. (2022b) states with reasonable accuracy whether a given latent-factor graph is rationally identifiable or not, this approach is still not able to generate rational formulas. In contrast, the LF-HTC and our identification results are able to produce such identification formulas.
+
+22 |DV | Total Rationally LF-HTC Det + eLF-HTC + rec 0 1 1 1 (100%) 1 (100%) 
+
+1 1 1 1 (100%) 1 (100%) 
+
+2 4 4 4 (100%) 4 (100%) 
+
+3 13 13 13 (100%) 13 (100%) 
+
+4 51 51 50 (≈98%) 51 (100%) 
+
+5 163 159 134 (≈84%) 159 (100%) 
+
+6 407 398 250 (≈63%) 398 (100%) 
+
+7 796 747 234 (≈31%) 743 (≈99%) 
+
+8 1169 956 64 (≈7%) 938 (≈98%) 
+
+9 1291 631 4 (<1%) 606 (≈96%) 
+
+Total 3896 2961 755 (≈25%) 2914 (≈98%) 
+
+Table 1: Number of total, rationally identifiable, LF-HTC identifiable, and Algorithm 1 identifiable unlabeled DAGs (up to topological equivalence) for the latent structure presented in Figure 6a. The percentages are relative to the number of rationally identifiable latent-factor graphs. 3 in Section E, we consider further amalgamations of the eLF-HTC, determinantal and recursive subgraph identification approaches, to illustrate the individual contributions each identification result makes. In Figure 7 in Section E, we also present the runtimes of these different amalgations. We then also consider a second setting (see Figure 6b), where there are again 6 observed variables but now 2 latent variables. The first latent variable points to 4 of the observed variables, the second latent variable points to the remaining two observed variables and to one of the other 4 observed variables. Then, similarly as in the first setting, we consider for different |DV | the number of identifiable cases. We present a condensation of the results for the second setting in Table 2 and in more detail in Table 4 and Figure 7 in Section E. For both numerical settings, one can see that our combined identification algorithm identifies significantly more latent-factor graphs, especially, when |DV | is rather large. We emphasize that we can identify approximately 98% of all identifiable graphs in both of these two settings, in comparison to 25% and 71% for the LF-HTC, respectively. For dense settings, the improvement is even stronger. For example, consider the case |DV | = 9 in Table 1, where the LF-HTC identifies less than 1% of all identifiable graphs compared to 96% for our combined approach. In the aforementioned tables in Section E, one can also see that each of the three discussed identification results, so the eLF-HTC, determinantal and recursive subgraph identification results, yield a strict improvement when compared to just using the other two results. In addition, one can see that algorithmic simplifications based on Theorem 5.3 still identify a large number of graphs. Moreover, one can see that all three identification results combined are better than just taking the union of the individual results after applying them which hints at synergies between the different results. Regarding runtime, one can further see that particularly the determinantal subprocedure is responsible for longer runtimes; when simplifying the determinantal subprocedure or when not using it at all, runtimes are significantly shorter. 23 |DV | Total Rationally LF-HTC Det + eLF-HTC + rec 0 1 1 1 (100%) 1 (100%) 
+
+1 8 6 6 (100%) 6 (100%) 
+
+2 63 45 43 (≈96%) 45 (100%) 
+
+3 391 255 236 (≈93%) 255 (100%) 
+
+4 1983 1171 1018 (≈87%) 1168 (≈100%) 
+
+5 7570 3898 3028 (≈78%) 3850 (≈99%) 
+
+6 21,029 8960 5861 (≈65%) 8675 (≈97%) 
+
+Total 31,045 14,336 10,193 (≈71%) 14,000 (≈98%) 
+
+Table 2: Number of total, rationally identifiable, LF-HTC identifiable, and Algorithm 1 identifi-able DAGs (up to topological equivalence) for the latent structure presented in Figure 6b. The percentages are relative to the number of rationally identifiable latent-factor graphs. 
+
+# 7 Conclusion 
+
+In this paper, we have provided a new identification criterion that strictly improves all existing criteria that are known to us. As we have shown, combining all these extensions into one algorithm yields significantly more latent-factor graphs that one can identify. For the considered latent-factor graphs, a combination of our presented graphical criteria is able to rationally identify nearly all rationally identifiable graphs. To the best of our knowledge, our results are the most general graphical results for latent-factor graphs. From a computational point of view, these graphical results also scale better than classical computer-algebra-based methods, and under some simplifying assumptions we even achieve polynomial time complexity. Besides, a practitioner with a latent-factor graph at hand might also directly apply our provided implementation or implement the provided pseudo-code themselves. In the future, it will be interesting to find (rational) formulas for identifying the remaining rationally identifiable graphs (which is typically not possible thus far with computer algebra methods due to the very long runtimes). Furthermore, one could combine our presented ideas with the recent ideas from Sturma and Drton (2025) who provide identification results for more general latent variables structures where the latent variables are not restricted to be source nodes in the graph. One could also derive more elaborate necessary results than the rather simple necessary results already derived in Barber et al. (2022a). Besides, one could study finite-sample properties of different valid estimators for a given direct causal effect and study some notion of “optimal estimation” (similar in spirit to Runge (2021) or Henckel et al. (2022, 2024)). 
+
+# Acknowledgements and Disclosure of Funding 
+
+T.H. is also affiliated with Technische Universit¨ at Berlin as a registered PhD-student. J.R. re-ceived funding from the European Research Council (ERC) Starting Grant CausalEarth under the European Union’s Horizon 2020 research and innovation program (Grant Agreement No. 948112). M.D. has received funding from the European Research Council (ERC) under the European Union’s Horizon 2020 research and innovation programme (grant agreement No. 883818). 24 A Appendix to Section 2 
+
+In Section A.1, we introduce the terminology from Barber et al. (2022a) of rational identifiability and compare it to our Definition 2.1. In Section A.2, we then give more detailed explanations on why the Zariski closures of the involved parameter spaces are irreducible. 
+
+## A.1 Comparison of Different Definitions of Identifiability 
+
+The notion of rational identifiability from Barber et al. (2022a) does not directly operate on the parameters (Λ , Γ, Ωdiag , VL), but rather on (Λ , Ωdiag + Γ T VLΓ). To formalize their approach, define the map 
+
+τ : RDLV × diag + 
+
+> d
+
+× diag + 
+
+> ℓ
+
+→ PD( d),
+
+(Γ , Ωdiag , VL) 7 → Ωdiag + Γ T VLΓand let Θ 2022 := RDV 
+
+> reg
+
+× Im( τ ), where the index 2022 indicates the publishing year. It holds that Θ2022 is irreducible because Θ 2022 is the polynomial image of an open set; for a more detailed explanation of this fact see Section A.2. Note that Barber et al. (2022a) assume without loss of generality that VL = Iℓ. However, their identification results also apply to the slightly more general setting considering arbitrary VL, as the image of the map τ does not change. Next, define the map 
+
+ϕGL : Θ 2022 −→ PD( d),
+
+(Λ , Ω) 7 → (Id − Λ) −T Ω( Id − Λ) −1.
+
+The definition of rational identifiability from Barber et al. (2022a) is now as follows. Since the definition operates directly on Θ 2022 , we use the term Θ 2022 -rational identifiability to differentiate from Definition 2.1. 
+
+Definition A.1. 
+
+(a) The latent-factor graph GL is Θ 2022 -rationally identifiable if there exists a proper algebraic subset A2022 ⊊ Θ2022 and a rational map ψ2022 : PD( d) → RDV 
+
+> reg
+
+× PD( d) such that ( ψ2022 ◦
+
+ϕGL )(Λ , Ω) = (Λ , Ω) for all (Λ , Ω) ∈ Θ2022 \ A2022 .(b) The direct causal effect λvw , or also simply the edge v → w ∈ DV , or if the vertex w is clear from the context simply the parent v, is Θ 2022 -rationally identifiable if there exists a proper algebraic subset A2022 ⊊ Θ2022 and a rational map ψ2022 : PD( d) → R such that (ψ2022 ◦ ϕGL )(Λ , Ω) = λvw for all (Λ , Ω) ∈ Θ2022 \ A2022 .Let diag d and diag ℓ denote the set of all d×d- and ℓ×ℓ-diagonal matrices, respectively. To state our result relating the two definitions of rational identifiability, we need to extend τ to a mapping from Rm → Rn where m := |DLV | + d + ℓ and where n := d(d + 1) /2 (and where we slightly abuse notation and identify RDLV × diag d × diag ℓ with Rm and PD( d) as a subset of Rn). We denote this extension by τ and define it in a trivial way by τ : Rm → Rn, (Γ , Ωdiag , VL) 7 → Ωdiag + Γ T VLΓ. Note that τ restricted to Θ 2022 equals τ . We also use the function (id , τ ) : Θ → Θ2022 , for which the first |DV |-components are the identity and the last |DLV | + d + ℓ-components are given by τ .The function (id , τ ) is important as χGL (Λ , Γ, Ωdiag , VL) = ( ϕGL ◦ (id , τ ))(Λ , Γ, Ωdiag , VL) for all (Λ , Γ, Ωdiag , VL) ∈ Θ. Finally, we consider the extension (id , τ ) := (id , τ ). 25 Proposition A.2. Let GL = ( V ∪ L , D ) be a latent-factor graph. If GL is Θ2022 -rationally identi-fiable, then it is rationally identifiable. In particular, if A2022 ⊆ Θ2022 is a proper algebraic subset, then AΘ := (id , τ )−1
+
+(A2022 ) ⊆ Θ is a proper algebraic subset. Vice versa, if GL is rationally identifiable, then it is Θ2022 -rationally identifiable if the proper algebraic subset AΘ ⊆ Θ is given by AΘ = {(Λ , Γ, Ωdiag , VL) ∈ Θ : f (Λ , τ (Γ , Ωdiag , VL)) = 0 for all f ∈ S}, where S is a finite set of polynomials in the entries of Λ and Ω.Proof. First note that from a standard topological fact about continuous functions (e.g., Theorem 2.9 in Armstrong, 1983), it follows that (id , τ )(Θ) ⊆ (id , τ )(Θ) = (id , τ )(Θ) = Θ 2022 . (A.1) Also, note that (id , τ ) restricted to Θ equals (id , τ ). Now, to show the first direction, suppose that A2022 ⊆ Θ2022 is a proper algebraic subset. Define AΘ := (id , τ )−1
+
+(A2022 ) and observe that AΘ ⊆ Θ due to (A.1). Since preimages of algebraic sets under polynomial maps are again algebraic sets, it follows that AΘ is an algebraic 
+
+subset of Θ. It remains to show the properness of AΘ. First, suppose that Θ 2022 ⊆ A2022 . Then, Θ 2022 ⊆
+
+A2022 = A2022 ⊊ Θ2022 , which is a contradiction, and thus, Θ 2022 ̸ ⊆ A2022 , which implies that there exists (Λ , Ω) ∈ Θ2022 \A2022 . For this (Λ , Ω) it holds that (id , τ )−1
+
+(Λ , Ω) = (id , τ )−1(Λ , Ω) ̸ = ∅, thus we can take (Λ , Γ, Ωdiag , VL) ∈ (id , τ )−1
+
+(Λ , Ω) ⊆ (id , τ )−1
+
+(Θ 2022 ) = (id , τ )−1(Θ 2022 ) = Θ. Observe that if (Λ , Γ, Ωdiag , VL) were in AΘ, then, by the definition of AΘ, the tuple (Λ , Ω) would be in 
+
+A2022 , which is a contradiction. Thus, we conclude that (Λ , Γ, Ωdiag , VL) /∈ AΘ, which implies that 
+
+AΘ is a proper algebraic subset of Θ. If GL is Θ 2022 -rationally identifiable, then there exists a proper algebraic subset A2022 ⊊ Θ2022 
+
+and a rational map ψ2022 : PD( d) → RDV 
+
+> reg
+
+× PD( d) such that ( ψ2022 ◦ ϕGL )(Λ , Ω) = (Λ , Ω) for all (Λ , Ω) ∈ Θ2022 \ A2022 . Define ψ by ψ := π ◦ ψ2022 where π : RDV 
+
+> reg
+
+× PD( d) → RDV 
+
+> reg
+
+is the projection onto RDV 
+
+> reg
+
+. Also, recall that χGL (Λ , Γ, Ωdiag , VL) = ( ϕGL ◦ (id , τ ))(Λ , Γ, Ωdiag , VL) for all (Λ , Γ, Ωdiag , VL) ∈ Θ. Since we have already seen that AΘ := (id , τ )−1
+
+(A2022 ) is a proper algebraic subset of Θ, we conclude that, for all (Λ , Γ, Ωdiag , VL) ∈ Θ \ AΘ, it holds that (ψ ◦ χGL )(Λ , Γ, Ωdiag , VL) = ( π ◦ ψ2022 ◦ ϕGL ◦ (id , τ ))(Λ , Γ, Ωdiag , VL)= ( π ◦ ψ2022 ◦ ϕGL )(Λ , τ (Γ , Ωdiag , VL)) = π(Λ , τ (Γ , Ωdiag , VL)) = Λ .
+
+For the other direction of the proposition, suppose first that AΘ ⊊ Θ is a proper algebraic subset that is defined by 
+
+AΘ = {(Λ , Γ, Ωdiag , VL) ∈ Θ : f (Λ , τ (Γ , Ωdiag , VL)) = 0 for all f ∈ S}
+
+= {(Λ , Γ, Ωdiag , VL) ∈ Θ : ˜f (Λ , Γ, Ωdiag , VL) = 0 for all ˜f ∈ ˜S}
+
+for some sets of polynomials S and ˜S = {f ◦ (id , τ ) : f ∈ S}. Note that ˜S is a finite set of polynomials because (id , τ ) is a polynomial. Now, define 
+
+A2022 := {(Λ , Ω) ∈ Θ2022 : f (Λ , Ω) = 0 for all f ∈ S}
+
+= {(Λ , Ω) ∈ R|DV |+d(d+1) /2 : f (Λ , Ω) = 0 for all f ∈ S} ∩ Θ2022 , (A.2) 26 where we in the last line slightly abuse notation and interpret (Λ , Ω) as an element of R|DV |+d(d+1) /2.Because Θ 2022 is an algebraic set by definition and because the intersection of two algebraic sets is an algebraic set, A2022 is an algebraic set. It remains to show the properness of A2022 . Because AΘ is proper, it follows that there exists (Λ , Γ, Ωdiag , VL) ∈ Θ \ AΘ, that is, there exists (Λ , Γ, Ωdiag , VL) ∈
+
+Θ and an ˜f ∈ ˜S such that ˜f (Λ , Γ, Ωdiag , VL)̸ = 0. By construction of ˜S, it now follows that 
+
+f (Λ , τ (Γ , Ωdiag , VL)) ̸ = 0 for at least one f ∈ S, and thus, it follows that (Λ , τ (Γ , Ωdiag , VL)) /∈ A2022 .Since (Λ , Γ, Ωdiag , VL) ∈ Θ and because of Equation (A.1) it also holds that (Λ , τ (Γ , Ωdiag , VL)) ∈
+
+Θ2022 , we have that A2022 is a proper subset of Θ 2022 .Now, suppose that GL is rationally identifiable, that is, there exists a proper algebraic subset 
+
+AΘ ⊊ Θ and a rational map ψ : PD( d) → RDV 
+
+> reg
+
+such that ( ψ ◦ χGL )(Λ , Γ, Ωdiag , VL) = Λ for all (Λ , Γ, Ωdiag , VL) ∈ Θ \ AΘ. Moreover, suppose that AΘ is of the required form, which implies that A2022 ⊆ Θ2022 defined as in (A.2) is a proper algebraic subset. Consider a parameter pair (Λ , Ω) ∈ Θ2022 \ A2022 and a corresponding triple (Γ , Ωdiag , VL) ∈ τ −1(Ω) in the preimage. Since (Λ , Γ, Ωdiag , VL) ∈ Θ \ AΘ, it holds that (ψ ◦ ϕGL )(Λ , Ω) = ( ψ ◦ ϕGL ◦ (id , τ ))(Λ , Γ, Ωdiag , VL)= ( ψ ◦ χGL )(Λ , Γ, Ωdiag , VL)= Λ .
+
+Setting ψ2022 (Σ) := ( ψ(Σ) , (Id − ψ(Σ)) T Σ( Id − ψ(Σ))), we conclude that (ψ2022 ◦ ϕGL )(Λ , Ω) = ( ψ(ϕGL (Λ , Ω)) , (Id − ψ(ϕGL (Λ , Ω))) T ϕGL (Λ , Ω)( Id − ψ(ϕGL (Λ , Ω)))) = (Λ , (Id − Λ) T ϕGL (Λ , Ω)( Id − Λ)) = (Λ , Ω) ,
+
+where we used Equation (1.4) for the second to last equality. We now state a widely applicable condition under which both directions of Proposition A.2 hold. 
+
+Corollary A.3. Let GL = ( V ∪ L , D ) be a latent-factor graph. Suppose that GL is rationally identifiable and the proper algebraic subset AΘ can be rewritten in terms of polynomials of the observed covariance matrix Σ(Λ , Γ, Ωdiag , VL) := ( Id − Λ) −T τ (Γ , Ωdiag , VL)( Id − Λ) −1, that is, 
+
+AΘ := {(Λ , Γ, Ωdiag , VL) ∈ Θ : f (Σ(Λ , Γ, Ωdiag , VL)) = 0 for all f ∈ S}
+
+for some set of polynomials S ⊆ R[x1, . . . , x d(d+1) /2] (where we again slightly abuse notation and identify Σ(Λ , Γ, Ωdiag , VL) as an element of Rd(d+1) /2). Then, GL is Θ2022 -rationally identifiable. Proof. Suppose that GL is rationally identifiable, that is, there exists a proper algebraic subset 
+
+AΘ ⊊ Θ and a rational map ψ : PD( d) → RDV 
+
+> reg
+
+such that ( ψ ◦ χGL )(Λ , Γ, Ωdiag , VL) = Λ for all (Λ , Γ, Ωdiag , VL) ∈ Θ\AΘ. By assumption, we can rewrite AΘ in terms of rational functions of Λ and 
+
+τ (Γ , Ωdiag , VL), that is, as AΘ = {(Λ , Γ, Ωdiag , VL) ∈ Θ : g(Λ , τ (Γ , Ωdiag , VL)) = 0 for all g ∈ ˜S}
+
+where ˜S := {g ≡ f ◦ Σ}. It remains to show that we can replace the rational functions g ∈ ˜S
+
+by polynomial functions. For every g ∈ ˜S consider the representation g = gnum /g denom for some polynomials gnum and gdenom , and define S′ := {h ≡ gnum : g ∈ ˜S}. Then, the set 
+
+BΘ := {(Λ , τ (Γ , Ωdiag , VL)) ∈ Θ : h(Λ , τ (Γ , Ωdiag , VL)) = 0 for all h ∈ S′}
+
+27 is a proper algebraic subset of Θ that contains AΘ. Hence, it holds that ( ψ ◦ χGL )(Λ , Γ, Ωdiag ,
+
+VL) = Λ for all (Λ , Γ, Ωdiag , VL) ∈ Θ \ BΘ, and we conclude by Proposition A.2 that GL is Θ 2022 -rationally identifiable. By Corollary A.3, all discussed identification results from our main paper, that is, Theorems 2.7, 3.2 and 4.3 and Proposition 4.6, are also true when replacing rational identifiability with Θ2022 -rational identifiability and vice versa. This follows directly from inspecting the proofs. 
+
+## A.2 Further Explanations on the Irreducibility of Θ and Θ2022 
+
+We first recall a standard fact about Cartesian products and Zariski closures: For two sets X ⊆ Rnx
+
+and Y ⊆ Rny for some nx, n y ∈ { 1, 2, 3, . . . }, we have X × Y = X × Y . The “ ⊆” follows because 
+
+X × Y is an algebraic set (see, for example, exercise 15d in Section 2 in Cox et al. (2015)) con-taining X × Y . Vice versa for the “ ⊇”, write X × Y = V (S). Then, for every f ∈ S, it holds that f (x, y ) = 0 for all ( x, y ) ∈ X × Y . Now, define for all y ∈ Y and f ∈ S the polynomial 
+
+gy,f (x) := f (x, y ). Clearly, for all x ∈ X, y ∈ Y and f ∈ S it holds that gy,f (x) = 0, and hence, {x ∈ Rnx : gy,f (x) = 0 , y ∈ Y, f ∈ S} is a closed set containing X which implies that 
+
+X ⊆ { x ∈ Rnx : gy,f (x) = 0 , y ∈ Y, f ∈ S} because X is the smallest closed set containing 
+
+X by definition. Thus, gy,f (x) = 0 for all x ∈ X, y ∈ Y and f ∈ S, which implies f (x, y ) = 0 for all x ∈ X, y ∈ Y and f ∈ S. Analogously, defining hx,f (y) := f (x, y ) for all x ∈ X, y ∈ Y
+
+and f ∈ S, we conclude that f (x, y ) = 0 for all x ∈ X, y ∈ Y and f ∈ S which implies that (x, y ) ∈ V (S) = X × Y for all ( x, y ) ∈ X × Y .Now we show the irreducibility of Θ. For that, we write diag d and diag ℓ to denote the set of all d × d- and ℓ × ℓ-diagonal matrices, respectively. As already mentioned in the main paper, it holds that Θ ∼= RmΘ . This fact is true firstly because Θ = RDV 
+
+> reg
+
+× RDLV × diag + 
+
+> d
+
+× diag + 
+
+> ℓ
+
+=
+
+RDV 
+
+> reg
+
+× RDLV × diag + 
+
+> d
+
+× diag + 
+
+> ℓ
+
+from the fact about Cartesian products in the previous paragraph. Secondly, we have RDV 
+
+> reg
+
+= RDV ∼= R|DV | and diag + 
+
+> d
+
+= diag d ∼= Rd and diag + 
+
+> ℓ
+
+= diag ℓ ∼= Rℓ as the Zariski closure of a non-empty open set (in the classical Euclidean topology) is the entire space because a polynomial that is zero on open balls (in the classical Euclidean topology) must be zero everywhere as the polynomial restricted to every line intersecting this ball is a one-dimensional polynomial and as every such intersection contains infinitely many points and in one dimension the Zariski closed sets are exactly all the sets with finitely many points except for the real num-bers itself. We now explain (the also rather standard fact) that RmΘ is irreducible (which then immediately implies that Θ ∼= RmΘ is irreducible): Let RmΘ ⊆ A1 ∪ A2 for two proper alge-braic subsets A1, A 2 of RmΘ . Then, we can write A1 = V (S1) and A2 = V (S2) for some set of polynomials S1, S 2 ⊆ R[x1, . . . , x mΘ ]. Hence, we can write RmΘ = A1 ∪ A2 = V (S1 · S2) where 
+
+S1S2 = {f1f2 : f1 ∈ S1, f2 ∈ S2}. Therefore, f1f2 ≡ 0 for all f1 ∈ S1 and f2 ∈ S2, which implies that f1 ≡ 0 for all f1 ∈ S1 or f2 ≡ 0 for all f2 ∈ S2. Therefore, either V (S1) = RmΘ or 
+
+V (S2) = RmΘ , contradiction. Next, we show the irreducibility of Θ 2022 defined in Section A.1. Suppose Θ 2022 ⊆ C1 ∪C2, where 
+
+C1 and C2 are (in slight abuse of notation) Zariski closed subsets of Rm2022 , where m2022 := |DV | +
+
+d(d+1) /2, and where C1 and C2 are proper subsets of Θ 2022 . Then, Θ 2022 ⊆ Θ2022 ⊆ C1 ∪C2. Now, recall the definition of (id , τ ) in Section A.1. Because Θ 2022 = (id , τ )(Θ) = (id , τ )(Θ), it follows that Θ ⊆ (id , τ )−1
+
+((id , τ )(Θ)) = (id , τ )−1
+
+(Θ 2022 ) ⊆ (id , τ )−1
+
+(C1 ∪ C2) = (id , τ )−1
+
+(C1) ∪ (id , τ )−1
+
+(C2). 28 Because (id , τ ) is a polynomial and thus continuous with respect to the Zariski topology, it follows that (id , τ )−1
+
+(C1) and (id , τ )−1
+
+(C2) are also Zariski closed with respect to the Zariski topology on Θ ∼= RmΘ . Therefore, Θ ⊆ (id , τ )−1
+
+(C1) ∪ (id , τ )−1
+
+(C2). As argued in the previous paragraph, Θ ∼= RmΘ is irreducible, and thus, without loss of generality, (id , τ )−1
+
+(C1) = Θ ∼= RmΘ . Hence, we have that C1 = (id , τ )( RmΘ ) ⊇ (id , τ )(Θ) = (id , τ )(Θ) = Θ 2022 , which implies C1 ⊇ Θ2022 because 
+
+C1 is Zariski closed by assumption, contradiction. 
+
+# B Appendix to Section 3 
+
+In Section B.1, we provide the proof of the eLF-HTC identification result (Theorem 3.2) from Section 3. Afterwards, in Sections B.2 and B.3, we provide statements and proofs of lemmas occuring in Section B.1. Then, in Section B.4, we provide the rational identification formulas for Example 3.1. Finally, in Section B.5, we provide the rational identification formula for Example 3.2. 
+
+## B.1 Proof of the eLF-HTC Identification Result 
+
+Proof. We first show rational identifiability with respect to the definition from Barber et al. (2022a), so with respect to Θ 2022 , which we introduce in Section A.1. Proposition A.2 then implies rational identifiability with respect to our notion. We divide the proof of Theorem 3.2 into three steps: In Step 1 , we introduce the linear equation system which one can uniquely solve in order to obtain the coefficients Λ pv v with pv ∈
+
+Wv \ (Z(2) ∪ WZ ) that Theorem 3.2 claims to identify. In Step 1, we also introduce some required notation and give some general remarks. In Step 2 , we then prove that the claimed unique solution of this linear equation system in Step 1 indeed is a solution for generic (Λ , Ω) ∈ Θ2022 , that is, for all (Λ , Ω) ∈ Θ2022 \ A2022 for some proper algebraic subset A2022 ⊊ Θ2022 . In Step 3 , we then prove that this solution is unique for generic (Λ , Ω) ∈ Θ2022 .
+
+Step 1 (introducing the linear equation system of interest): 
+
+Regarding notation: To ease notation, for a matrix M , we write Mrs with r, s ∈ V to indicate the entry of M where the row corresponds to r and the column corresponds to s, similarly for a vector q we write qr to denote the component corresponding to r (what “corresponds” means will be clear from context). Similarly, we write MR,S with R = {r1, . . . , r m}, S = {s1, . . . , s n} ⊆ V with m
+
+not necessarily equal to n to indicate the submatrix of M whose ( i, j )-th entry with i ∈ { 1, . . . , m }
+
+and j ∈ { 1, . . . , n } is Mrisj , similarly for a vector qR. When R = {r}, we sometimes also write Mr,S .When writing down a matrix-vector product MR,S qS , we implicitly assume that the s-columns of 
+
+MR,S match the corresponding s-components of qS .Now, in order to prove Theorem 3.2, we construct a linear equation system of the form 
+
+d = ( A B C) ·
+
+
+
+αβγ
+
+ , (B.1) where α has components 
+
+αpv = Λ pv v for pv ∈ Wv \ (Z(2) ∪ WZ ) (B.2) 29 and where we introduce the “byproducts” β and γ which are not relevant for the remainder of this work in Step 2. For defining the respective rows of A, B, C and d, we distinguish between two cases: 
+
+Case 1: y̸ ∈ htr H (Z ∪ { v}): In this case, define 
+
+dy := Σ yv − X  
+
+> pv∈pa V(v)\Wv
+
+Σyp v Λpv v ,Ayp v := Σ yp v , pv ∈ Wv \ (Z(2) ∪ WZ ),Byz := Σ yz − X  
+
+> pz∈pa V(z)\Wz
+
+Σyp z Λpz z , z ∈ Z(1) , and 
+
+Cyw := Σ yw , w ∈ Z(2) ∪ WZ .
+
+Note that dy and each Byz is rationally identifiable as all occuring covariances are between ob-served variables and as all occuring parameters from the matrix Λ are rationally identifiable by the (additional) assumptions in Theorem 3.2. Similarly, each Ayp v and each Cyw is trivially rationally identifiable from Σ. 
+
+Case 2: y ∈ htr H (Z ∪ { v}): In this case, define 
+
+dy := Σ yv − X  
+
+> py∈pa V(y)
+
+Λpy y Σpy v − X  
+
+> pv∈pa V(v)\Wv
+
+Σyp v − X  
+
+> py∈pa V(y)
+
+Λpy y Σpy pv
+
+ Λpv v ,Ayp v := Σ yp v − X  
+
+> py∈pa V(y)
+
+Λpy y Σpy pv , pv ∈ Wv \ (Z(2) ∪ WZ ),Byz := Σ yz − X  
+
+> py∈pa V(y)
+
+Λpy y Σpy z − X  
+
+> pz∈pa V(z)\Wz
+
+Σyp z − X  
+
+> py∈pa V(y)
+
+Λpy y Σpy pz
+
+ Λpz z , z ∈ Z(1) ,Cyw := Σ yw − X  
+
+> py∈pa V(y)
+
+Λpy y Σpy w, w ∈ Z(2) ∪ WZ .
+
+Note that again every dy , Ayp v , Byz and Cyw is rationally identifiable as all occuring covariances are between observed variables and as all occuring parameters are rationally identifiable by assumption. 
+
+Step 2 (proposed solution is indeed a solution): 
+
+Write pa V (v) = {pv 
+
+> 1
+
+, . . . , p vn} and Z = {z1, . . . , z r } and Y = {y1, . . . , y k} where n := |pa V (v)|
+
+and r := |H| and k := |Wv ∪ WZ ∪ Z|. Define n1 := |Wv \ (Z(2) ∪ WZ )| and without loss of generality, assume that pv 
+
+> 1
+
+, . . . , p vn1 ∈ Wv \ (Z(2) ∪ WZ ) and that pvn1+1 , . . . , p vn ∈ pa V (v) \ (Wv \
+
+(Z(2) ∪WZ )). Define r1 := |Z(1) | and also assume without loss of generality that z1, z 2 . . . , z r1 ∈ Z(1) 
+
+and zr1+1 , . . . , z r ∈ Z(2) . Now, define the matrix A′ ∈ Rk×n and B′ ∈ Rk×r and a vector c′ ∈ Rk
+
+by 
+
+A′ 
+
+> yp v
+
+:= 
+
+(
+
+[( Id − Λ) T Σ] yp v if y ∈ htr H (Z ∪ { v}),
+
+Σyp v if y̸ ∈ htr H (Z ∪ { v})30 for all y ∈ Y and pv ∈ pa V (v), and 
+
+B′ 
+
+> yz
+
+:= 
+
+(
+
+[( Id − Λ) T Σ( Id − Λ)] yz if y ∈ htr H (Z ∪ { v}),
+
+[Σ( Id − Λ)] yz if y̸ ∈ htr H (Z ∪ { v})for all y ∈ Y and z ∈ Z, and 
+
+c′ 
+
+> y
+
+:= 
+
+(
+
+[( Id − Λ) T Σ] yv if y ∈ htr H (Z ∪ { v}),
+
+Σyv if y̸ ∈ htr H (Z ∪ { v})for all y ∈ Y . Next, similarly as in the proof of the LF-HTC in Barber et al. (2022a), note that from condition (iii) in the eLF-HTC it follows that there exists YZ ⊆ Y such that there is a system of latent-factor half-treks with no-sided intersection from YZ to Z. Every latent-factor half-trek in this system of treks thereby has the form y ← h → z for y ∈ Y , z ∈ Z and h ∈ H. From Proposition 3.4 in Sullivant et al. (2010), it now follows that det(Ω YZ ,Z )̸ = 0 for generic (Λ , Ω) ∈ Θ2022 and hence that Ω Y,Z has full column rank for generic (Λ , Ω) ∈ Θ2022 .We now invoke Claim 2 from Barber et al. (2022a) which we more formally state in Section B.2 and which implies that there exists ψ ∈ Rr for generic (Λ , Ω) ∈ Θ2022 such that 
+
+ A′ B′ ·
+
+Λpa V (v),v 
+
+ψ
+
+
+
+= c′. (B.3) Now, note that A′ 
+
+> yp v
+
+= Ayp v for all y ∈ Y and pv ∈ Wv \ (Z(2) ∪ WZ ). Similarly, for all y ∈ Y and 
+
+z ∈ Z,
+
+B′ 
+
+> yz
+
+=
+
+(
+
+Byz − P 
+
+> w∈Wz
+
+Cyw Λwz if z ∈ Z(1) 
+
+Cyz − P 
+
+> w∈Wz
+
+Cyw Λwz if z ∈ Z(2) .
+
+Therefore, equation (B.3) implies that 
+
+
+
+A A′    
+
+> Y, pa V(v)\(Wv\(Z(2) ∪WZ))
+
+(BY z − P 
+
+> w∈Wz
+
+CY w Λwz )z∈Z(1) (CY z − P 
+
+> w∈Wz
+
+CY w Λwz )z∈Z(2) 
+
+
+
+·
+
+
+
+ΛWv \(Z(2) ∪WZ ),v 
+
+Λpa V (v)\(Wv \(Z(2) ∪WZ )) ,v 
+
+ψZ(1) 
+
+ψZ(2) 
+
+ = c′. (B.4) Now, let α be as in equation (B.2) and define β := ψZ(1) and γ for all w ∈ Z(2) ∪ WZ by 
+
+γw := ψw1w∈Z(2) + Λ w,v 1w∈(pa V (v)\(Wv \(Z(2) ∪Wz ))) − P 
+
+> z∈Z:w∈Wz
+
+Λwz ψz . Note that (in particular) for w ∈ (pa V (v) \ (Wv \ (Z(2) ∪ Wz ))) ∩ (Z(2) ∪ Wz ) it holds that A′ 
+
+> yw
+
+= Cyw . Also note that (pa V (v) \ (Wv \ (Z(2) ∪ WZ ))) \ (Z(2) ∪ WZ ) = pa V (v) \ Wv . Besides, recall that Z(1) ∩ (WZ ∪
+
+Wv ∪ Z(2) ) = ∅ by condition (i) in the eLF-HTC and by definition. Using these three facts, and rearranging (B.4) then yields 
+
+ A B C ·
+
+αβγ
+
+ = c′ − A′  
+
+> Y, pa V(v)\Wv
+
+· ΛWv \pa V (v),v = d. (B.5) 31 Step 3 (unique solvability): 
+
+Similarly to Barber et al. (2022a), we will set some parameters equal to zero and then show that the considered matrix ( A B C) is invertible for generic choices of the remaining free parameters of (Λ , Ω) ∈ Θ2022 . Doing so then implies that the considered matrix ( A B C) is invertible for generic choices of all parameters of (Λ , Ω) ∈ Θ2022 (see Proposition 4.6 in Section 4.2 for a formal proof of (a modification of) this fact). In particular, we set Λ pz z = 0 for all ( pz , z ) with z ∈ Z(1) and pz ∈ pa V (z) \ Wz . Under this modification and for both Case 1 and Case 2, the A- and C-matrices do not change. However, for the 
+
+B-matrix we get in Case 1 Byz = Σ yz with z ∈ Z(1) and in Case 2 Byz = Σ yz −P   
+
+> py∈pa V(y)
+
+Λpy y Σpy z
+
+with z ∈ Z(1) .By definition, the matrices A and C do not share any matrix-entries (where the entries are interpreted as indeterminates). Under the previously described modification, by assumption (i) in the eLF-HTC implying that Z(1) ∩ (WZ ∪ Wv ) = ∅ and also the trivial fact Z(1) ∩ Z(2) = ∅ which follows by definition, it follows that also the B-matrix does not share any matrix entry with either the A- or C-matrix (where again the entries are interpreted as indeterminates). Note that under the modification from the beginning of Step 3, if Z(1) ∩ (WZ ∪ Wv )̸ = ∅ from assumption (i) in the eLF-HTC was violated, then either the B- and C-matrix or the A- and 
+
+B-matrix would share an entire column. We now define a new graph ˆG as follows: Start with the induced subgraph ˆG = ( V, D V ) of the original graph GL to the observed vertices V . Then, remove all edges pz → z in ˆG with z ∈ Z(1) 
+
+and pz ∈ pa V (z) \ Wz . Next, whenever two observed vertices w1, w 2 ∈ V are confounded by some 
+
+h ∈ L in GL, so whenever Ω w1w2̸ = 0 (where Ω w1w2 is again interpreted as an indeterminant), add the bidirected edge w1 ↔ w2 to ˆG.Now, define ˆΛ by starting with Λ and then setting Λ pz z = 0 for all ( pz , z ) with z ∈ Z(1) and 
+
+pz ∈ pa V (z) \ Wz , so exactly as explained at the beginning of Step 3, and define ˆΩ := Ω. Note that the LSEM in the latent-projection framework given by the direct causal effect matrix ˆΛ and the covariance matrix for the dependent error terms between the observed variables ˆΩ induces the mixed graph ˆG by construction. Also note that Σ = ( Id − ˆΛ) −T ˆΩ( Id − ˆΛ) −1 under this modification (which follows from the same reasoning as for equation (1.4) in Section 1). Also, by definition of the new graph ˆG, the selected system of latent-factor half-treks from Y
+
+to Wv ∪ WZ ∪ Z induces a system of half-treks in ˆG. (A half-trek in a mixed graph either is a directed path or a bidirected edge followed by a directed path, see Foygel et al. (2012a) for a formal definition). In this system of half-treks in ˆG, any latent-factor half-trek in GL that begins with 
+
+y ← h → w has these two edges replaced in its corresponding half-trek in ˆG with the bidirected edge 
+
+y ↔ w. Because the left-side of a latent-factor half-trek consists of at most an edge linking latent variables and observed variables, none of the latent-factor half-treks in GL ending in ( Wv ∪ WZ ) \ Z
+
+uses one of the to-be-deleted edges into Z(1) as these to-be-deleted edges must be on the right side of the respective latent-factor half-treks and hence, there would be a sided-intersection with the latent-factor half-treks ending in Z. Furthermore, by assumption, the latent-factor half-treks ending in Z also do not use such deleted edges into Z(1) as they have the form y ← h → z for y ∈ Y
+
+and z ∈ Z in GL and thus the form y ↔ z in ˆG. Therefore, this construction is possible, and by this construction, the resulting system of half-treks in ˆG has also no sided intersection. 32 Under this modification, we can now rewrite the row of ( A B C) indexed by y ∈ Y as (A B C)y
+
+=
+
+(
+
+Σy,W v \(Z(2) ∪WZ ), Σy,Z (1) , Σy,Z (2) ∪WZ if y / ∈ htr H (Z ∪ { v})[( Id − ˆΛ) T Σ] y,W v \(Z(2) ∪WZ ), [( Id − ˆΛ) T Σ] y,Z (1) , [( Id − ˆΛ) T Σ] y,Z (2) ∪WZ else .
+
+As argued in the previous paragraph, there is a system of half-treks in ˆG from Y to Wv ∪ Z(1) ∪
+
+Z(2) ∪ WZ with no sided intersection. We can now apply a modification of Lemma 2 from Foygel et al. (2012a) (which we state as Lemma B.2 in Section B.3) to ( A B C) to get invertibility of (A B C) for generic (Λ , Ω) ∈ Θ2022 .
+
+## B.2 Statement of Claim 2 from Barber et al. (2022a) 
+
+Proposition B.1 (Claim 2 from Barber et al. (2022a)) . Consider the latent-factor graph setting as introduced in Sections 1 and 2. Furthermore, assume condition (ii) from the eLF-HTC (or equivalently condition (ii) from the LF-HTC) and |Z| = |H| and that ΩY,Z has full column rank. Then, there exists ψ ∈ Rr such that equation (B.3) in Section B.1 is true for generic (Λ , Ω) ∈ Θ2022 ,that is, for all (Λ , Ω) ∈ Θ2022 \ A2022 where A2022 is a proper algebraic subset of Θ2022 .Proof. In the original proof of Barber et al. (2022a), replace the definition of Ω h = (Γ h)T Γh for all 
+
+h ∈ L , whereby Γ h indicates the row of Γ indexed by h, by Ω h = (Γ h)T (VL)hh Γh to incorporate our slightly more general setting of an arbitrary latent covariance matrix. The rest of the proof is exactly as in Barber et al. (2022a), we do not restate it. 
+
+## B.3 Statement of Modified Version of Lemma 2 from Foygel et al. (2012a) 
+
+In this section, we consider mixed graphs G = ( V, D, B ) as introduced in Foygel et al. (2012a) with vertex set V and |V | = d, directed edge set D and bidirected edge set B. These mixed graphs represent LSEMs with observed variables indexed by V and latent confounding represented by dependent error terms with covariance matrix Ω. (For a more detailed introduction, see Foygel et al. (2012a)). We now have the following modification of Lemma 2 in Foygel et al. (2012a). 
+
+Lemma B.2. Consider a mixed graph G = ( V, D, B ). Let Y, P ⊆ V with |Y | = |P |, consider a partition Y = Y1 ˙∪Y2 of Y , and define the matrix A for y ∈ Y and p ∈ P by 
+
+Ayp := 
+
+(
+
+[( Id − Λ) T Σ] yp , if y ∈ Y1
+
+Σyp , if y ∈ Y2.
+
+If there exists a system of half-treks from Y to P with no sided intersection, then A is invertible for generic (Λ , Ω) ∈ Θ2022 , that is, for all (Λ , Ω) ∈ Θ2022 \ A2022 where A2022 is a proper algebraic subset of Θ2022 .Proof. Let H(y, p ) denote the set of all half-treks from y ∈ Y to p ∈ P in G, and let π(Λ , Ω) denote the trek monomial of a trek π in the mixed graph G. Note that we can write 
+
+Ayp := 
+
+(P  
+
+> π∈H (y,p )
+
+π(Λ , Ω) , if y ∈ Y1
+
+P  
+
+> π∈T (y,p )
+
+π(Λ , Ω) , if y ∈ Y2,
+
+33 which is exactly the starting point in the original proof of Lemma 2 in Foygel et al. (2012a). In the proof of Lemma 2 in Foygel et al. (2012a), the specific choices of Y1 and Y2 never occur from this point on in the proof, as do the further assumptions in the statement of Lemma 2 in Foygel et al. (2012a). Our proof from here on is hence exactly as the original proof of Lemma 2 from Foygel et al. (2012a), we do not restate it. 
+
+## B.4 Rational Formulas for Identification for Example 3.1 
+
+In the following, we write ( x1, . . . )T = A−1b if x1 equals the first component of the vector x =(x1, . . . )T that uniquely solves the linear equation system Ax = b. With this notation, the rational formulas for the presented choices of Wv and ( Y, Z, (Wz )z∈Z , H ) are 
+
+λ34 
+
+...
+
+!
+
+=
+
+
+
+Σ13 Σ16 Σ15 
+
+Σ23 Σ26 Σ25 
+
+Σ33 Σ36 Σ35 
+
+
+
+> −1
+
+·
+
+
+
+Σ14 
+
+Σ24 
+
+Σ34 
+
+ ,
+
+λ56 
+
+...
+
+!
+
+=
+
+
+
+Σ15 Σ14 Σ13 
+
+Σ25 Σ24 Σ23 
+
+Σ35 Σ34 Σ33 
+
+
+
+> −1
+
+·
+
+
+
+Σ16 
+
+Σ26 
+
+Σ36 
+
+ ,
+
+λ12 
+
+...
+
+!
+
+=
+
+ Σ11 Σ14 − Λ34 Σ13 
+
+Σ61 − Λ56 Σ51 Σ64 − Λ56 Σ54 − (Σ 63 − Λ56 Σ53 )Λ 34 
+
+−1
+
+·
+
+ Σ12 
+
+Σ62 − Λ56 Σ52 
+
+
+
+,
+
+λ23 
+
+...
+
+!
+
+=
+
+Σ22 − Λ12 Σ12 Σ21 − Λ12 Σ11 
+
+Σ42 − Λ34 Σ32 Σ41 − Λ34 Σ31 
+
+−1
+
+·
+
+Σ23 − Λ12 Σ13 
+
+Σ43 − Λ34 Σ33 
+
+
+
+, and (λ15 , λ 45 , . . . )T
+
+=
+
+
+
+Σ11 Σ14 Σ12 − Λ12 Σ11 
+
+Σ31 − Λ23 Σ21 Σ34 − Λ23 Σ24 Σ32 − Λ23 Σ22 − (Σ 31 − Λ23 Σ21 )Λ 12 
+
+Σ41 − Λ34 Σ31 Σ44 − Λ34 Σ34 Σ42 − Λ34 Σ32 − (Σ 41 − Λ34 Σ31 )Σ 12 
+
+
+
+> −1
+
+·
+
+
+
+Σ15 
+
+Σ35 − Λ23 Σ25 
+
+Σ45 − Λ34 Σ35 
+
+ .
+
+## B.5 Rational Formulas for Identification for Example 3.2 
+
+Using the same notation as in Section B.4, the rational formula for the presented choices of Wv and (Y, Z, (Wz )z∈Z , H ) is 
+
+λ23 
+
+...
+
+!
+
+=
+
+Σ12 Σ14 
+
+Σ22 Σ24 
+
+−1 Σ13 
+
+Σ23 
+
+
+
+.
+
+# C Appendix to Section 4 
+
+We begin this section by proving Theorem 4.3 in Section C.1. We then show Proposition 4.5 in Section C.2. In Section C.3, we then prove Proposition 4.6. Finally, we prove Proposition 4.8 in Section C.4. 34 C.1 Proof of Theorem 4.3 
+
+Proof. To prove the result, we apply Theorem 3.8 from Weihs et al. (2018) to the graph GL (which does not contain bidirected edges) and only allow for sets S, T containing observed nodes. As we will explain, rational identifiability of λw0v as in Theorem 3.8 from Weihs et al. (2018) then implies rational identifiability of λw0v with respect to our employed notion. For defining rational identifiability as in Weihs et al. (2018), first note that because 
+
+ LX
+
+
+
+=
+
+ 0 0ΓT ΛT
+
+
+
+·
+
+ LX
+
+
+
++
+
+Lϵ
+
+
+
+,
+
+and hence that 
+
+ LX
+
+
+
+=
+
+
+
+Iℓ+d −
+
+0 Γ0 Λ
+
+ −T Lϵ
+
+
+
+,
+
+where invertibility holds for all (Λ , Γ) ∈ RDV 
+
+> reg
+
+× RDLV as argued further down below, the vector (L, X )T has covariance matrix ΣL,X = χL,X GL
+
+ 0 Γ0 Λ
+
+
+
+, Ωdiag , VL
+
+
+
+:= 
+
+ VL Cov( L, X )Cov( X, L ) Σ
+
+
+
+=
+
+
+
+Iℓ+d −
+
+0 Γ0 Λ
+
+ −T VL 00 Ωdiag 
+
+| {z }
+
+> =Cov( L,ϵ )
+
+
+
+Iℓ+d −
+
+0 Γ0 Λ
+
+ −1
+
+=
+
+Iℓ −Γ0 Id − Λ
+
+−T VL 00 Ωdiag 
+
+  Iℓ −Γ0 Id − Λ
+
+−1
+
+=
+
+Iℓ Γ( Id − Λ) −1
+
+0 (Id − Λ) −1
+
+T VL 00 Ωdiag 
+
+  Iℓ Γ( Id − Λ) −1
+
+0 (Id − Λ) −1
+
+
+
+=
+
+ VL VLΓ( Id − Λ) −1
+
+(Id − Λ) −T ΓT VL (Id − Λ) −T (Ω diag + Γ T VLΓ)( Id − Λ) −1
+
+
+
+.
+
+Here, χL,X GL has domain Θ L,X := RD 
+
+> reg
+
+×diag + 
+
+> d
+
+×diag + 
+
+> ℓ
+
+, where diag + 
+
+> d
+
+×diag + 
+
+> ℓ
+
+equals the set of positive definite covariance matrices as defined in Weihs et al. (2018) corresponding to the bidirected edges between the components of ( L, X ) because there are no bidirected edges in our case; and where furthermore, RD 
+
+> reg
+
+is the space of all real-valued matrices which have the same number of rows and columns and the same zero structure as 
+
+0 Γ0 Λ
+
+
+
+and for which 
+
+
+
+Iℓ+d −
+
+0 Γ0 Λ
+
+ 
+
+35 is invertible. Note that because det 
+
+
+
+Iℓ+d −
+
+0 Γ0 Λ
+
+ 
+
+= det( Il) · det( Id − Λ) ,
+
+it follows that RD 
+
+> reg
+
+∼= RDV 
+
+> reg
+
+× RDLV and hence that Θ L,X ∼= Θ. Therefore and by definition of χL,X GL ,we have 
+
+χGL (Λ , Γ, Ωdiag , VL) = 
+
+
+
+χL,X GL
+
+ 0 Γ0 Λ
+
+
+
+, Ωdiag , VL
+
+ 
+
+> 4,4
+
+for all (Λ , Γ, Ωdiag , VL) ∈ RDV 
+
+> reg
+
+× RDLV × diag + 
+
+> d
+
+× diag + 
+
+> ℓ
+
+= Θ, and vice versa for all 
+
+ 0 Γ0 Λ
+
+
+
+, Ωdiag , VL
+
+
+
+∈ ΘL,X .
+
+Weihs et al. (2018) now say that some edge x → y ∈ DV is rationally identifiable if there exists a rational function ψL,X such that (ψL,X ◦ χL,X GL )
+
+ 0 Γ0 Λ
+
+
+
+, Ωdiag , VL
+
+
+
+= λxy 
+
+for all 
+
+ 0 Γ0 Λ
+
+
+
+, Ωdiag , VL
+
+
+
+∈ ΘL,X \ AL,X 
+
+> Θ
+
+for some proper algebraic subset AL,X  
+
+> Θ
+
+of Θ L,X . It holds that our notion of rational identifiability implies the notion of rational identifiability from Weihs et al. (2018): To see this fact, let ψ the rational function in our employed notion of rational identifiability, let AΘ be the occuring algebraic set, and define ψL,X by 
+
+ψL,X 
+
+ VL Cov( L, X )Cov( X, L ) Σ
+
+ 
+
+:= ψ(Σ) .
+
+It then immediately follows that for all 
+
+ 0 Γ0 Λ
+
+
+
+, Ωdiag , VL
+
+
+
+∈ ΘL,X \ AL,X  
+
+> Θ
+
+,
+
+where AL,X  
+
+> Θ
+
+is the isomorphic correspondent of AΘ, that (ψL,X ◦ χL,X GL )
+
+ 0 Γ0 Λ
+
+
+
+, Ωdiag , VL
+
+
+
+= ( ψ ◦ (χL,X GL )4,4)
+
+ 0 Γ0 Λ
+
+
+
+, Ωdiag , VL
+
+
+
+= ( ψ ◦ χGL )(Λ , Γ, Ωdiag , VL) = λxy .
+
+Therefore, the assumption in our theorem that λw1v , . . . , λ wmv are rationally identifiable (according to our notion) implies rational identifiable of these same coefficients as in Weihs et al. (2018), so Theorem 3.8 from Weihs et al. (2018) applies. 36 Theorem 3.8 from Weihs et al. (2018) now yields rational identifiability with respect to the notion of rational identifiability from Weihs et al. (2018). Writing AL,X  
+
+> Θ,1
+
+, . . . , A L,X  
+
+> Θ,m
+
+for the isor-morphic correspondents of the algebraic sets AΘ,1, . . . , A Θ,m occuring in the rational identifiability assumptions of the edges w1 → v, . . . , w m → v with respect to our employed terminology, there hence exists a rational function ψL,X and a proper algebraic subset AL,X  
+
+> Θ
+
+⊆ ΘL,X , where AL,X  
+
+> Θ
+
+is given by 
+
+AL,X  
+
+> Θ
+
+:= 
+
+ 0 Γ0 Λ
+
+
+
+, Ωdiag , VL
+
+
+
+∈ ΘL,X : det(Σ S,T ∪{ w0}) = 0 
+
+| {z }
+
+> =: AL,X
+> Θ,0
+
+∪
+
+> m
+
+[
+
+> i=1
+
+AL,X  
+
+> Θ,i
+
+,
+
+such that (ψL,X ◦ χL,X GL )
+
+ 0 Γ0 Λ
+
+
+
+, Ωdiag , VL
+
+
+
+= λw0v
+
+for all  0 Γ0 Λ
+
+
+
+, Ωdiag , VL
+
+
+
+∈ ΘL,X \ AL,X  
+
+> Θ
+
+.
+
+In particular, it holds that (ψL,X ◦ χL,X GL )
+
+ 0 Γ0 Λ
+
+
+
+, Ωdiag , VL
+
+
+
+= det (Σ S,T ∪{ v}) − Pmi=1 λwiv det (Σ S,T ∪{ wi})det (Σ S,T ∪{ w0}) ,
+
+where the λwiv ’s are rational functions in terms of Σ on Θ L,X \ AL,X  
+
+> Θ
+
+and hence, ψL,X is indeed a rational function. The stated rational formula ψL,X in Theorem 3.8 of Weihs et al. (2018), however, just contains entries of Σ (where we use the assumption that the coefficients λw1v , . . . , λ wmv are rationally iden-tifiable according to our notion which implies that λw1v , . . . , λ wmv are also rationally identifiable according to the notion of Weihs et al. (2018) by just entries of Σ), and so in particular, the occuring rational function ψL,X can be rewritten to a function ψ that just depends on the arguments of Σ, that is, we can write 
+
+ψ(Σ) = ψL,X 
+
+ VL Cov( L, X )Cov( X, L ) Σ
+
+ 
+
+which implies that (ψ ◦ χGL ) (Λ , Γ, Ωdiag , VL)= ( ψ ◦ (χL,X GL )4,4)
+
+ 0 Γ0 Λ
+
+
+
+, Ωdiag , VL
+
+
+
+= ( ψL,X ◦ χL,X GL )
+
+ 0 Γ0 Λ
+
+
+
+, Ωdiag , VL
+
+
+
+= λw0v
+
+for all  0 Γ0 Λ
+
+
+
+, Ωdiag , VL
+
+
+
+∈ ΘL,X \ AL,X  
+
+> Θ
+
+.
+
+respectively, for all (Λ , Γ, Ωdiag , VL) ∈ Θ\AΘ where AΘ is the isomorphic correspondent of AL,X  
+
+> Θ
+
+.37 C.2 Proof of Proposition 4.5 
+
+Proof. Case 1: In this case, no trek from x to y uses one of the deleted edges, as otherwise, either x
+
+or y would either be a descendant of v in GL or would equal v, contradiction. Therefore, every trek from x to y in GL occurs in GL, and vice versa, every trek from x to y in GL occurs in GL. From the trek rule (see, e.g., Section 2 in Sullivant et al. (2010) or Section 2 in Foygel et al. (2012a)) then follows the result. Case 2: In this case, every trek from x to y = v in GL ends with an edge pv → v with pv ∈ pa( v); otherwise, either x = v or x ∈ dec GL (v). Also, in every trek from x to y = v in GL an edge of the type pv → v with pv ∈ pa( v) can only occur on the right-side of the trek, as otherwise x ∈ dec GL (v). Furthermore, in every trek from x to y = v in GL an edge of the type pv → v with pv ∈ pa( v)appears at most (and hence exactly) once, as otherwise v = y ∈ dec GL (v) (as all these edges of the type pv → v with pv ∈ pa( v) must appear on the right-side of the trek as previously argued), contradiction. Therefore, the set of all the treks in GL from x to y equals the set of all the treks from x to 
+
+y in GL minus the set of all the treks in GL from x to y that end via any of the deleted edges 
+
+wi → v = y. From the trek rule (see, e.g., Section 2 in Sullivant et al. (2010) or Section 2 in Foygel et al. (2012a)), it follows that Σ xw i equals the sum of all trek monomials over all treks from x to 
+
+wi and it thus also follows that Σ xw i Λwiy equals the sum of all trek monomials over all treks from 
+
+x to v = y in G having as last edge wi → v = y. From the trek rule, it also follows that Σ xy equals the sum of all trek monomials over all treks from x to v = y. Therefore, Case 2 follows. Case 3: Switch roles of x and y in the proof of Case 2. 
+
+## C.3 Proof of Proposition 4.6 
+
+Proof. Write Θ sub := RDsub  
+
+> V
+> reg
+
+× RDLV × diag + 
+
+> d
+
+× diag + 
+
+> ℓ
+
+, where Dsub  
+
+> V
+
+:= DV \ { w1 → v, . . . , w m → v}.Let Asub ⊊ Θsub be the proper algebraic subset for which rational identifiability of Λ w0v0 with respect to GL holds. For all i ∈ { 1, . . . , m }, let Ai ⊊ Θ be the proper algebraic subset for the definition of rational identifiability of wi → v with respect to GL. In the following, because Θsub ∼= RmΘsub , where mΘsub = |Dsub  
+
+> V
+
+| + |DLV | + d + ℓ = |DV | − m + |DLV | + d + ℓ, and because Θ ∼= Rm, we in slight abuse of notation write Rm × B for any subset B ⊆ Θsub to indicate the subset of Θ for which the coefficients corresponding to w1 → v1, . . . , w m → vm can be chosen from the real-numbers and for which the remaining coefficients corresponding to GL must be in B. We now construct a new proper algebraic subset A ⊊ Θ ∼= RmΘ for rational identifiability of Λ w0v0
+
+with respect to GL by 
+
+A := ( Rm × Asub ) ∪
+
+> m
+
+[
+
+> i=1
+
+Ai.
+
+Note that Rm × Asub is still an algebraic set as the Cartesian product of algebraic sets is an algebraic set (see the beginning of Section A.2 in the Appendix for a proof of this fact). Also, note that Rm × Asub is proper because Asub is proper. Because the finite union of algebraic sets is also an algebraic set, it follows that A is an algebraic subset of Θ ∼= RmΘ . Regarding properness of 
+
+A: The set A is a finite union of proper algebraic subsets of the irreducible set Θ and hence, A
+
+has Lebesgue measure zero (as mentioned in Section 2.2, see, e.g., the lemma in Okamoto (1973)). However, Θ ∼= RmΘ does not have Lebesgue measure zero. Hence, A must be a proper subset of Θ. 38 Now, write χGL : Θ sub → PD( d) for the function mapping parameters in Θ sub to observed covariance matrices with respect to GL. Write χGL,allowed := π ◦ χGL where π is the projec-tion function onto the covariances that can be calculated via Proposition 4.5. Note that from Proposition 4.5 it follows that we can write χGL,allowed (Λ sub , Γ, Ωdiag , VL), where Λ sub is Λ with the entries Λ w1v , . . . , Λwmv set to zero, as a polynomial and hence rational function in terms of χGL (Λ , Γ, Ωdiag , VL) and Λ w1v , . . . , Λwmv for all (Λ , Γ, Ωdiag , VL) ∈ Θ \ A. That is, for all (Λ , Γ, Ωdiag , VL) ∈ Θ \ A we can write χGL,allowed (Λ sub , Γ, Ωdiag , VL) = γ(χGL (Λ , Γ, Ωdiag , VL), Λw1v ,. . . , Λwmv ) for a rational function γ.Let ψsub be the rational function such that ( ψsub ◦ χGL )(Λ sub , Γ, Ωdiag , VL) = Λ w0v0 for all (Λ sub , Γ, Ωdiag , VL) ∈ Θsub \ Asub . As one is just using covariances that can be calculated by Proposition 4.5 for rational identifiability of Λ w0v with respect to GL, we have for some other rational function ψsub ,allowed that (ψsub ,allowed ◦ χGL,allowed )(Λ sub , Γ, Ωdiag , VL)= ( ψsub ◦ χGL )(Λ sub , Γ, Ωdiag , VL)for all (Λ sub , Γ, Ωdiag , VL) ∈ Θsub \ Asub and hence that (ψsub ,allowed (γ(χGL (Λ , Γ, Ωdiag , VL), Λw1v , . . . , Λwmv )) (ψsub ,allowed ◦ χGL,allowed )(Λ sub , Γ, Ωdiag , VL)= ( ψsub ◦ χGL )(Λ sub , Γ, Ωdiag , VL)= Λ w0v0 ,
+
+for all (Λ , Γ, Ωdiag , VL) ∈ Θ \ A. Each Λ wiv is itself rationally identifiable in GL, and thus, there ex-ists ψi for each i ∈ { 1, . . . , m } such that ( ψi ◦ χGL )(Λ , Γ, Ωdiag , VL) = Λ wiv for all (Λ , Γ, Ωdiag , VL) ∈
+
+Θ \ Ai and hence in particular for all (Λ , Γ, Ωdiag , VL) ∈ Θ \ A. Therefore, we have for all (Λ , Γ, Ωdiag , VL) ∈ Θ \ A
+
+Λw0v0 = ( ψsub ,allowed (γ(χGL (Λ , Γ, Ωdiag , VL), Λw1v , . . . , Λwmv )) = ( ψsub ,allowed (γ(χGL (Λ sub , Γ, Ωdiag , VL),
+
+(ψ1 ◦ χGL )(Λ , Γ, Ωdiag , VL), . . . , 
+
+(ψm ◦ χGL )(Λ , Γ, Ωdiag , VL)) = ( ψsub ,allowed ◦ γ ◦ (χGL , (ψ1 ◦ χGL ), . . . , (ψm ◦ χGL )))(Λ , Γ, Ωdiag , VL)= ( ψsub ,allowed ◦ γ ◦ ((id ◦ χGL ), (ψ1 ◦ χGL ), . . . , (ψm ◦ χGL )))(Λ , Γ, Ωdiag , VL)= ( ψsub ,allowed ◦ γ ◦ (id , ψ 1, . . . , ψ m) ◦ χGL )(Λ , Γ, Ωdiag , VL)= ( ψ ◦ χGL )(Λ , Γ, Ωdiag , VL),
+
+where ψ := ψsub ,allowed ◦ γ ◦ (id , ψ 1, . . . , ψ m) is a rational function which implies the result. 
+
+Regarding the notion of rational identifiability from Barber et al. (2022a): The previous proof also works for the notion of rational identifiability from Barber et al. (2022a). Just replace RDLV × diag + 
+
+> d
+
+× diag + 
+
+> ℓ
+
+by im( τ ); the remainder of the proof is then exactly the same as only the first part of the Cartesian product—the part corresponding to Λ—is used and connected with Λ sub in the remainder of the proof. 39 C.4 Proof of Proposition 4.8 
+
+For x, y ∈ V ∪ L , write x ⪯ y if x / ∈ dec GL (y). We now argue that (Σ n)xy being allowed with respect to the deletion sequence Dv1 , . . . , D vn is equivalent to x, y ⪯ v1, . . . , v n (part 1) and ( {x, y }∩ {v1, . . . , v n} = ∅ or ( {x, y }∩{ v1, . . . , v n}̸ = ∅ and x̸ = y)) (part 2). This equivalence then implies the result because the right-hand side of this equivalence does not depend on the order of the v1, . . . , v n
+
+and also only depends on the unique elements of v1, . . . , v n, that is, on {v1, . . . , v n}, and thus, the equivalent condition on the right-hand side is the same for every other choice v′
+
+> 1
+
+, . . . , v ′ 
+
+> n′
+
+∈ V for which Sn′ 
+
+> i=1
+
+Dv′ 
+
+> i
+
+= Ddel (as {v1, . . . , v n} = {v′
+
+> 1
+
+, . . . , v ′ 
+
+> n′
+
+} for every other such deletion sequence). For the “ ⇒”-direction, part 2 immediately follows from the equality conditions in Proposition 4.5. From the repeated application of Proposition 4.5, it also follows that x, y / ∈ dec GL 
+
+> i−1
+
+(vi) for all 
+
+i ∈ { 1, . . . , n } (where GL 
+
+> 0
+
+:= GL). Now, suppose without loss of generality that i ∈ { 1, . . . , n } is the minimal index for which x ∈ dec GL (vi), which would contradict part 1. Suppose first i > 1. Then, there is a nontrivial directed path in GL from vi to x that has to use one of the deleted edges from Dv1 , . . . , D vi−1 , otherwise, x ∈ dec GL 
+
+> i−1
+
+(vi). However, then, x ∈ dec GL ({v1, . . . , v i−1}) which is a contradiction to the minimality of i. If i = 1, then GL 
+
+> i−1
+
+= GL anyhow, so this case is trivial. For the “ ⇐”-direction: Note that x, y ⪯ v1, . . . , v n and {x, y } ∩ { v1, . . . , v n} = ∅ immediately implies that Case 1 of Proposition 4.5 applies to each deletion (as deleting edges from GL can only reduce the number of descendants). Similarly, if x, y ⪯ v1, . . . , v n and ( {x, y } ∩ { v1, . . . , v n}̸ = ∅
+
+and x̸ = y), then one of the three cases from Proposition 4.5 at each deletion step applies. In addition, for all w ∈ pa( {x, y }), it holds that w ⪯ v1, . . . , v n and w̸ = v1, . . . , v n, otherwise x or y
+
+is in dec GL ({v1, . . . , v n}), contradiction. Therefore, for all w ∈ pa V (y) and w′ ∈ pa V (x), one of the three cases from Proposition 4.5 also applies at each deletion step i ∈ { 1, . . . , n } to the covariances (Σ i)xw and (Σ i)yw ′ , and Case 1 applies to (Σ i)ww ′ , thus making all further required covariances for Proposition 4.5 allowed at each step i.
+
+# D Appendix to Section 5 
+
+We begin this section by proving Theorem 5.1 in Section D.1. In Section D.2, we then prove Proposition 5.2. Finally, in Section D.3, we prove Theorem 5.3. 
+
+## D.1 Proof of Theorem 5.1 
+
+Proof. The set of allowed nodes A is already defined such that condition (ii) is satisfied for every 
+
+Y ⊆ A. Furthermore, the remaining assumptions in Theorem 5.1 ensure that condition (i) of the eLF-HTC is satisfied except for |Y | = |Wv ∪ Z ∪ WZ |. Thus, Theorem 5.1 really is a statement about condition (iii) of the eLF-HTC (plus the just mentioned remaining part of condition (i)). Now, the set Wv ∪ WZ in condition (iii) of the eLF-HTC is pa V (v) in condition (iii) of the LF-HTC. Otherwise, condition (iii) in the eLF-HTC and condition (iii) in the LF-HTC are equal. Now, similarly as in the LF-HTC paper, introduce a source node and a sink node in order to transform our multi-source and multi-sink max-flow problem for the eLF-HTC into an equivalent single-source and single-sink max-flow problem with the same max-flow by adding a source node s which points to all vertices in A and by adding a sink node t such that from each vertex in W ′ 
+
+> v
+
+∪ W ′ 
+
+> z
+
+∪ Z′ there is an edge to t, and such that s and t have capacity ∞. Next, the set Wv ∪ WZ (and W ′ 
+
+> v
+
+∪ W ′ 
+
+> Z
+
+) in this equivalent flow network for the eLF-HTC is pa V (v) in the flow network for the LF-HTC (which is 40 introduced in Barber et al. (2022a)). Otherwise, the (transformed) flow network constructions are equal. Said differently, for both the eLF-HTC and the LF-HTC, it is possible to replace Wv ∪ WZ
+
+respectively pa V (v) (and the corresponding primed versions) for the sake of this proof by any arbitrary placeholder sets since the precise definitions of these sets are neither used for condition (iii) (and the remainder of condition (i)) nor are they used for the corresponding (transformed) flow networks. Thus, conditions (iii) in the eLF-HTC and the LF-HTC and the corresponding (transformed) flow networks looked at in an isolated manner are the same. Therefore, the result for condition (iii) for the eLF-HTC follows from the same proof as the proof of Theorem 5.1 in Barber et al. (2022a). The remainder of condition (i) stating that |Y | = |Wv ∪ Z ∪ WZ | then follows automatically as otherwise, no such system of latent-factor half-treks from Y to Wv ∪ Z ∪ WZ can exist. 
+
+## D.2 Proof of Proposition 5.2 
+
+Proof. The proof is very similar to the proof of Proposition 5.2 in Barber et al. (2022a). First note that by assumption there exists h ∈ H so |H| = |Z| ≥ 1. Now, suppose ( Y, Z, (Wz )z∈Z , H ) satisfies the eLF-HTC with respect to ( v, W v ). Because there exists a system of latent-factor half-treks from 
+
+Y to Wv ∪ WZ ∪ Z such that for each z ∈ Z the latent-factor half-trek ending in z has the form 
+
+y ← h → z for some y ∈ Y and because |H| = |Z| ≥ 1, it follows that |ch( h)| > 1 for all h ∈ H.Next, let h ∈ H such that |ch( h)| ∈ { 2, 3}. Then, in the system of latent-factor half-treks for condition (iii) there is a latent-factor half-trek of the form y ← h → z for some y ∈ Y and some 
+
+z ∈ Z. Now, take ˜Y = Y \ { y}, ˜Z = Z \ { z} and ˜H = H \ { h}. Then, ( ˜Y , ˜Z, (W˜z )˜z∈ ˜Z , ˜H) clearly satisfies conditions (i) and (iii) from the eLF-HTC and that ˜Y ∩ ( ˜Z ∪ { v}) = ∅ (the first part of condition (ii)). In order to show that the remainder of condition (ii) from the eLF-HTC also holds, we must show that h / ∈ pa L( ˜Y ) ∩ (pa L( ˜Z) ∪ { v}). As conditions (ii) in the eLF-HTC and the LF-HTC are exactly the same, from here on, the proof is exactly the same as the proof of Proposition 5.2; for completeness, we restate it: If |ch( h)| = 2, then the vertices y and z are the only two children of 
+
+h. Therefore, h can clearly not be a parent of ˜Y or ˜Z ∪ v, that is, h / ∈ pa L( ˜Y ) ∩ pa L( ˜Z ∪ { v}). In case |ch( h)| = 3, then there might exist one child w ∈ ch( h) \ { y, z }. Because as previously argued ˜Y ∩ ( ˜Z ∪ { v}) = ∅, it follows that w cannot be an element of both ˜Y and ˜Z ∪ { v} simultaneously. Therefore, h / ∈ pa L( ˜Y ) ∩ pa L( ˜Z ∪ { v}) in the case |ch( h)| = 3 as well. Therefore, condition (ii) and hence the eLF-HTC are satisfied for ( ˜Y , ˜Z, (W˜z )˜z∈ ˜Z , ˜H). 
+
+## D.3 Proof of Theorem 5.3 
+
+Proof. This proof bears some similarity to the proof of Theorem 5.3 from Barber et al. (2022a) which itself is similar to the proof from Foygel et al. (2012a). We start by analyzing the complexity of the determinantal subprocedure. The multi-source multi-sink determinantal flow graph and corresponding max-flow problem can be (and is in practice) transformed to an equivalent single-source single-sink max-flow problem by adding a source node 
+
+s pointing to all previous sources, and a sink node t such that all previous sinks point to t and by giving s and t capacity ∞ and the newly introduced edges capacity 1. For this equivalent flow-graph, each max-flow computation has a computational complexity of at most O(( |V f |+rf )3) (e.g., Foygel et al. (2012a) or Section 26 in Cormen et al., 2022) where rf is the number of reciprocal edge pairs in the original (or equivalently transformed) determinantal flow-graph. Because |V f | = 2( |V | + |L| )41 and because in the transformed determinantal flow graph the number of reciprocal edge pairs is two times the number of reciprocal edge pairs in the original latent-factor graph, so rf = 2 r, it follows that the determinantal-flow-graph calculation has a time complexity of at most O(( |V | + |L| + r)3). In line 2 of the determinantal subprocedure, we iterate (at most) over all sets S ⊆ V and sets 
+
+T ⊆ V \ { v, w 0} where |S| = |T | + 1 = k for all possible sizes k = 1 , . . . , |V | − 1. Given that the number of subsets of V equals 2 |V |, it follows that there are at most O(2 |V |) individual checks of Theorem 4.3 for one w0 → v; if one is willing to only iterate over cS -many subsets, then there are at most O(cS ) individual checks of Theorem 4.3 for one w0 → v. As there are at most |V |-many observed parents of v, there are at most O(|V |2|V |) respectively O(|V |cS ) individual checks of Theorem 4.3 for a fixed target vertex v ∈ V , so for one call of the determinantal subprocedure. Finding descendants in a graph (condition (i) in Theorem 4.3) is of complexity at most O(|V |2)(by, for example, doing a breadth-first search (e.g., Section 22.2 in Cormen et al., 2022]) and thus, finding descendants is not of higher complexity than the max-flow computations. Therefore, the determinantal subprocedure has without any simplifying assumptions a time complexity of at most 
+
+O(|V |2|V |(|V | + |L| + r)3) and if one is just iterating over cS -many subsets, a time complexity of at most O(|V |cS (|V | + |L| + r)3). Now to the eLF-HTC subprocedure: For the for-loop starting in line 1 we iterate over all sets 
+
+H ⊆ L ≥4 ⊆ L . In general, there are O(2 |L| ) such iterations. However, as already argued in Barber et al. (2022a), under the assumption |H| ≤ cH , this number reduces to 
+
+> cH
+
+X
+
+> i=0
+
+|L ≥4|
+
+i
+
+
+
+= O(|L| cH ). (D.1) In line 2 of the eLF-HTC subprocedure we then iterate over all Z ⊆ ch( H) \ { v} ⊆ V such that 
+
+|Z| = |H|. It follows from an analogous calculation as in equation (D.1) that this for-loop in line 2 has at most O(2 |V |) iterations under no simplifying assumptions and O(|V |cH ) iterations under the simplifying assumptions from the theorem. In general, the for-loop over the ( Wz )z∈Z has at most 
+
+O(2 |V |2
+
+) iterations as each Wz has at most O(2 |V |) supersets and as |Z| ≤ | V |. If one just takes as the Wz the set of already rationally identified observed parents of z, then this for-loop in line 3 “disappears” and hence has O(1) iterations. Therefore, there are at most O(2 |L| 2|V |2+|V |) max-flow calculations in each call of the eLF-HTC subprocedure when no simplifying assumptions are made. With the simplifying assumptions from the theorem, there are at most O(|L| cH |V |cH ) max-flow calculations in each call of the eLF-HTC subprocedure. From an analogous argument as for the determinantal subprocedure, each max-flow computation has time complexity at most O(( |V | + |L| + r)3). Each htr H -calculation can be done by, e.g., a breadth-first search yielding a complexity of at most O(|V | + |L| + |D|) (e.g., Section 22.2 in Cormen et al., 2022) and thus of at most O(|L|| V |2) (and hence not of higher complexity than the max-flow computations) because |D| = |DV | + |DLV | ≤ | V |2 + |L|| V | ≤ 2|L|| V |2 and because |L| ≤ |L|| V |2. The other required basic set operations and finding parents is not of higher time complexity. Hence, each eLF-HTC subprocedure call has a time complexity of at most 
+
+O(2 |L| 2|V |2+|V |(|V | + |L| + r)3) when no simplifying assumptions are made and O(|L| cH |V |cH (|V | +
+
+|L| + r)3) with the simplifying assumptions. Together, one call of the eLF-HTC subprocedure and one call of the determinantal subprocedure thus have a time complexity of O(2 |L| 2|V |2+|V |(|V | + |L| + r)3) with no simplifying assumptions and O(cS |L| cH |V |cH (|V | + |L| + r)3) with the simplifying assumptions. Now to the combined algorithm (Algorithm 1): Note that we run the repeat-loop in each call of Algorithm 1 at most |V |2 times. To see this fact, note that this repeat loop only does another 42 repetition if a further edge is added to Sedges , otherwise the algorithm terminates. Therefore, after at most |V |2-many repetitions of the repeat-loop in line 1 of Algorithm 1, either all edges have been added to Sedges or Algorithm 1 has terminated. Next, the for-loop in line 3 of Algorithm 1 is executed at most |V |-times within each repeat-loop iteration as there are at most |V | unsolved nodes. At the last level in the recursion tree, the for-loop in line 17 is not executed at all. Without this execution of the for-loop in line 17, the combined identification algorithm thus has a complexity of at most O(|V |32|L| 2|V |2+|V |(|V | + |L| + r)3) when no simplifying assumptions are made and O(cS |L| cH |V |cH +3 (|V | + |L| + r)3) with the simplifying assumptions. Now, for any recursion level above, note that the complexity(-bound) of the for-loop in line 3 is negligible relative to the complexity(-bound) of calling another instance of the combined algorithm. Writing A0 for the initial call of the combined identification algorithm and 
+
+Ai to represent any call with i edges deleted from GL, we have that Time Complexity Bound( Ai) ≤ | V |4Time Complexity Bound( Ai+1 )as the repeat-loop in each call of Algorithm 1 is executed at most |V |2-times and as the for-loop in line 17 of Algorithm 1 is called at most |DV | ≤ | V |2-times in each repeat-loop-iteration. As at most |DV | ≤ | V |2-edges can be deleted from GL, we obtain that Algorithm 1 has a time complexity of O(|V |4|V |2+3 2|L| 2|V |2+|V |(|V | + |L| + r)3) with no simplifying assumptions and O(cS
+
+|L| cH |V |4crec +cH +3 (|V | + |L| + r)3) with the simplifying assumptions. 
+
+# E Appendix to Section 6 
+
+In this section, we present extensions of Tables 1 and 2 from Section 6. In particular, we consider different combinations of the individual identification results in order to investigate each’s contri-bution. The ”No Wz -loop”-column is the algorithm including the determinantal and eLF-HTC subprocedure and the recursive subgraph result with the additional simplification for the for-loop over the Wz ’s as explained in Theorem 5.3 in Section 5. Similarly, the ≤ 10-, ≤ 100- and ≤ 500-columns refer to the algorithm including the determinantal and eLF-HTC subprocedure and the recursive subgraph result with the additional simplification of limiting the number of pairs S, T in the determinantal subprocedure as explained in Section 5. In Figure 7, we also present the me-dian runtimes for each latent structure and for each |DV |. In Section 6, we discuss some findings regarding these tables and figures. 
+
+References 
+
+Ankur Ankan, Inge Wortel, Kenneth Bollen, and Johannes Textor. Combining graphical and al-gebraic approaches for parameter identification in latent variable structural equation models. In 
+
+International Conference on Artificial Intelligence and Statistics , pages 7252–7264. PMLR, 2023. Mark A. Armstrong. Basic Topology . Springer Science & Business Media New York, New York, NY, USA, 1983. Rina Foygel Barber, Mathias Drton, Nils Sturma, and Luca Weihs. Half-trek criterion for identifi-ability of latent variable models. The Annals of Statistics , 50(6):3174–3196, 2022a. 43 Figure 7: Median runtimes: 1 latent node (left), 2 latent nodes (right). For better distinguisha-bility: For the left plot and |DV | = 9, the lines from top to bottom are: Det+LFHTC+rec, Det+rec, Wz loop simple, Det+eLFHTC+rec (essentially located under the Wz loop simple-line), Det ≤500, Det, Det+LFHTC, Det+eLFHTC, Det ≤100, Det ≤10, eLFHTC+rec, eLFHTC, LFHTC+rec, LFHTC. For the right plot and |DV | = 6, the lines from top to bottom are: Det+rec, Det+LFHTC+rec, Wz loop simple, Det+eLFHTC+rec (essentially located under the Wz loop simple-line), Det ≤500, Det ≤100, Det+LFHTC, Det ≤10, eLFHTC+rec, LFHTC+rec, eLFHTC, LFHTC. Rina Foygel Barber, Mathias Drton, Nils Sturma, and Luca Weihs. Supplement to “Half-trek criterion for identifiability of latent variable models”, 2022b. URL https://doi.org/10.1214/ 22-AOS2221SUPP .Rina Foygel Barber, Mathias Drton, Luca Weihs, and Nils Sturma. SEMID: Identifiability of Linear Structural Equation Models , 2025. URL https://CRAN.R-project.org/package=SEMID . Rpackage version 0.4.2. Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest, and Clifford Stein. Introduction to Algorithms . The MIT Press, Cambridge, MA, USA; London, UK, 3rd edition, 2022. David Cox, John Little, and Donal O’shea. Ideals, Varieties, and Algorithms . Undergraduate Texts in Mathematics. Springer International Publishing AG Switzerland, Cham, Switzerland; Heidelberg, Germany; New York, NY; USA, 4th edition, 2015. Xinshuai Dong, Ignavier Ng, Biwei Huang, Yuewen Sun, Songyao Jin, Roberto Legaspi, Peter Spirtes, and Kun Zhang. On the parameter identifiability of partially observed linear causal models. In Advances in Neural Information Processing Systems , volume 37, pages 30740–30771, Red Hook, NY, USA, 2024. Curran Associates, Inc. Mathias Drton. Algebraic problems in structural equation modeling. In The 50th anniversary of Gr¨ obner bases , volume 77 of Adv. Stud. Pure Math. , pages 35–86. Math. Soc. Japan, Tokyo, 2018. Mathias Drton, Rina Foygel, and Seth Sullivant. Global identifiability of linear structural equation models. The Annals of Statistics , pages 865–886, 2011. 44 |DV | Total Rationally Det Det + rec LF-HTC LF-HTC + rec Det + LF-HTC 0 1 1 1 1 1 1 11 1 1 1 1 1 1 12 4 4 4 4 4 4 43 13 13 13 13 13 13 13 4 51 51 45 51 50 50 51 5 163 159 104 159 134 134 159 6 407 398 168 397 250 250 398 7 796 747 168 737 234 234 739 8 1169 956 89 911 64 64 882 9 1291 631 11 550 4 4 434                                                                                                                                                       
+
+> |DV|Total Rationally Det + LF-HTC + rec eLF-HTC eLF-HTC + rec Det + eLF-HTC Det + eLF-HTC + rec 011111111111111124444444313 13 13 13 13 13 13 451 51 51 51 51 51 51 5163 159 159 154 154 159 159 6407 398 398 372 372 398 398 7796 747 742 642 649 743 743 81169 956 926 669 714 922 938 91291 631 566 300 377 556 606
+> |DV|Total Rationally No Wz-loop ≤10 ≤100 ≤500 011111111111112444444313 13 13 13 13 13 451 51 51 51 51 51 5163 159 159 154 157 159 6407 398 398 378 393 395 7796 747 743 670 711 738 81169 956 938 771 864 929 91291 631 606 425 494 589
+
+Table 3: Extended version of Table 1. Hossein Estiri. Building and household X-factors and energy consumption at the residential sector: A structural equation analysis of the effects of household and building characteristics on the annual energy consumption of us residential buildings. Energy Economics , 43:178–184, 2014. Lester R. Ford Jr. and Delbert R. Fulkerson. Maximal flow through a network. Canadian Journal of Mathematics , 8:399–404, 1956. Rina Foygel, Jan Draisma, and Mathias Drton. Half-trek criterion for generic identifiability of linear structural equation models. The Annals of Statistics , 40(3):1682–1713, 2012a. Rina Foygel, Jan Draisma, and Mathias Drton. Supplement to ”Half-trek criterion for generic identifiability of linear structural equation models”, 2012b. URL http://dx.doi.org/10.1214 /12-AOS1012SUPP .Luis D. Garcia-Puente, Sarah Spielvogel, and Seth Sullivant. Identifying causal effects with com-puter algebra. In Proceedings of the Twenty-Sixth Conference on Uncertainty in Artificial Intel-ligence (UAI) , Arlington, VA, USA, 2010. AUAI Press. Leonard Henckel, Emilija Perkovi´ c, and Marloes H. Maathuis. Graphical criteria for efficient total effect estimation via adjustment in causal linear models. Journal of the Royal Statistical Society Series B: Statistical Methodology , 84(2):579–599, 2022. 45 |DV | Total Rationally Det Det + rec LF-HTC LF-HTC + rec Det + LF-HTC 0 1 1 1 1 1 1 11 8 6 6 6 6 6 62 63 45 43 45 43 43 45 3 391 255 238 255 236 236 255 4 1983 1171 882 1164 1018 1018 1163 5 7570 3898 1789 3742 3028 3028 3691 6 21,029 8960 1882 7704 5861 5861 7783                                                                                                                
+
+> |DV|Total Rationally Det + LF-HTC + rec eLF-HTC eLF-HTC + rec Det + eLF-HTC Det + eLF-HTC + rec 0111111118666666263 45 45 45 45 45 45 3391 255 255 254 254 255 255 41983 1171 1166 1140 1146 1166 1168 57570 3898 3827 3601 3642 3819 3850 621,029 8960 8557 7563 7750 8449 8675
+> |DV|Total Rationally No Wz-loop ≤10 ≤100 ≤500 01111111866666263 45 45 45 45 45 3391 255 255 254 255 255 41983 1171 1166 1149 1160 1167 57570 3898 3832 3670 3766 3839 621029 8960 8589 7882 8278 8617
+
+Table 4: Extended version of Table 2. Leonard Henckel, Martin Buttenschoen, and Marloes H. Maathuis. Graphical tools for selecting conditional instrumental sets. Biometrika , 111(3):771–788, 2024. Tom Hochsprung, Jakob Runge, and Andreas Gerhardus. Using time structure to estimate causal effects. arXiv preprint arXiv:2504.11076 , 2025. Yimin Huang and Marco Valtorta. Identifiability in causal bayesian networks: A sound and complete algorithm. In Proceedings of the 21st National Conference on Artificial Intelligence (AAAI) ,volume 2, pages 1149–1154, Menlo Park, CA, USA; Cambridge, MA, USA; London, UK, 2006a. AAAI Press / The MIT Press. Yimin Huang and Marco Valtorta. Pearl’s calculus of intervention is complete. In Proceedings of the Twenty-Second Conference on Uncertainty in Artificial Intelligence (UAI) , pages 217–224, Arlington, VA, USA, 2006b. AUAI Press. Dung T. Huynh. A superexponential lower bound for Gr¨ obner bases and Church-Rosser commuta-tive thue systems. Information and Control , 68(1–3):196–206, 1986. S. Karatasou and M. Santamouris. Socio-economic status and residential energy consumption: A latent variable approach. Energy and Buildings , 198:100–105, 2019. Manabu Kuroki and Judea Pearl. Measurement bias and effect restoration in causal inference. 
+
+Biometrika , 101(2):423–437, 2014. Steffen L. Lauritzen. Graphical Models . Clarendon Press, Oxford, UK, 1996. Sanghack Lee and Elias Bareinboim. Causal identification with matrix equations. In Advances in Neural Information Processing Systems (NeurIPS) , volume 34, pages 9468–9479, Red Hook, NY, USA, 2021. Curran Associates, Inc. 46 Dennis Leung, Mathias Drton, and Hisayuki Hara. Identifiability of directed Gaussian graphical models with one latent source. Electronic Journal of Statistics , 10(1):394–422, 2016. Ernst W. Mayr. Some complexity results for polynomial ideals. Journal of Complexity , 13(3): 303–325, 1997. Wang Miao, Zhi Geng, and Eric J. Tchetgen Tchetgen. Identifying causal effects with proxy variables of an unmeasured confounder. Biometrika , 105(4):987–993, 2018. Masashi Okamoto. Distinctness of the eigenvalues of a quadratic form in a multivariate sample. 
+
+The Annals of Statistics , 1(4):763–765, 1973. Judea Pearl. Causality . Cambridge University Press, Cambridge, UK, 2nd edition, 2009. R Core Team. R: A Language and Environment for Statistical Computing . R Foundation for Statistical Computing, Vienna, Austria, 2025. URL https://www.R-project.org/ .Jakob Runge. Necessary and sufficient graphical conditions for optimal adjustment sets in causal graphical models with hidden variables. In Proceedings of the 35th International Conference on Neural Information Processing Systems , pages 15762–15773, Red Hook, NY, USA, 2021. Curran Associates, Inc. Jakob Runge, Andreas Gerhardus, Gherardo Varando, Veronika Eyring, and Gustau Camps-Valls. Causal inference for time series. Nature Reviews Earth & Environment , 4(7):487–505, 2023. Ilya Shpitser and Judea Pearl. Identification of conditional interventional distributions. In Pro-ceedings of the Twenty-Second Conference on Uncertainty in Artificial Intelligence (UAI) , pages 437–444, Arlington, VA, USA, 2006a. AUAI Press. Ilya Shpitser and Judea Pearl. Identification of joint interventional distributions in recursive semi-Markovian causal models. In Proceedings of the 21st National Conference on Artificial Intelligence (AAAI) , volume 2, pages 1219–1226, Menlo Park, CA, USA; Cambridge, MA, USA; London, UK, 2006b. AAAI Press / The MIT Press. Ilya Shpitser and Eli Sherman. Identification of personalized effects associated with causal pathways. In Proceedings of the Thirty-Fourth Conference on Uncertainty in Artificial Intelligence (UAI) ,volume 2018, pages 198–208, USA, 2018. PMLR. Ilya Shpitser, Zach Wood-Doughty, and Eric J. Tchetgen Tchetgen. The proximal ID algorithm. 
+
+Journal of Machine Learning Research , 24(188):1–46, 2023. Peter Spirtes, Clark N. Glymour, and Richard Scheines. Causation, Prediction, and Search . The MIT press, Cambridge, MA, USA; London, UK, 2nd edition, 2000. Elena Stanghellini and Nanny Wermuth. On the identification of path analysis models with one hidden variable. Biometrika , 92(2):337–350, 2005. Nils Sturma and Mathias Drton. Trek-based parameter identification for linear causal models with arbitrarily structured latent variables. arXiv preprint arXiv:2507.18170 , 2025. Seth Sullivant, Kelli Talaska, and Jan Draisma. Trek separation for Gaussian graphical models. 
+
+The Annals of Statistics , 38(3):1665–1685, 2010. 47 Eric J. Tchetgen Tchetgen, Andrew Ying, Yifan Cui, Xu Shi, and Wang Miao. An introduction to proximal causal learning. Statistical Science , 39(3), 2024. Jin Tian and Judea Pearl. A general identification condition for causal effects. In Proceedings of the Eighteent National Conference on Artificial Intelligence (AAAI) , pages 567–573, Menlo Park, CA, USA; Cambridge, MA, USA; London, UK, 2002a. AAAI Press / The MIT Press. Jin Tian and Judea Pearl. On the testable implications of causal models with hidden variables. In Proceedings of the Eighteenth Conference on Uncertainty in Artificial Intelligence (UAI) , San Francisco, CA, USA, 2002b. Jin Tian and Judea Pearl. On the identification of causal effects. Technical Report R-290-L, 
+
+ht tp s: // ft p. cs .u cl a. ed u/ pu b/ st at \_ se r/ R2 90 -L .p df , 2003. Benito Van der Zander, Maciej Li´ skiewicz, and Johannes Textor. Efficiently finding conditional instruments for causal inference. In Proceedings of the Twenty-Fourth International Joint Con-ference on Artificial Intelligence (IJCAI) , pages 3243–3249, Palo Alto, CA, USA, 2015. AAAI Press. Luca Weihs, Bill Robinson, Emilie Dufresne, Jennifer Kenkel, Kaie Kubjas, Reginald McGee II, Nhan Nguyen, Elina Robeva, and Mathias Drton. Determinantal generalizations of instrumental variables. Journal of Causal Inference , 6(1), 2018. Sewall Wright. Correlation and causation. Journal of Agricultural Research , 20(7):557, 1921. Sewall Wright. The method of path coefficients. The Annals of Mathematical Statistics , 5(3): 161–215, 1934. 48

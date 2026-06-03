@@ -1,0 +1,1598 @@
+Title: Quotient DAGs for Off-Policy Evaluation:Forward-Flow Importance Sampling and Exact Slate Propensities
+
+URL Source: https://arxiv.org/pdf/2605.29500v1
+
+Published Time: Fri, 29 May 2026 00:47:00 GMT
+
+Number of Pages: 31
+
+Markdown Content:
+# Quotient DAGs for Off-Policy Evaluation: Forward-Flow Importance Sampling and Exact Slate Propensities 
+
+Ziwen Xie ∗
+
+Shanghai Jiao Tong University 
+
+shuji888@sjtu.edu.cn 
+
+Shaowen Xiang ∗
+
+Shanghai Jiao Tong University 
+
+starryspace@sjtu.edu.cn 
+
+Hongyu He 
+
+National University of Singapore 
+
+hongyu.h@nus.edu.sg 
+
+Dianbo Liu †
+
+National University of Singapore 
+
+dianbo@nus.edu.sg 
+
+# Abstract 
+
+Off-policy evaluation estimates how a target policy would perform using data col-lected by a different behavior policy, which is crucial when online testing is costly or risky, such as in recommendation or healthcare. Standard importance sampling reweights each logged trajectory, but it can treat details of the generation process as meaningful even when the evaluation target ignores them: for example, an autore-gressive slate recommender may generate an ordered sequence of items while the reward and downstream estimator depend only on the unordered slate. This creates nuisance variance and a computational gap, since exact unordered slate propensities require summing over all generation orders. We introduce a quotient-DAG view that merges histories equivalent for evaluation and assigns weights using target-to-behavior forward-flow ratios on the merged graph. For slate recommendation under a set-sufficient next-item interface, this yields Forward-DP, a subset-DAG dynamic program that computes exact unordered propensities without factorial enumeration. The resulting propensity primitive enables practical propensity-based evaluation and model selection for context-dependent autoregressive slate loggers. 
+
+# 1 Introduction 
+
+Reinforcement learning is widely used for sequential decision policies in recommendation, clinical treatment, and public-sector resource allocation. In many such settings, deploying a new policy directly is expensive or unsafe: a candidate sepsis-treatment protocol, for instance, cannot be tested on ICU patients merely to see whether it improves outcomes. Off-policy evaluation (OPE) addresses this problem by estimating the value of a target policy from data logged under a different behavior policy. Importance sampling (IS), the canonical unbiased OPE estimator, reweights each logged trajectory by a product of target-to-behavior action-probability ratios, but these products can vary by orders of magnitude as horizon and policy mismatch grow. This work starts from the observation, illustrated in Figure 1, that the rollout tree can be a finer representation than the evaluation problem requires. A logged trajectory is one path through the tree, and trajectory IS assigns a likelihood ratio to that particular path. Yet the tree may contain history prefixes that are equivalent for the relevant continuation or evaluation target. We quotient the rollout tree by such an equivalence relation, collapsing equivalent prefixes into nodes of a layered directed acyclic graph (DAG). On this quotient DAG, the probability mass reaching a node under 
+
+> ∗Equal contribution.
+> †Corresponding author. Preprint.
+> arXiv:2605.29500v1 [cs.LG] 28 May 2026
+
+Figure 1: From trajectory IS to quotient-DAG weighting. (a) Trajectory IS assigns a likelihood ratio to each realized path. (b) The rollout tree shares prefixes but still represents distinct history-prefix nodes, even with repeated state labels. (c) A quotient DAG merges evaluation-equivalent prefixes into multi-parent nodes such as z4. The quotient likelihood ratio is the forward-flow ratio 
+
+Fπ (z)/F β (z), not any single path ratio. each policy defines its forward flow, and the appropriate likelihood ratio is the target-to-behavior flow ratio Fπ (z)/F β (z). Per-decision IS, marginalized IS, and known-abstraction MIS are special cases of this construction, corresponding to different choices of equivalence relation. Our main concrete instantiation is slate recommendation, where modern slate generators often construct slates autoregressively, exposing per-step probabilities along one realized ordering. Yet slate rewards and propensity-consuming slate-OPE estimators may depend only on the unordered slate. This creates a joint-propensity gap: the logger exposes an ordering probability, while the estimator requires the total probability of the unordered slate. Computing this quantity exactly requires summing over all generation orders, and fixed-score Plackett–Luce expressions no longer apply once the next-item softmax depends on the partial slate. In this paper, we formulate the quotient-space likelihood ratio as a forward-flow ratio and use it to construct forward-flow IS estimators. For terminal quotient-measurable returns, this gives an exact variance-gap expression that identifies the within-class likelihood-ratio variation removed by quotient weighting. For autoregressive slate generation, when the per-step distribution depends only on the context and the set of items already picked, forward flow on the subset DAG computes the exact unordered slate propensity in time polynomial in the catalog size and exponential in the slate size. This closes the joint-propensity computational gap for context-dependent set-sufficient loggers. We evaluate the resulting estimators on finite-horizon MDP benchmarks and use KuaiRec slate experiments to test the Forward-DP propensity primitive in downstream OPE and model selection. 
+
+# 2 Problem setup 
+
+Off-policy evaluation. We consider off-policy evaluation (OPE) of a target policy π from data logged under a behavior policy β. The environment is a finite-horizon MDP M =(S, A, P, R, d 0, γ, H ). A trajectory τ = ( s1, a 1, r 1, . . . , s H , a H , r H ) is generated by s1 ∼ d0,
+
+at ∼ π(· | st), rt ∼ R(st, a t), and st+1 ∼ P (· | st, a t) for t < H . The discounted return is 
+
+J(τ ) = PHt=1 γt−1rt, and the policy value is V (π) = Eπ [J(τ )] .Given logged trajectories D = {τ (i)}Ni=1 ∼ β, define the per-step ratio ρt(τ ) = π(at | st)/β (at | st)
+
+and ρ1: t(τ ) = Qtt′=1 ρt′ (τ ). The trajectory-level importance sampling estimator is 
+
+bVIS (π) = 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+ρ1: H (τ (i))J(τ (i)), (1) which is unbiased under the standard support condition that the target trajectory distribution is absolutely continuous with respect to the behavior trajectory distribution [Precup et al., 2000]. The self-normalized variant bVWIS (π) = P 
+
+> i
+
+wiJ(τ (i))/ P 
+
+> i
+
+wi with wi = ρ1: H (τ (i)) trades finite-sample unbiasedness for typically lower variance [Mahmood et al., 2014]. 
+
+Slate OPE. The slate setting is a contextual combinatorial bandit at the evaluation level. A context 
+
+x ∼ pX is observed, a candidate pool [M ] = {1, . . . , M } is available, and the policy selects a size-K
+
+2slate S ⊆ [M ] with |S| = K. We assume the evaluation reward is a set function r(x, S ), invariant to the generation order of the slate. The value of a slate policy is 
+
+V (π) = Ex∼pX , S ∼π(·| x)[r(x, S )] .
+
+Although evaluation is slate-level, the logger may generate S autoregressively as an ordered sequence 
+
+σ = ( σ1, . . . , σ K ) with S = {σ1, . . . , σ K }. Let h<t = ( σ1, . . . , σ t−1) be the ordered prefix and 
+
+S<t = {σ1, . . . , σ t−1} the picked set. For a slate policy μ ∈ { β, π },
+
+μ(σ | x) = 
+
+> K
+
+Y
+
+> t=1
+
+μ(σt | x, h <t ). (2) 
+
+Definition 1 (Set-sufficient slate policy) . A slate policy μ is set-sufficient if, for every context x, step 
+
+t, item a, and any two ordered prefixes h<t and h′ 
+
+> <t
+
+with the same picked set S<t ,
+
+μ(a | x, h <t ) = μ(a | x, h ′
+
+> <t
+
+) for all a / ∈ S<t . (3) 
+
+We write this common value as μ(a | x, S <t ).
+
+Our exact subset-DAG construction assumes that the behavior policy β and every target policy under evaluation are set-sufficient. Under set-sufficiency, an autoregressive Plackett–Luce policy can be written as 
+
+μθ (a | x, S <t ) = exp( ℓθ (a; prompt( x, S <t )) /T temp )
+
+P  
+
+> a′/∈S<t
+
+exp( ℓθ (a′; prompt( x, S <t )) /T temp ) , (4) where prompt( x, S <t ) is the model’s input encoding of the context x together with the picked set 
+
+S<t , ℓθ (a; ·) is the model’s logit for item a, and Ttemp > 0 is the sampling temperature. 
+
+Scope of set-sufficiency. Set-sufficiency is imposed on the slate-generation interface, not on the architecture alone. It holds for score-then-mask deployments in which a model scores the remaining candidates and previously selected items affect future choices only through the exclusion mask; this is the canonical slate-generation lift adopted in practice for SASRec, BERT4Rec, and NeuralPGRank-style neural rankers [Kang and McAuley, 2018, Sun et al., 2019, Gao et al., 2023]. For prompt-based LLM rerankers, we enforce the same interface by presenting the picked set in a canonical order (§4.3). Models that autoregressively condition on the emitted order of previous items fall outside this assumption unless their prefix representation is canonicalized, which changes the deployed policy by removing ordering information [Geng et al., 2022, Cui et al., 2022, Sun et al., 2023]. The induced unordered-slate propensity is 
+
+μ(S | x) = X
+
+> σ∈perm( S)
+
+μ(σ | x), (5) a sum over all K! orderings of S. Slate-OPE estimators assume access to this quantity for both β and 
+
+π [Swaminathan et al., 2017, Vlassis et al., 2021, Kiyohara et al., 2023, 2024, Shimizu et al., 2024]. The logged slate dataset is D = {(xn, S n, R n)}Nn=1 , with xn ∼ pX , Sn ∼ β(· | xn), and E[Rn |
+
+xn, S n] = r(xn, S n). The slate-level IS estimator is 
+
+bVslate (π) = 1
+
+N
+
+> N
+
+X
+
+> n=1
+
+π(Sn | xn)
+
+β(Sn | xn) Rn, (6) which is unbiased under the slate-level support condition β(S | x) > 0 whenever π(S | x) > 0 for 
+
+pX -almost every x. Its self-normalized variant estimates P 
+
+> n
+
+wnRn/ P 
+
+> n
+
+wn with wn = π(Sn |
+
+xn)/β (Sn | xn), trading finite-sample unbiasedness for typically lower variance. The doubly-robust (DR) variant adds a control variate br(x, S ) to the IS residual; with exact propensities and a fixed or independently fitted baseline, DR is unbiased and can reduce variance when br tracks the reward [Dudík et al., 2011, Jiang and Li, 2016, Thomas and Brunskill, 2016]. 33 Method 
+
+We formulate IS on the rollout tree of history prefixes and then quotient this tree by equivalence classes that are sufficient for evaluation. Pushing both the target and behavior measures through the quotient map gives a coarser sample space on which the correct likelihood ratio is the ratio of forward flows, Fπ (z)/F β (z), rather than the likelihood ratio of any single realized path. This is a graph-structured specialization of conditional IS [Rowland et al., 2020, Liu et al., 2020]: the identity history quotient gives per-decision IS, the state–time quotient gives finite-horizon marginalized IS [Xie et al., 2019, Liu et al., 2020], and sufficient abstract-state quotients recover known-abstraction MIS [Pavse and Hanna, 2023]. Our main algorithmic use of this view is autoregressive slate OPE. When the next-item distribution depends on the context and picked set but not on the order of the picked prefix, the permutation quotient is the subset DAG. Forward-DP computes the exact unordered-slate propensity of a logged slate in O(( M + K) · 2K ) time, avoiding the K! enumeration over generation orders. 
+
+3.1 Quotient likelihood ratios and forward-flow IS Rollout tree. At decision step t, define the pre-action history 
+
+ht = ( s1, a 1, r 1, . . . , s t−1, a t−1, r t−1, s t), t = 1 , . . . , H, 
+
+with h1 = s1. The rollout tree has one node for each such history; an edge from ht to ht+1 
+
+corresponds to drawing at, observing rt, and transitioning to st+1 . Trajectory IS assigns a likelihood ratio to the sampled root-to-leaf path. 
+
+Sufficient quotient. We quotient the rollout tree by an equivalence relation on pre-action histories. 
+
+Definition 2 (Sufficient equivalence) . An equivalence relation ∼ on pre-action histories is sufficient 
+
+if, for every layer t, every pair ht ∼ h′
+
+> t
+
+, and every policy μ ∈ { β, π }, the conditional distribution under μ of the continuation 
+
+(at, r t, s t+1 , a t+1 , r t+1 , . . . , s H , a H , r H )
+
+given ht is the same as that given h′
+
+> t
+
+.
+
+Let Zt be the layer-t equivalence classes and zt(ht) = [ ht]. The quotient is a layered DAG whose nodes are classes z ∈ Zt, with an edge z → z′ whenever some history in z can transition to a history in z′. Sufficiency makes the quotient-level transition probability Pμ(z′ | z) well defined. 
+
+Forward flow. For policy μ ∈ { β, π }, the forward flow into a quotient node z ∈ Zt is 
+
+Fμ(z) = X
+
+> ht∈z
+
+Pμ(ht) = Pμ[zt = z], (7) with recursion 
+
+Fμ(z′) = X 
+
+> z∈Zt:z→z′
+
+Fμ(z)Pμ(z′ | z), z′ ∈ Zt+1 . (8) Thus, given the quotient DAG and quotient transitions, all flows are computed by a single forward sweep. 
+
+Proposition 3 (Quotient likelihood ratio) . Fix a layer t and assume the history-level support condition 
+
+P Ht 
+
+> π
+
+≪ P Ht 
+
+> β
+
+, that is, Pβ (ht) = 0 implies Pπ (ht) = 0 for all pre-action histories ht, so that the prefix ratio ρ1: t−1 = dP Ht 
+
+> π
+
+/dP Ht 
+
+> β
+
+is well-defined Pβ -a.s. Let P Zμ,t denote the pushforward of the policy-induced distribution over ht under zt. Then P Zπ,t ≪ P Zβ,t and 
+
+dP Zπ,t 
+
+dP Zβ,t 
+
+(z) = Fπ (z)
+
+Fβ (z) . (9) 
+
+Equivalently, for every class z with Fβ (z) > 0,
+
+Eβ [ρ1: t−1(τ ) | zt(τ ) = z] = Fπ (z)
+
+Fβ (z) , (10) 
+
+with ρ1:0 ≡ 1.
+
+4The proof is the standard pushforward likelihood-ratio identity and is given in Appendix A.1. Equation (10) is the link to conditional and marginalized IS: different quotients recover per-decision IS, state– time MIS, and known-abstraction MIS. The distinction here is that the conditioning variable is represented as a history-prefix quotient with a computable forward flow. 
+
+Forward-flow IS. For general finite-horizon OPE, we use this quotient ratio in the per-decision estimator. Under sufficiency, the current action distribution is class-measurable, so 
+
+ρt(zt, a t) = π(at | zt)
+
+β(at | zt) .
+
+Forward-Flow IS replaces the sampled prefix ratio in PDIS by the quotient likelihood ratio: 
+
+bVFF (π) = 1
+
+N
+
+> N
+
+X
+
+> i=1
+> H
+
+X
+
+> t=1
+
+γt−1 Fπ (z(i) 
+
+> t
+
+)
+
+Fβ (z(i) 
+
+> t
+
+) ρt(z(i) 
+
+> t
+
+, a (i) 
+
+> t
+
+)r(i) 
+
+> t
+
+. (11) Each summand replaces the history-prefix ratio by its conditional expectation within the quotient class, while keeping the current action correction explicit. Hence FF-IS is unbiased under the usual support condition for PDIS, and each per-decision summand has no larger variance than its PDIS counterpart. This is only a per-term statement; it does not imply a full-estimator variance ordering for arbitrary multi-step returns because cross-time covariance terms may change. 
+
+Terminal quotient and variance gap. A full Rao–Blackwell variance comparison is available when the return is measurable with respect to a terminal quotient. Let q be a terminal quotient map, such as q = zH or, for slate OPE, q(τ ) = S. Suppose G(τ ) = g(q(τ )) , and define 
+
+w(q) = dP qπ
+
+dP qβ
+
+(q) = Fπ (q)
+
+Fβ (q) .
+
+The terminal forward-flow estimator is 
+
+bVFF -terminal (π) = 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+w(q(τ (i))) g(q(τ (i))) . (12) 
+
+Proposition 4 (Exact variance gap on a quotient) . If G(τ ) = g(q(τ )) is quotient-measurable, then 
+
+Var β (ρ(τ )G(τ )) − Var β (w(q(τ )) g(q(τ ))) = Eβ
+
+g(q(τ )) 2Var β (ρ(τ ) | q(τ ))  . (13) 
+
+For a finite quotient space, this equals 
+
+X
+
+> z
+
+Fβ (z)g(z)2w(z)2χ2(Pπ (· | z) ∥ Pβ (· | z)) . (14) The proof is in Appendix A.3. This result identifies what terminal forward-flow weighting removes: the within-class target–behavior mismatch. Slate OPE with generation-order-invariant rewards is the main instance of this terminal quotient. 
+
+3.2 Slate instantiation: subset DAG and Forward-DP 
+
+The slate setting of §2 is a contextual bandit at the evaluation level, but an autoregressive logger unfolds it into a K-step tree over ordered item prefixes. Under set-sufficiency (Definition 1), two ordered prefixes are equivalent whenever they contain the same picked set. The permutation quotient is therefore the subset DAG: depth-ℓ nodes are subsets S ⊆ [M ] with |S| = ℓ, and edges append one unpicked item. For a single logged slate SK , only the rooted sub-DAG over subsets of SK is needed, containing 2K nodes rather than K! ordered paths. 
+
+Forward-DP. For policy μ and context x, define the forward flow on subsets of a target slate by 
+
+F xμ (S) = 
+
+(1, S = ∅,
+
+P 
+
+> a∈S
+
+F xμ (S \ { a})μ(a | x, S \ { a}), |S| ≥ 1. (15) 5Algorithm 1 Forward-DP for one joint slate propensity 
+
+Require: Slate SK ⊆ [M ], |SK | = K; context x; set-sufficient policy μ
+
+Ensure: F xμ (SK ) = μ(SK | x) 
+
+> 1:
+
+F xμ (∅) ← 1 
+
+> 2:
+
+for t = 1 , . . . , K do  
+
+> 3:
+
+for each S ⊆ SK with |S| = t do  
+
+> 4:
+
+F xμ (S) ← P 
+
+> a∈S
+
+F xμ (S \ { a})μ(a | x, S \ { a}) 
+
+> 5:
+
+end for  
+
+> 6:
+
+end for  
+
+> 7:
+
+return F xμ (SK )
+
+Proposition 5 (Forward flow equals joint slate propensity) . If μ is set-sufficient, then F xμ (S) = μ(S |
+
+x) for every S ⊆ [M ] with |S| ≤ K.
+
+The proof, given in Appendix A.4, partitions the orderings of S by their last selected item. Thus, for slate OPE, the terminal forward-flow estimator becomes 
+
+bVDAG (π) = 1
+
+N
+
+> N
+
+X
+
+> n=1
+
+F xn 
+
+> π
+
+(Sn)
+
+F xn 
+
+> β
+
+(Sn) Rn. (16) By Proposition 5, this is exactly the slate-level IS estimator with the otherwise intractable joint propensities computed by forward flow. Self-normalized and doubly robust variants replace the same slate-level ratio by F xn 
+
+> π
+
+(Sn)/F xn 
+
+> β
+
+(Sn).
+
+Ordering-nuisance variance gap. The terminal variance gap has a direct slate interpretation. Sup-pose the reward distribution depends on (x, S ) but not on the generation ordering, and is conditionally independent of the ordering given (x, S ). Let 
+
+W (x, S ) = π(S | x)
+
+β(S | x) = F xπ (S)
+
+F xβ (S) .
+
+Then replacing trajectory IS over orderings by DAG-IS removes 
+
+Ex∼pX ,S ∼β(·| x)
+
+E[R2 | x, S ] W (x, S )2χ2(π(· | x, S ) ∥ β(· | x, S ))  , (17) where π(· | x, S ) and β(· | x, S ) are the conditional distributions over the K! orderings of the same unordered slate. The gap is exactly the ordering-nuisance variance: it is large when target and behavior agree on the unordered slate only after averaging over substantially different generation orders. 
+
+Algorithm and complexity. Algorithm 1 computes F xμ (SK ) by visiting all subsets of the logged slate in increasing size. The rooted sub-DAG has 2K nodes. If the normalized transition probabilities μ(a | x, S ) are already available, the arithmetic cost is O(K · 2K ) and memory is O(2 K ). For an autoregressive transformer logger, obtaining μ(· | x, S ) requires one next-item softmax over the remaining catalog per queried subset, giving 
+
+O(( M + K) · 2K )
+
+time, dominated by O(M · 2K ) when M ≳ K.
+
+Proposition 6 (Subset-query lower bound) . Fix M > K and a target slate SK ⊆ [M ] with 
+
+|SK | = K. Any deterministic algorithm that exactly computes μ(SK | x) for all set-sufficient policies using only oracle queries μ(· | x, S ) must query every proper subset of SK in the worst case, and hence requires Ω(2 K ) subset-level queries. 
+
+The proof is in Appendix A.6. Thus Forward-DP is query-optimal up to constant factors in the natural oracle model. 6Comparison to alternatives. Naively evaluating the unordered propensity requires summing over 
+
+K! orderings. Gumbel-top-K sampling [Kool et al., 2019] gives a Monte Carlo approximation whose accuracy depends on the sampling budget. Ryser’s O(K · 2K ) permanent-style subset DP [Ryser, 1963] computes the joint slate propensity for vanilla Plackett–Luce in the same complexity class as Forward-DP, but assumes that the per-step softmax does not depend on the picked prefix. Marginalized-PL closed forms [Ma et al., 2021] likewise apply when item scores are fixed after observing the context, and target rank-placement marginals rather than the joint set probability. Stochastic beam search gives ordered samples without joint propensities. The gap addressed here is the exact unordered-slate propensity for context-dependent set-sufficient autoregressive loggers, where the softmax denominator changes with the partial slate and Ryser-style fixed-matrix permanents no longer apply. 
+
+Forward-DP as a primitive for slate OPE. Forward-DP supplies the joint slate propensity con-sumed by downstream slate-OPE estimators. We use this primitive in two ways: as the IS weight 
+
+Fπ (S)/F β (S) for the forward-flow estimators (FF-OIS, FF-WIS, FF-DR) of §3.1, and as the building block for context-dependent extensions of two prior slate-OPE constructions. The marginalized-PL formula [Ma et al., 2021] multiplies inclusion-marginal ratios Q 
+
+> d∈S
+
+πincl (d | x)/β incl (d | x); for vanilla Plackett–Luce these marginals admit a closed form, but for context-dependent set-sufficient policies they must be computed from the Forward-DP flow table as P 
+
+> S
+
+F (S)1{d ∈ S}. We re-fer to this combination as DP-MPL. Similarly, the OPCB construction of Kiyohara et al. [2024] marginalizes joint propensities over a learnable kth-element equivalence class; for context-dependent slate loggers, these joint propensities are supplied by Forward-DP. We refer to this combination as DP-OPCB. DP-MPL and DP-OPCB are the Forward-DP-enabled extensions of [Ma et al., 2021, Kiyohara et al., 2024] to context-dependent set-sufficient loggers. 
+
+# 4 Experiments 
+
+We evaluate forward-flow IS on two finite-horizon MDPs and Forward-DP on KuaiRec slate OPE. The MDP experiments test variance reduction without fitting a transition model; the slate experiments test exact unordered-slate propensity computation for context-dependent autoregressive loggers. We report RMSE for value estimation and top-1, Spearman correlation, and regret for model selection. Full details, estimator definitions, and additional sweeps are in Appendix G. 
+
+4.1 Finite-horizon MDPs 
+
+We evaluate FF-IS on the Sepsis simulator [Oberst and Sontag, 2019] and ICU-Sepsis [Komorowski et al., 2018]. In both benchmarks, forward flows are computed from logged trajectories alone via Proposition 3. Table 1: Finite-horizon MDP validation. Flows use logged trajectories only. Bold marks the lowest RMSE within each benchmark. †Neural GenDICE’s saddle-point optimization did not converge (defined as |V − V π | > 1) in 18/50 Sepsis and 14/50 ICU-Sepsis trials; reported statistics are on the 32 and 36 converged trials. Full 50-trial statistics are in Appendix G.                                                     
+
+> Benchmark Estimator Bias Std ↓RMSE Sepsis OIS +0 .039 2.14 2.14
+> WIS +0 .105 0.272 0.291
+> FF-OIS +0 .001 0.0672 0.0672
+> FF-WIS +0 .012 0.0555 0.0568
+> LS +0 .012 0.0941 0.0949
+> STAR +0 .124 0.0250 0.126
+> DualDICE +0 .264 0.004 0.264
+> GenDICE †+0 .132 0.229 0.264
+> ICU-Sepsis OIS +0 .032 0.410 0.412
+> WIS +0 .034 0.0409 0.0532
+> FQE −0.322 0.0178 0.323
+> DR −0.286 0.203 0.351
+> FF-OIS −0.005 0.0488 0.0491
+> FF-WIS +0 .004 0.0262 0.0265
+> DualDICE −0.759 0.007 0.759
+> GenDICE †−0.579 0.430 0.721
+
+7The MDP results are consistent with the variance-reduction intuition behind quotient conditioning. On Sepsis, FF-WIS reduces RMSE from 0.291 to 0.0568 ; on ICU-Sepsis, it reduces RMSE from 
+
+0.0532 to 0.0265 . These gains use only logged trajectories and do not rely on a fitted transition model. We include DICE-family estimators as reference density-ratio baselines; they are not tailored to these finite-horizon non-stationary benchmarks and are bias-dominated in Table 1. Implementation details and full 50-trial statistics are in Appendix G. 
+
+4.2 KuaiRec slate propensity and OPE 
+
+We next evaluate the slate specialization on KuaiRec [Gao et al., 2022], using a context-dependent Plackett–Luce logger with pool size M = 15 and slate sizes K ∈ { 4, 6, 8}. Table 2 reports exact propensity runtime and downstream OPE RMSE. Table 2: KuaiRec slate experiments: exact propensity runtime and downstream OPE RMSE. Bold marks the better RMSE within each trajectory/forward-flow pair.                                   
+
+> Joint propensity time (s) Downstream OPE RMSE
+> K MK
+> K!enum Forward-DP Gumbel-MC OIS FF-OIS DR FF-DR 41,365 6.20.36 26 .93.36 1.27 1.66 0.617
+> 65,005 1,010 2.93 29 .611 .46 2.19 7.81 1.08
+> 86,435 97 ,108 8.94 105 12 .30 1.75 2.02 0.949
+
+Forward-DP avoids factorial enumeration while remaining exact: at K = 8 , enumeration takes 97 ,108 
+
+seconds, versus 8.94 seconds for Forward-DP. The same trend extends to larger slate sizes: at K = 10 
+
+and K = 12 on the same 5-user timing pool, Forward-DP completes in 12 .5 and 13 .7 seconds respectively, while K!-enumeration is no longer feasible (extrapolated wall times of ∼ 10 7 and 
+
+∼ 10 10 seconds). Figure 2 plots the wall-clock comparison on a log-log scale and the corresponding downstream RMSE. Downstream, FF-OIS and FF-DR consistently improve over OIS and DR across all K. Comparisons to fixed-score Ryser and marginalized-PL alternatives, together with details on the K-sweep, Gumbel-MC setting, and within-K RMSE interpretation, are given in Appendix G. 4 6 8 10 12         
+
+> slate size K
+> 10 −1
+> 10 0
+> 10 1
+> 10 2
+> 10 3
+> 10 4
+> 10 5
+> 10 6
+> 10 7
+> 10 8
+> 10 9
+> 10 10
+> 10 11
+> wall-clock time (seconds)
+> Joint slate-propensity wall-clock
+> K!enumeration (measured)
+> K!enumeration (extrapolated)
+> Forward-DP (ours)
+> Gumbel-MC ( 3×10 6)
+> 46810 12
+> slate size K
+> 1
+> 10
+> 100
+> RMSE
+> Downstream OPE RMSE
+> OIS
+> FF-OIS (ours)
+> DR
+> FF-DR (ours)
+
+Figure 2: KuaiRec scaling. Left: joint slate-propensity wall-clock time for K!-enumeration, Forward-DP, and Gumbel-MC as slate size K increases; enumeration is extrapolated beyond K = 8 , and Gumbel-MC uses 3 × 10 6 samples. Forward-DP avoids factorial enumeration while remaining exact. Right: downstream OPE RMSE for trajectory weights (OIS, DR) versus forward-flow weights (FF-OIS, FF-DR), using nusers = 300 and ntrials = 200 . Within each K, the forward-flow variants reduce RMSE relative to their trajectory-weighted counterparts. 
+
+4.3 Off-policy model selection 
+
+Finally, we apply Forward-DP to off-policy model selection among autoregressive transformer recommenders. All evaluated policies expose a set-sufficient next-item interface, so Forward-DP supplies unordered-slate propensities without architecture-specific modification. Table 3 reports the main K = 4 workflow. The best rows all use Forward-DP-supplied propensities or expectations, although no estimator dominates all metrics. Tree-DR gives the best top-1 and Spearman scores, while DP-OPCB-DR 8Table 3: Off-policy model selection on KuaiRec at K = 4 and Nlog = 1000 . Rows are grouped by propensity source; full estimator definitions are in Appendix G.                                   
+
+> Estimator ↑Top-1 ↑Spearman ρ↓Regret
+> Trajectory IS
+> Tree-OIS 0.06 −0.53 0.209
+> Tree-WIS 0.26 +0 .24 0.059
+> Forward-flow IS
+> FF-OIS 0.08 −0.45 0.204
+> FF-WIS 0.22 +0 .27 0.058
+> FF-DR 0.18 +0 .35 0.072
+> Forward-DP-enabled
+> Tree-DR 0.28 +0.42 0.056
+> DP-MPL-OIS 0.10 −0.53 0.369
+> DP-MPL-WIS 0.26 +0 .22 0.075
+> DP-OPCB-OIS 0.02 +0 .09 0.090
+> DP-OPCB-DR 0.08 +0 .38 0.051
+
+gives the lowest regret. The cleanest head-to-head comparison is Tree-OIS versus FF-OIS: FF-OIS improves on all three metrics. Additional K-sweeps and cross-architecture results are in Appendix G. 
+
+# 5 Related work 
+
+OPE, conditional IS, and marginalization. Our quotient-DAG view organizes IS by rollout-tree ratio placement: trajectories for trajectory IS, prefixes for per-decision IS [Precup et al., 2000, Mah-mood et al., 2014]; conditional expectations for conditional IS [Rowland et al., 2020, Liu et al., 2020]; the state–time quotient for finite-horizon MIS [Xie et al., 2019, Liu et al., 2020]; and coarser sufficient quotients (ϕ(st), t ) for abstraction-based OPE [Pavse and Hanna, 2023, Chaudhari et al., 2024, Majumdar et al., 2024]. DR [Jiang and Li, 2016, Thomas and Brunskill, 2016] adds control variates, while DICE [Nachum et al., 2019, Zhang et al., 2020, Uehara et al., 2020] estimates discounted-occupancy ratios; DualDICE and GenDICE serve as §4.1 baselines despite a stationary/finite-horizon target mismatch. 
+
+Slate OPE, combinatorial DPs, and slate generators. Slate OPE requires the logging propensity of the reward/estimator slate representation [Swaminathan et al., 2017, Vlassis et al., 2021, Kiyohara et al., 2023, 2024, Shimizu et al., 2024]: β(S | x) for unordered rewards, but only sampled-order probabilities from autoregressive loggers. Context-free Plackett–Luce formulas, Ryser-style subset DPs, and Gumbel-top-K sampling [Ma et al., 2021, Ryser, 1963, Kool et al., 2019] solve adjacent fixed-score or sampling problems, not the context-dependent unordered joint propensity. Forward-DP supplies this primitive and enables DP-MPL/DP-OPCB; score-then-mask rankers are set-sufficient, whereas order-conditioned generative recommenders require picked-set canonicalization [Kang and McAuley, 2018, Sun et al., 2019, Gao et al., 2023, Geng et al., 2022, Cui et al., 2022, Rajput et al., 2023, Sun et al., 2023, Pradeep et al., 2023]. 
+
+# 6 Conclusion 
+
+We presented Forward-Flow Importance Sampling, a Rao–Blackwellization of per-decision IS on the layered DAG obtained by quotienting the rollout tree under any sufficient equivalence relation. The conditional importance weight admits a closed form as the ratio of target and behavior forward flows, computable by a single forward sweep on the quotient DAG. For autoregressive slate generation under set-sufficiency, the permutation-orbit quotient yields a subset DAG on which Forward-DP computes the joint slate propensity exactly in O(( M + K) · 2K ) time, fixed-parameter tractable in K and practical for the K ≤ 10 slate sizes typical of slate-OPE deployments. For context-dependent autoregressive Plackett–Luce loggers whose next-item softmax depends on the partial slate, this closes the joint-propensity gap and supplies a missing OPE primitive for transformer-based slate recommenders. The framework recovers MIS at the (state , time ) quotient and slate IS at the permutation-orbit quotient; experiments on Sepsis, ICU-Sepsis, KuaiRec, and off-policy model selection for transformer recommenders validate both the framework and the slate primitive. 9Future directions include continuous-state extensions via learned partitions or kernels, bias analysis for ϵ-sufficient quotients, and forward-flow weights combined with doubly-robust baselines. 
+
+# References 
+
+Shreyas Chaudhari, Ameet Deshpande, Bruno Castro da Silva, and Philip Thomas. Abstract reward processes: Leveraging state abstraction for consistent off-policy evaluation. In Advances in Neural Information Processing Systems (NeurIPS) , volume 37, pages 17069–17105. Curran Associates, Inc., 2024. STAR algorithm. Zeyu Cui, Jianxin Ma, Chang Zhou, Jingren Zhou, and Hongxia Yang. M6-Rec: Generative pretrained language models are open-ended recommender systems, 2022. arXiv:2205.08084. Miroslav Dudík, John Langford, and Lihong Li. Doubly robust policy evaluation and learning. In Lise Getoor and Tobias Scheffer, editors, Proceedings of the 28th International Conference on Machine Learning, ICML 2011, Bellevue, Washington, USA, June 28 - July 2, 2011 , pages 1097–1104. Omnipress, 2011. Chongming Gao, Shijun Li, Wenqiang Lei, Jiawei Chen, Biao Li, Peng Jiang, Xiangnan He, Jiaxin Mao, and Tat-Seng Chua. KuaiRec: A fully-observed dataset and insights for evaluating recom-mender systems. In Mohammad Al Hasan and Li Xiong, editors, Proceedings of the 31st ACM International Conference on Information & Knowledge Management, Atlanta, GA, USA, October 17-21, 2022 , pages 540–550. ACM, 2022. doi: 10.1145/3511808.3557220. Ge Gao, Jonathan D. Chang, Claire Cardie, Kianté Brantley, and Thorsten Joachims. Policy-gradient training of language models for ranking. CoRR , abs/2310.04407, 2023. doi: 10.48550/ARXIV. 2310.04407. Shijie Geng, Shuchang Liu, Zuohui Fu, Yingqiang Ge, and Yongfeng Zhang. Recommendation as language processing (RLP): A unified pretrain, personalized prompt & predict paradigm (P5). In 
+
+RecSys ’22: Sixteenth ACM Conference on Recommender Systems, Seattle, WA, USA, September 18 - 23, 2022 , pages 299–315. ACM, 2022. doi: 10.1145/3523227.3546767. Nan Jiang and Lihong Li. Doubly robust off-policy value evaluation for reinforcement learning. In Maria-Florina Balcan and Kilian Q. Weinberger, editors, Proceedings of the 33rd International Conference on Machine Learning, ICML 2016, New York City, NY, USA, June 19-24, 2016 , JMLR Workshop and Conference Proceedings, pages 652–661. JMLR.org, 2016. Wang-Cheng Kang and Julian J. McAuley. Self-attentive sequential recommendation. In IEEE International Conference on Data Mining, ICDM 2018, Singapore, November 17-20, 2018 , pages 197–206. IEEE Computer Society, 2018. doi: 10.1109/ICDM.2018.00035. SASRec. Haruka Kiyohara, Masatoshi Uehara, Yusuke Narita, Nobuyuki Shimizu, Yasuo Yamamoto, and Yuta Saito. Off-policy evaluation of ranking policies under diverse user behavior. In Proceedings of the 29th ACM SIGKDD Conference on Knowledge Discovery and Data Mining, KDD 2023, Long Beach, CA, USA, August 6-10, 2023 , pages 1154–1163. ACM, 2023. doi: 10.1145/3580305. 3599447. AIPS estimator. Haruka Kiyohara, Masahiro Nomura, and Yuta Saito. Off-policy evaluation of slate bandit policies via optimizing abstraction. In Tat-Seng Chua, Chong-Wah Ngo, Ravi Kumar, Hady W. Lauw, and Roy Ka-Wei Lee, editors, Proceedings of the ACM on Web Conference 2024, WWW 2024, Singapore, May 13-17, 2024 , pages 3150–3161. ACM, 2024. doi: 10.1145/3589334.3645343. OPCB estimator. Matthieu Komorowski, Leo A. Celi, Omar Badawi, Anthony C. Gordon, and A. Aldo Faisal. The Artificial Intelligence Clinician learns optimal treatment strategies for sepsis in intensive care. 
+
+Nature Medicine , 24(11):1716–1720, 2018. doi: 10.1038/s41591-018-0213-5. Wouter Kool, Herke van Hoof, and Max Welling. Stochastic beams and where to find them: The Gumbel-top-k trick for sampling sequences without replacement. In Proceedings of the 36th International Conference on Machine Learning (ICML) , 2019. 10 Yao Liu, Pierre-Luc Bacon, and Emma Brunskill. Understanding the curse of horizon in off-policy evaluation via conditional importance sampling. In Proceedings of the 37th International Conference on Machine Learning, ICML 2020, 13-18 July 2020, Virtual Event , Proceedings of Machine Learning Research, pages 6184–6193. PMLR, 2020. Jiaqi Ma, Xinyang Yi, Weijing Tang, Zhe Zhao, Lichan Hong, Ed H. Chi, and Qiaozhu Mei. Learning-to-rank with partitioned preference: Fast estimation for the Plackett-Luce model. In Arindam Banerjee and Kenji Fukumizu, editors, The 24th International Conference on Artificial Intelligence and Statistics, AISTATS 2021, April 13-15, 2021, Virtual Event , Proceedings of Machine Learning Research, pages 928–936. PMLR, 2021. Ashique Rupam Mahmood, Hado van Hasselt, and Richard S. Sutton. Weighted importance sampling for off-policy learning with linear function approximation. In Zoubin Ghahramani, Max Welling, Corinna Cortes, Neil D. Lawrence, and Kilian Q. Weinberger, editors, Advances in Neural Infor-mation Processing Systems 27: Annual Conference on Neural Information Processing Systems 2014, December 8-13 2014, Montreal, Quebec, Canada , pages 3014–3022, 2014. Ritam Majumdar, Jack Teversham, and Sonali Parbhoo. Concept-driven off policy evaluation. CoRR ,abs/2411.19395, 2024. doi: 10.48550/ARXIV.2411.19395. Ofir Nachum, Yinlam Chow, Bo Dai, and Lihong Li. DualDICE: Behavior-agnostic estimation of discounted stationary distribution corrections. In Hanna M. Wallach, Hugo Larochelle, Alina Beygelzimer, Florence d’Alché Buc, Emily B. Fox, and Roman Garnett, editors, Advances in Neural Information Processing Systems 32: Annual Conference on Neural Information Processing Systems 2019, NeurIPS 2019, December 8-14, 2019, Vancouver, BC, Canada , pages 2315–2325, 2019. Michael Oberst and David A. Sontag. Counterfactual off-policy evaluation with Gumbel-max structural causal models. In Kamalika Chaudhuri and Ruslan Salakhutdinov, editors, Proceedings of the 36th International Conference on Machine Learning, ICML 2019, 9-15 June 2019, Long Beach, California, USA , Proceedings of Machine Learning Research, pages 4881–4890. PMLR, 2019. Brahma S. Pavse and Josiah P. Hanna. Scaling marginalized importance sampling to high-dimensional state-spaces via state abstraction. In Brian Williams, Yiling Chen, and Jennifer Neville, editors, 
+
+Thirty-Seventh AAAI Conference on Artificial Intelligence, AAAI 2023, Washington, DC, USA, February 7-14, 2023 , pages 9417–9425. AAAI Press, 2023. doi: 10.1609/aaai.v37i8.26128. Ronak Pradeep, Sahel Sharifymoghaddam, and Jimmy Lin. RankZephyr: Effective and robust zero-shot listwise reranking is a breeze! CoRR , abs/2312.02724, 2023. doi: 10.48550/ARXIV. 2312.02724. Doina Precup, Richard S. Sutton, and Satinder Singh. Eligibility traces for off-policy policy evaluation. In Pat Langley, editor, Proceedings of the Seventeenth International Conference on Machine Learning (ICML 2000), Stanford University, Stanford, CA, USA, June 29 - July 2, 2000 , pages 759–766. Morgan Kaufmann, 2000. Shashank Rajput, Nikhil Mehta, Anima Singh, Raghunandan Hulikal Keshavan, Trung Vu, Lukasz Heldt, Lichan Hong, Yi Tay, Vinh Q. Tran, Jonah Samost, Maciej Kula, Ed H. Chi, and Mahesh Sathiamoorthy. Recommender systems with generative retrieval. In Alice Oh, Tristan Naumann, Amir Globerson, Kate Saenko, Moritz Hardt, and Sergey Levine, editors, Advances in Neural Information Processing Systems 36: Annual Conference on Neural Information Processing Systems 2023, NeurIPS 2023, New Orleans, LA, USA, December 10 - 16, 2023 , 2023. TIGER. Mark Rowland, Anna Harutyunyan, Hado van Hasselt, Diana Borsa, Tom Schaul, Rémi Munos, and Will Dabney. Conditional importance sampling for off-policy learning. In Silvia Chiappa and Roberto Calandra, editors, The 23rd International Conference on Artificial Intelligence and Statistics, AISTATS 2020, 26-28 August 2020, Online [Palermo, Sicily, Italy] , Proceedings of Machine Learning Research, pages 45–55. PMLR, 2020. Herbert John Ryser. Combinatorial mathematics , volume 14 of Carus Mathematical Monographs .Mathematical Association of America, 1963. Permanent inclusion-exclusion algorithm in Ch. 1. 11 Tatsuhiro Shimizu, Koichi Tanaka, Ren Kishimoto, Haruka Kiyohara, Masahiro Nomura, and Yuta Saito. Effective off-policy evaluation and learning in contextual combinatorial bandits. In Tommaso Di Noia, Pasquale Lops, Thorsten Joachims, Katrien Verbert, Pablo Castells, Zhenhua Dong, and Ben London, editors, Proceedings of the 18th ACM Conference on Recommender Systems, RecSys 2024, Bari, Italy, October 14-18, 2024 , pages 733–741. ACM, 2024. doi: 10.1145/3640457.3688099. Slate-OPE via abstraction. Fei Sun, Jun Liu, Jian Wu, Changhua Pei, Xiao Lin, Wenwu Ou, and Peng Jiang. BERT4Rec: Sequential recommendation with bidirectional encoder representations from transformer. In Wenwu Zhu, Dacheng Tao, Xueqi Cheng, Peng Cui, Elke A. Rundensteiner, David Carmel, Qi He, and Jeffrey Xu Yu, editors, Proceedings of the 28th ACM International Conference on Information and Knowledge Management, CIKM 2019, Beijing, China, November 3-7, 2019 , pages 1441–1450. ACM, 2019. doi: 10.1145/3357384.3357895. Weiwei Sun, Lingyong Yan, Xinyu Ma, Shuaiqiang Wang, Pengjie Ren, Zhumin Chen, Dawei Yin, and Zhaochun Ren. Is ChatGPT good at search? investigating large language models as re-ranking agents. In Houda Bouamor, Juan Pino, and Kalika Bali, editors, Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing, EMNLP 2023, Singapore, December 6-10, 2023 , pages 14918–14937. Association for Computational Linguistics, 2023. doi: 10.18653/v1/2023.emnlp-main.923. Adith Swaminathan, Akshay Krishnamurthy, Alekh Agarwal, Miroslav Dudík, John Langford, Damien Jose, and Imed Zitouni. Off-policy evaluation for slate recommendation. In Isabelle Guyon, Ulrike von Luxburg, Samy Bengio, Hanna M. Wallach, Rob Fergus, S. V. N. Vishwanathan, and Roman Garnett, editors, Advances in Neural Information Processing Systems 30: Annual Conference on Neural Information Processing Systems 2017, December 4-9, 2017, Long Beach, CA, USA , pages 3632–3642, 2017. Philip S. Thomas and Emma Brunskill. Data-efficient off-policy policy evaluation for reinforcement learning. In Maria-Florina Balcan and Kilian Q. Weinberger, editors, Proceedings of the 33rd International Conference on Machine Learning, ICML 2016, New York City, NY, USA, June 19-24, 2016 , JMLR Workshop and Conference Proceedings, pages 2139–2148. JMLR.org, 2016. Masatoshi Uehara, Jiawei Huang, and Nan Jiang. Minimax weight and q-function learning for off-policy evaluation. In Proceedings of the 37th International Conference on Machine Learning, ICML 2020, 13-18 July 2020, Virtual Event , Proceedings of Machine Learning Research, pages 9659–9668. PMLR, 2020. Nikos Vlassis, Ashok Chandrashekar, Fernando Amat Gil, and Nathan Kallus. Control variates for slate off-policy evaluation. In Marc’Aurelio Ranzato, Alina Beygelzimer, Yann N. Dauphin, Percy Liang, and Jennifer Wortman Vaughan, editors, Advances in Neural Information Processing Systems 34: Annual Conference on Neural Information Processing Systems 2021, NeurIPS 2021, December 6-14, 2021, virtual , pages 3667–3679, 2021. Tengyang Xie, Yifei Ma, and Yu-Xiang Wang. Towards optimal off-policy evaluation for reinforce-ment learning with marginalized importance sampling. In Hanna M. Wallach, Hugo Larochelle, Alina Beygelzimer, Florence d’Alché Buc, Emily B. Fox, and Roman Garnett, editors, Advances in Neural Information Processing Systems 32: Annual Conference on Neural Information Processing Systems 2019, NeurIPS 2019, December 8-14, 2019, Vancouver, BC, Canada , pages 9665–9675, 2019. Ruiyi Zhang, Bo Dai, Lihong Li, and Dale Schuurmans. GenDICE: Generalized offline estimation of stationary values. In 8th International Conference on Learning Representations, ICLR 2020, Addis Ababa, Ethiopia, April 26-30, 2020 . OpenReview.net, 2020. 12 A Proofs and additional details for Section 3 
+
+A.1 Proof of Proposition 3 
+
+Fix a layer t and a quotient class z ∈ Zt with Fβ (z) > 0. By the history-level support assumption, for any pre-action history ht with Pβ (ht) > 0 the prefix likelihood ratio is 
+
+ρ1: t−1(ht) = Pπ (ht)
+
+Pβ (ht) ,
+
+because the target and behavior policies share the same initial-state, transition, and reward kernels, and differ only in their action probabilities; for histories with Pβ (ht) = 0 the assumption forces 
+
+Pπ (ht) = 0 as well, so such histories contribute zero mass to both measures. By Bayes’ rule, for 
+
+ht ∈ z with Pβ (ht) > 0,
+
+Pβ (ht | zt = z) = Pβ (ht)
+
+Fβ (z) .
+
+Therefore, restricting the conditional expectation to the Pβ -support inside z,
+
+Eβ [ρ1: t−1 | zt = z] = X 
+
+> ht∈zPβ(ht)>0
+
+Pβ (ht)
+
+Fβ (z)
+
+Pπ (ht)
+
+Pβ (ht) = 1
+
+Fβ (z)
+
+X
+
+> ht∈z
+
+Pπ (ht) = Fπ (z)
+
+Fβ (z) ,
+
+where the second equality uses Pπ (ht) = 0 on {ht ∈ z : Pβ (ht) = 0 } to extend the sum back to all of z. Since P Zμ,t (z) = Fμ(z) by definition of the pushforward measure, the same identity gives 
+
+dP Zπ,t 
+
+dP Zβ,t 
+
+(z) = P Zπ,t (z)
+
+P Zβ,t (z) = Fπ (z)
+
+Fβ (z)
+
+on any finite quotient class with Fβ (z) > 0. The general countable case follows identically by replacing sums over atoms with the corresponding Radon–Nikodym derivative of the pushed-forward measures. 
+
+A.2 Forward-flow IS as a per-term conditional estimator 
+
+We justify the per-decision statement used in §3.1. The tth PDIS summand is 
+
+Xt = γt−1ρ1: t−1(ht)ρt(ht, a t)rt.
+
+Under a sufficient quotient, the current action distribution is class-measurable: 
+
+ρt(ht, a t) = ρt(zt, a t) = π(at | zt)
+
+β(at | zt) .
+
+Moreover, sufficiency implies that, under the behavior policy, the conditional distribution of (at, r t)
+
+given ht depends on ht only through zt. Hence conditioning on (zt, a t, r t) does not change the conditional distribution over histories inside the quotient class beyond conditioning on zt itself. Therefore, by Proposition 3, 
+
+Eβ [ρ1: t−1(ht) | zt, a t, r t] = Eβ [ρ1: t−1(ht) | zt] = Fπ (zt)
+
+Fβ (zt) .
+
+It follows that 
+
+Eβ [Xt | zt, a t, r t] = γt−1 Fπ (zt)
+
+Fβ (zt) ρt(zt, a t)rt,
+
+which is exactly the tth FF-IS summand. Thus each FF-IS summand is a conditional expectation of the corresponding PDIS summand. Consequently it is unbiased for the same per-decision target, and by the law of total variance, 
+
+Var β (Eβ [Xt | zt, a t, r t]) ≤ Var β (Xt).
+
+This establishes the per-term Rao–Blackwell property. It does not imply a variance ordering for the sum P 
+
+> t
+
+Xt, because the covariance terms between different time steps may change after conditioning. 13 A.3 Proof of Proposition 4 
+
+Let G(τ ) = g(q(τ )) and 
+
+w(q) = dP qπ
+
+dP qβ
+
+(q).
+
+By the law of total variance, 
+
+Var β (ρG ) = Var β (Eβ [ρG | q]) + Eβ [Var β (ρG | q)] .
+
+Since G = g(q) is q-measurable and Eβ [ρ | q] = w(q) is the standard pushforward Radon–Nikodym identity (i.e., for ρ = dP π /dP β we have Eβ [ρ | q] = dP qπ /dP qβ (q) = w(q), the same push-forward computation as in Proposition 3 but at the terminal quotient rather than at a prefix layer), 
+
+Eβ [ρG | q] = g(q)Eβ [ρ | q] = w(q)g(q).
+
+Therefore 
+
+Var β (ρG ) − Var β (w(q)g(q)) = Eβ [Var β (ρG | q)] .
+
+Again using G = g(q),
+
+Var β (ρG | q) = g(q)2Var β (ρ | q),
+
+which proves 
+
+Var β (ρG ) − Var β (w(q)g(q)) = Eβ
+
+g(q)2Var β (ρ | q) .
+
+For a finite quotient space, fix a quotient class z. For q(τ ) = z,
+
+ρ(τ ) = Pπ (τ )
+
+Pβ (τ ) = Pπ (z)Pπ (τ | z)
+
+Pβ (z)Pβ (τ | z) = w(z) Pπ (τ | z)
+
+Pβ (τ | z) .
+
+Thus 
+
+Var β (ρ | z) = w(z)2Var τ ∼Pβ (·| z)
+
+ Pπ (τ | z)
+
+Pβ (τ | z)
+
+
+
+.
+
+Since the likelihood ratio Pπ (τ | z)/P β (τ | z) has expectation 1 under Pβ (· | z), the variance is exactly the chi-square divergence: 
+
+Var Pβ (·| z)
+
+ Pπ (τ | z)
+
+Pβ (τ | z)
+
+
+
+= χ2(Pπ (· | z) ∥ Pβ (· | z)) .
+
+Multiplying by Pβ (q = z) = Fβ (z) and summing over z gives 
+
+X
+
+> z
+
+Fβ (z)g(z)2w(z)2χ2(Pπ (· | z) ∥ Pβ (· | z)) .
+
+A.4 Proof of Proposition 5 
+
+We prove the claim by induction on |S|. For the empty set, 
+
+F xμ (∅) = 1 = μ(∅ | x).
+
+Assume the claim holds for all subsets of size less than |S|, and consider a nonempty set S. Every ordering of S has a unique last selected item a ∈ S. Conversely, for every a ∈ S, any ordering of 
+
+S \ { a} followed by a gives an ordering of S whose last item is a. Therefore the unordered propensity can be partitioned by the last item: 
+
+μ(S | x) = X
+
+> a∈S
+
+μ(S \ { a} | x)μ(a | x, S \ { a}),
+
+where set-sufficiency is used to make the probability of selecting a depend only on the picked set 
+
+S \ { a} rather than on the order used to reach it. By the induction hypothesis, 
+
+μ(S \ { a} | x) = F xμ (S \ { a}),
+
+so 
+
+μ(S | x) = X
+
+> a∈S
+
+F xμ (S \ { a})μ(a | x, S \ { a}) = F xμ (S).
+
+This proves the proposition. 14 A.5 Derivation of the ordering-nuisance variance gap 
+
+We derive Eq. (17) . Fix a context x and unordered slate S. Let σ denote the latent generation ordering of S. The trajectory-style ordered estimator uses the weight 
+
+ρord (x, σ ) = π(σ | x)
+
+β(σ | x) ,
+
+whereas the DAG estimator uses the unordered weight 
+
+W (x, S ) = π(S | x)
+
+β(S | x) .
+
+Conditioning on (x, S ), define the conditional ordering distributions 
+
+π(σ | x, S ) = π(σ | x)
+
+π(S | x) , β(σ | x, S ) = β(σ | x)
+
+β(S | x) .
+
+For any ordering σ of S,
+
+ρord (x, σ ) = W (x, S ) π(σ | x, S )
+
+β(σ | x, S ) .
+
+Therefore 
+
+Eβ(·| x,S )[ρord (x, σ )] = W (x, S ),
+
+and 
+
+Var β(·| x,S )(ρord (x, σ )) = W (x, S )2χ2(π(· | x, S ) ∥ β(· | x, S )) .
+
+Now assume the reward distribution depends on (x, S ) but not on the ordering, and is conditionally independent of σ given (x, S ). Conditioning on (x, S, R ), the DAG estimator is deterministic: 
+
+W (x, S )R, while the ordered estimator is ρord (x, σ )R. Their conditional means agree: 
+
+Eβ [ρord (x, σ )R | x, S, R ] = W (x, S )R. 
+
+Hence the variance removed by replacing the ordered estimator with the DAG estimator is the expected conditional variance 
+
+ER2Var β(·| x,S )(ρord (x, σ ))  .
+
+Substituting the chi-square expression above and averaging over x ∼ pX and S ∼ β(· | x) gives 
+
+Ex∼pX ,S ∼β(·| x)
+
+E[R2 | x, S ] W (x, S )2χ2(π(· | x, S ) ∥ β(· | x, S ))  ,
+
+which is Eq. (17). 
+
+A.6 Proof of Proposition 6 
+
+We prove the lower bound in the subset-oracle model used in Proposition 6. The algorithm may query an oracle for transition distributions of the form μ(· | x, S ) at subsets S ⊆ [M ]. It must output the exact unordered propensity μ(SK | x) for every set-sufficient policy μ.Fix M > K and a target slate SK with |SK | = K. Suppose a deterministic algorithm does not query some proper subset U ⊂ SK . We construct two set-sufficient policies that return identical answers to every oracle query made by the algorithm but have different values of μ(SK | x).Because M > K , there exists an item b ∈ [M ] \ SK . Since U ⊂ SK is proper, there exists an item 
+
+a ∈ SK \ U . Consider two policies that agree on all queried subsets and on all subsets except U . At the unqueried subset U , let the first policy assign probability mass p + δ to item a and probability mass q − δ to item b, while the second assigns probability p to a and q to b, with δ > 0 chosen small enough that all probabilities remain nonnegative. All other transition probabilities at U are adjusted identically so that both distributions remain normalized. The two policies are indistinguishable to the algorithm because they differ only at the unqueried subset U . However, they assign different total mass to paths that pass through U and then continue inside SK . Shifting probability from b / ∈ SK to a ∈ SK \ U changes the probability of eventually completing the exact slate SK , because choosing b makes it impossible to end with unordered slate 
+
+SK of size K. Therefore the two policies have different values of μ(SK | x) while producing identical oracle responses on all queried subsets. Thus any exact deterministic algorithm must query every proper subset of SK in the worst case. There are 2K − 1 such subsets, giving an Ω(2 K ) subset-query lower bound. Forward-DP queries each proper subset once, and is therefore query-optimal up to constant factors in this oracle model. 15 B Additional discussion of related estimators 
+
+The quotient likelihood-ratio identity used in the main text is a special case of conditional importance sampling. In the notation of Section 3, choosing the conditioning variable to be the full pre-action history ht gives ordinary per-decision IS, since 
+
+Fπ (ht)
+
+Fβ (ht) = Pπ (ht)
+
+Pβ (ht) = ρ1: t−1.
+
+Choosing the quotient variable zt = ( st, t ) in a Markov state space gives finite-horizon marginalized IS. More generally, choosing zt = ( ϕ(st), t ) for a sufficient abstraction ϕ gives known-abstraction MIS. The slate construction uses a different history-prefix quotient: all ordered prefixes that contain the same picked set are merged. The common object in all cases is the pushforward likelihood ratio on the quotient space. The algorithmic distinction in the slate setting is that the quotient density itself is not readily available from an autoregressive logger. Naively computing the unordered propensity requires summing over 
+
+K! orderings. Gumbel-top-K sampling gives a Monte Carlo approximation, while marginalized Plackett–Luce closed forms apply to fixed-score settings where item scores do not change with the partial slate. Forward-DP instead handles context-dependent set-sufficient loggers, where the next-item softmax may change after every picked set. 
+
+Finite-horizon IS variants. We first spell out the finite-horizon estimators to clarify the relationship between ordinary IS, weighted IS, per-decision IS, and forward-flow IS. For a trajectory τ =(s1, a 1, r 1, . . . , s H , a H , r H ), define 
+
+G(τ ) = 
+
+> H
+
+X
+
+> t=1
+
+γt−1rt, ρt(τ ) = π(at | st)
+
+β(at | st) , ρ1: t(τ ) = 
+
+> t
+
+Y
+
+> u=1
+
+ρu(τ ).
+
+The ordinary trajectory IS estimator is 
+
+bVOIS (π) = 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+ρ1: H (τ (i))G(τ (i)).
+
+The self-normalized or weighted variant is 
+
+bVWIS (π) = 
+
+PNi=1 ρ1: H (τ (i))G(τ (i))
+
+PNi=1 ρ1: H (τ (i)) .
+
+WIS generally has lower weight instability than OIS but is biased in finite samples. The per-decision IS estimator uses the prefix ratio only up to the reward time: 
+
+bVPDIS (π) = 1
+
+N
+
+> N
+
+X
+
+> i=1
+> H
+
+X
+
+> t=1
+
+γt−1ρ1: t(τ (i))r(i) 
+
+> t
+
+.
+
+Under a sufficient quotient, the prefix ratio ρ1: t−1 can be replaced by its conditional expectation within the quotient class. This gives the forward-flow per-decision estimator 
+
+bVFF (π) = 1
+
+N
+
+> N
+
+X
+
+> i=1
+> H
+
+X
+
+> t=1
+
+γt−1 Fπ (z(i) 
+
+> t
+
+)
+
+Fβ (z(i) 
+
+> t
+
+)
+
+π(a(i) 
+
+> t
+
+| z(i) 
+
+> t
+
+)
+
+β(a(i) 
+
+> t
+
+| z(i) 
+
+> t
+
+) r(i) 
+
+> t
+
+.
+
+When the quotient flows are known, this estimator is unbiased under the same support condition as PDIS, and each summand is a Rao–Blackwellized version of the corresponding PDIS summand. As discussed in the main text, this is a per-term statement and does not imply a variance ordering for the full multi-step sum. A self-normalized per-decision variant can also be formed by normalizing the weights at each decision time: 
+
+bVWPDIS (π) = 
+
+> H
+
+X
+
+> t=1
+
+γt−1
+
+PNi=1 ρ1: t(τ (i))r(i)
+
+> t
+
+PNi=1 ρ1: t(τ (i)) ,
+
+with the analogous forward-flow version replacing ρ1: t−1 by Fπ (zt)/F β (zt). In the experiments, we use the notation FF-OIS and FF-WIS for the ordinary and self-normalized forms after this quotient-weight replacement. 16 Slate-level ordered and quotient weights. For slate OPE, the logged action may be an ordered generation sequence σ = ( σ1, . . . , σ K ), while the reward depends only on the unordered slate 
+
+S = {σ1, . . . , σ K }. The ordered trajectory-tree ratio is 
+
+ρtree (x, σ ) = π(σ | x)
+
+β(σ | x) =
+
+> K
+
+Y
+
+> t=1
+
+π(σt | x, h <t )
+
+β(σt | x, h <t ) .
+
+This is the weight used by Tree-OIS and Tree-WIS. In contrast, the quotient or forward-flow slate ratio is 
+
+WFF (x, S ) = π(S | x)
+
+β(S | x) = F xπ (S)
+
+F xβ (S) ,
+
+where F xμ (S) is computed exactly by Forward-DP under set-sufficiency. This is the weight used by FF-OIS, FF-WIS, and FF-DR. The ordered ordinary IS estimator is 
+
+bVTree -OIS (π) = 1
+
+N
+
+> N
+
+X
+
+> n=1
+
+ρtree (xn, σ n)Rn,
+
+whereas the quotient ordinary IS estimator is 
+
+bVFF -OIS (π) = 1
+
+N
+
+> N
+
+X
+
+> n=1
+
+WFF (xn, S n)Rn.
+
+Their self-normalized variants are 
+
+bVTree -WIS (π) = 
+
+PNn=1 ρtree (xn, σ n)Rn
+
+PNn=1 ρtree (xn, σ n) ,
+
+and 
+
+bVFF -WIS (π) = 
+
+PNn=1 WFF (xn, S n)Rn
+
+PNn=1 WFF (xn, S n) .
+
+Thus “Tree” denotes weighting on the ordered autoregressive rollout tree, while “FF” denotes weighting after pushing the policy distributions forward to the unordered slate quotient. 
+
+Doubly robust slate estimators. Let ˆr(x, S ) be a fixed or independently fitted reward model. The direct-method value for a context x is 
+
+bmπ (x) = X
+
+> S:|S|=K
+
+π(S | x)ˆ r(x, S ) = X
+
+> S:|S|=K
+
+F xπ (S)ˆ r(x, S ).
+
+When the candidate slate space is small enough, this sum is evaluated exactly over all size-K subsets; otherwise it can be approximated using the same Forward-DP primitive on the queried slate family. The forward-flow doubly robust estimator is 
+
+bVFF -DR (π) = 1
+
+N
+
+> N
+
+X
+
+> n=1
+
+[ bmπ (xn) + WFF (xn, S n){Rn − ˆr(xn, S n)}] .
+
+For comparison, the ordered Tree-DR variant uses the same direct-method term but corrects the residual with the ordered trajectory ratio: 
+
+bVTree -DR (π) = 1
+
+N
+
+> N
+
+X
+
+> n=1
+
+[ bmπ (xn) + ρtree (xn, σ n){Rn − ˆr(xn, S n)}] .
+
+Tree-DR and FF-DR therefore differ only in the residual correction: Tree-DR corrects by the probability of the realized generation order, whereas FF-DR corrects by the probability of the unordered slate. With exact propensities and a fixed or cross-fitted reward model, the DR estimator is unbiased if either the propensity model is correct or the reward model is correct. Self-normalized and plug-in variants may introduce finite-sample bias, as usual. 17 Forward-DP-enabled extensions. Forward-DP also supplies the probability tables needed by existing slate-OPE constructions whose original forms assume access to slate propensities or fixed-score Plackett–Luce marginals. In DP-MPL, we compute the inclusion marginal of item d under policy μ as 
+
+pμ, incl (d | x) = X
+
+> S:|S|=K
+
+F xμ (S)1{d ∈ S},
+
+and use these marginals inside the marginalized-PL weighting rule. In DP-OPCB, Forward-DP supplies the joint slate propensities that are then marginalized over the OPCB equivalence classes. We use the prefixes “DP-MPL” and “DP-OPCB” rather than “FF-MPL” or “FF-OPCB” because these estimators use Forward-DP as a propensity-computation primitive, not the forward-flow slate ratio Fπ (S)/F β (S) directly. 
+
+# C Empirical quotient-flow estimation in the MDP experiments 
+
+The theoretical statements in Section 3.1 assume that the quotient forward flows, or equivalently the quotient likelihood ratios Fπ (z)/F β (z), are known. In the finite-horizon MDP experiments of Section 4.1, we do not fit a transition model and do not use oracle transition probabilities. Instead, we estimate quotient ratios directly from the logged trajectories using the conditional-expectation identity in Proposition 3. For a quotient class z ∈ Zt, let 
+
+It(z) = {i : zt(τ (i)) = z}
+
+be the indices of logged trajectories whose layer-t pre-action history lies in class z. The empirical quotient ratio used in the plug-in estimator is 
+
+bwt(z) = 1
+
+|I t(z)|
+
+X
+
+> i∈I t(z)
+
+ρ1: t−1(τ (i)), |I t(z)| > 0. (18) This is the sample analogue of Eβ [ρ1: t−1 | zt = z] = Fπ (z)/F β (z). The resulting plug-in FF estimator replaces Fπ (z(i) 
+
+> t
+
+)/F β (z(i) 
+
+> t
+
+) in Eq. (11) by bwt(z(i) 
+
+> t
+
+).This empirical construction is useful for validating quotient conditioning from logged data, but it should not be confused with the oracle-flow estimator in the theory. If the same trajectories are used both to estimate bwt(z) and to evaluate the IS summands, the resulting estimator can have finite-sample plug-in bias. A sample-split version avoids this coupling by estimating bwt on one split and evaluating Eq. (11) on an independent split. A leave-one-out variant similarly defines 
+
+bw(−i) 
+
+> t
+
+(z) = 1
+
+|I t(z)| − 1
+
+X 
+
+> j∈I t(z), j ̸=i
+
+ρ1: t−1(τ (j)), (19) whenever |I t(z)| > 1. The MDP experiments are intended as validation of the quotient-weighting mechanism; the main algorithmic contribution in the slate setting computes the relevant quotient flows exactly by Forward-DP. Empty or singleton quotient classes are handled in the usual support-limited way. If a class is never observed under the behavior data, it cannot contribute to the empirical estimator. If a leave-one-out denominator is zero, the corresponding sample is omitted from the leave-one-out diagnostic or replaced by the split-estimated ratio. These implementation choices affect only the empirical MDP validation, not the exact slate Forward-DP results. 
+
+# D Additional implementation details for Forward-DP 
+
+Bit-mask implementation. For a logged slate SK = {d1, . . . , d K }, Forward-DP is implemented over bit masks m ∈ { 0, 1}K . A mask m represents the subset S(m) = {dj : mj = 1 }. Masks are visited in increasing Hamming weight. For each nonempty mask m, the update is 
+
+F xμ (m) = X 
+
+> j:mj=1
+
+F xμ (m \ { j})μ(dj | x, S (m \ { j})) . (20) The output for the logged slate is F xμ (1), where 1 is the all-one mask. 18 Caching next-item probabilities. For each proper subset U ⊂ SK , the implementation queries the policy once for the next-item distribution μ(· | x, U ) and caches the probabilities of the still-unselected logged items SK \ U . If the policy is a neural generator whose logits must be recomputed after each partial slate, this query includes the forward pass and the softmax over the remaining catalog. If normalized probabilities are already available, only the cached transition probabilities are needed. 
+
+Numerical stability. For the slate sizes considered in the experiments, ordinary floating-point summation is sufficient. For larger K or sharper policies, the same recursion can be run in log space: 
+
+log F xμ (S) = logsumexp a∈S
+
+log F xμ (S \ { a}) + log μ(a | x, S \ { a}) . (21) This does not change the query complexity. Zero-probability transitions are represented as −∞ in log space. The slate-level support condition used by Eq. (16) requires F xβ (S) > 0 whenever F xπ (S) > 0
+
+for the logged evaluation distribution. 
+
+Computing full distributions and marginals. Algorithm 1 computes the propensity of one logged slate by restricting the subset DAG to subsets of that slate. Some downstream estimators or diagnostics require quantities over all size-K slates in a candidate pool. In that case the same recursion can be run over the full subset lattice {S ⊆ [M ] : |S| ≤ K}. The cost is 
+
+O M
+
+> K−1
+
+X
+
+> ℓ=0
+
+Mℓ
+
+
+
++ K
+
+MK
+
+!
+
+(22) when each queried subset requires a softmax over the catalog, and the resulting flows give both joint slate probabilities F xμ (S) and inclusion marginals 
+
+μincl (d | x) = X 
+
+> S⊆[M]: |S|=K, d ∈S
+
+F xμ (S). (23) The logged-slate version used for propensity correction is cheaper because it requires only the 2K
+
+subsets of the observed slate. 
+
+# E Estimator definitions used in model selection 
+
+This section spells out the estimators used in Table 3. For a logged example (xn, σ n, S n, R n), let 
+
+ρord ,n = π(σn | xn)/β (σn | xn)
+
+be the ordered trajectory ratio and 
+
+Wn = F xn 
+
+> π
+
+(Sn)/F xn 
+
+> β
+
+(Sn)
+
+be the unordered forward-flow slate ratio. 
+
+Tree-OIS and Tree-WIS. Tree-OIS uses the ordered ratio, 
+
+bVTree -OIS (π) = 1
+
+N
+
+> N
+
+X
+
+> n=1
+
+ρord ,n Rn. (24) Tree-WIS self-normalizes the same ordered weights, 
+
+bVTree -WIS (π) = 
+
+PNn=1 ρord ,n Rn
+
+PNn=1 ρord ,n 
+
+. (25) These estimators do not require Forward-DP. 
+
+FF-OIS and FF-WIS. FF-OIS replaces the ordered trajectory ratio by the unordered quotient ratio, 
+
+bVFF -OIS (π) = 1
+
+N
+
+> N
+
+X
+
+> n=1
+
+WnRn, (26) and FF-WIS self-normalizes the same weights, 
+
+bVFF -WIS (π) = 
+
+PNn=1 WnRn
+
+PNn=1 Wn
+
+. (27) These are the direct head-to-head estimators for ordered versus unordered weighting. 19 FF-DR and Tree-DR. Let bq(x, S ) denote a fixed or independently fitted slate reward model. The FF-DR estimator is 
+
+bVFF -DR (π) = 1
+
+N
+
+> N
+
+X
+
+> n=1
+
+ X
+
+> S:|S|=K
+
+F xn 
+
+> π
+
+(S)bq(xn, S ) + Wn{Rn − bq(xn, S n)}
+
+ . (28) Tree-DR uses the same direct-method expectation but retains the ordered residual weight: 
+
+bVTree -DR (π) = 1
+
+N
+
+> N
+
+X
+
+> n=1
+
+ X
+
+> S:|S|=K
+
+F xn 
+
+> π
+
+(S)bq(xn, S ) + ρord ,n {Rn − bq(xn, S n)}
+
+ . (29) Thus Tree-DR still uses Forward-DP for the direct-method expectation, even though its residual correction is trajectory-weighted. 
+
+DP-MPL. DP-MPL uses Forward-DP to compute inclusion marginals in the context-dependent setting. For each policy μ and context x, define μincl (d | x) as in Eq. (23) . The MPL-style weight for a logged slate is 
+
+WMPL (x, S ) = Y
+
+> d∈S
+
+πincl (d | x)
+
+βincl (d | x) . (30) DP-MPL-OIS and DP-MPL-WIS use this weight in ordinary and self-normalized IS, respectively. The estimator is biased in general because the product of inclusion-marginal ratios is not the joint slate ratio; it is included as a Forward-DP-enabled extension of marginalized-PL-style weighting. 
+
+DP-OPCB. DP-OPCB follows the OPCB abstraction idea by grouping slates into learned or specified equivalence classes and using Forward-DP-supplied joint propensities to compute class-level probabilities. If c(S) denotes the OPCB class of slate S, define 
+
+Pμ(c | x) = X
+
+> S:|S|=K, c (S)= c
+
+F xμ (S). (31) The OPCB class weight is Pπ (c(Sn) | xn)/P β (c(Sn) | xn). DP-OPCB-OIS uses this class weight directly, while DP-OPCB-DR adds the corresponding direct-method/control-variate term. Because OPCB intentionally coarsens the action space, its objective can trade bias for variance; this is why its lowest-regret row in Table 3 need not have the highest exact top-1 accuracy. 
+
+# F Limitations and scope 
+
+Sufficiency of the quotient. The finite-horizon FF-IS construction assumes that the quotient is sufficient in the sense of Definition 2. Coarser reward-compatible partitions can still be useful, but exact unbiasedness requires that the continuation law relevant to the estimator be compatible with the quotient. For example, a reward-class quotient alone is not sufficient unless histories in the same class also have compatible future transitions, actions, and rewards under the policies being compared. 
+
+Set-sufficiency in slate generation. Forward-DP is exact only for the stochastic next-item interface in Definition 1. A transformer or LLM architecture does not automatically satisfy this property. The deployed policy must present the picked items through a canonical set representation, or otherwise ensure that previously picked items affect the next-item distribution only through the picked set. If the model conditions on the emitted order, then the unordered slate propensity remains a sum over K!
+
+distinct order-conditioned paths unless the interface is changed. Canonicalization is a deployment-time policy choice, not an OPE-method limitation: we evaluate whichever set-sufficient policy is deployed, and non-canonicalized order-conditioned variants are simply different policies, for which exact propensity computation requires either K! enumeration or approximate Monte Carlo regardless of the OPE estimator used. 
+
+Empirical set-sufficiency violation. To quantify how far from set-sufficient an off-the-shelf trans-former recommender actually is, we measure, for random picked subsets S ⊆ [M ] with |S| = t, the next-item distribution under each ordering of S and report the median (across user/subset draws) 20 of the maximum pairwise total-variation distance over orderings. Set-sufficiency holds exactly iff this TVD is identically zero; any non-zero value bounds the bias incurred by Forward-DP if the canonicalization step is omitted. Table 4 reports this diagnostic for the canonicalized SASRec and Qwen2.5-3B reranker deployments used in §4.3. Table 4: Empirical violation of set-sufficiency under non-canonicalized prefix orderings on KuaiRec (M = 15 , item-letter prompts). Two subset-sampling distributions are compared: random draws 
+
+S ⊆ [M ] uniformly; β-induced draws S as the prefix at step |S| of a canonicalized β trajectory of length Kmax = 8 . Each row reports the median, 90th percentile, and mean (over user/subset draws) of the maximum pairwise TVD across orderings of S. Set-sufficiency requires all entries to be exactly 0;the larger entries on β-induced rows therefore quantify the bias the OPE estimator actually encounters under the deployed behavior policy. Each cell uses 160 (user, subset) draws.                                                                                                  
+
+> |S|SASRec (KuaiRec, M= 15 )Qwen2.5-3B (KuaiRec, M= 15 )med. max p90 max med. mean med. max p90 max med. mean random
+> 10.00 0.00 0.00 0.00 0.00 0.00 20.15 0.28 0.15 0.04 0.07 0.04 30.14 0.23 0.10 0.07 0.11 0.04 40.22 0.34 0.12 0.11 0.16 0.05 50.21 0.34 0.11 0.14 0.19 0.07 60.19 0.29 0.09 0.15 0.24 0.07 70.28 0.43 0.14 0.16 0.26 0.08
+> β-induced  10.00 0.00 0.00 0.00 0.00 0.00 20.20 0.32 0.20 0.04 0.09 0.04 30.19 0.30 0.12 0.08 0.11 0.05 40.25 0.40 0.14 0.12 0.17 0.06 50.25 0.39 0.13 0.15 0.22 0.08 60.27 0.31 0.12 0.18 0.26 0.09 70.38 0.45 0.17 0.21 0.28 0.11
+
+The two recommenders show distinct but moderate violations on the random-subset rows: on Qwen2.5-3B the median maximum pairwise TVD grows from 0 at |S| = 1 to ≈ 0.16 at |S| = 7 ,while on SASRec the same quantity grows to ≈ 0.28 (p90 ≈ 0.43 ), reflecting the stronger positional dependence of an autoregressive sequence model relative to a prompt-based reranker. The β-induced rows are uniformly larger than the matching random rows: at |S| = 7 , SASRec rises from median TVD 0.28 to 0.38 , and Qwen from 0.16 to 0.21 . This direction of effect is expected. The behavior policy preferentially samples high-score items together, which are exactly the configurations for which the next-item softmax is most concentrated (and therefore most order-sensitive); a diagnostic restricted to uniformly random subsets understates the violation that the OPE estimator actually encounters at deployment. A worst-case bound on the resulting joint-propensity error is obtained by partitioning μa(S | x) = P 
+
+> a∈S
+
+μa(S \ { a} | x)¯ μa(a | x, S \ { a}) where ¯μa(a | x, S \ { a}) is the average of μa(a | x, σ ′) over orderings σ′ of S \ { a} under μa; per-step TVD ≤ ε gives |¯μa(· | 
+
+x, T ) − μc(· | x, T )|TV ≤ ε for every prefix subset T . Writing Dℓ = max |S|=ℓ |F xc (S) − μa(S | x)|,the triangle inequality applied to this averaged recursion yields Dℓ ≤ ℓ D ℓ−1 + 2 ε ℓ , and hence 
+
+DK ≤ 2ε K ! PK−1 
+
+> j=0
+
+1/j ! = O(K! ε). This bound is exponential in K, and at the empirical TVDs in Table 4 ( ε ≈ 0.1–0.3, K ≤ 7) it is large enough to be vacuous in absolute terms; equivalently, the per-ordering deviation can be at most ∼ Kε but summing over the K! orderings of S gives no useful absolute bound at this scale. The substantive point of the table is therefore not a tight bias number but a structural one: the deployed policy and the canonical set-sufficient policy are slightly different objects, the OPE estimator evaluates whichever is presented to it through the interface, and the canonicalization in §4.3 is part of the target-policy specification, not a transparent preprocessing step. A tighter data-dependent bias bound for non-canonicalized deployments is left to future work. 
+
+Reward invariance. The slate variance-gap statement assumes that the reward distribution depends on (x, S ) and not on the latent generation ordering. If the displayed order itself affects user response, then the relevant evaluation object is an ordered slate or a deterministic display transformation of the unordered set. In that case the quotient should be defined with respect to the representation on which the reward is actually measured. 21 Scaling with slate size. Forward-DP removes the factorial dependence on K but remains exponen-tial in K. This is appropriate for moderate slate sizes, where 2K is feasible and K! is not, but it is not intended for very large slates without additional approximation or structure. 
+
+Known stochastic interface and support. Like other propensity-based OPE estimators, the slate estimators require access to the behavior propensity on the evaluated representation and a support condition. If the logging system does not expose calibrated next-item probabilities, or if the target places mass on slates with zero behavior propensity, exact Forward-DP computation alone cannot remove the resulting OPE identification problem. 
+
+# G Experiment details 
+
+Reproducibility. All experiments use single-CPU runs with random seed 42 . The Sepsis simulator uses N = 5000 logged trajectories and 500 trials; ICU-Sepsis uses 200 trials. KuaiRec downstream OPE uses N = 500 and 200 trials. Model-selection experiments use 50 trials with logged budgets 
+
+Nlog ∈ { 50 , 100 , 200 , 500 , 1000 }.
+
+Sepsis simulator. The Sepsis simulator of Oberst and Sontag [2019] is a stochastic MDP with 
+
+720 ground states, 8 actions, horizon H = 5 , and terminal rewards {+1 , 0, −1} for discharge, non-terminal, and death respectively. The target policy is π = softmax( Q∗) at temperature 0.1, and the behavior policy is β = ϵ-greedy (Q∗) at ϵ = 0 .3. The ground-truth value is V (π) = −0.2683 . The learned-abstraction baselines in Table 1 are LS [Pavse and Hanna, 2023] and STAR [Chaudhari et al., 2024]. 
+
+DICE baselines. DualDICE [Nachum et al., 2019] and GenDICE [Zhang et al., 2020] are run with 
+
+γ = 0 .99 and the canonical estimator V = E(s,a )∼dβ [ζ(s, a ) r(s, a )] /(1 − γ) on each estimator’s primal density-ratio output. Both are parameterized as a 2-layer MLP with 64 hidden units (state and action embeddings of dimension 64) and trained for 20 ,000 steps (DualDICE) or 15 ,000 steps (GenDICE) with Adam, batch size 2048, and gradient clipping at norm 5. DualDICE uses the primal form ( ζ(s, a ) = ∂f (bellman) for f (x) = x2/2); GenDICE uses the saddle-point form with τ ≥ 0
+
+via softplus, learning rates (ητ , η f ) = (10 −4, 10 −3), normalization penalty λ = 10 , and chi-square penalty α = 1 . Each estimator is run for 50 trials with seeds {43 , . . . , 92 }. The reported Table 1 entries are bias, std, and RMSE relative to the undiscounted ground truth V π .The full 50-trial GenDICE bias / std / RMSE before any trimming are (−11 .78 , 58 .16 , 59 .34) on Sepsis and (+96 .32 , 359 .40 , 372 .08) on ICU-Sepsis: a long tail of seeds for which the saddle-point optimization places density-ratio mass on states with non-zero terminal reward, blowing up Eβ [τ r ]
+
+and through the 1/(1 − γ) scale, V . Discounted-occupancy DICE estimators target the stationary 
+
+γ-discounted distribution under an infinite-horizon MDP; on the finite-horizon non-stationary Sepsis benchmarks, neither the infinite-horizon decomposition dγπ = (1 − γ) P 
+
+> t
+
+γt Pr π (st = ·, a t = ·) nor the saddle’s stationary-distribution ansatz match the data-generating process, and the saddle is highly sensitive to seed. We define non-convergence as |V − V π | > 1 (loose enough that any reasonable IPS-family RMSE remains converged) and report the trimmed bias / std / RMSE on converged trials in Table 1, marked with †. The median estimator value across all 50 trials, robust to the tail, is −0.069 
+
+on Sepsis (median bias +0 .199 , MAD 0.155 ) and +0 .206 on ICU-Sepsis (median bias −0.628 ,MAD 0.200 ). DualDICE on the same protocol does not exhibit this divergence (50/50 trials within a 
+
+|V − V π | = 1 ball) but its bias remains an order of magnitude larger than FF-WIS. For the Table 1 entries, 10 ,000 -bootstrap 95% CIs over the 50 -trial sample are: DualDICE Sepsis bias [+0 .263 , +0 .265] , RMSE [0 .264 , 0.266] ; DualDICE ICU-Sepsis bias [−0.762 , −0.758] , RMSE 
+
+[0 .758 , 0.762] ; GenDICE † Sepsis (trimmed 32 /50 ) bias [+0 .046 , +0 .206] , RMSE [0 .216 , 0.316] ;GenDICE † ICU-Sepsis (trimmed 36 /50 ) bias [−0.703 , −0.425] , RMSE [0 .677 , 0.762] . DualDICE CIs are tight because the saddle is well-conditioned in our setting; GenDICE CIs are wider despite trimming, reflecting residual variability among “converged” trials. 
+
+ICU-Sepsis. ICU-Sepsis [Komorowski et al., 2018] is a tabular MDP with 716 states and 25 actions fit from the MIMIC-III intensive-care database. Target-policy rollouts are used only to approximate 
+
+V (π) = 0 .833 as ground truth and never enter the estimator. Figure 3 decomposes the Table 1 RMSE entries into bias and standard deviation, showing that learned-abstraction baselines (STAR on Sepsis; 22 FQE on ICU-Sepsis) are bias-dominated, while OIS is variance-dominated; FF-OIS and FF-WIS are small on both axes. OIS  
+
+> WIS
+> FF-OIS
+> FF-WIS
+> LS
+> STAR
+> DSA
+> DualDICE
+> GenDICE
+> 10 −3
+> 10 −2
+> 10 −1
+> 10 0
+> value (log scale)
+> Sepsis
+> OIS
+> WIS
+> FQE
+> DR
+> FF-OIS
+> FF-WIS
+> DualDICE
+> GenDICE
+> 10 −3
+> 10 −2
+> 10 −1
+> 10 0
+> ICU-Sepsis
+> |Bias| Std
+
+Figure 3: Bias versus standard-deviation decomposition of RMSE on the finite-horizon MDP bench-marks (visualizing Table 1). Bars on log scale. STAR on Sepsis and FQE on ICU-Sepsis are bias-dominated; OIS is variance-dominated on both benchmarks; the DICE-family estimators (DualDICE, GenDICE) are bias-dominated on both, with bias an order of magnitude larger than FF-WIS; FF-OIS and FF-WIS are small on both axes. GenDICE bars use trimmed-trial statistics (see Table 1). 
+
+KuaiRec slate setup. KuaiRec [Gao et al., 2022] provides a 1,411 × 3,327 user–video matrix at 
+
+99 .6% density. We construct a per-item ranking task with pool size M = 15 , slate sizes K ∈ { 4, 6, 8},and a context-dependent Plackett–Luce behavior policy implemented as per-item softmax sampling without replacement. The reward is the geometric mean of true watch ratios plus Gaussian noise 
+
+σ = 1 , with nusers = 300 .
+
+KuaiRec scaling details for Figure 2. Figure 2 evaluates how slate size K affects both joint-propensity computation and downstream OPE. The left panel compares exact enumeration over all K! generation orders, Forward-DP, and a Gumbel-top-K Monte Carlo estimator [Kool et al., 2019]. Direct K!-enumeration is measured up to K = 8 and extrapolated for K > 8, where direct measurement is computationally infeasible. Gumbel-MC uses 3 × 10 6 samples per user. In the KuaiRec timing experiment the behavior policy is a fixed-score Plackett–Luce logger, so Gumbel-top-
+
+K sampling admits a vectorized fast path. This makes Gumbel-MC competitive in wall-clock time on this particular plain-PL timing benchmark, but it remains an approximation and does not provide exact propensities. The distinction from Forward-DP becomes important for the context-dependent loggers used in the model-selection experiments. Fixed-score Plackett–Luce and Gumbel-top-K samplers assume that the item scores are fixed after observing the context [Ma et al., 2021, Kool et al., 2019]. They therefore do not directly compute the unordered joint propensity when the next-item softmax is recomputed after each partial slate, as in the SASRec and Qwen logger interfaces of Section 4.3. Forward-DP instead queries the policy on each picked subset and is exact for the stated set-sufficient context-dependent interface. 
+
+K-sweep RMSE summary. The right panel of Figure 2 reports downstream OPE RMSE for 
+
+K ∈ { 4, 6, 8, 10 , 12 } with nusers = 300 and ntrials = 200 . Absolute RMSE values are not directly comparable across K, because the ground-truth target value changes substantially with slate size: 
+
+V (π) = 4 .64 , 3.27 , 0.05 , −4.71 , −10 .86 for K = 4 , 6, 8, 10 , 12 ,
+
+respectively. In addition, the number of size-K slates,  MK
+
+, peaks around K = 7 –8 for M = 15 , and the negative pairwise interaction term in the reward construction becomes dominant at larger K. We 23 therefore interpret the right panel within each fixed K, comparing each trajectory-weighted estimator to its forward-flow counterpart. Within each K, the relative RMSE reductions are stable. Table 5 reports ratios against the corre-sponding trajectory-weighted baselines. FF-OIS reduces RMSE relative to OIS for all tested K, and FF-DR reduces RMSE relative to trajectory-IS DR for all tested K. The largest reductions occur when the ordered prefix ratios are most unstable, especially at K = 6 and K = 12 .Table 5: Within-K RMSE ratios on KuaiRec ( M = 15 , nusers = 300 , ntrials = 200 ). Lower than 
+
+1.00 indicates lower RMSE than the denominator. Ratios should be compared within the same K,not across different K.                        
+
+> KFF-OIS / OIS DR / OIS FF-DR / OIS FF-DR / DR 40.378 0.494 0.184 0.372
+> 60.191 0.682 0.094 0.138
+> 80.142 0.164 0.077 0.470
+> 10 0.497 0.941 0.401 0.426
+> 12 0.182 0.328 0.095 0.288
+
+Fixed-score propensity baselines. We compare Forward-DP to three adjacent fixed-score or sampling baselines. First, direct enumeration sums the probabilities of all K! orderings and is exact but factorial in K. Second, Gumbel-MC uses the Gumbel-top-K trick to sample without replacement from fixed item scores and estimates unordered propensities by Monte Carlo [Kool et al., 2019]. Third, permanent-style subset dynamic programs such as Ryser’s formula [Ryser, 1963] and marginalized Plackett–Luce closed forms [Ma et al., 2021] exploit fixed-score structure. These alternatives are relevant comparisons because they also avoid explicit K! enumeration in fixed-score settings. However, they do not target the same quantity as Forward-DP when the logger is context-dependent at each partial slate. In a re-prompting or set-conditioned logger, the softmax denominator and item logits may change after each picked set S<t . Applying a fixed-score Ryser computation to the re-prompting SASRec logger of Section 4.3 gives average distributional L1 errors of 0.39 , 0.50 ,and 0.57 at K = 4 , 6, 8, after normalizing the prefix-independent estimates over all  MK
+
+ slates for each user. Forward-DP is designed for this context-dependent set-sufficient setting: it recomputes or queries the next-item distribution at every picked subset and returns the exact unordered propensity for the deployed interface. 
+
+Off-policy model selection: setup. KuaiRec is used with item pool M = 20 for K ∈ { 4, 6}
+
+and M = 15 for K = 8 to match the propensity-timing setup of Section 4.2. User-pool size is 
+
+nusers = 300 for SASRec-only model selection, matching the OPCB scale of Kiyohara et al. [2024], and nusers = 30 for cross-architecture runs that include the LLM, since the LLM logit cache scales linearly with users. SASRec-only rankings agree at the two user-pool scales. The deployment logger is β = SASRec [step 200 , T = 3 .0] , a weakly trained high-temperature checkpoint standing in for an exploration-aware production deployment. Reward is the position-allocated discounted watch ratio with a pairwise diminishing-returns interaction term ( λ = 0 .1), following Kiyohara et al. [2024]. 
+
+Off-policy model selection: candidate pool. Thirteen target candidates are evaluated jointly in the SASRec-only setting: six SASRec checkpoints at training step ∈ { 200 , 400 , 800 , 1600 , 3200 , 6400 }
+
+with T = 0 .7; four step-800 copies at T ∈ { 0.3, 0.5, 1.0, 1.5}; two reward-aware references ScorerPL [T = 0 .3] and ScorerPL [T = 1 .0] on the held-out reward scorer; and a uniform-random generator. Cross-architecture runs add three LLM-Qwen2.5-3B candidates at T ∈ { 0.5, 0.7, 1.0}
+
+prompted with KuaiRec second-level category captions. Ground-truth V (πc) is computed exactly by enumerating all  MK
+
+ subsets and weighting them with the Forward-DP propensity Fπc .
+
+Estimator definitions for model selection. Tree-OIS and Tree-WIS use the trajectory prefix-ratio weight and require no unordered-slate joint propensity. FF-OIS, FF-WIS, and FF-DR replace the trajectory prefix ratio by the forward-flow slate weight Fπ (S)/F β (S). Tree-DR uses the trajectory-IS residual but computes the direct-method expectation 
+
+VDM (π) = X
+
+> S
+
+Fπ (S)bq(S)
+
+24 with Forward-DP. DP-MPL-OIS and DP-MPL-WIS apply the marginalized-PL construction using inclusion marginals P 
+
+> S
+
+F (S)1{d ∈ S} supplied by Forward-DP in the context-dependent setting. DP-OPCB-OIS and DP-OPCB-DR apply the OPCB construction of Kiyohara et al. [2024] with Forward-DP-supplied joint propensities and the SLOPE+ kth-element rule. Figure 4 visualizes the per-estimator metrics of Table 3. 0.0      
+
+> 0.1
+> 0.2
+> 0.3
+> ↑ Top-1
+> 0.06
+> 0.26
+> 0.08
+> 0.22
+> 0.18
+> 0.28
+> 0.10
+> 0.26
+> 0.02
+> 0.08
+> −0.50
+> −0.25
+> 0.00
+> 0.25
+> 0.50
+> ↑ Spearman  ρ
+> -0.53
+> 0.24
+> -0.45
+> 0.27 0.35 0.42
+> -0.53
+> 0.22
+> 0.09
+> 0.38
+> Tree-OIS
+> Tree-WIS
+> FF-OIS
+> FF-WIS
+> FF-DR
+> Tree-DR
+> DP-MPL-OIS
+> DP-MPL-WIS
+> DP-OPCB-OIS
+> DP-OPCB-DR
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> ↓ Regret
+> 0.21
+> 0.06
+> 0.20
+> 0.06 0.07 0.06
+> 0.37
+> 0.07 0.09
+> 0.05
+
+Figure 4: K = 4 off-policy model-selection metrics by estimator (visualizing Table 3). Higher is better for top-1 and Spearman; lower is better for regret. Best per panel: Tree-DR (top-1, Spearman) and DP-OPCB-DR (regret), both Forward-DP-enabled. 
+
+Additional slate-size sweeps. Changing K changes both the ordering-orbit size and the candidate value landscape. At K = 6 , the SASRec-only candidate values collapse to a narrow range [3 .28 , 3.64] 
+
+with V (β) = 3 .62 near the top, making broadness-biased estimators unusually favorable; DP-MPL-OIS therefore attains top-1 accuracy 1.00 , Spearman +0 .91 , and zero regret in this specific landscape. This dominance is not uniform: at K = 4 , the same estimator has regret 0.369 . The direct forward-flow comparison shows the expected growth with the ordering orbit: at K = 8 , FF-OIS reaches top-1
+
+accuracy 0.44 versus 0.24 for Tree-OIS, with 40 ,320 latent orderings per slate. 
+
+Cross-architecture migration. Adding three LLM-Qwen2.5-3B candidates yields a K-dependent deployment verdict. At K = 4 , the LLM cluster sits below trained SASRec checkpoints ( V ∈
+
+[4 .02 , 4.13] versus [4 .49 , 4.62] ). At K = 6 , the same LLM cluster moves to the top ( V ∈ [3 .64 , 3.69] ,beating the best SASRec at 3.61 ). At K = 8 on M = 15 , SASRec[step 400 , T = 0 .7] wins back with V = 1 .04 , while the LLM cluster is mid-pack at V ∈ [0 .76 , 0.84] . In this offline benchmark, once the logger interface and reward table are available, Forward-DP supplies the unordered-slate propensities needed to evaluate these counterfactual slate-size and architecture choices without new online interaction. Table 6 summarizes the K-dependent verdicts. 25 Table 6: Cross-architecture migration verdict by slate size K. Values are computed exactly by enumerating all  MK
+
+ size-K subsets and weighting them with the Forward-DP propensity Fπc .                             
+
+> KMLLM-Qwen Vrange Best SASRec VVerdict 420 [4 .02 ,4.13] 4.62 (range [4 .49 ,4.62] )SASRec 620 [3 .64 ,3.69] 3.61 LLM 815 [0 .76 ,0.84] 1.04 (step 400 ,T= 0 .7)SASRec
+
+DP-OPCB-WIS at K = 4 SASRec-only. The self-normalized DP-OPCB-WIS variant is omitted from Table 3 because it attains top-1 accuracy 0.00 across all 50 trials on this benchmark, with Spearman +0 .14 and regret 0.052 . Inspecting the per-trial argmax shows that self-normalization combined with the SLOPE+ kth shrinkage of Kiyohara et al. [2024] concentrates the predicted-best on a fixed broader-distribution candidate, SASRec[step 800 , T = 1 .0] with V = 4 .37 , rather than the sharper true-best, SASRec[step 800 , T = 0 .3] with V = 4 .42 . Thus regret remains competitive while exact top-1 accuracy is zero in this landscape. 
+
+# NeurIPS Paper Checklist 
+
+1. Claims 
+
+Question: Do the main claims made in the abstract and introduction accurately reflect the paper’s contributions and scope? Answer: [Yes] Justification: The two contributions claimed in the abstract and introduction (the rollout-tree to quotient-DAG view of OPE in §3.1 and the Forward-DP exact-propensity algorithm for context-dependent set-sufficient autoregressive slate loggers in §3.2) are both formalized as propositions with proofs in Appendix A and validated empirically in §4. Guidelines: • The answer [N/A] means that the abstract and introduction do not include the claims made in the paper. • The abstract and/or introduction should clearly state the claims made, including the contributions made in the paper and important assumptions and limitations. A [No] or [N/A] answer to this question will not be perceived well by the reviewers. • The claims made should match theoretical and experimental results, and reflect how much the results can be expected to generalize to other settings. • It is fine to include aspirational goals as motivation as long as it is clear that these goals are not attained by the paper. 2. Limitations 
+
+Question: Does the paper discuss the limitations of the work performed by the authors? Answer: [Yes] Justification: §2 (“Scope of set-sufficiency”) states for which recommender deployment styles set-sufficiency holds and for which it does not; §3.1 notes that per-decision FF-IS gives a per-term Rao–Blackwell statement that does not imply a full-estimator variance ordering; §3.2 bounds Forward-DP’s regime of practicality at K ≤ 10 ; Appendix F consolidates the assumptions and scope of the framework (sufficiency, set-sufficiency, reward invariance, scaling with K, support and known stochastic interface); the Conclusion lists open directions on continuous-state extensions and approximate sufficiency. Guidelines: • The answer [N/A] means that the paper has no limitation while the answer [No] means that the paper has limitations, but those are not discussed in the paper. • The authors are encouraged to create a separate “Limitations” section in their paper. • The paper should point out any strong assumptions and how robust the results are to violations of these assumptions (e.g., independence assumptions, noiseless settings, model well-specification, asymptotic approximations only holding locally). The authors 26 should reflect on how these assumptions might be violated in practice and what the implications would be. • The authors should reflect on the scope of the claims made, e.g., if the approach was only tested on a few datasets or with a few runs. In general, empirical results often depend on implicit assumptions, which should be articulated. • The authors should reflect on the factors that influence the performance of the approach. • The authors should discuss the computational efficiency of the proposed algorithms and how they scale with dataset size. • If applicable, the authors should discuss possible limitations of their approach to address problems of privacy and fairness. • While the authors might fear that complete honesty about limitations might be used by reviewers as grounds for rejection, a worse outcome might be that reviewers discover limitations that aren’t acknowledged in the paper. The authors should use their best judgment and recognize that individual actions in favor of transparency play an impor-tant role in developing norms that preserve the integrity of the community. Reviewers will be specifically instructed to not penalize honesty concerning limitations. 3. Theory assumptions and proofs 
+
+Question: For each theoretical result, does the paper provide the full set of assumptions and a complete (and correct) proof? Answer: [Yes] Justification: All four propositions (3, 4, 5, 6) state their assumptions in the proposition body. Full proofs appear in Appendix A (§A.1, §A.3, §A.4, §A.6). The variance gap derivation specialized to slate OPE is in §A.5. Guidelines: • The answer [N/A] means that the paper does not include theoretical results. • All the theorems, formulas, and proofs in the paper should be numbered and cross-referenced. • All assumptions should be clearly stated or referenced in the statement of any theorems. • The proofs can either appear in the main paper or the supplemental material, but if they appear in the supplemental material, the authors are encouraged to provide a short proof sketch to provide intuition. • Inversely, any informal proof provided in the core of the paper should be complemented by formal proofs provided in appendix or supplemental material. • Theorems and Lemmas that the proof relies upon should be properly referenced. 4. Experimental result reproducibility 
+
+Question: Does the paper fully disclose all the information needed to reproduce the main ex-perimental results of the paper to the extent that it affects the main claims and/or conclusions of the paper (regardless of whether the code and data are provided or not)? Answer: [Yes] Justification: All experiments use public benchmarks (Sepsis simulator of Oberst and Sontag [2019], MIMIC-III ICU-Sepsis tabular MDP of Komorowski et al. [2018], KuaiRec of Gao et al. [2022]) and the open Qwen2.5-3B model. Appendix G specifies behavior and target policies, candidate pool, reward construction with diminishing-returns coefficient, logged-budget grid, single-CPU runs, and random seed 42 .Guidelines: • The answer [N/A] means that the paper does not include experiments. • If the paper includes experiments, a [No] answer to this question will not be perceived well by the reviewers: Making the paper reproducible is important, regardless of whether the code and data are provided or not. • If the contribution is a dataset and/or model, the authors should describe the steps taken to make their results reproducible or verifiable. 27 • Depending on the contribution, reproducibility can be accomplished in various ways. For example, if the contribution is a novel architecture, describing the architecture fully might suffice, or if the contribution is a specific model and empirical evaluation, it may be necessary to either make it possible for others to replicate the model with the same dataset, or provide access to the model. 5. Open access to data and code 
+
+Question: Does the paper provide open access to the data and code, with sufficient instruc-tions to faithfully reproduce the main experimental results, as described in supplemental material? Answer: [Yes] Justification: All datasets are publicly available (KuaiRec via official release; Sepsis sim-ulator open source; MIMIC-III via standard PhysioNet credentialing). An anonymized code release accompanying the supplemental material reproduces every figure, table, and propensity-timing experiment. Guidelines: • The answer [N/A] means that paper does not include experiments requiring code. • Please see the NeurIPS code and data submission guidelines ( https://neurips.cc/ public/guides/CodeSubmissionPolicy ) for more details. • While we encourage the release of code and data, we understand that this might not be possible, so [No] is an acceptable answer. • The authors should provide instructions on data access and preparation. • The authors should provide scripts to reproduce all experimental results for the new proposed method and baselines. • At submission time, to preserve anonymity, the authors should release anonymized versions (if applicable). 6. Experimental setting/details 
+
+Question: Does the paper specify all the training and test details (e.g., data splits, hyperpa-rameters, how they were chosen, type of optimizer) necessary to understand the results? Answer: [Yes] Justification: Appendix G specifies the data splits, behavior and target policy hyperparame-ters (temperatures, ϵ-greedy mixture, training-step indexing of SASRec checkpoints), reward construction, logged budgets, and trial counts for each benchmark. Guidelines: • The answer [N/A] means that the paper does not include experiments. • The experimental setting should be presented in the core of the paper to a level of detail that is necessary to appreciate the results and make sense of them. • The full details can be provided either with the code, in appendix, or as supplemental material. 7. Experiment statistical significance 
+
+Question: Does the paper report error bars suitably and correctly defined or other appropriate information about the statistical significance of the experiments? Answer: [Yes] Justification: All RMSE and selection-metric values are averaged over 50–2000 independent trials with random seed 42 ; the trial count for each benchmark is stated in the corresponding table caption. The within-trial randomness is the resampling of logged trajectories under the behavior policy. Guidelines: • The answer [N/A] means that the paper does not include experiments. • The authors should answer [Yes] if the results are accompanied by error bars, confidence intervals, or statistical significance tests, at least for the experiments that support the main claims of the paper. 28 • The factors of variability that the error bars are capturing should be clearly stated. • The method for calculating the error bars should be explained. • The assumptions made should be given. • It should be clear whether the error bar is the standard deviation or the standard error of the mean. 8. Experiments compute resources 
+
+Question: For each experiment, does the paper provide sufficient information on the com-puter resources (type of compute workers, memory, time of execution) needed to reproduce the experiments? Answer: [Yes] Justification: Appendix G states that all experiments are single-CPU runs. Wall-clock seconds for the propensity DP under each K are reported in Table 2. The Qwen2.5-3B logit cache for the cross-architecture run is the only GPU-dependent step and is amortized once per user. Guidelines: • The answer [N/A] means that the paper does not include experiments. • The paper should indicate the type of compute workers CPU or GPU, internal cluster, or cloud provider, including relevant memory and storage. • The paper should provide the amount of compute required for each of the individual experimental runs as well as estimate the total compute. • The paper should disclose whether the full research project required more compute than the experiments reported in the paper. 9. Code of ethics 
+
+Question: Does the research conducted in the paper conform, in every respect, with the NeurIPS Code of Ethics https://neurips.cc/public/EthicsGuidelines ?Answer: [Yes] Justification: The work is a methodological contribution to off-policy evaluation; we use only de-identified public benchmarks (MIMIC-III via PhysioNet credentialing) and pre-trained recommenders, and we recruit no human subjects. Guidelines: • The answer [N/A] means that the authors have not reviewed the NeurIPS Code of Ethics. • If the authors answer [No], they should explain the special circumstances that require a deviation from the Code of Ethics. • The authors should make sure to preserve anonymity (e.g., if there is a special consid-eration due to laws or regulations in their jurisdiction). 10. Broader impacts 
+
+Question: Does the paper discuss both potential positive societal impacts and negative societal impacts of the work performed? Answer: [Yes] Justification: More accurate off-policy evaluation supports safer deployment decisions in high-stakes domains such as healthcare and recommendation by reducing reliance on costly or risky online experimentation. The estimator is value-neutral and does not introduce a new mode of harm beyond standard IS-family OPE; we encourage practitioners to validate fairness properties of any policy selected via this primitive. Guidelines: • The answer [N/A] means that there is no societal impact of the work performed. • If the authors answer [N/A] or [No], they should explain why their work has no societal impact or why the paper does not address societal impact. • Examples of negative societal impacts include potential malicious or unintended uses (e.g., disinformation, surveillance), fairness considerations, privacy considerations, and security considerations. 29 11. Safeguards 
+
+Question: Does the paper describe safeguards that have been put in place for responsible release of data or models that have a high risk for misuse? Answer: [N/A] Justification: The paper releases no new pre-trained model, scraped dataset, or generative artifact that poses misuse risk. Guidelines: • The answer [N/A] means that the paper poses no such risks. 12. Licenses for existing assets 
+
+Question: Are the creators or original owners of assets (e.g., code, data, models), used in the paper, properly credited and are the license and terms of use explicitly mentioned and properly respected? Answer: [Yes] Justification: The Sepsis simulator [Oberst and Sontag, 2019], ICU-Sepsis [Komorowski et al., 2018], KuaiRec [Gao et al., 2022], SASRec [Kang and McAuley, 2018], and Qwen2.5-3B model are all cited; we use them under their respective open or research licenses (MIMIC-III access requires PhysioNet credentialing, which we obtained). Guidelines: • The answer [N/A] means that the paper does not use existing assets. • The authors should cite the original paper that produced the code package or dataset. • The authors should state which version of the asset is used and, if possible, include a URL. • The name of the license (e.g., CC-BY 4.0) should be included for each asset. 13. New assets 
+
+Question: Are new assets introduced in the paper well documented and is the documentation provided alongside the assets? Answer: [N/A] Justification: The paper introduces no new dataset or model. The algorithmic implementation accompanying the supplemental material includes a README and reproduction scripts. Guidelines: • The answer [N/A] means that the paper does not release new assets. 14. Crowdsourcing and research with human subjects 
+
+Question: For crowdsourcing experiments and research with human subjects, does the paper include the full text of instructions given to participants and screenshots, if applicable, as well as details about compensation (if any)? Answer: [N/A] Justification: The paper involves no crowdsourcing or human-subject research; all data are pre-collected and de-identified public benchmarks. Guidelines: • The answer [N/A] means that the paper does not involve crowdsourcing nor research with human subjects. 15. Institutional review board (IRB) approvals or equivalent for research with human subjects 
+
+Question: Does the paper describe potential risks incurred by study participants, whether such risks were disclosed to the subjects, and whether Institutional Review Board (IRB) approvals (or an equivalent approval/review based on the requirements of your country or institution) were obtained? Answer: [N/A] 30 Justification: No human subjects participated in this research; MIMIC-III is accessed under its standard PhysioNet credentialing. Guidelines: • The answer [N/A] means that the paper does not involve crowdsourcing nor research with human subjects. 16. Declaration of LLM usage 
+
+Question: Does the paper describe the usage of LLMs if it is an important, original, or non-standard component of the core methods in this research? Answer: [N/A] Justification: Qwen2.5-3B appears in our experiments only as one of several recommender candidates evaluated by the proposed estimator (§4.3, Appendix G); large language models are not part of the core methodology. Guidelines: • The answer [N/A] means that the core method development in this research does not involve LLMs as any important, original, or non-standard components. • Please refer to our LLM policy in the NeurIPS handbook for what should or should not be described. 31

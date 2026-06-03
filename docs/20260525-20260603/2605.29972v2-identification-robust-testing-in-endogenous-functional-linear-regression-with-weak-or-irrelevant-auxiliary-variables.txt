@@ -1,0 +1,3055 @@
+Title: Identification-Robust Testing in Endogenous Functional Linear Regression with Weak or Irrelevant Auxiliary Variables
+
+URL Source: https://arxiv.org/pdf/2605.29972v2
+
+Published Time: Mon, 01 Jun 2026 01:45:46 GMT
+
+Number of Pages: 42
+
+Markdown Content:
+# Identification-Robust Testing in Endogenous Functional Linear Regression with Weak or Irrelevant Auxiliary Variables 
+
+Won-Ki Seo ∗
+
+Abstract 
+
+We develop dimension-reduction-free tests for the slope function in functional linear regression when the functional regressor may be endogenous or measured with error. The tests are based on a functional moment condition induced by an auxiliary functional variable and do not require estima-tion of the slope function. This feature is particularly useful in infinite-dimensional settings, where the identification and regularization conditions needed for consistent estimation are often strong and dif-ficult to verify. The proposed procedures remain asymptotically valid under weak or even failed rel-evance of the auxiliary variable, and they are consistent against fixed alternatives that are detectable through the moment operator. We establish the asymptotic null distribution, consistency against de-tectable alternatives, and local power under drifting alternatives. We also derive the locally optimal test within a class of weighted test statistics. Feasible critical values for implementation of the tests are obtained from data. Simulations show reliable size control and competitive power, including under weak relevance. We illustrate the method using a functional regression analysis of residential electric-ity demand and temperature distributions in South Korea. 
+
+MSC 2020 : 62R10; 62M10; 62J05 ;62F03. 
+
+Keywords : endogenous functional linear regression; weak relevance; dimension-reduction-free infer-ence; functional time series; identification-robust testing. 
+
+1 Introduction 
+
+The functional linear model (FLM) is a central tool for relating response variables to complex covariates such as curves, images, and distributional objects. Important contributions to the study of FLMs include Bosq (2000), Yao et al. (2005), Mas (2007), Hall and Horowitz (2007), and Imaizumi and Kato (2018); Ramsay and Silverman (2005) and Horváth and Kokoszka (2012) provide comprehensive reviews of the topic. Much of this literature operates under the exogeneity assumption that the functional regressor is uncorrelated with the regression error. In practice, however, this assumption is frequently violated. Endogeneity in functional regression can arise for a variety of reasons, such as omission of relevant variables, simultaneity between the response and the regressor, and the regressor being observed only with error. The last issue is particularly common in functional data analysis, since functional regressors are typically reconstructed by smoothing discrete and noisy measurements or estimated from raw data such as empirical distributions; see Chen et al. (2022) and Seong and Seo (2025) for representative discussions. Endogeneity of any of these forms makes standard exogenous inference procedures unreliable, which has motivated a growing  
+
+> ∗The author thanks Kyungsik Nam for kindly granting access to the replication materials from Nam and Seo (2026) and for his work in data compilation and preprocessing. The compiled dataset is maintained in a private repository by Kyungsik Nam at
+> https://github.com/norandom83/FRKET-Program-Code and is available upon request.
+
+1
+
+> arXiv:2605.29972v2 [stat.ME] 29 May 2026
+
+literature on inference for the endogenous functional linear model, including Florens and Van Bellegem (2015), Benatia et al. (2017), Chen et al. (2022), Babii (2022), Petrovich et al. (2024), and Seong and Seo (2025). In this paper, we consider the FLM with a scalar response yt and a functional regressor Xt taking values in a Hilbert space H,
+
+yt = Θ Xt + ut, (1.1) where ut satisfies E[ut] = 0 and Θ : H → R is a continuous linear map. Although (1.1) is stated in a sim-plified form to highlight the core components, the framework readily accommodates more general speci-fications, including those with additional scalar control variables, as detailed in the subsequent sections. Estimation and inference for the slope parameter Θ, the linear map that links the functional regressor to the response, are central issues in the FLM literature. When Xt is endogenous, a standard strategy is to introduce an auxiliary functional variable Zt that is correlated with the functional regressor but uncorrelated with the regression error. Such a variable is often referred to as an instrumental variable (IV) in the literature (see, e.g., Florens and Van Bellegem, 2015). The use of Zt yields a functional moment equation that supports inference without requiring exogeneity of Xt. As we show below, our framework subsumes the exogenous setting as a special case: when Xt is exogenous, one may set Zt = Xt, and the procedure reduces to a test for the classical FLM. The framework therefore provides a unified inferential approach that applies whether or not the regressor is exogenous. Despite the empirical relevance of endogeneity in functional regression, endogeneity-robust hypothe-sis testing remains underdeveloped relative to the extensive literature on exogenous FLMs (see, for exam-ple, Cardot et al., 2003; Hilgert et al., 2013; Su et al., 2017; Dette et al., 2020; Lin and Lin, 2021; Yeon et al., 2023a,b). To our knowledge, only a few studies, including Babii (2022) and Seo and Seong (2025), address the testing problem for model (1.1) in the presence of endogeneity. Babii (2022) focuses on inference for an upper bound of the parameter of interest, while Seo and Seong (2025) develops inference on the slope parameter itself. As we detail in Section 2.3, however, the method of Seo and Seong (2025) relies on tech-nical conditions that are stringent and difficult to verify, including spectral-gap and injectivity conditions on certain covariance operators. These conditions can be overly restrictive in practice, and the same lim-itation applies to existing function-on-function regression methods that could be adapted to the present setup. Such restrictions are unattractive for practitioners who, for example, simply wish to test the basic significance of the functional linear model (that is, H0 : Θ = 0 ) as a preliminary model check, without committing to unverifiable assumptions. A second concern in inference for the endogenous FLM is that, in the infinite-dimensional setting, the auxiliary variable Zt may not be sufficiently correlated with the endogenous regressor Xt. The literature commonly imposes regularity conditions on the cross-covariance operator CXZ of Xt and Zt, such as in-jectivity or specific spectral properties. The injectivity condition, which is typically required for consistent estimation, demands that CXZ v̸ = 0 for every nonzero v of the entire space H or an infinite-dimensional subspace. This is a restrictive requirement, since the auxiliary variable must be chosen so that CXZ v̸ = 0 
+
+for infinitely many directions v. Moreover, the condition cannot be verified from finite-sample data. Both the requirement of sufficient correlation between Xt and Zt and the technical conditions dis-cussed above are typically essential for consistency of functional estimators and for the asymptotic valid-2ity of estimator-based inference. Since most of these conditions cannot be tested from the data, they im-pose substantial costs in empirical work. We address these limitations by developing a testing framework whose asymptotic validity does not rely on consistent estimation of the slope function or on the strength of the auxiliary variable, a property we refer to as identification robustness .Our contribution is threefold. First, we introduce a class of tests for the slope function constructed di-rectly from a functional moment process. The tests do not require a consistent estimator of the slope func-tion and therefore avoid the regularization and dimension-reduction choices inherent in many estimator-based approaches. Second, we establish identification-robust validity. The asymptotic null distribution of the proposed tests does not require the moment operator linking Xt and Zt to be injective or even strongly informative, and weak or failed relevance affects power rather than asymptotic size. The tests are consis-tent against any fixed alternative whose deviation from the null is detectable through the moment opera-tor. Third, we develop a local power theory in which, within a broad class of weighted statistics, the effect of the weight function on local power is summarized by a single normalized drift parameter, which leads to an explicit optimality result. The remainder of the paper is organized as follows. Section 2 introduces the notation and presents the functional linear model with potential endogeneity. Section 3 develops the proposed tests and establishes their asymptotic properties, including local power. Section 4 addresses the computation of feasible critical values. Section 5 presents several extensions that broaden the scope of the proposed method. Section 6 re-ports simulation evidence in support of the theory, and Section 7 applies the proposed tests to an empiri-cal example concerning residential electricity demand and temperature distributions. Section 8 concludes. All technical proofs are deferred to the Appendix. 
+
+2 Functional linear model with potential endogeneity 
+
+2.1 Notation 
+
+Throughout the paper, we work with random elements taking values in the Hilbert space H = L2[0 , 1] of square-integrable functions on [0 , 1] . The choice of [0 , 1] is for notational convenience only, and the results extend to any compact interval [a, b ]. We write ⟨v1, v 2⟩ and ∥v1∥ = p⟨v1, v 1⟩ for the inner product and norm in H. For notational simplicity, we use the same symbols for the inner product and norm in R, so that ⟨v1, v 2⟩ = v1v2 and ∥v1∥ = |v1| for v1, v 2 ∈ R, whenever no confusion arises. For any continuous linear map A between H and R (in either direction) or from H to H, ∥A∥op =sup ∥v∥≤ 1 ∥Av ∥ denotes the operator norm of A. For any v1, v 2 each taking values in H or R, the tensor product v1 ⊗ v2 is the map defined by (v1 ⊗ v2)( ·) = ⟨v1, ·⟩ v2. We write ran A and ker A for the range and kernel of A, and M⊥ for the orthogonal complement of any set M ⊂ H . For random elements W and V
+
+taking values in H or R with E[∥W ∥2] < ∞ and E[∥V ∥2] < ∞, CW V = Cov (W, V ) = E[( W − E[W ]) ⊗
+
+(V − E[V ])] denotes the (cross-)covariance of W and V , which is a well-defined bounded linear map. 
+
+2.2 Model formulation 
+
+We assume throughout the main development that yt and Xt are mean-zero, E[yt] = 0 and E[Xt] = 0 ,and that (1.1) holds. This assumption is made for expositional simplicity; extensions to models with an intercept and with additional scalar covariates are given in Sections 5.1 and 5.2, respectively. By the Riesz 3representation theorem (see, e.g., Conway, 1994, p. 13), any continuous linear map A : H → R admits the representation A(·) = ⟨a, ·⟩ for a unique a ∈ H . Hence (1.1) can be written equivalently as 
+
+yt = ⟨Xt, θ ⟩ + ut, E[ut] = 0 , (2.1) for a unique θ ∈ H . Inference on Θ : H → R therefore reduces to inference on θ ∈ H , and our proposed test for θ in the H-norm has an explicit duality with testing for Θ in the operator norm; see Remark 3.1. 
+
+2.3 Testing hypotheses under potential endogeneity 
+
+We consider testing 
+
+H0 : θ = θ0 against H1 : θ = θ0 + ψ for ψ ∈ H \ { 0}, (2.2) where ψ ∈ H\{ 0} is either a fixed element or a sequence shrinking to zero in norm as T → ∞ , depending on the context; we will specify this further as needed. The hypotheses for θ in (2.2) translate immediately into the corresponding hypotheses for Θ. These hypotheses are of central empirical interest. For example, examining the nullity of the slope coefficient ( H0 : θ = 0 ) is often a first step in verifying the functional association between yt and Xt (see, e.g., Cardot et al., 2004; Yi et al., 2022). Testing (2.2) is more challenging in the FLM framework than in the scalar or finite-dimensional regressor case, mainly because Xt takes values in a potentially infinite-dimensional space. It is commonly assumed in the FLM literature that the regressor Xt is exogenous, meaning that 
+
+CXu := Cov (Xt, u t) = E[( Xt − E[Xt]) ⊗ (ut − E[ut])] = 0 . (2.3) Under the present mean-zero assumption, CXu simplifies to E[Xt ⊗ut]; we retain the centered form in (2.3) so that the same definition applies to the intercept model considered later. As discussed in the introduction, the exogeneity assumption is frequently violated in practice (see, e.g., Florens and Van Bellegem, 2015; Benatia et al., 2017; Chen et al., 2022; Petrovich et al., 2024; Seong and Seo, 2025). As noted by Seong and Seo (2025), in many applications, the functional regressor of interest is often incompletely observed and is typically constructed by smoothing a finite number of discrete samples, the number of which may not be sufficiently large. Consequently, the regressor used in practice almost always deviates from the intended true functional observation, which can give rise to endogeneity. Beyond measurement errors, certain regressors considered by practitioners may be inherently endogenous; we refer the reader to Section 2.1 of Seong and Seo (2025) for specific examples. A standard approach to address this is to introduce an auxiliary functional variable Zt satisfying 
+
+CXZ := Cov (Xt, Z t)̸ = 0 and CZu := Cov (Zt, u t) = 0 . (2.4) The condition CXZ ̸ = 0 is a minimal relevance condition on Zt; more stringent conditions, such as 
+
+CXZ v̸ = 0 for all nonzero v in a sufficiently large subspace, are typically imposed in the literature for identification and consistent estimation. While such stronger relevance is also desirable for power of our tests, it is not required for the asymptotic validity of our tests under the null; one of the main features of our procedure is that weak or even failed relevance affects power rather than size. The framework also includes the classical exogenous case as a special case: when Xt is exogenous, one may take Zt = Xt, in which case (2.4) reduces to the standard requirements CXX ̸ = 0 and CXu = 0 . The proposed procedure 4therefore applies whether or not the regressor is exogenous. From (2.1), we find that the following relationship holds: letting CyZ = Cov (yt, Z t),
+
+CyZ = CXZ θ, (2.5) which is the population moment equation upon which existing estimators based on the auxiliary variable 
+
+Zt, often referred to as functional IV estimators in the literature on IV methods, are implicitly or explicitly based. Equation (2.5) does not, in general, identify θ uniquely: if ker CXZ is nontrivial, then CXZ (θ+ψ) = 
+
+CXZ θ for any ψ ∈ ker CXZ , and (2.5) remains satisfied when θ is replaced by θ + ψ. This ambiguity complicates the discussion of an estimator’s consistency based on (2.5). Unique identification of θ therefore requires an additional assumption on CXZ , most commonly the injectivity condition ker CXZ = {0}.Even injectivity is generally insufficient for consistent estimation of θ, and stronger spectral conditions on CXZ are typically imposed; see, for example, Florens and Van Bellegem (2015, Section 2), Benatia et al. (2017, Section 7), and Seong and Seo (2025, Section 2). These conditions can be interpreted as requirements on how informative Zt is about Xt in the functional setting, analogous to instrument-strength conditions in the literature. The injectivity condition itself requires a sufficiently strong correlation between Xt and 
+
+Zt, in the sense that CXZ v = E[⟨Xt, v ⟩Zt]̸ = 0 for every nonzero v ∈ H . Since such conditions on the potentially infinite-rank operator CXZ cannot be verified from finite samples, we instead develop inference whose validity does not depend on them. Many functional datasets in the literature are observed over time rather than cross-sectionally, so we allow for temporal dependence in what follows. 
+
+Assumption 1. (i) (2.1) holds, (ii) CZu = Cov (Zt, u t) = 0 (where Zt = Xt if Xt is exogenous), and (iii) Xt,
+
+Zt, and ut are L4-m-approximable in their respective spaces, in the sense of Definition 1. 
+
+Definition 1 (Lp-m-approximability) . Let H be a Hilbert space with norm ∥ · ∥ H . For any positive integer 
+
+p, a random sequence ξt in H is said to be Lp-m-approximable if the following hold: (i) For some measurable function G and i.i.d. elements et taking values in H , ξt = G(et, e t−1, . . . ).(ii) For some δ ∈ (0 , 1) and ϱ > 1, E[ξt] = 0 , E(∥ξt∥p+δ 
+
+> H
+
+) < ∞, and 
+
+E
+
+
+
+∥ξt − ξt,m ∥p+δ
+
+> H
+
+1/(p+δ)
+
+= O(m−ϱ),
+
+where ξt,m = G(et, . . . , e t−m+1 , e (m)
+
+> t,t −m
+
+, e (m)
+
+> t,t −m−1
+
+, . . . ) and {e(m) 
+
+> t,k
+
+} are independent copies of et.
+
+Lp-m-approximability as in Definition 1, together with its variants, is a standard notion of weak de-pendence in functional data analysis (see, e.g., Hörmann and Kokoszka, 2010; Berkes et al., 2013; Horváth et al., 2014; Horváth et al., 2016). 
+
+3 Identification-robust tests without dimension reduction 
+
+3.1 Preliminaries and notation 
+
+We first observe that under H1, ψ̸ = 0 and the unit direction ψ/ ∥ψ∥ admits the orthogonal decomposition 
+
+¯ψ := ψ/ ∥ψ∥ = γrψr + γkψk, (3.1) 5where ψr ∈ [ker CXZ ]⊥ and ψk ∈ ker CXZ are unit vectors, and the scalars γr = ⟨ψ, ψ r⟩/∥ψ∥ and 
+
+γk = ⟨ψ, ψ k⟩/∥ψ∥ satisfy γ2 
+
+> r
+
++ γ2 
+
+> k
+
+= 1 . Observe that, by construction, 
+
+CXZ ¯ψ̸ = 0 ⇐⇒ γr̸ = 0 . (3.2) Letting κ = ∥ψ∥ ≥ 0 denote the magnitude of the deviation from the null, H0 and H1 in (2.2) can be jointly written as 
+
+Hκ : θ = θ0 + κ ¯ψ, ∥ ¯ψ∥2 = γ2 
+
+> r
+
++ γ2 
+
+> k
+
+= 1 , (3.3) where ¯ψ is an arbitrary unit vector when κ = 0 ; the subsequent results under H0 hold for any such choice. 
+
+H0 (resp. H1) in (2.2) corresponds to κ = 0 (resp. κ > 0) in (3.3), and Hκ deviates more from H0 as κ
+
+increases. In addition to (3.3), which formulates a fixed deviation from the null, we will also consider the following sequence of local alternative hypotheses for asymptotic properties of our tests in detail: 
+
+Hκ,T : θ = θ0 + κ
+
+√T
+
+¯ψ, ∥ ¯ψ∥2 = γ2 
+
+> r
+
++ γ2 
+
+> k
+
+= 1 . (3.4) Our asymptotic analysis based on (3.4) bears some resemblance to the “weak IV” asymptotics in finite-dimensional IV regression, adapted to the functional setting (see Section 3.3). To construct our test, we define the H-valued partial-sum process eS = { eS(r) : r ∈ [0 , 1] } by 
+
+eS(r) := S⌊T r ⌋ = 1
+
+T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+Zt(yt − ⟨ Xt, θ 0⟩) . (3.5) Let DS[0 , 1] denote the space of càdlàg functions on [0 , 1] taking values in S, where S is either R or H.Then eS is a random element of DH[0 , 1] , and its limiting behavior underlies our asymptotic analysis. We consider norm-based test statistics of the form 
+
+∥√T g ( eS)∥2, (3.6) where g is a continuous linear map satisfying: (G1) g maps DS[0 , 1] to S; that is, g(f ) ∈ R if f ∈ DR[0 , 1] , and g(f ) ∈ H if f ∈ DH[0 , 1] .(G2) For any f ∈ DH[0 , 1] and v ∈ H , ⟨g(f ), v ⟩ = g(⟨f, v ⟩).Most choices of g that can be considered in practice fulfill these requirements. Standard examples include the point-evaluation map g(f ) = f (1) and the integration map g(f ) = R 10 f (r)dr for f ∈ DS[0 , 1] .The requirements (G1) and (G2) ensure a duality between inference on θ ∈ H via eS and inference on 
+
+Θ : H → R in the usual uniform operator norm, paralleling the duality between θ and Θ themselves; see Remark 3.1 and Lemma A.1. 
+
+Remark 3.1 (Duality in the testing on θ in the H-norm and Θ in the operator norm.) . Since each θ ∈ H 
+
+corresponds to a linear functional Θ : H → R via (2.1), the process eS identifies a process eR of linear functionals, where for each r, eR(r) = R⌊T r ⌋ : H → R is given by 
+
+R⌊T r ⌋ = 1
+
+T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+(Zt ⊗ yt − Zt ⊗ Θ0Xt) , (3.7) 6with Θ0(v) = ⟨θ0, v ⟩ for every v ∈ H . Moreover, under (G1) and (G2), Lemma A.1 gives 
+
+∥g( eR)∥op = ∥g( eS)∥. (3.8) The map g( eR) : H → R is continuous and linear, and ∥ · ∥ op defines the dual norm for such maps (see, e.g., Conway, 1994, p. 74). By Remark 3.1, the tests developed below using ∥g(√T eS)∥ can be equivalently understood as those based on ∥g(√T eR)∥op . This duality highlights a fundamental coherence in our testing framework. While the operator norm is the canonical metric for evaluating Θ, computing its supremum over an infinite-dimensional space is often empirically intractable. The duality resolves this difficulty: testing in the com-putationally straightforward H-norm is mathematically equivalent to testing Θ under the operator norm. Consequently, our inferential procedure remains theoretically grounded in the natural operator geometry while being readily implementable. 
+
+3.2 Infeasible tests 
+
+In this section, we develop statistical tests for examining the hypotheses in (2.2). As shown below, com-puting the critical values for the proposed test statistics requires knowledge of the eigenvalues of ΛZu , the long-run covariance operator of the sequence {Ztut}, defined as 
+
+ΛZu =
+
+> ∞
+
+X
+
+> s=−∞
+
+E[( Ztut) ⊗ (Zt−sut−s)] . (3.9) Under Assumption 1, ΛZu is a well-defined trace-class operator (see, e.g., Hörmann and Kokoszka, 2010, Lemma 4.1). Because ΛZu is non-negative, self-adjoint, and compact, it admits the spectral decomposition 
+
+ΛZu =
+
+> ∞
+
+X
+
+> j=1
+
+λj (vj ⊗ vj ), (3.10) where {λj }j≥1 are the eigenvalues in decreasing order and {vj }j≥1 are the corresponding orthonormal eigenvectors. For ease of exposition, we first assume that the eigenvalues {λj }j≥1 are known and use them to compute the critical values of our test statistics. Section 4 shows how to compute feasible critical values from estimates of these eigenvalues. We first examine the limiting behavior of eS(r) = S⌊T r ⌋ under Hκ (which includes H0 when κ = 0 ), as a preparation for constructing a consistent test. 
+
+Theorem 3.1. Suppose that Assumption 1 is satisfied. Let ψ = θ − θ0 and let ηt(ψ) = Zt{ut + ⟨Xt, ψ ⟩} − 
+
+CXZ ψ. Define Nψ as an H-valued Brownian motion with covariance 
+
+Λψ =
+
+> ∞
+
+X
+
+> ℓ=−∞
+
+E [ηt(ψ) ⊗ ηt−ℓ(ψ)] , (3.11) 
+
+i.e., ⟨N ψ(r), v ⟩ ∼ N (0 , r ⟨Λψv, v ⟩) for any v ∈ H . Then, under Hκ in (3.3) , sup 0≤r≤1 ∥ eS(r) − rC XZ ψ∥ → p
+
+0 and 
+
+sup 
+
+> 0≤r≤1
+
+√T { eS(r) − rC XZ ψ} − N ψ(r) →p 0. (3.12) 7Since ψ = κ ¯ψ and CXZ ¯ψ = γrCXZ ψr with CXZ ψr̸ = 0 (see (3.1)–(3.2)), Theorem 3.1 implies the following: (i) Under H0, where κ = 0 , sup 0≤r≤1 ∥√T eS(r) − N 0(r)∥ → p 0, where N0 has covariance ΛZu ;(ii) Under Hκ with κ > 0 and γr̸ = 0 , sup 0≤r≤1 ∥ eS(r) − rM∥ → p 0, where M = κγrCXZ ψr.(iii) Under Hκ with κ > 0 and γr = 0 , ηt(ψ) reduces to Zt{ut + ⟨Xt, ψ ⟩} , and sup 0≤r≤1 ∥√T eS(r) −Nψ(r)∥ → p 0, where the covariance of Nψ generally differs from ΛZu .The above results show that, under H0, the partial-sum process √T eS is tight and converges weakly to a mean-zero Brownian motion. In contrast, under a fixed alternative Hκ with CXZ ψ̸ = 0 (i.e., κ > 0 and 
+
+γr̸ = 0 ), the process eS(r) has the nonzero deterministic drift rM, and hence √T eS(r) diverges in the direction of M. This motivates using continuous functionals of the moment process that do not annihilate this drift. For example, assuming that g(·) is a continuous mapping from DH[0 , 1] to H, we find that, under 
+
+H0 in (2.2) 
+
+∥√T g ( eS)∥2 →d ∥g(N0)∥2. (3.13) On the other hand, under a fixed alternative with κ > 0 and CXZ ψ̸ = 0 , if g(rM)̸ = 0 , ∥√T g ( eS)∥2 →p
+
+∞. Hence, such a choice of g yields a consistent test. (The weighted statistics with gw considered below satisfy this requirement automatically, since gw(rM) = DwM and Dw > 0 under Assumption W.) A comprehensive analysis for any arbitrary choice of g is impractical, so we focus on a class of weighted statistics commonly used in practice. For a bounded weight function w on [0 , 1] , we consider statistics of the form 
+
+g◦
+
+> w
+
+( eS) = 
+
+Z 10
+
+eS(r)w(r)dr. (3.14) We also consider a discrete version of (3.14): for any partition 0 = r0 < r 1 < . . . < r N = 1 ,
+
+g◦
+
+> w
+
+( eS) = 
+
+> N
+
+X
+
+> i=1
+
+eS(ri)w(ri)( ri − ri−1). (3.15) We can express (3.14) and (3.15) collectively as follows: 
+
+g◦
+
+> w
+
+( eS) = 
+
+Z 10
+
+eS(r)w(r)μ(dr ), (3.16) where μ denotes the standard Lebesgue measure in the continuous case (3.14), and a discrete measure given by μ = PNj=1 (rj − rj−1)δrj in the discrete case (3.15), with δrj being the Dirac measure at rj . We impose the following two conditions on the weight function w:
+
+Assumption W. w(·) satisfies the following: (i) w(·) is continuous on [0 , 1] and R 10 r|w(r)|μ(dr ) > 0;(ii) w(r) ≥ 0 for all r ∈ [0 , 1] .
+
+The asymptotic null distribution of the test statistic can be derived under Assumption W(i) alone, without invoking Assumption W(ii); the nonnegativity in Assumption W(ii) is imposed to streamline the local-power analysis. In particular, under the local alternatives considered below, the deterministic drift 8of the statistic based on g◦ 
+
+> w
+
+is proportional to 
+
+Bw := 
+
+Z 10
+
+rw (r)μ(dr ). (3.17) Note that Bw > 0 under Assumptions W(i) and W(ii). The nonnegativity constraint in Assumption W(ii) is therefore mainly a normalization; one could instead impose w(r) ≤ 0, in which case Bw < 0 and anal-ogous results would follow after accounting for the sign. It should be noted, however, that the raw magni-tude of Bw itself is not the relevant criterion for comparing different choices of w. Multiplying w by any positive constant multiplies both the statistic and the corresponding critical value by the same constant, and hence does not alter the resulting test. Thus, local-power comparisons across different choices of w
+
+should be based on a normalized drift. We therefore study the asymptotic properties of the normalized statistic 
+
+gw(f ) = Cwg◦
+
+> w
+
+(f ), (3.18) where Cw is a positive normalizing constant. In the subsequent discussion, it is convenient to set 
+
+Cw =
+
+Z 10
+
+Z 1
+
+> s
+
+w(r)μ(dr )
+
+2
+
+μ(ds )
+
+!−1/2
+
+. (3.19) The constant Cw is strictly positive under Assumption W. For convenience and later use, define 
+
+Dw = Cw
+
+Z 10
+
+rw (r)μ(dr ) = 
+
+R 10 rw (r)μ(dr )
+
+rR 10
+
+R 1 
+
+> s
+
+w(r)μ(dr )
+
+2
+
+μ(ds )
+
+. (3.20) Under Assumption W(ii), Dw > 0. As shown below (in Section 3.3), Dw characterizes the local power properties of the proposed test for the normalized test statistic (3.18). The following is a consequence of Theorem 3.1 and the properties of gw:
+
+Theorem 3.2. Suppose that Assumptions 1 and W hold, and let Gw = gw(N0). Then, the following hold: 
+
+
+
+∥√T g w( eS)∥2 →d ∥G w∥2 if H0 holds ,
+
+∥√T g w( eS)∥2 →p ∞ if Hκ holds with κ > 0 and CXZ ψ̸ = 0 .
+
+(3.21) Assuming {λj }j≥1 in (3.10) are known, the following gives us a consistent test for examining (3.3): 
+
+Corollary 3.1 (Infeasible tests) . Let the assumptions in Theorem 3.2 hold and define qα as the (1 − α)-quantile of P∞ 
+
+> j=1
+
+λj ν2 
+
+> j
+
+for some α ∈ (0 , 1) , where {νj }j≥1 is an i.i.d. sequence of standard normal random variables. Then, the following hold: 
+
+P{∥ √T g w( eS)∥2 > q α}
+
+
+
+→ α if H0 holds, 
+
+→ 1 if Hκ holds with κ > 0 and CXZ ψ̸ = 0 .
+
+(3.22) Under the working assumption that the eigenvalues {λj }j≥1 are known (as in Corollary 3.1), the crit-ical value qα can be approximated by standard Monte Carlo methods. An important feature of the nor-malization in (3.19) is that the same critical value applies to all admissible choices of w. Thus, the weight function affects local power through Dw, but it does not require a separate null critical value. In practice, 9of course, the eigenvalues {λj }j≥1 are unknown, so the test in Corollary 3.1 is infeasible. Section 4 de-velops feasible critical values based on a consistent estimator of the relevant long-run covariance opera-tor and shows that replacing qα by its feasible counterpart preserves the asymptotic size and consistency properties stated above. 
+
+Remark 3.2 (Size robustness to weak relevance) . The null distribution of the proposed test does not depend on CXZ . Indeed, under H0 : θ = θ0, √T eS(r) = T −1/2 P⌊T r ⌋ 
+
+> t=1
+
+Ztut, which does not involve Xt or 
+
+CXZ . Hence the null limit is determined by the long-run covariance of the null moment process {Ztut},and not by the covariance between Xt and Zt. In particular, the same null theory applies even when CXZ 
+
+is local to zero or exactly zero, provided that {Ztut} satisfies the regularity conditions imposed above. Thus, weak or failed relevance affects the power of the test, but not its null size. The feasible versions discussed in Section 4 inherit this property under Assumption 2. Corollary 3.1 demonstrates that, under the fixed alternative Hκ with κ > 0, the proposed test is con-sistent as long as 
+
+CXZ ψ̸ = 0 (or equivalently ψ / ∈ ker CXZ ). (3.23) Thus, the proposed test is consistent against alternatives whose deviation from the null is identifiable through the moment operator CXZ . Condition (3.23) is much weaker than requiring CXZ to be injective. If CXZ is injective, then every nonzero deviation from θ is detectable. Injectivity is sufficient for consis-tency against all fixed alternatives, but it is stronger than necessary for consistency against any specific alternative. Such a condition, or stronger spectral conditions on CXZ , is often imposed for consistent esti-mation of the slope parameter in endogenous functional regression models; see, for example, Florens and Van Bellegem, 2015; Benatia et al., 2017; Seong and Seo, 2025. These assumptions are strong and difficult to verify from finite samples. In contrast, the proposed test does not require consistent estimation of θ and remains consistent against any deviation that is visible through CXZ .The identifiability condition can be particularly mild for some hypotheses of practical interest. For example, when testing the nullity of the functional linear relationship, 
+
+H0 : θ = 0 ,
+
+condition (3.23) reduces, by (2.5), to 
+
+CyZ = CXZ θ̸ = 0 . (3.24) Thus, for the nullity test, the proposed procedure is consistent as long as yt has nonzero covariance with the auxiliary variable Zt.
+
+Remark 3.3 (Unidentifiable alternative and robustness to identification strength) . The preceding discus-sion clarifies the identification-robust nature of the proposed test. The asymptotic validity of the test un-der H0 does not require CXZ to be injective, nor does it require the relevance condition CXZ ̸ = 0 . Even in the extreme case where CXZ = 0 , if H0 is true, then ψ = 0 and the null limit is still governed by the Brow-nian motion with long-run covariance operator ΛZu . Thus, weak or failed relevance does not distort the asymptotic size of the test. On the other hand, if H0 is false but CXZ ψ = 0 , then the alternative is uniden-tifiable from the population moment condition. In this case, the statistic has no nonzero deterministic drift 10 and therefore does not diverge. This should be interpreted as a loss of power against unidentified direc-tions, rather than as a failure of size control. In this sense, weak identification affects power but not the va-lidity of the null distribution, paralleling Anderson–Rubin-type tests in finite-dimensional IV regression. 
+
+3.3 Local asymptotic distributions and local power 
+
+To examine the asymptotic properties of the proposed tests in more detail, we now study the behavior of the proposed tests under local alternatives. Recall that, under Hκ,T in (3.4), 
+
+θ − θ0 = κ
+
+√T
+
+¯ψ, (3.25) where ¯ψ = γrψr +γkψk is a unit vector representing the direction of the deviation and CXZ ¯ψ = γrCXZ ψr
+
+since ψk ∈ ker CXZ . Hence, 
+
+CXZ (θ − θ0) = κ
+
+√T CXZ ¯ψ = κγr
+
+√T CXZ ψr. (3.26) Thus, the local alternatives considered here make the detectable moment drift local to zero at the usual 
+
+T −1/2 rate. This is the sense in which the analysis below is analogous to weak-identification asymptotics: the component of the alternative that is visible through the moment operator is of order T −1/2.Our next result gives the asymptotic distribution of the test statistic (3.18) under Hκ,T .
+
+Theorem 3.3. Suppose that Assumptions 1 and W hold. Let Gw = gw(N0), where N0 is the Brownian motion appearing under H0 in Theorem 3.1. Under the local alternatives Hκ,T in (3.4) ,
+
+∥√T g w( eS)∥2 →d Gw + κDwCXZ ¯ψ 2 . (3.27) If CXZ ¯ψ = 0 (i.e., γr = 0 ), the local shift in Theorem 3.3 vanishes and the limiting distribution coincides with the null limiting distribution. Thus, local alternatives in directions invisible to CXZ do not generate nontrivial local power at the T −1/2 rate. In the following local-power comparison, we therefore focus on detectable directions satisfying CXZ ¯ψ̸ = 0 . Theorem 3.3 shows that, under local alternatives, the limiting distribution is obtained by shifting the same centered Gaussian element that appears under the null by κDwCXZ ¯ψ. Thus, for a fixed detectable direction ¯ψ, the effect of the weight function on local power is summarized entirely by the scalar Dw.Let qα be the null critical value in Corollary 3.1. The local asymptotic power of the test based on w in direction ¯ψ is 
+
+πw(κ, ¯ψ; α) = P
+
+
+
+Gw + κDwCXZ ¯ψ 2 > q α
+
+
+
+. (3.28) Since the normalization in (3.19) makes the null distribution of Gw invariant to the choice of w, different weights are compared only through the effective local signal κDwCXZ ¯ψ. This makes it possible to char-acterize the locally optimal weight within the normalized weighted class considered in Section 3.2, which reduces to the one-dimensional problem of maximizing Dw.
+
+Definition 2 (Relative local efficiency) . For two admissible weights w1, w 2, the test based on w1 is said to be locally at least as efficient as the test based on w2 if, for every detectable direction ¯ψ (i.e., CXZ ¯ψ̸ = 0 ) and every κ > 0,
+
+πw1 (κ, ¯ψ; α) ≥ πw2 (κ, ¯ψ; α).
+
+11 By Theorem 3.3, this is equivalent to Dw1 ≥ Dw2 .
+
+Note that, if Dw1 > D w2 , then the local power of the test based on w1 under Hκ,T is identical to that of the test based on w2 under Heκ,T with 
+
+eκ = κ Dw1
+
+Dw2
+
+> κ.
+
+Thus, the test with the smaller value of Dw requires a larger local deviation from the null to achieve the same asymptotic power. It remains to characterize the largest value that Dw can attain within the admissible weighted class. Thus from the result of Theorem 3.3, the choice of w maximizing Dw gives us an optimal test with respect to any detectable direction ¯ψ (i.e., CXZ ¯ψ̸ = 0 ). As shown in Lemma A.3, 
+
+Dw ≤ 1 (3.29) is satisfied, and furthermore, the upper bound is actually sharp. 
+
+Theorem 3.4 (Locally optimal test) . Suppose that Assumptions 1 and W hold. Within the normalized weighted class (3.18) , maximal local power is obtained when Dw = 1 . One representative choice attaining this bound is 
+
+μ = δ1 and w(r) = 1 for r ∈ [0 , 1] ,
+
+where δ1 denotes the Dirac measure at r = 1 , which yields the endpoint evaluation functional gw(f ) = f (1) .
+
+Moreover, within the continuous/discrete formulations of μ considered in (3.16) , any choice attaining Dw = 1 
+
+is equivalent to the aforementioned endpoint evaluation functional under the normalization in (3.19) . Thus, the unique locally optimal test is based on gw(f ) = f (1) .
+
+If one restricts attention to the Lebesgue-integral version, the bound Dw = 1 is not attained exactly. It can, however, be approached by weights that concentrate increasingly near r = 1 . For example, in the continuous case with w(r) = rp for p ≥ 0,
+
+Dw = p2p + 3 /p2p + 4 . (3.30) Thus Dw → 1 as p → ∞ , reflecting the fact that the weight increasingly concentrates near the endpoint 
+
+r = 1 . Although these weights are sub-optimal for any finite p, they can be made arbitrarily close to optimal by choosing p sufficiently large. The tests in this section are infeasible; Section 4 replaces qα with a feasible critical value bqα computed from a sample operator. Since the asymptotic gap in Dw across choices of w(r) = rp is small for large p (for instance, Dw = 0 .96 at p = 5 and Dw = 0 .97 at p = 7 ), finite-sample power differences across p need not be dramatic. Section 6 examines this with several choices of w; the simulation results are broadly consistent with the asymptotic ranking implied by Dw, with the endpoint-evaluation test tending to perform best. 
+
+Remark 3.4. The local limiting distribution of Gw + κDwCXZ ¯ψ 2 can be expressed in terms of the eigen-basis of ΛZu . Let {(λj , v j )}j≥1 be the eigenpairs of ΛZu and let {νj }j≥1 be i.i.d. standard normal random variables. Then 
+
+Gw + κDwCXZ ¯ψ 2 =d
+
+> ∞
+
+X
+
+> j=1
+
+pλj νj + κDwCXZ ¯ψ, v j
+
+2
+
+. (3.31) 12 Observe that eνj = pλj νj + κDwCXZ ¯ψ, v j is independent across j. Therefore, if ¯ψ, w, CXZ and the eigenelements of ΛZu are given, the local asymptotic distribution can be approximated by simulating i.i.d. standard normal random variables {νj }j≥1.
+
+4 Computation of feasible critical values 
+
+Under H0, Gw is a mean-zero Gaussian random element with covariance ΛZu , regardless of the choice of 
+
+w. Moreover, from (3.31), ∥G w∥2 = P∞ 
+
+> j=1
+
+λj ν2 
+
+> j
+
+, where νj ∼iid N (0 , 1) . The asymptotic null distribution therefore depends on the nuisance parameters {λj }j≥1, and computing critical values directly is infeasible. To obtain feasible critical values, we define u0,t = yt − ⟨ Xt, θ 0⟩ and let bΛZu be the sample long-run covariance operator defined as follows: 
+
+bΛZu = T −1
+
+> h
+
+X
+
+> s=−h
+
+k( s/h )bΓs, bΓs =
+
+PTt=s+1 (Zt−su0,t −s − Ztu0,t ) ⊗ (Ztu0,t − Ztu0,t ), if s ≥ 0,
+
+PTt=−s+1 (Ztu0,t − Ztu0,t ) ⊗ (Zt+su0,t +s − Ztu0,t ), if s < 0,
+
+(4.1) where Ztu0,t = T −1 PTt=1 Ztu0,t and h is the bandwidth parameter, which grows without bound as 
+
+T → ∞ . We let {bλj }j≥1 be the eigenvalues of bΛZu in decreasing order, with corresponding eigenvectors 
+
+{bvj }j≥1:
+
+bΛZu bvj = bλj bvj . (4.2) In what follows, Γs = E[( Zt−sut−s) ⊗ (Ztut)] denotes the lag-s autocovariance operator of Ztut. We impose the following conditions: 
+
+Assumption 2. k, h and the sequences of Zt and ut satisfy the following: (i) k is an even function with k(0) = 1 , k( τ ) = 0 if |τ | > c for some c > 0 and k is Lipschitz continuous on [−c, c ]. For some φ > 0, lim x→0 |1 − k( x)|| x|−φ = em for some em > 0.(ii) h → ∞ and h2φ+1 /T → cφ ∈ (0 , ∞].(iii) For some eφ > φ , P∞ 
+
+> s=−∞
+
+|s| eφ∥Γs∥op < ∞.(iv) Zt and ut are L8-m-approximable and E[∥Ztut∥8] < ∞.
+
+Assumption 2(i) is not restrictive, and commonly used kernel functions with bounded supports satisfy the condition; for example, the Bartlett, Parzen, and Tukey–Hanning kernels satisfy the conditions for 
+
+c = 1 and φ = 1 (Bartlett) or φ = 2 (the others). Under these values of φ for the aforementioned kernels, Rice and Shang (2017) shows that h = CT 1/(2 φ+1) for some C is rate-optimal for the estimation of the long-run covariance of an Lp-m-approximable sequence. Thus, the requirement on h in Assumption 2(ii) is not restrictive; rather, it reflects a practically standard choice. Given that Ztut is a stationary sequence, which can be approximated by an m-dependent sequence in our setting (see e.g. Lemma A.2), ∥Γs∥op 
+
+decays rapidly to zero as |s| grows, and thus Assumption 2(iii) does not seem restrictive from a practical point of view. Assumption 2(iv) imposes a stricter m-approximability condition and requires a higher moment of Ztut. This condition is employed for mathematical convenience and it can be replaced by some 13 other existing and standard requirements in the literature; a more detailed justification of this condition is given in Remark 4.2. We obtain a feasible critical value bqα by approximating the limiting distribution P∞ 
+
+> j=1
+
+λj ν2 
+
+> j
+
+. Specifi-cally, for some truncation level dT , we replace λj with bλj for j = 1 , . . . , d T and compute bqα via standard Monte Carlo as the (1 − α)-quantile of PdT 
+
+> j=1
+
+bλj ν2 
+
+> j
+
+. This method is supported by the following: 
+
+Theorem 4.1. Suppose that Assumptions 1, 2, and W hold, dT → ∞ and dT = o(pT /h ). Then Corollary 3.1 holds when qα is replaced by the feasible critical value bqα.
+
+As noted in our proof of Theorem 4.1 (see Section A), the requirement dT = o(pT /h ) is employed to facilitate proving the asymptotic validity of the proposed approximation. Our simulations show that the test’s finite-sample performance is highly robust to the choice of dT , provided dT is not too small, even when dT is large enough to violate dT = o(pT /h ). Therefore, we do not further pursue finer tuning of dT .Under Hκ,T , u0,t = ut + Op(T −1/2), so the arguments in the proof of Theorem 4.1 show that bΛZu 
+
+remains consistent for ΛZu . Hence the local power expression in (3.28) is unchanged when qα is replaced by bqα.
+
+Remark 4.1. An implication of Assumption 2(ii) is that h−φ = O(ph/T ). This simplifies the order of the asymptotic error associated with the eigenvalue approximation in Theorem 4.1 and leads to the re-quirement dT = o(pT /h ). The conclusion of Theorem 4.1, however, can also be established without imposing the rate restriction in Assumption 2(ii). Indeed, by a slight modification of the proof of Theo-rem 4.1, it is enough to assume that ph/T + h−φ → 0 and that dT satisfies dT (ph/T + h−φ) → 0. Un-der these conditions, the feasible critical value based on the estimated eigenvalues has the same asymp-totic validity as asserted in Theorem 4.1. If h = cT a for some c > 0 and a ∈ (0 , 1) , then, for the Bartlett (resp. Parzen or Tukey–Hanning) kernel, this condition reduces to dT {T (a−1) /2 +T −a} → 0 (resp. 
+
+dT {T (a−1) /2 + T −2a} → 0). 
+
+Remark 4.2. In our proof of Theorem 4.1, Assumption 2(iv) is used only to show that bΛZu − E[bΛZu ] = 
+
+Op(ph/T ), which is a standard result for the kernel long-run covariance estimator of an Lp-m-approximable sequence; see, e.g., Berkes et al. (2016) and Rice and Shang (2017). Other sufficient conditions, which can replace Assumption 2(iv) without affecting the desired results, can be found in the aforementioned arti-cles; specifically, see Theorem 2.2 of Berkes et al. (2016) and Lemma 4.1 of Rice and Shang (2017). 
+
+5 Extensions 
+
+5.1 Models with an intercept and testing functional correlation 
+
+In this section, we extend our methods to models with an intercept and additional scalar covariates; an extension to joint hypotheses involving multiple functional covariates is discussed in Section D of the Supplementary Material. 
+
+Model with an intercept 
+
+In practice, the more common case is one in which yt, Xt, and Zt have possibly nonzero means, i.e., 
+
+E[yt] = μy ∈ R, E[Xt] = μX ∈ H , and E[Zt] = μZ ∈ H . In this case, instead of (2.1), it will be natural to 14 consider the functional linear model with an intercept as follows: 
+
+yt = μ + ⟨Xt, θ ⟩ + ut, (5.1) where E[ut] = 0 . The proposed test statistic needs to be adjusted to be invariant with respect to μ. This can be easily done if the employed assumptions for the random elements {yt, X t, Z t} in the previous sections are properly adjusted for the centered random elements, say yc,t := yt − μy, Xc,t := Xt − μX ,and Zc,t := Zt − μZ . Note that CXZ = Cov (Xt, Z t) = E[Xc,t ⊗ Zc,t ]. We define 
+
+eSc(r) := Sc, ⌊T r ⌋ = 1
+
+T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+(Zt − ZT )(yt − yT ) − ⟨ Xt − XT , θ 0⟩ , (5.2) where yT = T −1 PTt=1 yt, ZT = T −1 PTt=1 Zt and XT = T −1 PTt=1 Xt. We also let Λc,Zu be defined as 
+
+ΛZu in (3.9) but replacing Zt with Zc,t , and let {λc,j }j≥1 be the eigenvalues of Λc,Zu .As in (3.3), we let the hypotheses of interest be collectively formulated as follows: for κ ≥ 0,
+
+Hκ : θ = θ0 + κ ¯ψ, ∥ ¯ψ∥2 = γ2 
+
+> r
+
++ γ2 
+
+> k
+
+= 1 . (5.3) We define bΛc,Zu as in bΛZu , but replacing Zt (resp. u0,t ) with Zt − ZT (resp. u0,t − T −1 PTt=1 u0,t ) and let 
+
+{bλc,j }j≥1 be the eigenvalues of bΛc,Zu in decreasing order. We let eqα be the (1 −α)-quantile of PdT 
+
+> j=1
+
+bλc,j ν2 
+
+> j
+
+,where νj ∼iid N (0 , 1) .We employ the following assumptions, which are straightforward adaptations of Assumptions 1 and 2: 
+
+Assumption 1A. (i) (5.1) holds, (ii) E[Zc,t ⊗ut] = 0 , and (iii) the variables Xc,t , Zc,t and ut are L4-m-approximable sequences in the relevant spaces. 
+
+Assumption 2A. Assumption 2 holds when Zt is replaced by Zc,t = Zt − μZ .
+
+Then the following presents the desired extension of the test: 
+
+Theorem 5.1. Suppose that Assumptions 1A and W hold. Let qα be the (1 − α)-quantile of P∞ 
+
+> j=1
+
+λc,j ν2 
+
+> j
+
+,where {νj }j≥1 are i.i.d. standard normal random variables. Then 
+
+P{∥ √T g w( eSc)∥2 > q α}
+
+
+
+→ α if H0 holds, 
+
+→ 1 if Hκ holds with κ > 0 and CXZ ψ̸ = 0 .
+
+(5.4) 
+
+If Assumption 2A also holds and dT → ∞ satisfies dT = o(pT /h ), then the same conclusions hold when qα
+
+is replaced by the feasible critical value eqα.
+
+Thus, our theoretical results developed in Section 3 can be extended to the model with intercept (5.1). The results given in Section 3.3 can also be extended with a slight modification of the arguments used in our proofs of those results, and thus the details are omitted. 
+
+Application: testing functional correlation 
+
+Let yt (resp. Xt) be a general R-valued (resp. H-valued) random element with possibly nonzero mean and variance σ2 
+
+> y
+
+(resp. covariance CX X ). The cross-covariance operator CX y, as a map from H to R, is defined as 
+
+CX y(·) = E[( Xc,t ⊗ yc,t )]( ·) = E[⟨X c,t , ·⟩ yc,t ],
+
+15 where yc,t = yt − μy and Xc,t = Xt − E[Xt]. If this cross-covariance operator is not zero, we say that yt
+
+and Xt are functionally correlated. Suppose that we are interested in testing 
+
+H0 : functional correlation = 0 against H1 : functional correlation ̸ = 0 . (5.5) Under a regularity condition, this hypothesis can be rephrased as a hypothesis on the slope coefficient in a functional linear model with an intercept. Thus, it can be examined using the test developed for the intercept model. To this end, we use the following proposition: 
+
+Proposition 5.1. Suppose that yc,t = yt − μy and Xc,t = Xt − E[Xt] are L4-m-approximable sequences in the relevant spaces. Let mX y := E[Xc,t yc,t ] ∈ H , so that the cross-covariance functional is given by 
+
+CX y(v) = E[⟨X c,t , v ⟩yc,t ] = ⟨mX y, v ⟩ for any v ∈ H . Assume further that there exists a unique θ ∈ H such that mX y = CX X θ. Then there exist μ ∈ R and an L4-m-approximable sequence {εt}t≥1 satisfying 
+
+yt = μ + ⟨θ, Xt⟩ + εt, (5.6) 
+
+where E[εt] = 0 and Xt and εt are uncorrelated, i.e., E[Xc,t εt] = 0 . Moreover, CX y = 0 if and only if θ = 0 .
+
+Remark 5.1. The uniqueness of θ satisfying mX y = CX X θ in Proposition 5.1 is used only to make the equivalence between zero correlation ( CX y = 0 ) and θ = 0 unambiguous. In general, the equation 
+
+mX y = CX X θ may have multiple solutions; indeed, if θ is a solution, then θ + v is also a solution for any v ∈ ker CX X . Given existence of a solution, one can select a unique representative by imposing 
+
+θ ∈ (ker CX X )⊥.By Proposition 5.1, testing (5.5) reduces to testing θ = 0 in (5.6), in which Xt is uncorrelated with εt. In practice, however, the functional regressor of interest is often imperfectly observed and may be contami-nated by measurement error. Suppose that Xt is not directly observed and that practitioners observe only 
+
+Xt = Xt + et,
+
+where et represents the additive measurement errors. Then (5.6) can be written as a special case of (5.1) as follows: 
+
+yt = μ + ⟨θ, X t⟩ + ut, ut = εt − ⟨ θ, e t⟩. (5.7) In this case, Xt is generally correlated with ut, so standard inferential methods developed for exogenous functional predictors may not be valid. If a valid auxiliary functional variable Zt is available, then the proposed identification-robust test can be applied to examine (5.5). If it is reasonable to assume that the measurement errors are serially uncorrelated and that lagged functional observations are uncorrelated with the current error εt, then one may use lagged variables, such as Zt = Xt−κ for κ ≥ 1, as auxiliary functional variables, as in Chen et al. (2022). 
+
+5.2 Inclusion of other scalar covariates 
+
+The proposed procedure can also accommodate additional scalar covariates. Consider testing hypotheses on θ in the model 
+
+yt =
+
+> K
+
+X
+
+> j=1
+
+βj ϖj,t + ⟨Xt, θ ⟩ + ut. (5.8) 16 We give only a brief description here and defer the theoretical justification to Appendix C. To extend the proposed test, we partial out ϖt = ( ϖ1,t , . . . , ϖ K,t ) from yt, Xt, and Zt. Let byt, bXt, and 
+
+bZt denote the least-squares projections of yt, Xt, and Zt onto the finite-dimensional space spanned by the scalar covariates ϖ1,t , . . . , ϖ K,t , respectively. Define 
+
+eSϖ(r) = 1
+
+T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+(Zt − bZt){(yt − byt) − ⟨ Xt − bXt, θ 0⟩} .
+
+Under the regularity conditions stated in Appendix C, the same asymptotic size and consistency results as in Corollary 3.1 hold with eS replaced by eSϖ and with the corresponding feasible critical value. Specifically, 
+
+P{∥ √T g w( eSϖ)∥2 > eqα} → α under H0, while the probability converges to one under alternatives de-tectable after residualization, that is, alternatives satisfying Cϖ,XZ (θ−θ0)̸ = 0 , where Cϖ,XZ = E[Xϖ,t ⊗
+
+Zϖ,t ] is the cross-covariance operator of the population residuals of Xt and Zt. Thus, scalar covariates can be incorporated by a standard residualization step before constructing the functional moment process. 
+
+6 Monte Carlo studies 
+
+We investigate the finite-sample performance of the proposed tests through Monte Carlo experiments based on 2,000 replications. We first focus on H0 : Θ = 0 (equivalently, H0 : θ = 0 ) for the without-intercept model (2.1); parallel results for the intercept model (5.1) are reported in Section 6.2. We also report the empirical size of an exogeneity-based benchmark adapted from Cardot et al. (2003) to illustrate the consequences of ignoring endogeneity, and compare our test with the procedure of Seong and Seo (2025) using their simulation design. Throughout the simulations, let {fj }j≥1 denote the standard Fourier basis of L2[0 , 1] , defined by f1(x) = 1 , f2j (x) = √2 sin(2 πjx ), and f2j+1 (x) = √2 cos(2 πjx ), j ≥ 1.
+
+6.1 Simulation design 
+
+In this section, yt, Xt, and Zt are assumed to be mean-zero random elements. We consider the following endogenous functional linear model: for a sequence of real numbers {aj }j≥1,
+
+yt = Θ T Xt + ut, Xt =
+
+> ∞
+
+X
+
+> j=1
+
+aj (0 .95) j−1⟨Xt−1, f j ⟩fj + εx,t , εx,t = βuut + et,
+
+where ut ∼iid N (0 , 1) , {et}t≥1 is an i.i.d. sequence of Brownian bridges, and ut and es are independent for all s and t. Note that, in this setup, unless βu = 0 , Xt becomes endogenous. We consider βu ∈ { 0.1, 0.25 }
+
+in this section; the case where βu = 0 is also considered to see how exogeneity-based test performs as endogeneity becomes severe (i.e., βu increases in this setup). We draw aj ∼iid U [−0.2, 0.8] , a distribution skewed toward positive values to reflect the positive autocorrelation commonly observed in functional time series. The local-to-zero slope operator is 
+
+ΘT (·) = κ
+
+√T ⟨· , ¯ψ⟩, κ ∈ { 0, 5, 10 , 20 }, (6.1) where ¯ψ ∈ H is a unit-norm direction generated independently each replication as ¯ψ = ψ/ ∥ψ∥ with 
+
+ψ = P3 
+
+> j=1
+
+eaj fj and eaj ∼iid N (0 , 1) . Randomizing both aj and ¯ψ in each replication averages perfor-mance across a wide range of parameter configurations. Since εx,t = βuut + et contains ut, the model is endogenous whenever βu̸ = 0 .17 We consider an auxiliary functional variable Zt that is defined differently across two simulation set-tings, which we call the informative design and the weakly-informative design . Specifically, we let 
+
+Zt =
+
+P50  
+
+> j=1
+
+bj ⟨X◦ 
+
+> t−1
+
++ et, f j ⟩ + vt, in the informative design ,
+
+P50  
+
+> j=1
+
+bj 1J (j)⟨X◦ 
+
+> t−1
+
++ et, f j ⟩ + vt, in the weakly-informative design ,
+
+(6.2) where X◦ 
+
+> t−1
+
+= P∞ 
+
+> j=1
+
+aj (0 .95) j−1⟨Xt−1, f j ⟩fj , 1J (·) denotes the indicator function 1{· ∈ J } , J =
+
+{m1, m 2, . . . , m N }, m1, . . . , m N are integers randomly drawn from {1, . . . , 5} without replacement, and 
+
+N is also a random integer drawn from {1, . . . , 4}. We generate bj independently from U [0 .8, 1.2] and let {vt}t≥1 be small idiosyncratic functional errors associated with Zt, which is set to an i.i.d. sequence of Brownian bridges scaled by 0.25. In both designs, CXZ is not injective, and Zt does not satisfy the standard conditions required for consistent estimation of θ in the endogenous FLM. The two designs differ, however, in how informative Zt is about Xt: in the weakly-informative design, the coefficient bj 1J (j) on 
+
+⟨Xt, f j ⟩ is zero for most j ∈ { 1, . . . , 50 }, so CXZ v = 0 on a substantially larger subspace of H than in the informative design. By the identification-robust theory in Section 3, the proposed test remains valid under both designs but exhibits reduced power in the weakly-informative case. The proposed test can be implemented with many choices of the weighting functional gw in (3.18). We focus on the family gp ≡ gw with w(r) = rp,
+
+gp(f ) = Cp
+
+Z 10
+
+rpf (r)dr, p ≥ 0,
+
+where Cp is the normalizing constant in (3.19). This family is useful for illustrating the local-power theory in Section 3.3: as p increases, the weight increasingly concentrates near the endpoint r = 1 , approaching the endpoint evaluation map. We write g∞(f ) = f (1) and compare the tests based on p = ∞ with those based on several finite values of p.For each replication the critical value is the (1 −α)-quantile of PdT 
+
+> j=1
+
+bλj ν2 
+
+> j
+
+, approximated by M = 1000 
+
+Monte Carlo draws. We set dT = 5 + ⌈T 0.333 ⌉; additional simulation results with a larger choice of dT are reported in the Supplementary Material (Section E), confirming that the test is robust to this choice as long as dT is sufficiently large, as expected given that bλj decays to zero with j. We use the Bartlett or Parzen kernel for bΛZu ; the bandwidth h follows the optimal choice of Andrews (1991) applied to the first five FPCA scores of Ztu0,t , and these choices satisfy the theoretical requirements (Assumptions 2(i) and 2(ii)). This is a pragmatic shortcut that reduces computation; more principled bandwidth selection for functional time series, such as that of Rice and Shang (2017), may be employed at higher computational cost. 
+
+An exogeneity-based benchmark 
+
+Before presenting the main results, we introduce an exogeneity-based benchmark adapted from Cardot et al. (2003), whose original procedure tests for no effect via the empirical cross-covariance between the functional predictor and the scalar response, with the null distribution approximated by permutations of (Xt, y t) under an i.i.d. exchangeability argument. Since permutations are inapplicable to our depen-dent setting, we adopt the cross-covariance idea within our framework by setting Zt = Xt and comput-ing the critical value from the long-run covariance of {Xtu0,t } as in Section 4; the resulting statistic is 
+
+∥√T g w( eSX )∥2 with eSX (r) = T −1 P⌊T r ⌋ 
+
+> t=1
+
+Xt{yt − ⟨ Xt, θ 0⟩} . With gp = g∞ this statistic closely parallels 18 Table 1: Empirical size (%) of the exogeneity-based benchmark 
+
+βu = 0 βu = 0 .1 βu = 0 .25 
+
+T k = Bartlett k = Parzen k = Bartlett k = Parzen k = Bartlett k = Parzen 100 4.8 4.9 80.9 80.7 100.0 100.0 200 5.1 5.1 98.0 98.0 100.0 100.0 400 4.9 4.9 100.0 100.0 100.0 100.0                  
+
+> Notes: The table reports rejection rates under H0: Θ = 0 at the 5% nominal level for the exogeneity-based benchmark obtained by setting Zt=Xt. The statistic is computed using g∞(f) = f(1) . The case βu= 0 corresponds to the exogenous design in which using Xtas the auxiliary variable is valid.
+
+that of Cardot et al. (2003, Section 2), though the critical value approximation differs. Because the bench-mark is a special case of our test with Zt = Xt, its validity hinges on E[Xt ⊗ ut] = 0 ; under endogeneity this condition fails, and the benchmark quantifies the cost of ignoring it. Table 1 reports the empirical size of the exogeneity-based benchmark for p = ∞. We include a control case in which the predictor is genuinely exogenous ( βu = 0 ): Xt is generated with εx,t = et, removing the 
+
+ut contamination. Under this control, the benchmark achieves the nominal 5% size, confirming that the long-run covariance calibration is correctly specified. Under the endogenous designs ( βu ∈ { 0.1, 0.25 }), the benchmark over-rejects severely; empirical rejection rates exceed 80% even at T = 100 and approach 
+
+100% as T grows. This severe over-rejection reflects the fact that, under endogeneity, E[Xtut]̸ = 0 in-duces a nonvanishing mean in the moment process {Xtu0,t } under H0, which the long-run covariance calibration cannot absorb. The proposed test (Table 2) replaces Xt with a valid auxiliary variable Zt and retains size control across all designs. 
+
+Simulation results for the proposed methods 
+
+Table 2 shows that the proposed tests have good size control across both designs. Rejection rates increase monotonically with κ, consistent with Theorem 3.3. The ranking across p is consistent with the local-power theory of Section 3.3: tests with larger p concentrate more weight near the endpoint and tend to have higher power, with g∞(f ) = f (1) dominating g0 throughout. The differences across p are modest, as expected given that the asymptotic efficiency gaps Dw = √2p + 3 /√2p + 4 are close for adjacent values of p.The comparison between designs illustrates the identification-robust nature of the test. Size is similar in both settings, but power is uniformly lower under the weakly-informative design, reflecting the smaller effective range of CXZ . Weaker relevance of Zt therefore reduces power without invalidating the null distribution, as predicted by Theorem 3.2. 
+
+6.1.1 Comparison with an existing test based on consistent estimation 
+
+The test of Seong and Seo (2025), hereafter called the functional IV test , is developed under the setting where both the regressor Xt and the response Yt are functional. Specifically, they consider a scalar outcome 
+
+yt = ⟨Yt, ζ ⟩ for some ζ ∈ H , where the functional response Yt satisfies Yt = μY + AX t + Ut for a bounded linear operator A : H → H and an H-valued mean-zero error Ut. Taking the inner product of the model for Yt with ζ, we find that yt satisfies (5.1) with intercept μ = ⟨μY , ζ ⟩, slope θ = A∗ζ, and error 
+
+ut = ⟨Ut, ζ ⟩. Testing H0 : θ = θ0 in this framework thus amounts to testing a restriction on the operator 19 Table 2: Rejection rates under local-to-zero hypotheses (%): without-intercept model 
+
+βu = 0 .1 βu = 0 .25 k = Bartlett k = Parzen k = Bartlett k = Parzen 
+
+T p \ κ 0 5 10 20 0 5 10 20 0 5 10 20 0 5 10 20 
+
+Panel A. Informative design 
+
+100 ∞ 5.1 18.1 45.7 77.8 5.1 17.9 45.5 77.8 5.1 19.1 47.1 78.7 5.1 19.1 46.9 78.1 7.0 5.2 16.9 43.8 76.4 5.2 17.0 43.5 76.4 5.2 18.4 45.4 77.0 5.3 18.8 45.3 76.8 3.0 5.1 16.6 42.6 75.2 5.3 16.9 41.9 75.0 5.2 18.3 44.0 75.8 5.2 18.5 43.6 75.6 1.0 5.1 16.2 39.8 73.3 5.0 16.2 40.0 72.8 5.1 17.3 41.6 73.5 4.9 17.2 41.8 73.5 0.0 5.0 14.4 37.5 70.0 5.1 14.6 37.5 69.8 5.0 16.6 39.6 70.0 5.1 16.4 39.5 69.8 200 ∞ 5.0 17.8 46.6 78.0 5.1 17.8 46.5 78.0 5.2 19.6 48.1 78.2 5.1 19.6 48.1 78.3 7.0 5.3 18.4 44.4 77.0 5.3 18.3 44.2 76.8 5.1 19.4 46.2 77.1 5.2 19.4 46.2 77.0 3.0 5.3 17.6 43.0 75.8 5.3 17.3 42.8 75.6 5.4 19.2 44.9 76.2 5.3 18.9 44.6 76.0 1.0 5.1 17.1 40.9 74.4 5.2 17.0 41.0 74.2 5.3 18.3 43.0 74.7 5.2 18.1 43.2 74.6 0.0 5.0 15.6 39.0 72.6 4.9 15.2 38.8 72.4 5.2 17.2 41.0 72.8 5.2 17.1 41.0 72.9 400 ∞ 5.2 18.4 46.2 79.3 5.2 18.4 46.2 79.1 5.2 19.7 47.9 79.2 5.4 19.9 48.1 79.2 7.0 5.1 16.9 45.3 78.3 5.2 17.0 45.2 78.0 5.8 18.4 47.1 78.2 5.8 18.4 47.1 78.3 3.0 5.4 16.9 44.2 77.5 5.3 16.9 44.5 77.3 5.5 18.2 46.5 77.5 5.5 18.2 46.2 77.3 1.0 5.6 16.4 42.1 75.8 5.4 16.4 42.2 75.9 5.5 17.8 44.1 75.7 5.5 17.8 44.4 75.6 0.0 5.0 15.4 39.4 72.9 5.1 15.4 39.4 73.0 5.0 16.4 41.5 73.6 5.0 16.6 41.4 73.8 
+
+Panel B. Weakly informative design 
+
+100 ∞ 5.6 13.4 34.1 61.5 5.7 13.1 34.1 61.1 5.6 14.5 34.6 61.8 5.6 14.3 34.7 61.6 7.0 5.6 13.2 32.9 60.5 5.6 13.4 32.9 60.1 5.4 14.6 33.8 60.8 5.4 14.7 33.8 60.5 3.0 5.8 12.8 31.1 59.4 5.8 13.1 31.1 59.2 5.6 14.1 31.9 59.9 5.8 14.2 32.4 59.4 1.0 6.1 12.6 29.4 58.0 6.3 12.6 29.4 57.6 5.8 13.7 31.1 57.9 6.0 13.8 30.8 57.9 0.0 5.9 12.2 27.8 55.4 5.9 12.2 27.7 55.3 5.5 13.2 28.6 54.9 5.7 13.2 28.7 54.8 200 ∞ 5.2 14.0 34.4 62.1 5.3 13.8 34.4 61.9 5.4 14.6 35.1 61.8 5.5 14.4 35.1 61.8 7.0 5.3 13.1 33.2 60.3 5.4 13.1 33.4 60.1 5.4 14.3 34.4 60.3 5.4 14.0 34.2 60.2 3.0 5.4 13.2 32.5 59.1 5.3 13.2 32.5 59.0 5.4 14.4 33.1 59.4 5.3 14.4 33.0 59.3 1.0 5.3 12.8 30.8 58.5 5.2 12.8 30.8 58.5 5.1 13.8 31.7 58.4 5.1 13.8 31.4 58.2 0.0 5.1 11.9 28.6 56.3 5.0 11.8 28.6 56.2 5.2 12.8 30.0 56.2 5.1 12.7 29.9 55.8 400 ∞ 4.9 14.1 33.8 61.8 5.0 14.2 33.7 61.8 4.9 14.9 34.8 62.2 5.1 14.9 34.8 62.1 7.0 5.1 12.6 33.1 60.4 5.1 12.8 33.1 60.5 5.1 13.7 34.1 61.0 5.1 13.8 34.0 61.0 3.0 5.1 12.4 32.2 59.6 5.2 12.4 32.3 59.6 5.2 13.4 33.1 60.1 5.4 13.4 33.1 60.0 1.0 5.4 12.9 30.9 57.8 5.3 13.0 30.9 57.8 5.3 13.9 31.6 59.2 5.3 13.8 31.4 59.1 0.0 5.2 11.8 28.8 55.6 5.4 12.0 29.3 55.6 5.3 12.3 30.0 57.0 5.4 12.3 30.1 56.9                         
+
+> Notes: The table reports rejection rates for the hypotheses H1: Θ = κ/√T⟨· ,¯ψ⟩with sample size T. The nominal level is 5% . Test statistics are computed using gp(f) = Cp
+> R10rpf(r)dr for p < ∞and g∞(f) = f(1) .
+
+A. The functional IV test requires a consistent estimator of A; their paper constructs this via a functional analogue of the classical IV estimator, replacing scalar moment conditions with operator-valued ones, and refers to it as the functional IV estimator . Consistency of this estimator necessitates strong conditions on 
+
+Zt (such as injectivity of CXZ ). Our proposed test targets the same hypothesis directly in the scalar FLM (5.1), without estimating A or imposing injectivity. We adopt the simulation DGP of Seong and Seo (2025, Section 5.2), which is a modification of that considered in Benatia et al. (2017), with a minor change to the auxiliary variable. We briefly describe the DGP here; additional details can be found in their paper. Let A be the integral operator with kernel 
+
+kA(s, r ) = 1 − | s − r|2, and let Vt, Et, ηt be mutually independent i.i.d. standard Brownian bridges. We set Ut = 0 .8Vt + 0 .6Et, and generate 
+
+Zt = Γ( at + bt)Γ( at)Γ( bt) sat−1(1 − s)bt−1 + ηt, Xt = ϑZ t + Vt, (6.3) where at, b t ∼iid U [2 , 5] and ϑ̸ = 0 . The construction Xt = ϑZ t + Vt gives a strong linear relationship between Xt and Zt; we refer to this as the informative design . We also consider the weakly-informative 
+
+20 Table 3: Comparison with the existing test of Seong and Seo (2025), rejection rates (%)                                                                           
+
+> Informative design (with Zt)Weakly informative design (with Z◦
+> t)Test Proposed Functional IV test Proposed Functional IV test
+> T\κ200.05 0.1 0.15 00.05 0.1 0.15 00.05 0.1 0.15 00.05 0.1 0.15 100 5.1 61.8 78.1 84.4 3.9 54.8 70.8 78.5 5.6 38.0 48.2 52.2 0.9 24.9 34.4 41.5 200 5.0 78.1 89.6 94.0 6.7 79.4 90.3 94.9 5.1 47.4 57.6 62.6 0.9 32.7 43.0 51.2 400 4.2 89.6 96.9 98.7 5.2 90.7 97.0 99.2 4.8 59.2 67.8 72.5 0.5 42.0 54.7 61.7
+
+design , where Zt is replaced by 
+
+Z◦ 
+
+> t
+
+= ⟨Zt, f 2⟩f2 + eηt, (6.4) with {eηt} an i.i.d. sequence of Brownian bridges. Z◦ 
+
+> t
+
+retains only the projection of Zt onto a single Fourier basis function, plus additive noise, and seriously violates the injectivity condition required by the func-tional IV test; this construction parallels the weakly-informative design of Section 6.1. Following Seong and Seo (2025, Section S7), we set θ0 = A∗φ where φ = P11  
+
+> j=1
+
+aj fj with aj ∼
+
+N (0 , 0.52( j−1) ), and compute rejection rates under H1,κ : θ = θ0 + κeθ, where eθ is drawn from the first 11 Fourier basis functions and normalized so that ∥κeθ∥2 = κ2 ∈ [0 , 0.5] . Table 3 compares the functional IV test with our proposed test ( p = ∞, Parzen kernel) for a few selected values of κ2. In the informative design, the two tests are broadly comparable in both size and power. In the weakly-informative design, the functional IV test is severely undersized and has substantially lower power, because Z◦ 
+
+> t
+
+seriously violates the injectivity condition on which it relies, the test is not theoretically guaranteed to be valid in this design. Our proposed test performs reliably in both settings, illustrating the practical value of the identification-robust framework. 
+
+6.2 Additional simulation results for the with-intercept model 
+
+We now consider the model (5.1), which allows for yt, Xt and Zt to have possibly nonzero means. Let 
+
+μy, μX and μZ be the unconditional means of yt, Xt and Zt, respectively. We let yt − μy, Xt − μX ,and Zt − μZ be generated as yt, Xt and Zt in Section 6.1. For each simulation run, we set μy = ea0 and let μX = P3 
+
+> j=1
+
+eaj fj /
+
+qP3 
+
+> j=1
+
+ea2 
+
+> j
+
+for i.i.d. standard normal random variables eaj for j = 0 , 1, 2, 3; μZ is generated in the same manner as μX .Table 4 reports rejection rates for the proposed test. The results are qualitatively identical to those in Section 6.1, supporting the theoretical findings of Section 5.1. 
+
+7 Empirical application 
+
+Climate change has altered temperature distributions in ways that extend well beyond shifts in the mean: extreme temperature events, including heat and cold waves, have become more frequent and severe, and these tail occurrences are primary drivers of electricity demand for cooling and heating. This distributional characteristic of temperature risk motivates replacing scalar temperature summaries (such as mean and variance of temperature) with the full temperature distribution as a predictor of residential electricity demand. We apply our proposed tests to the empirical framework of Nam and Seo (2026), who model this distributional relationship, and provide the first formal statistical test of whether the temperature distribution contributes explanatory power beyond what its standardized moments can capture. 21 Table 4: Rejection rates under local-to-zero hypotheses (%): with-intercept model 
+
+βu = 0 .1 βu = 0 .25 k = Bartlett k = Parzen k = Bartlett k = Parzen 
+
+T p \ κ 0 5 10 20 0 5 10 20 0 5 10 20 0 5 10 20 
+
+Panel A. Informative design 
+
+100 ∞ 5.5 17.9 45.4 75.6 5.6 18.1 45.4 75.5 6.2 19.4 46.3 75.2 6.2 19.8 46.5 75.3 7.0 5.8 17.6 43.6 74.2 5.9 17.6 43.6 74.2 6.1 18.9 45.6 73.9 6.2 19.0 45.3 73.7 3.0 5.9 17.3 42.2 73.5 5.8 17.1 42.1 73.2 6.2 18.6 44.0 73.0 6.4 18.8 44.1 73.1 1.0 5.8 15.6 40.2 71.8 6.0 15.8 39.9 71.8 6.6 17.5 41.9 71.4 6.6 17.8 41.5 71.5 0.0 6.3 14.6 36.4 68.4 6.7 14.8 36.0 68.5 6.6 15.9 38.6 68.1 6.5 16.0 38.5 68.2 200 ∞ 5.8 18.5 45.4 78.2 6.0 18.3 45.2 78.0 5.5 19.8 47.3 78.5 5.8 19.8 47.3 78.4 7.0 6.0 17.2 43.9 76.4 5.8 17.1 43.8 76.3 5.9 18.7 45.5 77.0 5.8 18.6 45.4 77.1 3.0 5.8 17.1 43.1 75.2 5.8 16.9 43.0 75.2 5.5 18.6 44.5 75.6 5.8 18.4 44.4 75.6 1.0 5.8 15.7 40.6 73.9 5.7 16.0 40.8 73.6 5.4 17.2 43.0 73.5 5.6 17.2 43.0 73.3 0.0 5.9 14.3 37.6 71.0 6.0 14.2 37.7 71.2 5.9 15.8 39.4 71.5 6.0 16.0 39.2 71.7 400 ∞ 5.3 18.0 44.9 78.1 5.4 18.1 45.1 78.0 5.1 19.4 47.2 78.8 5.1 19.4 47.1 78.9 7.0 5.4 16.8 44.0 76.8 5.6 16.8 44.2 76.9 5.7 18.1 45.8 77.2 5.8 17.9 45.6 77.2 3.0 5.1 16.4 42.9 76.3 5.2 16.6 42.8 76.4 5.5 17.5 44.5 76.3 5.5 17.6 44.7 76.2 1.0 5.2 15.7 40.5 74.6 5.3 15.2 40.7 74.6 5.8 16.4 42.9 74.7 5.8 16.4 42.5 74.6 0.0 5.2 14.5 38.3 72.5 5.2 14.5 38.4 72.3 5.3 15.6 39.5 72.7 5.3 15.8 39.5 72.5 
+
+Panel B. Weakly informative design 
+
+100 ∞ 5.7 13.7 33.5 59.7 5.9 14.2 33.7 59.7 5.8 15.0 34.2 59.7 5.9 15.4 34.4 59.8 7.0 5.4 13.9 31.4 58.6 5.5 14.1 31.8 58.5 5.5 15.0 32.8 59.1 5.5 15.1 33.0 58.7 3.0 5.9 13.0 30.8 57.7 6.1 13.2 30.6 57.9 6.0 13.6 31.8 58.3 6.0 14.1 31.9 58.1 1.0 6.0 12.1 29.2 55.6 6.3 12.0 29.3 55.8 6.2 13.2 30.9 56.5 6.3 13.2 31.0 56.3 0.0 6.2 11.6 27.4 53.3 6.5 11.8 27.2 53.3 6.2 12.4 29.1 53.6 6.3 12.6 28.9 53.5 200 ∞ 5.7 13.8 34.2 61.9 5.6 14.0 34.0 62.0 5.8 14.8 34.9 63.0 5.8 14.6 34.9 63.1 7.0 5.4 13.4 33.1 60.1 5.3 13.4 33.2 60.1 5.6 14.2 34.2 61.5 5.6 14.0 34.2 61.5 3.0 5.2 13.0 32.4 59.0 5.2 12.8 32.3 59.0 5.1 13.8 32.9 60.1 5.2 13.8 32.8 60.1 1.0 5.5 12.2 30.3 57.6 5.4 12.2 30.2 57.9 5.5 12.8 31.4 58.6 5.5 12.8 31.1 58.6 0.0 5.7 11.2 27.6 55.6 5.8 10.9 27.4 55.5 5.8 11.8 28.9 56.0 5.7 11.8 28.6 56.1 400 ∞ 4.9 14.3 33.8 62.9 5.0 14.4 33.8 62.8 5.1 15.2 35.1 63.6 5.1 15.3 35.2 63.7 7.0 5.2 14.2 33.6 61.7 5.3 14.1 33.7 61.6 5.3 15.1 34.0 62.5 5.5 14.9 34.2 62.6 3.0 5.3 13.4 32.0 60.7 5.4 13.4 32.1 60.8 5.6 14.6 32.9 61.6 5.6 14.6 32.8 61.4 1.0 5.1 12.9 30.4 59.6 5.3 13.1 30.4 59.7 5.6 14.0 31.4 60.1 5.6 14.0 31.4 60.0 0.0 5.3 12.0 28.6 57.5 5.3 11.8 28.8 57.5 5.7 12.8 29.4 57.7 5.7 12.6 29.4 57.6                         
+
+> Notes: The table reports rejection rates for the hypotheses H1: Θ = κ/√T⟨· ,¯ψ⟩with sample size T. The nominal level is 5% . Test statistics are computed using gp(f) = Cp
+> R10rpf(r)dr for p < ∞and g∞(f) = f(1) .
+
+The empirical model considered by Nam and Seo (2026) takes the form of (5.1): yt = μ + ⟨Xt, θ ⟩ + ut,
+
+where yt is detrended monthly residential electricity demand and Xt is a distributional predictor con-structed from raw temperature data via an appropriate transformation of the temperature probability den-sity function (PDF) pt; see Nam and Seo (2026) for the construction of these variables. A similar analysis was earlier implemented by Chang et al. (2016). The functional formulation is appealing because it allows electricity demand to respond to changes in the entire temperature distribution, including its tails, rather than only to a few scalar summaries such as the mean or variance. Figure 1 displays the monthly temper-ature density functions and their corresponding quantile functions. These curves form the basis for the PDF-based transformations and the QF specification used in the subsequent analysis. To test whether the full distribution matters beyond its moments, we augment the model with K stan-dardized moments and seasonal dummies as scalar controls: 
+
+yt =
+
+> K
+
+X
+
+> j=1
+
+βj ϖj,t +
+
+> 12
+
+X
+
+> j=1
+
+γj dj,t + ⟨Xt, θ ⟩ + ut, (7.1) where dj,t are monthly seasonal dummies and ϖj,t is the standardized j-th moment of the temperature 22 PDF pt: with ϖ1,t = R ba s p t(s)ds and ϖ2,t =
+
+qR ba (s − ϖ1,t )2pt(s)ds , the higher-order moments are 
+
+ϖj,t =
+
+Z ba
+
+(s − ϖ1,t )j pt(s)ds/ϖ j
+
+> 2,t
+
+, j ≥ 3, (7.2) so that ϖ1,t through ϖ4,t are the mean, standard deviation, skewness, and kurtosis. As discussed by Nam and Seo (2026), seasonal variation is central to this application, motivating the inclusion of monthly dummies in (7.1). Using the extension of our procedure to models with scalar covariates (Section 5.2), we test 
+
+H0 : θ = 0 against H1 : θ̸ = 0 . (7.3) Rejection of H0 provides formal statistical grounds for the distributional approach: it indicates that the temperature distribution contributes information about electricity demand beyond what its first K stan-dardized moments and seasonal dummies capture. We consider six choices of distributional predictor Xt, all based on pt: the centered-log-ratio (CLR), 
+
+log pt(s) − R ba log pt(r)dr ; the log-hazard-rate (LHR), log pt(s) − log(1 − Pt(s)) ; the log-reversed-hazard-rate (LRHR), log pt(s)−log Pt(s); the logit of the CDF (LCDF), log Pt(s)−log(1 −Pt(s)) ; the raw PDF; and the quantile function (QF), inf {x : R xa pt(r) dr ≥ s}, where Pt(r) = R ra pt(s)ds . CLR, LHR, LRHR, and QF were considered by Nam and Seo (2026), with QF also being a standard choice in the broader literature (see, e.g., Yang et al. 2020); LCDF is considered in Shang and Haberman (2025); the PDF specification follows Chang et al. (2016). Theoretical justifications for the distributional transformations are given in Egozcue et al. (2006) and Petersen and Müller (2016). For the CLR, LHR, LRHR, LCDF, and PDF specifications, θ(s) may be interpreted as the marginal effect on electricity demand of changes in the occurrence of temperature level s, so that extreme tail values of θ(s) capture the sensitivity to heat or cold waves at that level. The QF specification is qualitatively distinct: θ(s) then measures sensitivity to shifts in the s-quantile of temperature rather than to changes in the occurrence of a particular temperature level. As discussed by Nam and Seo (2026), this difference in interpretation can lead to different empirical conclusions; see their Section 4.4 for details. Since the temperature distribution is not directly observed and must be estimated from discrete sam-ples, measurement error in Xt introduces endogeneity. Following Nam and Seo (2026) and Chen et al. (2022), we address this by using the lagged predictor Zt = Xt−1 as the auxiliary variable, which is valid when measurement errors are serially uncorrelated. For comparison, we also consider the geometrically weighted lags Zt = Pℓj=1 (0 .5) j−1Xt−j for ℓ = 2 and ℓ = 3 , and the case Zt = Xt (no endogeneity cor-rection), which benchmarks the effect of ignoring measurement error. We consider K = 1 , . . . , 4 standard-ized moments in (7.1). The tuning parameters follow Section 6, and we use both the Bartlett and Parzen kernels. Since the critical value distribution needs to be computed only once for each empirical specifi-cation, we use a large number of Monte Carlo draws (500,000 draws) to approximate p-values, yielding a considerably finer approximation. Table 5 reports approximate p-values for the test of H0 : θ = 0 . For CLR, LRHR, LCDF, and PDF, the null is rejected at the 2% level across all choices of K and Zt, including the case Zt = Xt that forgoes the endogeneity correction. These results provide robust evidence that the full temperature distribution 23 −20 −10 0 10 20 30 40 0.00  0.05  0.10  0.15  0.20  Temperature density functions      
+
+> Temperature Density
+> 0.0 0.2 0.4 0.6 0.8 1.0 −10  0 10  20  30  40  Temperature quantile functions
+> Probability level Temperature
+
+Figure 1: Temperature density and quantile representations. The left panel shows monthly temperature PDFs, which underlie the other PDF-based transformations (CLR, LHR, LRHR, and LCDF) in the empirical analysis, while the right panel shows the corresponding QFs. Grey curves are monthly observations, and the solid black curve is the pointwise average. contributes explanatory power beyond its scalar summaries, validating the empirical models of Nam and Seo (2026) and Chang et al. (2016) and supporting the view that climate change operates on electricity demand through shifts in the entire distribution, including its tails. The LHR specification presents a particularly instructive contrast. The LHR transformation, log pt(s)−
+
+log(1 − Pt(s)) , is the primary specification used by Nam and Seo (2026) to study how electricity demand responds to high-temperature events, since it emphasizes the upper tail of the temperature distribution by scaling the density relative to the survival function. When endogeneity is addressed using Zt = Xt−1
+
+or the geometrically weighted lagged predictors, the LHR p-values are all below 5% , and mostly below 
+
+2% , so the null is clearly rejected. By contrast, when the endogeneity correction is dropped by setting 
+
+Zt = Xt, the LHR p-values rise to between about 10% and 33% , and the null cannot be rejected at the 10% level in any configuration. This pattern is consistent with measurement error in the estimated temperature distribution inducing bias that is especially consequential for tail-sensitive specifications such as LHR: ignoring endogeneity can lead to the conclusion that high-temperature distributional effects are insignificant, whereas the proposed auxiliary-variable approach restores statistical significance. The QF specification stands apart: p-values are large in all configurations and especially high when lagged auxiliary variables are used, indicating that the quantile-function predictor does not contribute significant explanatory power once scalar controls and seasonal effects are included. As discussed above, this likely reflects the qualitatively distinct interpretation of the QF model rather than a failure of the distributional approach. As Nam and Seo (2026) discuss, the s-quantile of temperature varies seasonally, so θ(s) in the QF model averages over these seasonal fluctuations and tends to be attenuated relative to 
+
+θ(s) in the other PDF-based specifications; their paper similarly finds slope parameters close to zero for the QF specification. Overall, the empirical evidence strongly supports the functional linear model for density-based repre-sentations of temperature distributions. The conclusions for CLR, LRHR, LCDF, and PDF are robust across the auxiliary-variable choices, while the LHR specification highlights the practical importance of correct-ing for measurement-error endogeneity in tail-sensitive inference. 24 Table 5: Testing functional association of electricity demand and temperature distribution, p-values (%) 
+
+Bartlett Parzen 
+
+K \ Xt CLR LHR LRHR LCDF PDF QF CLR LHR LRHR LCDF PDF QF 
+
+Case Zt = Xt−1
+
+1 0.00 0.79 0.16 0.71 0.01 85.21 0.00 0.69 0.17 0.78 0.01 85.07 2 0.00 0.65 0.14 0.65 0.00 83.15 0.00 0.63 0.16 0.73 0.01 82.99 3 0.00 0.57 0.17 0.67 0.01 88.57 0.00 0.56 0.20 0.73 0.01 88.40 4 0.00 0.56 0.15 0.62 0.01 89.36 0.00 0.55 0.18 0.68 0.01 89.19 
+
+Case Zt = Pℓj=1 (0 .5) j−1Xt−j with ℓ = 2 
+
+1 0.01 0.81 0.40 1.29 0.01 84.94 0.01 0.82 0.44 1.41 0.01 84.39 2 0.01 0.67 0.37 1.17 0.01 84.21 0.01 0.67 0.41 1.27 0.01 83.57 3 0.01 0.60 0.41 1.19 0.01 89.46 0.01 0.64 0.46 1.30 0.02 89.00 4 0.01 0.58 0.40 1.13 0.01 90.23 0.01 0.62 0.44 1.24 0.02 90.25 
+
+Case Zt = Pℓj=1 (0 .5) j−1Xt−j with ℓ = 3 
+
+1 0.01 2.07 0.28 1.57 0.02 78.35 0.01 2.20 0.30 1.71 0.02 78.90 2 0.01 1.72 0.25 1.41 0.01 77.62 0.01 1.81 0.27 1.54 0.02 78.09 3 0.01 1.75 0.27 1.45 0.02 82.70 0.01 1.89 0.29 1.58 0.02 83.14 4 0.01 1.72 0.26 1.35 0.02 83.23 0.01 1.85 0.28 1.48 0.02 83.66 
+
+Case Zt = Xt (no correction for endogeneity) 
+
+1 0.10 32.72 0.06 1.06 0.09 34.86 0.10 31.72 0.06 1.02 0.10 35.55 2 0.14 10.59 0.08 0.18 0.07 38.72 0.14 10.10 0.08 0.19 0.08 39.05 3 0.26 11.85 0.13 0.32 0.08 36.12 0.24 11.46 0.13 0.33 0.09 36.46 4 0.23 12.58 0.12 0.36 0.07 18.55 0.23 12.23 0.12 0.36 0.08 18.31            
+
+> Notes: The table reports approximate p-values (%) for H0:θ= 0 in model (7.1), computed via 500,000 Monte Carlo draws of PdT
+> j=1 bλϖ,j ν2
+> j.Kdenotes the number of standardized moments included as scalar controls.
+
+8 Conclusion 
+
+This paper develops identification-robust tests for the slope function in the functional linear regression model with a potentially endogenous functional regressor. The proposed tests are based on a functional moment condition induced by an auxiliary functional variable and require neither dimension reduction nor consistent estimation of the slope. They remain asymptotically valid under the null regardless of the strength of the linear relationship between the regressor and the auxiliary variable: weak or failed rele-vance reduces power but does not distort size. A local asymptotic power analysis establishes that endpoint evaluation is the locally optimal weighting within a natural family of weighted statistics, and a feasible implementation based on a kernel estimator of the long-run covariance is provided and shown to preserve the asymptotic properties. Monte Carlo experiments confirm good finite-sample size control and power properties consistent with the asymptotic theory, and demonstrate that existing tests based on exogene-ity or consistent estimation can break down when their underlying assumptions fail. An empirical appli-cation to residential electricity demand and temperature distributions provides formal statistical evidence that the full temperature distribution contributes explanatory power beyond scalar summaries, support-ing recent approaches that model the distributional effects of climate change on energy demand. 
+
+References 
+
+Andrews, D. W. K. (1991). Heteroskedasticity and autocorrelation consistent covariance matrix estimation. 
+
+Econometrica 59 (3), 817–858. Babii, A. (2022). High-dimensional mixed-frequency IV regression. Journal of Business & Economic Statis-
+
+25 tics 40 (4), 1470–1483. Benatia, D., M. Carrasco, and J.-P. Florens (2017). Functional linear regression with functional response. 
+
+Journal of Econometrics 201 (2), 269–291. Berkes, I., L. Horváth, and G. Rice (2013). Weak invariance principles for sums of dependent random functions. Stochastic Processes and their Applications 123 (2), 385–403. Berkes, I., L. Horváth, and G. Rice (2016). On the asymptotic normality of kernel estimators of the long run covariance of functional time series. Journal of Multivariate Analysis 144 (1), 150–175. Bosq, D. (2000). Linear Processes in Function Spaces . Springer-Verlag New York. Cardot, H., F. Ferraty, A. Mas, and P. Sarda (2003). Testing hypotheses in the functional linear model. 
+
+Scandinavian Journal of Statistics 30 (1), 241–255. Cardot, H., A. Goia, and P. Sarda (2004). Testing for no effect in functional linear regression models, some computational approaches. Communications in Statistics-Simulation and Computation 33 (1), 179–199. Chang, Y., C. S. Kim, J. I. Miller, J. Y. Park, and S. Park (2016). A new approach to modeling the effects of temperature fluctuations on monthly electricity demand. Energy Economics 60 , 206–216. Chen, C., S. Guo, and X. Qiao (2022). Functional linear regression: Dependence and error contamination. 
+
+Journal of Business & Economic Statistics 40 (1), 444–457. Conway, J. B. (1994). A Course in Functional Analysis . Springer. Dette, H., K. Kokot, and S. Volgushev (2020). Testing relevant hypotheses in functional time series via self-normalization. Journal of the Royal Statistical Society Series B: Statistical Methodology 82 (3), 629–660. Egozcue, J. J., J. L. Díaz-Barrero, and V. Pawlowsky-Glahn (2006, Jul). Hilbert space of probability density functions based on Aitchison geometry. Acta Mathematica Sinica 22 (4), 1175–1182. Florens, J.-P. and S. Van Bellegem (2015). Instrumental variable estimation in functional linear models. 
+
+Journal of Econometrics 186 (2), 465–476. Hall, P. and J. L. Horowitz (2007). Methodology and convergence rates for functional linear regression. 
+
+Annals of Statistics 35 (1), 70 – 91. Hilgert, N., A. Mas, and N. Verzelen (2013). Minimax adaptive tests for the functional linear model. The Annals of Statistics 41 (2), 838–869. Hörmann, S. and P. Kokoszka (2010). Weakly dependent functional data. The Annals of Statistics 38 (3), 1845–1884. Horváth, L. and P. Kokoszka (2012). Inference for Functional Data with Applications . Springer-Verlag GmbH. Horváth, L., P. Kokoszka, and R. Reeder (2013). Estimation of the mean of functional time series and a two-sample problem. Journal of the Royal Statistical Society: Series B (Statistical Methodology) 75 (1), 103–122. Horváth, L., P. Kokoszka, and G. Rice (2014). Testing stationarity of functional time series. Journal of Econometrics 179 (1), 66–82. Horváth, L., G. Rice, and S. Whipple (2016). Adaptive bandwidth selection in the long run covariance estimator of functional time series. Computational Statistics & Data Analysis 100 , 676–693. Imaizumi, M. and K. Kato (2018). PCA-based estimation for functional linear regression with functional responses. Journal of Multivariate Analysis 163 , 15–36. Lin, Y. and Z. Lin (2021). A unified approach to hypothesis testing for functional linear models. arXiv preprint arXiv:2109.02309 .26 Mas, A. (2007). Weak convergence in the functional autoregressive model. Journal of Multivariate Analy-sis 98 (6), 1231–1261. Nam, K. and W.-K. Seo (2026). Nonlinear temperature sensitivity of residential electricity demand: Evi-dence from a distributional regression approach. Energy Economics 153 , 109076. Petersen, A. and H.-G. Müller (2016, 02). Functional data analysis for density functions by transformation to a Hilbert space. Annals of Statistics 44 (1), 183–218. Petrovich, J., B. Taoufik, and Z. G. Davis (2024). Instrumental variable estimation for functional concurrent regression models. Journal of Applied Statistics 51 (8), 1570–1589. Ramsay, J. O. and B. W. Silverman (2005). Functional Data Analysis . Springer, New York. Rice, G. and H. L. Shang (2017). A plug-in bandwidth selection procedure for long-run covariance estima-tion with stationary functional time series. Journal of Time Series Analysis 38 (4), 591–609. Seo, W.-K. and D. Seong (2025). Functional linear projection and impulse response analysis. arXiv preprint arXiv:2503.08364 .Seong, D. and W.-K. Seo (2025). Functional instrumental variable regression with an application to esti-mating the impact of immigration on native wages. Econometric Theory, in press. Shang, H. L. and S. Haberman (2025). Constructing prediction intervals for the age distribution of deaths. 
+
+arXiv preprint arXiv:2506.17953 .Su, Y.-R., C.-Z. Di, and L. Hsu (2017). Hypothesis testing in functional linear models. Biometrics 73 (2), 551– 561. Yang, H., V. Baladandayuthapani, A. U. Rao, and J. S. Morris (2020). Quantile function on scalar regression analysis for distributional data. Journal of the American Statistical Association 115 (529), 90–106. Yao, F., H.-G. Müller, and J.-L. Wang (2005). Functional linear regression analysis for longitudinal data. The Annals of Statistics 33 (6), 2873–2903. Yeon, H., X. Dai, and D. J. Nordman (2023a). Bootstrap inference in functional linear regression models with scalar response. Bernoulli 29 (4), 2599–2626. Yeon, H., X. Dai, and D. J. Nordman (2023b). Bootstrap inference in functional linear regression models with scalar response under heteroscedasticity. arXiv preprint arXiv:2311.07031 .Yi, M., Z. Li, and Y. Tang (2022). F-type testing in functional linear models. Stat 11 (1), e420. 
+
+A Mathematical appendix 
+
+Lemma A.1. Let eS(r) and eR(r) be defined as in Section 3 and let g satisfy (G1) and (G2). Then ∥g( eR)∥op =
+
+∥g( eS)∥.Proof. Note that for every v ∈ H with ∥v∥ = 1 ,
+
+g( eR)( v) = g(⟨ eS, ·⟩ )( v) = ⟨g( eS), v ⟩. (A.1) From the Cauchy-Schwarz inequality, we find that ∥g( eR)( v)∥ ≤ ∥ g( eS)∥∥ v∥, which implies that ∥g( eR)∥op ≤∥g( eS)∥. If g( eS) = 0 , then the reverse inequality is trivial. If g( eS)̸ = 0 , the bound is sharp since 
+
+g( eR)( g( eS)/∥g( eS)∥) = ∥g( eS)∥.
+
+27 Lemma A.2. Under Assumption 1, (i) {Ztut}t≥1 is L2-m-approximable in H.(ii) {Xt ⊗ Zt − E(Xt ⊗ Zt)}t≥1 is L2-m-approximable in the space of Hilbert-Schmidt operators SH.Proof of Lemma A.2. We first show L2-m-approximability of {Ztut}t≥1. Since Zt and ut are both L4-m-approximable, Zt (resp. ut) admits the representation Zt = κZ (eZ,t , e Z,t −1, . . . ) (resp. ut = κu(eu,t , e u,t −1, . . . ))for some i.i.d. sequence {eZ,t } in H (resp. {eu,t } in R) for some measurable function κZ (resp. κu), and the following hold: for some δ ∈ (0 , 1) ,
+
+E[∥Zt − Zm,t ∥4+ δ]1/(4+ δ) < ∞ and E[∥ut − um,t ∥4+ δ]1/(4+ δ) < ∞, (A.2) where 
+
+Zm,t = κZ (eZ,t , e Z,t −1, . . . , e Z,t −m+1 , e ′
+
+> Z,t −m
+
+, e ′
+
+> Z,t −m−1
+
+, . . . ), (A.3) 
+
+um,t = κu(eu,t , e u,t −1, . . . , e u,t −m+1 , e ′
+
+> u,t −m
+
+, e ′
+
+> u,t −m−1
+
+, . . . ), (A.4) and {e′
+
+> Z,t
+
+} (resp. {e′
+
+> u,t
+
+}) is an independent copy of {eZ,t } (resp. {eu,t }) defined on the same probabil-ity space (see Definition 2.1 of Hörmann and Kokoszka, 2010). Since the other requirements for L2-m-approximability are obvious, we focus here only on the finiteness of E[∥Ztut − Z(m) 
+
+> t
+
+u(m) 
+
+> t
+
+∥2+ δ/ 2], as in the proof of Lemma 2.1 of Hörmann and Kokoszka (2010); of course, in the present paper, (E(∥Ztut −
+
+Z(m) 
+
+> t
+
+u(m) 
+
+> t
+
+∥2+ δ/ 2)) 1/(2+ δ/ 2) = O(m−ϱ) is required, and this will be shown as well. 
+
+∥Ztut − Z(m) 
+
+> t
+
+u(m) 
+
+> t
+
+∥2+ δ/ 2 ≤
+
+
+
+∥Zt − Z(m) 
+
+> t
+
+∥∥ ut∥ + ∥Z(m) 
+
+> t
+
+∥∥ ut − u(m) 
+
+> t
+
+∥
+
+2+ δ/ 2
+
+≤ 22+ δ/ 2 
+
+∥Zt − Z(m) 
+
+> t
+
+∥2+ δ/ 2∥ut∥2+ δ/ 2 + ∥Z(m) 
+
+> t
+
+∥2+ δ/ 2∥ut − u(m) 
+
+> t
+
+∥2+ δ/ 2
+
+,
+
+(A.5) where the second inequality follows from convexity of h(x) = ∥x∥p. From (A.5) and the Cauchy-Schwarz inequality, we find that 
+
+E
+
+
+
+Ztut − Z(m) 
+
+> t
+
+u(m)
+
+> t
+> 2+ δ/ 2
+
+
+
+(A.6) 
+
+≤ O(1) 
+
+
+
+(E[∥Zt − Z(m) 
+
+> t
+
+∥4+ δ]E[∥ut∥4+ δ]) 2+ δ/ 24+ δ + ( E[∥Z(m) 
+
+> t
+
+∥4+ δ]E[∥ut − u(m) 
+
+> t
+
+∥4+ δ]) 2+ δ/ 24+ δ
+
+
+
+(A.7) and deduce from Assumption 1 that the right hand side is finite. Note also that both (E[∥Zt − Z(m) 
+
+> t
+
+∥4+ δ]) 1/(4+ δ) and (E[∥ut − u(m) 
+
+> t
+
+∥4+ δ]) 1/(4+ δ) are O(m−ϱ) under Assumption 1, and thus we deduce from (A.7) that (E∥Ztut − Z(m) 
+
+> t
+
+u(m) 
+
+> t
+
+∥2+ δ/ 2)1/(2+ δ/ 2) = O(m−ϱ).
+
+L2-m-approximability of {Xt ⊗ Zt − E(Xt ⊗ Zt)}t≥1 can similarly be shown with moderate mod-ification, noting that Xt also admits the representation Xt = κX (eX,t , e X,t −1, . . . ) for some i.i.d. se-quence {eX,t } in H for some measurable function κX , and the following hold: for some δ ∈ (0 , 1) ,
+
+E[∥Xt − X(m) 
+
+> t
+
+∥4+ δ]1/(4+ δ) < ∞, where X(m) 
+
+> t
+
+= κX (eX,t , e X,t −1, . . . , e X,t −m+1 , e ′
+
+> X,t −m
+
+, e ′
+
+> X,t −m−1
+
+, . . . )
+
+and {e′
+
+> X,t
+
+} is an independent copy of {eX,t } defined on the same probability space. If we let Wt = Xt ⊗
+
+Zt − E(Xt ⊗ Zt) and W (m) 
+
+> t
+
+= X(m) 
+
+> t
+
+⊗ Z(m) 
+
+> t
+
+− E(Xt ⊗ Zt), then from similar arguments used in the proof 28 of Lemma 2.1 of Hörmann and Kokoszka (2010), the following can be shown: 
+
+∥Wt − W (m) 
+
+> t
+
+∥2+ δ/ 2 
+
+> SH
+
+≤ O(1) 
+
+
+
+∥Xt∥∥ Zt − Z(m) 
+
+> t
+
+∥ + ∥Z(m) 
+
+> t
+
+∥∥ Xt − X(m) 
+
+> t
+
+∥
+
+2+ δ/ 2
+
+, (A.8) where ∥ · ∥ SH denotes the Hilbert-Schmidt norm. Using similar arguments used in (A.5) and (A.7), we find that (∥Wt − W (m) 
+
+> t
+
+∥2+ δ/ 2 
+
+> SH
+
+)1/(2+ δ/ 2) is finite and also O(m−ϱ).
+
+Lemma A.3. Under Assumption W, Dw ≤ 1. Moreover, equality holds if and only if the map 
+
+s 7 →
+
+Z 1
+
+> s
+
+w(r)μ(dr )
+
+is constant μ-almost everywhere. Proof. Let Fw(s) = R 1 
+
+> s
+
+w(r)μ(dr ). By Fubini’s theorem and the definition of μ in (3.16), 
+
+Z 10
+
+Fw(s)μ(ds ) = 
+
+Z 10
+
+Z 1
+
+> s
+
+w(r)μ(dr )μ(ds ) = 
+
+Z 10
+
+rw (r)μ(dr ),
+
+where note that the last equality follows because μ([0 , r ]) = r for both the Lebesgue case and the discrete measure μ = PNj=1 (rj − rj−1)δrj . Hence, by the Cauchy–Schwarz inequality, 
+
+C−2 
+
+> w
+
+=
+
+Z 10
+
+Fw(s)2μ(ds ) ≥
+
+Z 10
+
+Fw(s)μ(ds )
+
+2
+
+=
+
+Z 10
+
+rw (r)μ(dr )
+
+2
+
+.
+
+Therefore, 
+
+D2 
+
+> w
+
+= C2
+
+> w
+
+Z 10
+
+rw (r)μ(dr )
+
+2
+
+≤ 1.
+
+For the inequality to become the equality, there must exist a constant α such that 
+
+α
+
+Z 1
+
+> s
+
+w(r)μ(dr ) = 1 , (A.9) which is implied by the necessary and sufficient condition for the Cauchy-Schwarz inequality to become equality; see, e.g,. (Conway, 1994, p. 3 ). This proves the lemma. 
+
+B Proofs 
+
+Proof of Theorem 3.1. Observe that ψ = θ − θ0 and 
+
+eS(r) = 1
+
+T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+Zt{yt − ⟨ Xt, θ 0⟩} = 1
+
+T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+(Zt{ut + ⟨Xt, ψ ⟩} − CXZ ψ) + rC XZ ψ. (B.1) By Lemma A.2 and Lemma 2.1 of Hörmann and Kokoszka (2010), we find that {Ztut} and {Zt⟨Xt, ψ ⟩ − 
+
+CXZ ψ} are both L2-m-approximable (see Lemma A.2 and also Lemma 2.1 of Hörmann and Kokoszka, 2010), from which it is deduced that {ηt(ψ)} is L2-m-approximable. Hence, by Berkes et al. (2013, Theo-rem 1.1), 
+
+sup 
+
+> 0≤r≤1
+
+1
+
+√T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+ηt(ψ) − N ψ(r) = op(1) , (B.2) 29 where Nψ is an H-valued Brownian motion with long-run covariance operator Λψ. From (B.1) and (B.2) 
+
+sup 
+
+> 0≤r≤1
+
+√T { eS(r) − rC XZ ψ} − N ψ(r) = op(1) ,
+
+as desired. Dividing (3.12) by √T also gives 
+
+sup 
+
+> 0≤r≤1
+
+∥ eS(r) − rC XZ ψ∥ = op(1) ,
+
+which proves the first assertion. 
+
+Proofs of Theorem 3.2 and Corollary 3.1. Note that gw is a bounded linear map from DH[0 , 1] to H under the sup norm. Specifically, 
+
+∥gw(f )∥ = Cw
+
+Z 10
+
+f (r)w(r)μ(dr ) ≤ Cw
+
+
+
+sup 
+
+> 0≤r≤1
+
+∥f (r)∥
+
+ Z 10
+
+|w(r)|μ(dr ),
+
+Hence the continuous mapping theorem can be applied to gw. Observe that √T g w( eS) = gw(√T eS), we find that √T g w( eS) converges weakly in DH[0 , 1] to gw(N0) = Gw. Moreover, it is obvious that 
+
+∥√T g w( eS)∥2 →d ∥G w∥2, (B.3) which proves the result under H0.Under Hκ with κ > 0 and γr̸ = 0 , we know from Theorem 3.1 that sup 0≤r≤1 ∥ eS(r) − rM∥ → p 0,where M = κγrCXZ ψr. Since gw is continuous, we find that gw( eS) →p gw(rM). Observe that 
+
+gw(rM) = Cw
+
+Z 10
+
+rw (r)μ(dr ) M = DwM = κγrDwCXZ ψr. (B.4) Under Assumption W, Dw > 0, and since γr̸ = 0 and ψr /∈ ker CXZ , we have gw(rM)̸ = 0 . Hence 
+
+∥√T g w( eS)∥2 = T ∥gw( eS)∥2 →p ∞ follows. It only remains to characterize the distribution of ∥G w∥2 under H0. Let {(λj , v j )}j≥1 be the eigenpairs of ΛZu in (3.10). The Brownian motion N0 admits the expansion N0(r) = P∞
+
+> j=1
+
+pλj ξj (r)vj , where 
+
+{ξj }j≥1 are i.i.d. standard Brownian motions. Therefore, 
+
+Gw = gw(N0) = 
+
+> ∞
+
+X
+
+> j=1
+
+pλj gw(ξj )vj , (B.5) where gw(ξj ) = Cw
+
+R 10 ξj (r)w(r)μ(dr ). Since the Brownian motions {ξj }j≥1 are independent, {gw(ξj )}j≥1
+
+are independent. We will now show that the distribution of each gw(ξj ) is standard normal. First, it is straightforward to see that gw(ξj ) is normally distributed with mean zero, since ξj is the standard Brown-ian motion. Moreover, gw(ξj ) has unit variance, which can be shown by the covariance identity for Brow-nian motion and the definition of Cw:Var (gw(ξj )) = C2
+
+> w
+
+E
+
+"Z 10
+
+ξj (r)w(r)μ(dr )
+
+2#
+
+= C2
+
+> w
+
+Z 10
+
+Z 1
+
+> s
+
+w(r)μ(dr )
+
+2
+
+μ(ds ) = 1; (B.6) the above hold regardless of whether μ is the Lebesgue measure or μ is the discrete measure given by 
+
+μ = PNj=1 (rj − rj−1)δrj for any partition 0 = r0 < r 1 < . . . < r N = 1 . Since {gw(ξj )}j≥1 are i.i.d. 30 standard normal random variables, and {vj }j≥1 is an orthonormal system, we find that 
+
+∥G w∥2 =
+
+> ∞
+
+X
+
+> j=1
+
+λj ν2 
+
+> j
+
+.
+
+The result in Corollary 3.1 now follows immediately. Specifically, under H0, ∥√T g w( eS)∥2 →d
+
+P∞ 
+
+> j=1
+
+λj ν2 
+
+> j
+
+,and under Hκ with κ > 0 and γr̸ = 0 , ∥√T g w( eS)∥2 →p ∞.
+
+Proof of Theorem 3.3. Under Hκ,T , write θ − θ0 = κ ¯ψ/ √T , then √T eS(r) can be written as follows: 
+
+√T eS(r) = 1
+
+√T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+Zt{yt − ⟨ Xt, θ 0⟩} = 1
+
+√T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+Ztut + κ
+
+T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+Zt⟨Xt, ¯ψ⟩.
+
+By Theorem 3.1 under H0, we find that sup 0≤r≤1 ∥T −1/2 P⌊T r ⌋ 
+
+> t=1
+
+Ztut − N 0(r)∥ → p 0. We also find from the property of eS under the alternative that 
+
+sup 
+
+> 0≤r≤1
+
+1
+
+T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+Zt⟨Xt, ¯ψ⟩ − rC XZ ¯ψ →p 0 (B.7) Combining these results, we find that 
+
+sup 
+
+> 0≤r≤1
+
+√T eS(r) − N 0(r) − κrC XZ ¯ψ →p 0. (B.8) Applying the continuous mapping theorem to gw gives 
+
+√T g w( eS) →d gw(N0) + κCw
+
+Z 10
+
+rw (r)μ(dr ) CXZ ¯ψ = Gw + κDwCXZ ¯ψ, (B.9) from which the desired result immediately follows. 
+
+Proof of Theorem 3.4. Within the normalized class gw = Cwg◦
+
+> w
+
+, local power is maximized by maximizing 
+
+Dw, and Lemma A.3 shows that Dw ≤ 1, with equality if and only if the map s 7 → R 1 
+
+> s
+
+w(r)μ(dr ) is constant μ-almost everywhere. First, if we consider the representative choice ( μ = δ1, w (r) = 1 for r ∈ [0 , 1] ), then g◦
+
+> w
+
+(f ) = f (1) 
+
+with Cw = 1 . Hence gw(f ) = Cwg◦
+
+> w
+
+(f ) = f (1) , and the equality condition in Lemma A.3 is satisfied. Therefore Dw = 1 .Conversely, suppose that a choice of w and μ attains Dw = 1 . Then, by Lemma A.3, the map s 7 →
+
+R 1 
+
+> s
+
+w(r)μ(dr ) must be constant μ-almost everywhere. In the discrete case, if the support of μ is written as 0 ≤ r1 < · · · < r N = 1 , this implies, for each i < N ,
+
+w(ri)μ({ri}) = 
+
+Z 1
+
+> ri
+
+w(r)μ(dr ) −
+
+Z 1
+
+> ri+1
+
+w(r)μ(dr ) = 0 .
+
+Thus all nonzero effective weight is placed at r = 1 . After the normalization in (3.19), this again gives 
+
+gw(f ) = f (1) . If μ is the Lebesgue measure, then under Assumption W, it is impossible to ensure the constancy of the map s 7 → R 1 
+
+> s
+
+w(r)μ(dr ). Hence for all choices attaining Dw = 1 are equivalent after normalization, and the locally optimal test is uniquely represented by the endpoint evaluation. 31 Proof of Theorem 4.1. The proof is divided into two parts: we first provide and prove some preliminary results, and then prove Theorem 4.1. In this proof, without loss of generality, we let c = 1 in Assump-tion 2 and thus let k( ·/h ) be supported on [−1, 1] . It is obvious that there exists a constant M such that 
+
+k( ·/h ) ≤ M . Extending the subsequent proof to the case with c > 0 requires only a minor modification. 
+
+1. Preliminary results : We let v0,t = Ztu0,t , ¯v0,T = T −1 PTt=1 v0,t , and let 
+
+eΓs =
+
+PTt=s+1 v0,t −s ⊗ v0,t , if s ≥ 0,
+
+PTt=−s+1 v0,t ⊗ v0,t +s, if s < 0.
+
+(B.10) If θ0 = θ, v0,t = Ztut and ¯v0,T = Op(T −1/2). We thus find that 
+
+T −1
+
+> h
+
+X
+
+> s=0
+
+k( s/h )
+
+> T
+
+X
+
+> t=s+1
+
+v0,t −s ⊗ ¯v0,T = Op(T −1h), T −1
+
+> −1
+
+X
+
+> s=−h
+
+k( s/h )
+
+> T
+
+X
+
+> t=−s+1
+
+v0,t ⊗ ¯v0,T = Op(T −1h).
+
+(B.11) Moreover, it is also deduced that T −1 Phs=−h k( s/h ) PTt=1 ¯v0,T ⊗ ¯v0,T = Op(T −1h). From these results, we find that 
+
+bΛZu = T −1
+
+> h
+
+X
+
+> s=−h
+
+k( s/h )eΓs + Op(T −1h). (B.12) Using similar arguments used in the proof of Lemma A.2, we can find that Ztut is an L4-m-approximable sequence under the conditions given in Assumptions 1 and 2. Moreover, based on the moment condition on Ztut in Assumption 2 and Theorems 2.1 and 2.2 of Berkes et al. (2016), we find that 
+
+T −1
+
+> h
+
+X
+
+> s=−h
+
+k( s/h )( eΓs − E[eΓs]) = Op(T −1/2h1/2). (B.13) Noting that E[( T − | s|)−1 eΓs] = Γ s for each s and P∞ 
+
+> s=−∞
+
+k( s/h )|s|Γs ≤ O(h) P∞ 
+
+> s=−∞
+
+∥Γs∥op = O(h),we find that 
+
+T −1
+
+> ∞
+
+X
+
+> s=−∞
+
+k( s/h )E[eΓs] = 
+
+> ∞
+
+X
+
+> s=−∞
+
+k( s/h )(1 − | s|/T )Γ s =
+
+> ∞
+
+X
+
+> s=−∞
+
+k( s/h )Γ s + Op(T −1h). (B.14) Let eh = h(log h)−1 for large enough h. We write 
+
+> ∞
+
+X
+
+> s=−∞
+
+k( s/h )Γ s =
+
+> ∞
+
+X
+
+> s=−∞
+
+Γs + A1 + A2 − A3, (B.15) where A1 = P
+
+> |s|≤ eh
+
+(k( s/h ) − 1)Γ s, A2 = P 
+
+> |s|>eh
+
+k( s/h )Γ s, and A3 = P 
+
+> |s|>eh
+
+Γs.
+
+∥A3∥op ≤ X
+
+> |s|>eh
+
+∥Γs∥op ≤ | eh|− eφ X
+
+> |s|>eh
+
+|s| eφ∥Γs∥op = O(h− eφ log eφ h) = O(h−φ). (B.16) Since A2 ≤ P 
+
+> |s|>eh
+
+|k( s/h )|∥ Γs∥op ≤ P 
+
+> |s|>eh
+
+∥Γs∥op , we also find that 
+
+∥A2∥op ≤ O(h−φ). (B.17) 32 Since eh/h → 0, we note that lim sup h→∞ max 0<|s|≤ eh |(k( s/h ) − 1)( |s|/h )−φ| ≤ em < ∞. Therefore, 
+
+∥A1∥op ≤ Op(h−φ) X
+
+> 0<|s|≤ eh
+
+|(k( s/h ) − 1) |
+
+(|s|/h )φ |s|φ∥Γs∥op ≤ Op(h−φ) X
+
+> 0<|s|≤ eh
+
+|s|φ∥Γs∥op = O(h−φ). (B.18) Note that h2φ+1 /T → cφ ∈ (0 , ∞], which implies that O(h−φ) = O(ph/T ). Combining this result with (B.13)-(B.18) and the fact that h/T → 0, we find that 
+
+bΛZu = Λ Zu + Op(T −1/2h1/2 + h−φ) = Λ Zu + Op(T −1/2h1/2) = Λ Zu + op(1) . (B.19) Now suppose that θ − θ0 = ψ; in this case u0,t = ut + xt, where xt = ⟨Xt, θ − θ0⟩. Then we have 
+
+v0,t − ¯v0,T = vt + vx,t − vT − vx,T , where vt = Ztut, vx,t = Ztxt, vT = T −1 PTt=1 vt and vx,T =
+
+T −1 PTt=1 vx,t . Let ςt = vt +vx,t and ¯ςT = ¯ vT +¯ vx,T . Observe that bΛZu = T −1 Phs=−h k( s/h )bΓς,s +op(1) ,where bΓς,s = PTt=s+1 (ςt−s − ¯ςT ) ⊗ (ςt − ¯ςT ) and bΓς,s = PTt=−s+1 (ςt − ¯ςT ) ⊗ (ςt+s − ¯ςT ). Given that (i) vt + ( vx,t − E[vx,t ]) is an L2-m-approximable sequence (Lemma 2.1, Hörmann and Kokoszka, 2010) and (ii) vT = Op(T −1/2) and vx,T − E[vx,t ] = Op(T −1/2) (Theorem 1, Horváth et al., 2013), we find from Theorem 2 of Horváth et al. (2013) establishing convergence of kernel estimators of the long-run covariance operator of L2-m-approximable sequence that 
+
+bΛZu →p Λv,v x , (B.20) where Λv,v x is the long-run covariance operator of vt + vx,t , which is guaranteed to exist (Corollary 4.1, Hörmann and Kokoszka, 2010). 
+
+2. Proof of the desired results : If H0 is true, we find from (B.19) and Lemma 4.2 of Bosq (2000) that 
+
+sup 
+
+> j
+
+|bλj − λj | = Op(T −1/2h1/2 + h−φ) = Op(T −1/2h1/2), (B.21) where the last equality follows from that h2φ+1 /T → cφ ∈ (0 , ∞] and hence O(h−φ) = O(ph/T ). Let 
+
+dT be a divergent sequence satisfying dT = o(T 1/2h−1/2). We then find that 
+
+> dT
+
+X
+
+> j=1
+
+bλj ν2 
+
+> j
+
+−
+
+> ∞
+
+X
+
+> j=1
+
+λj ν2 
+
+> j
+
+≤
+
+> dT
+
+X
+
+> j=1
+
+bλj ν2 
+
+> j
+
+−
+
+> dT
+
+X
+
+> j=1
+
+λj ν2 
+
+> j
+
+−
+
+> ∞
+
+X 
+
+> j=dT+1
+
+λj ν2 
+
+> j
+
+≤
+
+> dT
+
+X
+
+> j=1
+
+(bλj − λj )ν2 
+
+> j
+
++
+
+> ∞
+
+X 
+
+> j=dT+1
+
+λj ν2
+
+> j
+
+(B.22) 
+
+≤ Op(dT T −1/2h1/2) + op(1) = op(1) ,
+
+(B.23) where we used the fact that ΛZu is a trace-class operator and lim sup T →∞ 
+
+P∞ 
+
+> j=1
+
+λj < ∞, and hence 
+
+P∞  
+
+> j=dT+1
+
+λj →p 0 as dT → ∞ . Thus, the quantiles from PdT 
+
+> j=1
+
+bλj ν2 
+
+> j
+
+converge to those of P∞ 
+
+> j=1
+
+λj ν2 
+
+> j
+
+.On the other hand, suppose that Hκ holds with κ > 0 and γr̸ = 0 . By Theorem 3.2, T −1∥√T g w( eS)∥2 =
+
+∥gw( eS)∥2 →p ∥DwM∥ 2 > 0. Moreover, as shown above, due to the convergence of bΛZu , it is straightfor-ward to see that bqα = O(dT ), and hence T −1 bqα →p 0. This implies that 
+
+P{∥ √T g w( eS)∥2 > bqα} = P{T −1∥√T g w( eS)∥2 > T −1 bqα} → 1,
+
+as desired. 33 Proof of Theorem 5.1. Recall that ψ = θ − θ0, Zc,t = Zt − μZ , and Xc,t = Xt − μX . Since yt = μ +
+
+⟨Xt, θ ⟩ + ut and E[ut] = 0 , we have μy = μ + ⟨μX , θ ⟩. Hence yt − μy − ⟨ Xt − μX , θ 0⟩ = ut + ⟨Xc,t , ψ ⟩.For notational simplicity, we let 
+
+ξt = ut + ⟨Xc,t , ψ ⟩, ¯ξT = T −1
+
+> T
+
+X
+
+> t=1
+
+ξt, ¯Zc,T = T −1
+
+> T
+
+X
+
+> t=1
+
+Zc,t .
+
+Note that eSc(r) = 1
+
+> T
+
+P⌊T r ⌋ 
+
+> t=1
+
+(Zc,t − ¯Zc,T )( ξt − ¯ξT ). Thus, 
+
+eSc(r) = 1
+
+T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+Zc,t ξt − ¯Zc,T 
+
+1
+
+T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+ξt − ¯ξT
+
+1
+
+T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+Zc,t + ⌊T r ⌋
+
+T ¯Zc,T ¯ξT .
+
+Under Assumption 1A, the sequences {Zc,t } and {ξt} are L2-m-approximable. Hence ¯Zc,T = Op(T −1/2)
+
+and ¯ξT = Op(T −1/2), and furthermore, as in our proof of Theorem 3.1, we find that T −1/2 P⌊T r ⌋ 
+
+> t=1
+
+Zc,t =
+
+Op(1) and also T −1/2 P⌊T r ⌋ 
+
+> t=1
+
+ξt = Op(1) uniformly in r ∈ [0 , 1] . Therefore, we deduce that 
+
+sup 
+
+> 0≤r≤1
+
+√T eSc(r) − 1
+
+√T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+Zc,t ξt = op(1) . (B.24) Define ηc,t (ψ) = Zc,t ξt − CXZ ψ similarly to the proof of Theorem 3.1. By Assumption 1A and the same argument as in Lemma A.2, {ηc,t (ψ)} is L2-m-approximable. Hence, by Berkes et al. (2013, Theorem 1.1), 
+
+sup 
+
+> 0≤r≤1
+
+1
+
+√T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+ηc,t (ψ) − N c,ψ (r) = op(1) ,
+
+where Nc,ψ is an H-valued Brownian motion with long-run covariance operator Λc,ψ = P∞ 
+
+> s=−∞
+
+E[ηc,t (ψ)⊗
+
+ηc,t −s(ψ)] . Combining this with (B.24) gives 
+
+sup 
+
+> 0≤r≤1
+
+√T { eSc(r) − rC XZ ψ} − N c,ψ (r) = op(1) . (B.25) Under H0, ψ = 0 and Nc, 0 has long-run covariance operator Λc,Zu . Therefore, by the continuous mapping theorem and the same argument as in the proof of Theorem 3.2, 
+
+∥√T g w( eSc)∥2 →d
+
+> ∞
+
+X
+
+> j=1
+
+λc,j ν2 
+
+> j
+
+.
+
+This proves the desired property under H0.When Hκ holds with κ > 0 and CXZ ψ̸ = 0 (i.e., γr̸ = 0 ), we note that CXZ ψ = κγrCXZ ψr̸ = 0 . It follows from (B.25) that 
+
+sup 
+
+> 0≤r≤1
+
+∥ eSc(r) − rC XZ ψ∥ = op(1) .
+
+Consequently, we find that 
+
+∥√T g w( eSc)∥2 = T ∥gw( eSc)∥2 →p ∞,
+
+which proves the desired property under Hκ.Finally, under Assumption 2A, the same argument as in the proof of Theorem 4.1, with Zt replaced by 34 Zc,t and u0,t replaced by its centered counterpart, shows that under H0
+
+bΛc,Zu = Λ c,Zu + Op(T −1/2h1/2).
+
+Hence the nearly identical arguments used in our proof of Theorem 4.1 show that the feasible critical value eqα consistently estimates qα. Under Hκ with κ > 0 and CXZ ψ̸ = 0 , the same argument shows that 
+
+eqα does not grow faster than the diverging statistic, so replacing qα by eqα does not alter the consistency conclusion. 
+
+Proof of Proposition 5.1. Let θ ∈ H be the unique solution to mX y = CX X θ. Define μ = μy − ⟨ θ, E[Xt]⟩
+
+and εt = yt − μ − ⟨ θ, Xt⟩. Then, by construction, we have yt = μ + ⟨θ, Xt⟩ + εt. It is straightforward to show that E[εt] = 0 . From Lemma 2.1 of Hörmann and Kokoszka (2010), the L4-m-approximability of εt immediately follows. Furthermore, since εt = yc,t − ⟨ θ, Xc,t ⟩, we have E[Xc,t εt] = E[Xc,t yc,t ] −
+
+E[Xc,t ⟨θ, Xc,t ⟩] = mX y − CX X θ = 0 . Thus Xt and εt are uncorrelated. Finally, note that CX y(v) = E[⟨X c,t , v ⟩yc,t ] = ⟨mX y, v ⟩ for all v ∈ H . Hence CX y = 0 if and only if 
+
+mX y = 0 . If θ = 0 , then mX y = CX X θ = 0 , and hence CX y = 0 . Conversely, if CX y = 0 , then mX y = 0 ,so θ = 0 is a solution to mX y = CX X θ. By uniqueness of the solution, we obtain θ = 0 .
+
+C Extension to the model with other covariates 
+
+We provide theoretical justification for our tests when scalar covariates are included in the model. The intercept case has been treated in Section 5.1; hence, we focus here on additional centered scalar covariates. For notational simplicity, assume that the scalar covariates are population-orthonormalized: 
+
+E[ϖj,t ] = 0 , E[ϖ2
+
+> j,t
+
+] = 1 , E[ϖi,t ϖj,t ] = 0 (i̸ = j).
+
+In the algebra below, we write the least-squares projection coefficients as if the observed controls were sample-orthonormalized, 
+
+T −1
+
+> T
+
+X
+
+> t=1
+
+ϖi,t ϖj,t = 1{i = j}.
+
+This is only a notational simplification and does not require any data preprocessing in practice: least-squares residuals are invariant to nonsingular linear transformations of the finite-dimensional control vec-tor. Equivalently, one may work with the general sample Gram matrix and its inverse; the same expansion is obtained under the maintained weak-dependence and moment conditions. The least square projections of yt, Xt and Zt onto the space spanned by {ϖ1,t , . . . , ϖ K,t } can be estimated as 
+
+byt =
+
+> K
+
+X
+
+> j=1
+
+bβy,j ϖj,t , bXt =
+
+> K
+
+X
+
+> j=1
+> ∞
+
+X
+
+> ℓ=1
+
+bβX,j,ℓ ϖj,t vℓ, bZt =
+
+> K
+
+X
+
+> j=1
+> ∞
+
+X
+
+> ℓ=1
+
+bβZ,j,ℓ ϖj,t vℓ, (C.1) where {vℓ}ℓ≥1 is an orthonormal basis of H, and bβy,j , bβX,j,ℓ and bβZ,j,ℓ are defined as follows: 
+
+bβy,j = 1
+
+T
+
+> T
+
+X
+
+> t=1
+
+ϖj,t yt, bβX,j,ℓ = 1
+
+T
+
+> T
+
+X
+
+> t=1
+
+ϖj,t ⟨Xt, v ℓ⟩, bβZ,j,ℓ = 1
+
+T
+
+> T
+
+X
+
+> t=1
+
+ϖj,t ⟨Zt, v ℓ⟩. (C.2) 35 It is convenient to introduce additional notation to facilitate the subsequent discussion. We define the following projections, obtained by replacing the sample projection coefficients, associated with ϖj,t for 
+
+j = 1 , . . . , K, in (C.2) with their population counterparts as follows: 
+
+eyt =
+
+> K
+
+X
+
+> j=1
+
+βy,j ϖj,t , eXt =
+
+> K
+
+X
+
+> j=1
+> ∞
+
+X
+
+> ℓ=1
+
+βX,j,ℓ ϖj,t vℓ, eZt =
+
+> K
+
+X
+
+> j=1
+> ∞
+
+X
+
+> ℓ=1
+
+βZ,j,ℓ ϖj,t vℓ, (C.3) where βy,j = E[ϖj,t yt], βX,j,ℓ = E[ϖj,t ⟨Xt, v ℓ⟩] and βZ,j,ℓ = E[ϖj,t ⟨Zt, v ℓ⟩]. Let 
+
+yϖ,t = yt − eyt, Xϖ,t = Xt − eXt, Zϖ,t = Zt − eZt, uϖ,t = ut − eut, (C.4) where 
+
+uϖ,t = ut − eut with eut =
+
+> K
+
+X
+
+> j=1
+
+E[ϖj,t ut]ϖj,t .
+
+We let Cϖ,XZ = E[Xϖ,t ⊗ Zϖ,t ] and let Λϖ,Zu be defined as ΛZu in (3.9) but replacing Zt (resp. ut) with 
+
+Zϖ,t (resp. uϖ,t ), and let {λϖ,j }j≥1 be the eigenvalues of Λϖ,Zu . We also define bΛϖ,Zu as in (4.1) but replacing Zt and u0,t with Zt − bZt and bu0,t = yt − byt − ⟨ Xt − bXt, θ 0⟩, and let {bλϖ,j }j≥1 be the eigenvalues of bΛϖ,Zu . We employ the following assumptions: 
+
+Assumption 1C. (i) (5.8) holds, (ii) E[Zϖ,t ⊗ uϖ,t ] = 0 , and (iii) the variables Xϖ,t , Zϖ,t , uϖ,t and ϖj,t 
+
+for j = 1 , . . . , K are L4-m-approximable sequences in the relevant spaces. 
+
+Assumption 2C. Assumption 2 holds when Zt (resp. ut) is replaced by Zϖ,t (resp. uϖ,t ). 
+
+Following the decomposition of ψ = θ − θ0 in (3.1)–(3.3), with Cϖ,XZ in place of CXZ , we write Hκ
+
+as follows: 
+
+Hκ : θ = θ0 + κ ¯ψϖ, ∥ ¯ψϖ∥2 = γ2 
+
+> ϖ, r
+
++ γ2 
+
+> ϖ, k
+
+= 1 , (C.5) where ¯ψϖ = γϖ, rψϖ, r + γϖ, kψϖ, k, ψϖ, r ∈ [ker Cϖ,XZ ]⊥ and ψϖ, k ∈ ker Cϖ,XZ . The following result provides an extension of the proposed tests: 
+
+Theorem C.1. Suppose that Assumptions 1C and W hold. Let qα be the (1 − α)-quantile of P∞ 
+
+> j=1
+
+λϖ,j ν2 
+
+> j
+
+,where {νj }j≥1 are i.i.d. standard normal random variables. Then 
+
+P{∥ √T g w( eSϖ)∥2 > q α}
+
+
+
+→ α if H0 holds, 
+
+→ 1 if Hκ holds with κ > 0 and Cϖ,XZ ψ̸ = 0 (i.e., γϖ, r̸ = 0 ). 
+
+(C.6) 
+
+If Assumption 2C additionally holds and dT → ∞ satisfies dT = o(pT /h ), then the same conclusions hold when qα is replaced by the feasible critical value eqα, the (1 − α)-th quantile of PdT 
+
+> j=1
+
+bλϖ,j ν2 
+
+> j
+
+.Proof of Theorem C.1. Note that 
+
+byt = 1
+
+T
+
+> K
+
+X
+
+> j=1
+> T
+
+X
+
+> s=1
+
+ϖj,s 
+
+> K
+
+X
+
+> k=1
+
+βkϖk,s + ⟨Xs, θ ⟩ + us
+
+!
+
+ϖj,t . (C.7) 36 Observe that 
+
+1
+
+T
+
+> K
+
+X
+
+> j=1
+> T
+
+X
+
+> s=1
+
+ϖj,s ⟨Xs, θ ⟩ϖj,t =
+
+*
+
+1
+
+T
+
+> K
+
+X
+
+> j=1
+> T
+
+X
+
+> s=1
+> ∞
+
+X
+
+> ℓ=1
+
+ϖj,s ⟨Xs, v ℓ⟩ϖj,t vℓ, θ 
+
++
+
+=
+
+* KX
+
+> j=1
+> ∞
+
+X
+
+> ℓ=1
+
+bβX,j,ℓ ϖj,t vℓ, θ 
+
++
+
+= ⟨ bXt, θ ⟩.
+
+Let but = PK
+
+> j=1
+
+(T −1 PTs=1 ϖj,s us)ϖj,t . Then the sample residuals satisfy 
+
+yt − byt = ⟨Xt − bXt, θ ⟩ + ( ut − but). (C.8) From similar algebra, we also find that 
+
+yϖ,t = ⟨Xϖ,t , θ ⟩ + uϖ,t . (C.9) Note that 
+
+1
+
+√T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+(Zt − bZt)( yt − byt) = 1
+
+√T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+Zϖ,t yϖ,t + 1
+
+√T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+Zϖ,t (eyt − byt)+ 1
+
+√T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+( eZt − bZt)yϖ,t + 1
+
+√T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+( eZt − bZt)( eyt − byt). (C.10) Observe that 
+
+1
+
+√T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+Zϖ,t (byt − eyt) = 1
+
+√T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+Zϖ,t 
+
+
+
+> K
+
+X
+
+> j=1
+
+( bβy,j − βy,j )ϖj,t 
+
+
+
+=
+
+> K
+
+X
+
+> j=1
+
+1
+
+√T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+Zϖ,t 
+
+1
+
+T
+
+> T
+
+X
+
+> s=1
+
+(ϖj,s ys − E[ϖj,s ys]) 
+
+!
+
+ϖj,t 
+
+= Op(T −1/2)
+
+> K
+
+X
+
+> j=1
+
+1
+
+√T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+Zϖ,t ϖj,t = Op(T −1/2), (C.11) where the last equality follows from finiteness of K and the facts that T −1/2 PTt=1 (ϖj,t yt − E[ϖj,t yt]) = 
+
+Op(1) , T −1/2 P⌊T r ⌋ 
+
+> t=1
+
+Zϖ,t ϖj,t = Op(1) under the L2-m-approximability of {ϖj,t yt − E[ϖj,t yt]} and 
+
+{Zϖ,t ϖj,t } under Assumption 1C (see Theorem 1.1 in the paper of Berkes et al., 2013); the claimed L2-
+
+m-approximability of {Zϖ,t ϖj,t } and {ϖj,t yt − E[ϖj,t yt]} can be established from nearly identical argu-ments used in our proof of Lemma A.2(i), and hence the details are omitted. Note also that 
+
+1
+
+√T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+( bZt − eZt)yϖ,t = 1
+
+√T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+
+
+> K
+
+X
+
+> j=1
+
+ϖj,t 
+
+> ∞
+
+X
+
+> ℓ=1
+
+( bβZ,j,ℓ − βZ,j,ℓ )vℓ
+
+ yϖ,t (C.12) 
+
+= Op(T −1/2) 1
+
+√T
+
+> ⌊T r ⌋
+
+X
+
+> t=1 K
+
+X
+
+> j=1
+
+ϖj,t yϖ,t = Op(T −1/2), (C.13) 37 where we note that 
+
+> ∞
+
+X
+
+> ℓ=1
+
+( bβZ,j,ℓ − βZ,j,ℓ )vℓ = 1
+
+T
+
+> T
+
+X
+
+> t=1
+> ∞
+
+X
+
+> ℓ=1
+
+(ϖj,t ⟨Zt, v ℓ⟩ − E[ϖj,t ⟨Zt, v ℓ⟩]) vℓ
+
+= 1
+
+T
+
+> T
+
+X
+
+> t=1
+
+(ϖj,t Zt − E[ϖj,t Zt]) = Op(T −1/2), (C.14) where the last equality follows from the L2-m-approximability of {ϖj,t Zt − E[ϖj,t Zt]} as in (C.11). From similar arguments used in (C.11) and (C.14), we also find that 1√T
+
+P⌊T r ⌋ 
+
+> t=1
+
+( eZt − bZt)( eyt − byt) = Op(T −1/2),and thus deduce that 
+
+1
+
+√T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+(Zt − bZt)( yt − byt) = 1
+
+√T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+Zϖ,t yϖ,t + Op(T −1/2). (C.15) By the same argument, using the coefficient errors of bXt, we also have 
+
+1
+
+√T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+(Zt − bZt)⟨Xt − bXt, θ 0⟩ = 1
+
+√T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+Zϖ,t ⟨Xϖ,t , θ 0⟩ + op(1) , (C.16) uniformly in r ∈ [0 , 1] .From the preceding approximations, we obtain, uniformly in r ∈ [0 , 1] ,
+
+√T eSϖ(r) = 1
+
+√T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+Zϖ,t uϖ,t + 1
+
+√T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+Zϖ,t ⟨Xϖ,t , ψ ⟩ + op(1) . (C.17) Define ηϖ,t (ψ) = Zϖ,t {uϖ,t + ⟨Xϖ,t , ψ ⟩} − Cϖ,XZ ψ. Then {ηϖ,t (ψ)} is L2-m-approximable. By Berkes et al. (2013, Theorem 1.1), 
+
+sup 
+
+> 0≤r≤1
+
+1
+
+√T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+ηϖ,t (ψ) − N ϖ,ψ (r) = op(1) .
+
+Therefore, 
+
+sup 
+
+> 0≤r≤1
+
+√T { eSϖ(r) − rC ϖ,XZ ψ} − N ϖ,ψ (r) = op(1) . (C.18) Under H0, ψ = 0 , and the covariance operator of Nϖ, 0 is Λϖ,Zu . Hence 
+
+∥√T g w( eSϖ)∥2 →d
+
+> ∞
+
+X
+
+> j=1
+
+λϖ,j ν2 
+
+> j
+
+.
+
+Under Hκ with κ > 0 and Cϖ,XZ ψ̸ = 0 (i.e., γϖ, r̸ = 0 ), Cϖ,XZ ψ = κγϖ, rCϖ,XZ ψϖ, r̸ = 0 . Thus, from (C.18), we deduce that 
+
+∥√T g w( eSϖ)∥2 →p ∞.
+
+If Assumption 2C holds, the same argument as in the proof of Theorem 4.1, applied to the residualized sequence {Zϖ,t uϖ,t }, gives bΛϖ,Zu = Λ ϖ,Zu + Op(T −1/2h1/2). The replacement of Zϖ,t uϖ,t by (Zt −
+
+bZt)bu0,t is asymptotically negligible by the projection-error bounds established above. Therefore, if dT →∞ and dT = o(pT /h ), the feasible critical value eqα consistently approximates qα under H0. Under fixed detectable alternatives, the statistic diverges at rate T , while eqα is of smaller order, so the consistency 38 conclusion is unchanged. This completes the proof. 
+
+D Extension to multiple functional covariates 
+
+This section shows that the proposed identification-robust testing framework extends directly to testing joint hypotheses involving multiple functional covariates. Since the argument is a notational extension of the baseline case, we give only the main result. For simplicity, we present the result for the model without an intercept: 
+
+yt =
+
+> K
+
+X
+
+> j=1
+
+⟨Xj,t , θ j ⟩ + ut, E[ut] = 0 . (D.1) We consider testing 
+
+H0 : θj = θ0,j , j = 1 , . . . , K, against H1 : at least one equality fails . (D.2) Define 
+
+eS(r) = 1
+
+T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+Zt
+
+yt −
+
+> K
+
+X
+
+> j=1
+
+⟨Xj,t , θ 0,j ⟩
+
+ . (D.3) Let 
+
+ψj = θj − θ0,j , Cj = E[Xj,t ⊗ Zt], j = 1 , . . . , K.
+
+Then the population drift of the moment process is 
+
+M =
+
+> K
+
+X
+
+> j=1
+
+Cj ψj .
+
+Assumption 1D. (i) (D.1) holds, (ii) E[Zt⊗ut] = 0 , and (iii) X1,t , . . . , X K,t , Z t, and ut are L4-m-approximable sequences in the relevant spaces. 
+
+Theorem D.1. Suppose that Assumption 1D holds. Let ψj = θj − θ0,j and define 
+
+ηt(ψ1, . . . , ψ K) = Zt
+
+ut +
+
+> K
+
+X
+
+> j=1
+
+⟨Xj,t , ψ j ⟩
+
+ −
+
+> K
+
+X
+
+> j=1
+
+Cj ψj .
+
+Let Nψ be an H-valued Brownian motion with long-run covariance operator 
+
+Λψ =
+
+> ∞
+
+X
+
+> ℓ=−∞
+
+E[ηt(ψ1, . . . , ψ K) ⊗ ηt−ℓ(ψ1, . . . , ψ K)] .
+
+Then 
+
+sup 
+
+> 0≤r≤1
+
+√T
+
+eS(r) − r
+
+> K
+
+X
+
+> j=1
+
+Cj ψj
+
+ − N ψ(r) →p 0. (D.4) 
+
+Proof of Theorem D.1. Let ψj = θj − θ0,j for j = 1 , . . . , K. From (D.1) and (D.3), we have 
+
+√T eS(r) = 1
+
+√T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+Zt
+
+ut +
+
+> K
+
+X
+
+> j=1
+
+⟨Xj,t , ψ j ⟩
+
+ = 1
+
+√T
+
+> ⌊T r ⌋
+
+X
+
+> t=1
+
+ηt(ψ1, . . . , ψ K) + ⌊T r ⌋√T
+
+> K
+
+X
+
+> j=1
+
+Cj ψj ,
+
+39 where ηt(ψ1, . . . , ψ K) = Zt(ut + PK
+
+> j=1
+
+⟨Xj,t , ψ j ⟩) − PK 
+
+> j=1
+
+Cj ψj . By Assumption 1D and the same ar-gument as in Lemma A.2, {ηt(ψ1, . . . , ψ K)} is L2-m-approximable. Hence, by Berkes et al. (2013, Theo-rem 1.1), sup 0≤r≤1 1√T
+
+P⌊T r ⌋ 
+
+> t=1
+
+ηt(ψ1, . . . , ψ K) − N ψ(r) →p 0. Moreover, sup 0≤r≤1 
+
+> ⌊T r ⌋
+> T
+
+− r PK 
+
+> j=1
+
+Cj ψj →
+
+0. Combining these results, we find that sup 0≤r≤1
+
+√T
+
+neS(r) − r PK 
+
+> j=1
+
+Cj ψj
+
+o
+
+− N ψ(r) →p 0, which proves (D.4). Two immediate consequences follow: under H0, ψj = 0 for all j, and the limiting Brown-ian motion has long-run covariance operator ΛZu ; if M = PK 
+
+> j=1
+
+Cj ψj̸ = 0 , then dividing by √T we find that sup 0≤r≤1 ∥eS(r) − rM∥ → p 0.
+
+The following is an immediate consequence of Theorem D.1. 
+
+Corollary D.1 (Infeasible tests) . Suppose that Assumptions1D and W hold and let qα be defined as in Corol-lary 3.1. Then 
+
+P
+
+n
+
+∥√T g w(eS)∥2 > q α
+
+o
+
+→
+
+
+
+α if H0 holds, 
+
+1 if Hκ holds and PK 
+
+> j=1
+
+Cj (θj − θ0,j )̸ = 0 
+
+Proof of Corollary D.1. Under H0, Theorem D.1 gives sup 0≤r≤1 ∥√T eS(r)−N 0(r)∥ → p 0 and sup 0≤r≤1 ∥eS(r)−
+
+r PK 
+
+> j=1
+
+Cj ψj ∥ → p 0. Then the desired results follow by the continuous mapping theorem. To implement the test, define bΛK,Zu as in (4.1), replacing u0,t by 
+
+uK,0,t = yt −
+
+> K
+
+X
+
+> j=1
+
+⟨Xj,t , θ 0,j ⟩.
+
+Let bλK,j be the ordered eigenvalues of bΛK,Zu , and let ˇqα be the (1 − α)-quantile of PdT 
+
+> j=1
+
+bλK,j ν2 
+
+> j
+
+.
+
+Theorem D.2. Suppose that Assumptions 1D, 2, and W hold, and let dT → ∞ satisfy dT = o(pT /h ). Then the conclusions of Corollary D.1 remain valid when qα is replaced by ˇqα.Proof of Theorem D.2. The desired results follow from nearly identical arguments used in our proof of The-orem 4.1, and is hence omitted. 
+
+E Additional simulation results 
+
+In this section, we report additional simulation results using a larger truncation level, dT = 5 + ⌈T 0.666 ⌉,which exceeds the rate condition dT = o(pT /h ) required by Theorem 4.1. Tables 6 (without-intercept case) and 7 (with-intercept case) can be compared directly with Tables 2 and 4, respectively. The results differ only marginally, and all qualitative conclusions from Section 6 remain intact, confirming that the test is robust to the choice of dT in practice. 40 Table 6: Rejection rates under local-to-zero hypotheses (%): without-intercept model 
+
+βu = 0 .1 βu = 0 .25 k = Bartlett k = Parzen k = Bartlett k = Parzen 
+
+T p \ κ 0 5 10 20 0 5 10 20 0 5 10 20 0 5 10 20 
+
+Panel A. Informative design 
+
+100 ∞ 5.4 16.3 43.5 76.4 5.5 16.3 43.5 76.3 5.8 18.1 45.1 76.9 5.8 18.2 45.0 76.6 7.0 5.1 16.2 41.7 75.9 5.3 16.2 41.5 75.5 5.4 17.8 44.1 75.6 5.5 17.8 43.6 75.4 3.0 5.0 16.1 40.5 74.9 5.1 16.2 40.2 74.6 5.3 17.7 42.4 74.2 5.6 17.9 42.2 74.2 1.0 5.3 15.2 38.5 72.9 5.3 15.2 38.6 72.9 5.5 16.9 40.7 72.5 5.7 17.0 40.6 72.2 0.0 5.0 13.8 35.9 68.9 5.0 14.0 35.4 68.7 5.3 15.4 37.6 68.7 5.4 15.4 37.6 68.6 200 ∞ 5.8 18.4 45.9 77.6 5.9 18.4 45.9 77.7 5.6 19.8 47.0 77.5 5.7 19.7 46.8 77.4 7.0 5.3 18.0 43.3 77.1 5.3 18.0 43.0 77.1 5.4 18.6 45.3 76.6 5.4 18.4 45.1 76.6 3.0 5.5 17.0 42.1 75.9 5.4 17.1 42.4 76.1 5.1 17.9 43.5 76.2 5.2 17.5 43.6 76.0 1.0 5.3 15.6 40.2 74.1 5.3 15.6 40.2 74.0 5.2 17.0 41.4 74.4 5.3 17.2 41.3 74.5 0.0 5.3 14.2 36.5 71.9 5.4 14.2 36.9 71.7 5.2 16.2 38.6 72.0 5.4 16.5 38.6 71.8 400 ∞ 5.5 18.9 46.3 79.7 5.4 18.9 46.0 79.7 5.4 20.2 47.7 79.2 5.4 19.9 47.6 79.1 7.0 5.1 18.1 45.3 78.0 5.1 18.1 45.2 78.0 5.1 19.1 46.8 77.7 5.1 18.9 46.6 77.6 3.0 5.2 17.8 43.4 76.7 5.1 18.0 43.3 76.8 5.1 18.3 45.5 76.5 5.2 18.4 45.6 76.6 1.0 5.4 16.2 41.6 75.4 5.3 16.2 41.5 75.2 5.1 17.2 42.8 75.4 5.1 17.3 42.9 75.4 0.0 5.5 15.6 38.9 73.0 5.5 15.6 39.0 73.0 5.5 16.6 40.4 73.6 5.5 16.5 40.2 73.4 
+
+Panel B. Weakly informative design 
+
+100 ∞ 5.9 13.9 32.4 59.2 5.9 13.8 32.2 59.4 6.0 14.8 33.7 58.9 6.2 14.8 33.8 58.7 7.0 5.9 13.7 32.0 58.7 6.1 13.8 31.8 58.9 6.1 14.8 33.3 58.1 6.1 14.6 33.2 58.0 3.0 5.9 13.4 31.0 58.1 6.2 13.2 31.0 58.0 6.2 14.6 32.3 57.6 6.3 14.3 32.3 57.5 1.0 5.8 13.0 29.5 56.1 5.8 12.9 29.5 56.0 6.0 13.8 30.9 55.5 5.9 14.1 30.5 55.2 0.0 5.6 11.6 27.7 52.9 5.8 12.0 27.5 52.8 5.6 12.4 29.0 52.9 5.9 12.8 28.6 52.8 200 ∞ 5.8 15.0 33.7 61.0 5.8 14.9 34.0 60.9 6.0 15.6 34.8 60.9 6.0 15.4 34.9 61.2 7.0 6.0 14.4 32.0 60.1 5.8 14.4 32.1 60.2 5.9 14.8 33.0 60.1 5.7 14.8 33.1 60.1 3.0 5.8 13.6 31.2 59.1 6.1 13.5 31.1 59.0 5.8 13.9 31.8 59.2 6.0 13.8 31.8 59.2 1.0 5.5 12.8 29.6 57.5 5.6 13.0 29.7 57.3 5.3 13.7 30.3 57.7 5.4 14.1 30.3 57.6 0.0 5.5 11.6 27.6 55.6 5.6 11.8 27.8 55.7 5.6 12.8 28.5 55.0 5.6 12.8 28.5 55.1 400 ∞ 5.4 14.6 33.6 62.2 5.4 14.5 33.6 62.0 5.3 14.7 34.4 61.6 5.2 14.9 34.4 61.9 7.0 5.3 14.3 32.8 60.9 5.4 14.3 32.9 61.0 5.2 14.8 33.5 61.3 5.2 15.0 33.6 61.0 3.0 5.5 14.3 31.6 60.4 5.6 14.3 31.6 60.4 5.4 14.5 33.1 60.2 5.5 14.4 32.9 60.2 1.0 5.7 13.9 30.6 58.8 5.7 13.8 30.7 59.1 5.6 13.9 31.6 58.9 5.7 13.6 31.4 58.9 0.0 5.6 12.6 28.9 56.5 5.7 12.5 28.8 56.5 5.6 13.0 29.1 57.1 5.6 12.8 29.2 57.2                        
+
+> Notes: The table reports rejection rates for the hypotheses H1: Θ = κ/√T⟨· , ψ ⟩with sample size T. The nominal level is 5% . Test statistics are computed using gp(f) = Cp
+> R10rpf(r)dr for p < ∞and g∞(f) = f(1) .
+
+41 Table 7: Rejection rates under local-to-zero hypotheses (%): with-intercept model 
+
+βu = 0 .1 βu = 0 .25 k = Bartlett k = Parzen k = Bartlett k = Parzen 
+
+T p \ κ 0 5 10 20 0 5 10 20 0 5 10 20 0 5 10 20 
+
+Panel A. Informative design 
+
+100 ∞ 6.2 17.5 43.9 76.0 5.9 17.9 43.9 76.1 5.9 19.8 47.2 76.1 5.9 19.7 47.4 75.9 7.0 5.8 16.7 43.4 75.3 5.6 16.8 43.1 75.2 6.2 17.9 46.7 75.0 6.1 18.3 46.8 74.9 3.0 6.0 16.6 42.4 74.5 6.1 16.2 42.5 74.4 6.3 17.8 45.6 74.1 6.3 17.9 45.7 74.1 1.0 6.0 15.4 39.6 72.4 6.0 15.4 40.0 72.4 6.1 17.0 43.4 72.7 6.2 17.2 43.6 72.5 0.0 5.6 14.4 36.9 70.4 5.5 14.4 37.0 70.0 5.8 16.0 40.6 70.0 5.5 16.3 40.8 70.0 200 ∞ 5.8 17.3 45.6 78.0 5.8 17.4 45.5 78.0 6.0 18.2 47.8 77.8 6.1 18.1 47.9 77.8 7.0 5.9 16.3 44.0 76.9 5.8 16.4 43.9 76.8 6.4 17.9 45.6 76.9 6.4 17.8 45.8 76.8 3.0 5.8 16.1 42.7 75.9 5.6 16.3 42.6 75.8 6.1 17.4 44.9 76.0 6.1 17.4 44.7 75.7 1.0 5.4 15.6 40.6 74.2 5.5 15.4 40.4 74.0 5.8 16.7 42.4 74.2 5.8 17.0 42.6 74.0 0.0 5.4 14.2 37.8 71.0 5.6 14.2 37.9 70.9 5.6 15.3 40.1 71.6 5.7 15.6 40.3 71.2 400 ∞ 5.2 18.1 46.9 79.1 5.3 18.1 46.6 79.0 5.1 19.0 48.6 79.3 5.2 19.1 48.6 79.3 7.0 5.0 17.3 45.4 78.1 5.1 17.0 45.1 78.0 5.3 19.0 46.9 78.5 5.3 18.8 46.8 78.4 3.0 5.4 16.6 44.0 76.8 5.4 16.8 44.1 76.9 5.4 17.8 45.1 77.6 5.4 17.7 45.3 77.6 1.0 5.6 15.2 41.6 75.3 5.6 15.3 41.6 75.2 5.7 16.9 44.0 75.9 5.8 16.9 44.1 75.8 0.0 5.8 14.9 38.1 73.7 5.8 14.8 38.6 73.5 5.8 16.2 40.2 74.0 6.0 16.1 40.3 74.0 
+
+Panel B. Weakly informative design 
+
+100 ∞ 5.8 14.2 33.9 61.6 5.6 14.7 33.8 61.6 5.7 15.5 35.1 61.1 5.8 15.5 34.9 61.2 7.0 5.9 13.6 33.6 61.0 6.2 14.0 33.3 60.9 6.2 14.3 34.5 60.6 6.4 14.9 34.5 60.5 3.0 5.9 13.6 32.1 59.9 6.2 13.5 32.1 60.0 6.2 14.2 33.7 59.5 6.4 14.5 33.9 59.5 1.0 6.2 12.7 30.0 58.2 6.3 12.6 30.0 57.9 6.4 13.2 32.2 57.0 6.4 13.3 32.6 57.0 0.0 5.5 11.6 27.4 54.7 5.8 11.9 27.8 54.7 5.6 12.6 29.3 54.1 6.0 12.7 29.4 54.0 200 ∞ 5.8 13.4 34.2 63.4 5.8 13.5 34.5 63.5 5.9 13.9 35.3 63.3 5.9 13.9 35.4 63.3 7.0 5.5 13.4 32.8 62.2 5.5 13.5 32.8 62.2 5.8 14.3 34.0 62.6 5.9 14.2 34.1 62.8 3.0 5.5 13.7 32.4 61.3 5.5 13.6 32.2 61.2 5.6 14.3 33.7 61.8 5.8 14.2 33.8 61.8 1.0 5.7 13.5 31.1 59.9 5.8 13.5 30.9 59.6 6.2 14.1 31.8 60.0 6.2 13.9 31.9 59.9 0.0 5.6 12.4 28.7 57.2 5.8 12.4 28.7 57.0 5.5 13.0 29.7 57.6 5.6 13.0 29.5 57.5 400 ∞ 5.8 15.4 35.3 64.5 5.8 15.4 35.2 64.7 5.8 15.4 36.0 64.8 5.8 15.5 36.2 64.5 7.0 5.7 14.5 33.8 63.0 5.7 14.6 34.0 62.8 5.5 15.2 34.5 63.6 5.6 15.2 34.5 63.5 3.0 5.8 14.3 33.0 62.3 5.9 14.3 33.1 62.2 5.6 14.9 33.7 62.9 5.6 14.8 33.8 62.6 1.0 5.9 13.0 31.2 60.6 5.9 13.0 31.3 60.8 5.9 13.6 32.1 61.1 5.9 13.8 32.0 61.0 0.0 5.8 12.9 28.3 59.3 5.8 12.9 28.3 59.1 5.6 12.9 29.5 59.7 5.8 12.8 29.6 59.8                        
+
+> Notes: The table reports rejection rates for the hypotheses H1: Θ = κ/√T⟨· , ψ ⟩with sample size T. The nominal level is 5% . Test statistics are computed using gp(f) = Cp
+> R10rpf(r)dr for p < ∞and g∞(f) = f(1) .
+
+42

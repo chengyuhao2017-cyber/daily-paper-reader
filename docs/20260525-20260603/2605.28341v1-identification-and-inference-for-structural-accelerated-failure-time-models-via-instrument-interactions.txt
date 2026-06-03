@@ -1,0 +1,733 @@
+Title: Identification and Inference for Structural Accelerated Failure Time Models via Instrument Interactions
+
+URL Source: https://arxiv.org/pdf/2605.28341v1
+
+Published Time: Thu, 28 May 2026 01:09:32 GMT
+
+Number of Pages: 31
+
+Markdown Content:
+# Identification and Inference for Structural Accelerated Failure Time Models via Instrument Interactions 
+
+# Qiushi Bu 1,2 , Wen Su 1, Xinyu Zhang 2, Xingqiu Zhao 3, and Zhonghua Liu ∗41Department of Biostatistics, City University of Hong Kong, Hong Kong 
+
+> 2
+
+Academy of Mathematics and Systems Science, Chinese Academy of Sciences, Beijing, China 
+
+> 3
+
+Department of Applied Mathematics, The Hong Kong Polytechnic University, Hong Kong 
+
+> 4
+
+Department of Biostatistics, Columbia University, New York, NY, USA 
+
+# May 28, 2026 
+
+Abstract 
+
+We study causal inference for time-to-event outcomes under right censoring in the presence of unmeasured confounding. Focusing on structural accelerated failure time models, we develop an identification and inference framework that exploits interactions among instrumental variables. The proposed approach does not rely on classical instrumental variable validity and yields valid causal inference under both valid and invalid instruments, provided that the interaction-based identification condition holds. To accommodate right censoring, we construct a censoring-adjusted observed data moment function using an augmented inverse probability censoring weighting approach. The resulting moment function is Neyman orthogonal with respect to nuisance functions and enjoys a double robustness property, enabling valid inference under flexible nuisance estimation. Estimation and inference are conducted using generalized empirical likelihood, which is well suited to settings with many potentially weak interaction-based moment conditions. We establish consistency, and asymptotic normality under many weak moment asymptotics, and develop diagnostic tools to assess interaction-based identification strength and overidentifying restrictions. Simulation studies demonstrate favorable finite sample performance across a range of censoring rates and instrument configurations. An application to UK Biobank data illustrates the practical relevance of the proposed method for causal survival analysis in large-scale observational studies. 
+
+1          
+
+> arXiv:2605.28341v1 [stat.ME] 27 May 2026 Keywords: Causal inference; Censored data; Mendelian randomization; Instrumental variables; Structural accelerated failure time model; Weak identification
+
+# 1 Introduction 
+
+Estimating causal effects on the time to disease onset is important in epidemiology. Many modern cohorts record outcomes as time-to-event data with long follow-up. The UK Biobank is a representative resource that links genome-wide genetic data with longitudinal outcomes from health records and registries (Sudlow et al., 2015). This type of data supports large-scale survival analyses, and recent work has analyzed hundreds of time-to-event outcomes constructed from linked electronic health records (EHR) in the UK Biobank (Dey et al., 2022). These data sets are increasing, and they motivate methods for causal inference with censored survival outcomes. A main difficulty in observational studies is unmeasured confounding, for example, when unobserved lifestyle factor affects both the exposure and the time to disease onset. Ignoring such unmeasured confounding generally leads to biased estimation and invalid statistical inference. Instrumental variables (IV) address this problem by using variables that affect the exposure but do not otherwise affect the outcome. Mendelian randomization applies this idea using genetic variants as instruments (Katan, 1986; Smith and Ebrahim, 2003). In biobank studies, many variants are available for a given exposure, which makes it natural to use many candidate instruments in one analysis. Instrumental variable validity is often summarized by three requirements Angrist and Krueger (2001): (i) Relevance, which means that the instrument is associated with the exposure. (ii) Independence, which means that the instrument is independent of unmeasured confounders. (iii) Exclusion restriction, which means that the instrument affects the outcome only through the exposure. However, in genetic studies, these requirements may not be fully satisfied. Many variants have only weak associations with the exposure, which can yield weak identification and substantial weak IV bias (Burgess and Thompson, 2011; Stock et al., 2002). Moreover, horizontal pleiotropy, defined as a genetic variant influencing the outcome through pathways other than the exposure of interest, will also lead to spurious findings (Verbanck et al., 2018; Solovieff et al., 2013; Ye et al., 2024). Motivated by the prevalence of weak and invalid instruments in Mendelian randomization, a substantial body of work has been devoted to developing identification and inference methods that address these challenges, primarily in settings with uncensored outcomes. One line of work establishes identification by imposing restrictions on the set of instruments, assuming that a majority of candidate instruments are valid 2(Han, 2008; Kang et al., 2016; Bowden et al., 2016). A second line studies random coefficient formulations, showing that valid causal inference may still be possible even when all candidate instruments are invalid, provided that the effects of the instruments on the exposure are Neyman orthogonal to their direct effects on the outcome (Kolesár et al., 2015; Bowden et al., 2015; Zhao et al., 2020; Ye et al., 2021). A third line exploits heteroskedasticity in the exposure models to identify the causal effect in the presence of invalid instruments (Lewbel, 2012; Spiller et al., 2019; Tchetgen Tchetgen et al., 2021; Sun et al., 2022; Liu et al., 2023; Ye et al., 2024). More recently, additional identification methods have been obtained by constructing moment conditions from gene-by-gene interactions, which can deliver identification even when main effect instruments violate exclusion restrictions (Zhang et al., 2025). These results show that identification can be possible with many weak and potentially invalid instruments, but most theory is developed for fully observed outcomes. However, work for right-censored survival outcomes is much more limited. Existing instrumental variable methods for censored time-to-event data usually focus on handling censoring under valid instruments (Nie et al., 2011; Huling et al., 2019). There is also work that considers censoring together with weak instruments, for example, in applications where the outcome is a censored duration (Ertefaie et al., 2018). These papers do not cover the setting of many weak and potentially invalid genetic instruments that are common in Mendelian randomization. Tchetgen Tchetgen et al. (2021) develop estimation methods for censored outcomes in the presence of potentially weak and invalid instruments. However, their identification strategies rely on heteroskedasticity-based conditions. This paper develops a causal inference framework for right-censored outcomes with many weak and potentially invalid instruments through gene-gene interaction identification. We propose an observed data estimation strategy that combines interaction-based identification with a censoring-adjusted moment construction. Identification is achieved through interaction terms that remain informative under weak instrument strength and allow violations of standard instrumental variable assumptions. Estimation and inference are conducted using generalized empirical likelihood (GEL), which combines many moment functions and is suitable for weak identification settings (Smith, 1997; Newey and Smith, 2004; Owen, 2001; Newey and Windmeijer, 2009; Hansen, 1982). In summary, our contributions are mainly threefold: 1. We develop iGSAFT , (Interaction-IV based Generalized Structural Accelerated Failure Time), a causal inference framework for right-censored survival outcomes with many weak and potentially invalid instrumental variables. The proposed model is identified through interaction-based conditions, under which the causal effect 3is identifiable regardless of whether the instruments are valid, provided that the interaction-based assumptions hold. 2. We develop an estimation and inference procedure based on a censoring-adjusted augmented inverse probability weighted moment function under the GSAFT model. The moment function is Neyman orthogonal and doubly robust, yielding consistent estimation if either the censoring model or the outcome-related augmentation component is correctly specified. These properties support valid inference with flexible nuisance estimation and allow overidentification through many moment conditions under right censoring. 3. We develop two model diagnosis tools, focusing on weak identification and overidentification, respectively. The weak identification test assesses whether the gene-by-gene interaction-based identification conditions are sufficiently informative in the observed data, while the overidentification test evaluates the compatibility of the imposed moment functions with the observed data. Together, these procedures offer data-driven checks of the key identification assumptions and improve the reliability and scalability of the proposed methodology in large observational and biobank studies. The remainder of the paper is organized as follows. Section 2 introduces the problem setup and the structural accelerated failure time model. Section 3 presents the identification strategy and the censoring-adjusted moment function. Section 4 describes the estimation procedure. Section 5 establishes the asymptotic properties of the proposed estimator. Section 6 develops model diagnostic tools, including a weak identification test and an overidentification test. Section 7 reports simulation results. Section 8 applies the proposed method to UK Biobank data to study the causal effect of body mass index on disease onset. Section 9 concludes with a discussion. Technical proofs are provided in the Supplementary Material. 
+
+# 2 Structural AFT model with possibly invalid instruments 
+
+The classical structural accelerated failure time (SAFT) model quantifies treatment effects on survival outcomes, which characterizes the causal effect through an acceleration factor acting on the counterfactual failure time (Robins and Tsiatis, 1991; Robins, 1992; Vandebosch et al., 2005; Hernán et al., 2005). Let T ∗(d) denote the counterfactual failure time that would be observed if the exposure were set to level d ∈ R. The baseline counterfactual failure time T ∗(0) is not always observed and represents the survival 4outcome that would have been realized in the absence of exposure. The causal effect of the exposure is defined through the time ratio T ∗(d)/T ∗(0) .Under this model setup, the classical SAFT model (Robins and Tsiatis, 1991; Robins, 1993; Hernán et al., 2005) can be written as 
+
+T ∗(0) = T ∗(d)exp( −β0d),
+
+where β0 belongs to a compact set B. In randomized experiments, the exposure d is independent of the baseline counterfactual failure time T ∗(0) , so that d is exogenous and 
+
+β0 is identifiable. In observational settings, however, d may be correlated with T ∗(0) ,rendering d endogenous and the causal effect no longer identifiable without additional assumptions. In this case, instrumental variables can be used to achieve identification in SAFT model (Robins and Tsiatis, 1991; Robins, 1993). However, if the instrumental variables are invalid, for example, due to violations of the exclusion restriction or the independence condition, identification again fails. While identification under invalid instrumental variables have been studied in other causal frameworks (Kang et al., 2016; Zhang et al., 2025), these approaches do not directly generalize to SAFT models, where methodological developments remain limited. To accommodate possibly invalid instrumental variables, we generalize the SAFT model with valid instrumental variables in Robins (1993), and refer to the resulting model as the generalized structural accelerated failure time (GSAFT) model. Let T ∗(d, z) denote the counterfactual failure time that would be observed if the exposure were set to level 
+
+d ∈ R and the candidate instrumental variables were set to z = ( z1, . . . , z p)⊤ ∈ Rp. The baseline counterfactual failure time T ∗(0 , 0) represents the survival outcome that would have been realized when both exposure and candidate instruments are set to zero. Then the GSAFT model is given by 
+
+T ∗(0 , 0) = T ∗(d, z)exp 
+
+> {
+
+−β0d −
+
+> p∑
+> k=1
+
+γkzk
+
+> }
+
+, (1) 
+
+E{log T ∗(0 , 0)|z} =
+
+> p∑
+> k=1
+
+αkzk. (2) Here, the coefficients γk capture direct effects of the candidate instruments on the failure time; instruments with γk̸ = 0 violate the exclusion restriction and are therefore invalid. The coefficients αk characterize the dependence between the candidate instruments and the baseline counterfactual failure time T ∗(0 , 0). When αk̸ = 0 , the instruments are associated with unobserved confounders, implying that the IV independence assumption is violated. These two sources of invalidity are jointly summarized by ϕk = γk + αk.5In what follows, ϕk serves as an index of instrument invalidity. A nonzero value of ϕk
+
+indicates that the candidate instrument violates at least one of the core IV assumptions considered here, while ϕk = 0 corresponds to the absence of these two violations, and the model will reduce to classical SAFT model. A special case occurs when γk = −αk̸ = 0 .In this situation, ϕk = 0 by construction, but the instrument is still invalid, as both the exclusion restriction and the independence condition are violated despite the algebraic cancellation. Figure 1 illustrates the relationship among the instrumental variables, exposure, outcome, and confounders. 
+
+Z D T
+
+U
+
+α
+
+β0
+
+γ
+
+Figure 1: Invalid instrumental variable Z due to violation of IV validity requirements (ii) independence ( α̸ = 0 ) and (iii) exclusion restriction ( γ̸ = 0 ). Under model (1), exp( β0) represents the causal effect associated with a one-unit increase in the exposure while holding the instruments fixed. A positive value of β0
+
+corresponds to prolonged survival, whereas a negative value corresponds to shortened survival. To link the counterfactual outcome model (1) to the realized failure time, we impose the consistency assumption (Rubin, 1974): if an individual actually receives treatment level (D, Z) = ( d, z), then the realized failure time equals the corresponding counterfactual outcome. Substituting the realized treatment levels into the structural relation among counterfactual outcomes yields a log-linear representation for the counterfactual failure time. Consequently, (1) can be written as 
+
+log( T ∗) = β0D +
+
+> p∑
+> k=1
+
+ϕkZk + ε. (3) The error term ε is defined as ε = log T ∗(0 , 0)−E{log T ∗(0 , 0) | Z}, and thus satisfies E(ε |
+
+Z) = 0 . If the IV independence assumption holds, that is, α = 0 , then E{log T ∗(0 , 0)|z} =
+
+E{log T ∗(0 , 0)} and thus ε does not depend on Z. Despite its regression-like form, the structural model in (3) generally involves an endogenous exposure D in observational studies. Before specifying the structural equation for D, we first introduce notation for the interaction terms. The kth order interaction terms Ik(Z) and centered kth order interaction terms Ik(Z; ζ), which are both C(p, k ) = (pk
+
+> )
+
+dimensional vectors, capture 6higher order interactions among the instruments, defined as 
+
+I⊤ 
+
+> k
+
+(Z) = 
+
+> ∏
+> j∈Ξ
+
+Zj : Ξ ∈ Sk 
+
+> 
+
+, and I⊤ 
+
+> k
+
+(Z; ζ) = 
+
+> ∏
+> j∈Ξ
+
+(Zj − ζj ) : Ξ ∈ Sk 
+
+> 
+
+,
+
+where Sk denotes the collection of all distinct size k subsets of {1, . . . , p }, and 
+
+ζ = ( ζ1, . . . , ζ p)⊤ with ζk = E(Zk) is the mean of the jth instrument. For example, if there are three instruments, then I2(Z) = ( Z1Z2, Z 1Z3, Z 2Z3)⊤, and I3(Z) = ( Z1Z2Z3).The centering (Zj − ζj ) yields interaction terms Ik(Z; ζ) whose components have mean zero and play an important role in establishing Neyman orthogonality properties exploited in subsequent identification and estimation. For a range of interaction orders q1 ≤ q2, we further define Iq1:q2 (Z) = {I ⊤ 
+
+> q1
+
+(Z), . . . , I⊤ 
+
+> q2
+
+(Z)}⊤, and 
+
+Iq1:q2 (Z; ζ) = {I ⊤ 
+
+> q1
+
+(Z; ζ), . . . , I⊤ 
+
+> q2
+
+(Z; ζ)}⊤, which collects all interaction terms from order 
+
+q1 to order q2. Then we can write the structural equation for D as 
+
+D =
+
+> p∑
+> k=1
+
+θkZk +
+
+> p∑
+> k=2
+
+φ⊤ 
+
+> k
+
+Ik(Z) + ν, (4) where ν is the stochastic error term satisfying E(ν | Z) = 0 , and φk is a coefficient vector with the same dimension as Ik(Z).Finally, we account for right censoring, which commonly arises in survival studies due to administrative end of follow-up, loss to follow-up, or study termination before the occurrence of the event of interest. For notational simplicity, denote T = log( T ∗)
+
+as the log-transformed failure time in the following. Let C denote the log-transformed censoring time, representing the time at which observation of the event process ceases. The log-transformed observed outcome is then defined as 
+
+Y = min( T, C ), δ = I(T ≤ C),
+
+so that only partial information about the failure time T is available when censoring occurs. 
+
+# 3 Identification and moment function construction 
+
+# 3.1 Identification under uncensored data 
+
+We first outline the identification argument in the setting without censoring. The presence of unobserved confounders prevents identification of the causal effect in the SAFT model through direct regression, since the exposure is no longer conditionally exogenous given the observed instruments. To illustrate, the standard instrumental variable method 7identifies the causal parameter through the following equation: 
+
+E[( Z − ζ)( T − Dβ 0)] = E[( Z − ζ)( 
+
+> p∑
+> k=1
+
+ϕkZk + ε)] = 0 
+
+supposing that ϕk = 0 , i.e., the candidate IVs are valid. The remaining term involving ε
+
+vanishes since E(ε | Z) = 0 by definition. However, with invalid IVs ϕk̸ = 0 , the equation no longer holds since E[ϕk(Zk − ζk)( Zk)] ̸ = 0 , and thus β cannot be identified. To overcome this difficulty, we achieve causal identification by exploiting interaction terms constructed from the candidate instrumental variables. The new moment condition is given by 
+
+E[( Z1 − ζ1)( Z2 − ζ2)( T − Dβ 0)] = E[( Z1 − ζ1)( Z2 − ζ2)( 
+
+> p∑
+> k=1
+
+ϕkZk + ε)] = 0 . (5) Even when ϕk̸ = 0 , if the instruments are mutually independent, the interaction terms cancel out the effect induced by ϕk, so that the resulting moment condition has mean zero. Then a closed-form solution to β0 can be obtained by 
+
+β0 = E[( Z1 − ζ1)( Z2 − ζ2)T ]
+
+E[( Z1 − ζ1)( Z2 − ζ2)D]
+
+if the denominator is non-zero: E[( Z1 − ζ1)( Z2 − ζ2)D]̸ = 0 . Equation (5) presents only one particular interaction term. In fact, any linear combination of such interaction terms can be used to construct a valid moment function. Collecting moment functions of order 2 to q yields an r(p, q )-dimensional moment function, E[I2: q(Z; ζ)( T − β0D)] , where q ≤ p
+
+and r(p, q ) = ∑qk=2 C(p, k ) is the number of interaction terms. The identifiability conditions discussed above can be summarized in the following assumption. 
+
+Assumption 1. (i).(IV independence) All p candidate IVs are independent. (ii).(Interaction relevance) E [I2: q(Z; ζ0)D]̸ = 0, that is, at least one constructed interaction term is correlated with the exposure. 
+
+Assumption 1 (i) requires that all p candidate IVs are mutually independent. This condition can be satisfied in genetic studies, as one can perform linkage disequilibrium clumping to obtain an independent set of variants before the MR analysis (Purcell et al., 2007; Bowden et al., 2016; Zhao et al., 2020). Assumption 1 (ii) requires that at least one constructed interaction term is correlated with the exposure. Let m denote the total number of interaction terms. Then assumption 1 (ii) implies that our framework achieves r(p, q )-robust identification, i.e., identification is guaranteed as long as at least one component of the r(p, q )-dimensional vector I2: q(Z; ζ0)D is nonzero. 8Figure 2 illustrates the motivation for using interaction-based instruments. Identification can be achieved by constructing interaction-based instruments that avoid the violation of dependence and exclusion restriction. 
+
+Ik(Z) D T
+
+U
+
+β0
+
+# ×
+
+# ×
+
+Figure 2: Identification can be achieved by constructing interaction-based instruments from the candidate instruments. The moment I2: q(Z; ζ)( T − Dβ ) can be used as a moment function and identify the causal effect. However, the moment is not Neyman orthogonal with respect to the nuisance ζ. A formal definition of Neyman orthogonality is provided in Section 3.3. Following Zhang et al. (2025), we construct a new moment function that satisfies the Neyman orthogonality property. Define Vk = {1, I⊤
+
+> 1: k−1
+
+(Z)} as the collection of all interaction terms of Z up to order k − 1, including an intercept. To partial out the components of Y and D explained by Vk, we regress Y and D on Vk and denote the resulting coefficient vectors by ϑk and ωk, respectively, and let Λk = {ζ, ϑ k, ω k}. Under this setup, a moment function of order k is constructed to achieve identification in the presence of potential weak and invalid instrumental variables by leveraging interaction terms of the instrumental variables, given by 
+
+gk(β, Λk; OT ) = Ik(Z; ζ){
+
+(T − Vkϑk) − β(D − Vkωk)}
+
+.
+
+Then aggregate interaction terms of orders up to q and stack the resulting moments into a 
+
+r(p, q )-dimensional moment function: g(β, Λ; OT ) = ( g2(β, Λ2; OT )⊤, . . . , g q(β, Λq; OT )⊤)⊤,where Λ = {ζ, ϑ 2, ω 2, . . . , ϑ q, ω q}. Throughout the paper, we use a subscript 0 to indicate the true value of a nuisance function. For example, let Λ0 denote the true value of Λ. With the independent IV assumption, β can be uniquely determined. 
+
+Lemma 1. Under the structural models (3) , (4) and Assumption 1, β0 is the unique solution to the moment function 
+
+Eg(β, Λ0; OT ) = 0 .
+
+93.2 AIPCW moment function under right censoring 
+
+In the presence of right censoring, the moment function gk(β, Λ; OT ) cannot be evaluated since the true failure time T is not always observed. To accommodate censoring, we construct an augmented inverse probability censoring weighting (AIPCW) moment function. AIPCW methods originate from the general semiparametric theory for censored data developed by Robins and Rotnitzky (1992). In contrast, the AFT literature has primarily relied on the Buckley-James estimator (Buckley and James, 1979), rank-based estimating equations (Jin et al., 2003), and inverse probability of censoring weighted estimating equations without augmentation (Fan and Datta, 2011). To the best of our knowledge, there appears to be limited work on explicit AIPCW moment function tailored to the AFT model. We generalize the estimator of Robins et al. (1994) and propose an AIPCW estimator under the GSAFT model: 
+
+ψk(β, ηk; O) = δG(Y |Z, D )gk(β, Λ; O)
+
+− δG(Y |Z, D )ξk(β; Y, Z, D ) + ξk(β; −∞ , Z, D ) +  
+
+> ∫Y
+> −∞
+
+d ξ k(β; u, Z, D )
+
+G(u|Z, D ) , (6) where 
+
+G(u|Z, D ) = P (C > u |Z, D ), ξk(β; u, Z, D ) = E[
+
+gk(β, Λ; OT )|T ≥ u, Z, D ]
+
+,
+
+and ηk = {G, ξ k, Λk} collects the nuisance functions. The lower limit of integration is 
+
+−∞ , as we apply a logarithmic transformation to the time variable from Y = log( Y ∗),resulting in support on (−∞ , ∞).The AIPCW-type moment function contains two parts. The first term is an inverse probability censoring weighting term: 
+
+δG(Y |Z, D )gk(β, Λ; O).
+
+It reweighs the uncensored data moment gk(β, Λ; O) by the inverse probability of being uncensored, thereby amplifying the contribution from uncensored observations (δ = 1) .The second part is the augmentation term 
+
+− δG(Y |Z, D )ξk(β; Y, Z, D ) + ξk(β; −∞ , Z, D ) +  
+
+> ∫Y
+> −∞
+
+d ξ k(β; u, Z, D )
+
+G(u|Z, D ) .
+
+The resulting moment function is constructed to satisfy Neyman orthogonality and to enjoy a doubly robust property. The inverse probability term uses only uncensored observations and reweighs them by the inverse censoring survival probability G. As a result, its performance depends directly on the estimation accuracy of G, and the 10 resulting moment function can be sensitive to perturbations in the nuisance parameters. The augmentation term is introduced to offset this sensitivity. In particular, ξk uses the observed data and the censoring mechanism to impute the unobserved contribution of a censored individual to the moment function. This allows censored observations to contribute to the moment function rather than being discarded altogether. As a result, the augmentation component plays a crucial role in ensuring that the resulting moment function is Neyman orthogonal with respect to the nuisance parameters and enjoys a doubly robust property. These properties will be formally established and discussed in the next subsection. Similar to the case without censoring, we stack the interaction of orders up to q and obtain the final r(p, q )-dimensional AIPCW moment function as 
+
+ψ(β, η; O) = (ψ2(β, η2; O)⊤, . . . , ψ q(β, ηq; O)⊤)⊤, with η = (G, η2, ξ 2, . . . , ηq, ξ q, Λ)
+
+collecting all nuisance parameters. Also, let η0 denote the collection of all components of η evaluated at their true values. We now show that the proposed AIPCW moment function (6) is uniquely satisfied at the true parameter β0 with the following assumptions. Let τ < ∞ be the maximum follow-up horizon after logarithmic transformation. 
+
+Assumption 2 (Conditional non-informative censoring) . T ⊥ C|Z, D .
+
+Assumption 3 (Positivity of censoring distribution) . There exists a constant c > 0 such that 
+
+P (C > τ | Z, D ) ≥ c. 
+
+Assumption 2 states that, conditional on Z and D, the censoring mechanism is independent of the failure time, which is commonly used in the analysis of censored data (Cai et al., 2009; Tang et al., 2020). Assumption 3 rules out vanishing censoring probabilities and prevents the denominator in the inverse-probability weights from approaching zero (Cui et al., 2023). 
+
+Theorem 1. Under the structural models (3) , (4) and Assumption 1-3, β0 is the unique solution to the moment function 
+
+Eψ(β, η0; O) = 0 .
+
+Theorem 1 shows that the causal effect β0 is identified by the proposed AIPCW moment function under additional assumptions on censoring. Similar to Lemma 1, the identification condition remains unchanged. In particular, β0 is identified if and only if at least one constructed interaction term is correlated with the exposure. One additional remark is that when censoring rate is zero, the censoring probability satisfies G0(Y |
+
+Z, D ) ≡ 1, and the additional censoring adjustments vanish and the moment function 
+
+ψ reduces to its uncensored form g, confirming coherence between the censored and uncensored settings. 11 3.3 Neyman orthogonality and double robustness of the proposed AIPCW moment function 
+
+The AIPCW moment function ψ(β, η; O) defined in (6) depends on several unknown components, including the censoring-related functions G0 and ξ0 and ζ, ϑ, ω collected in Λ0. These components are not of primary interest for the target parameter β0 and are treated as nuisance functions. Since these nuisance functions are typically estimated using nonparametric methods, their estimation errors may converge at rates slower than 
+
+n−1/2, such as the estimation of G and ξ (He et al., 2013; Tang et al., 2020). To ensure valid inference for β0 in such settings, it is essential that the moment function possesses robustness properties that mitigate the impact of nuisance estimation. A central property of the proposed AIPCW moment is Neyman orthogonality (Neyman, 1959, 1979; Chernozhukov et al., 2018). Let η0 denote the true nuisance functions. The moment function ψ(β, η; O) is said to be Neyman orthogonal at (β0, η0)
+
+if its expectation is locally insensitive to perturbations of the nuisance functions. Formally, Neyman orthogonality requires that 
+
+∂∂t E[
+
+ψ(
+
+β0, η0 + t(η − η0); O)] ∣∣∣∣∣t=0 
+
+= 0 
+
+for all admissible directions η − η0. This condition eliminates the first-order contribution of nuisance estimation error in the asymptotic expansion of the estimator for β0 (Bickel et al., 1993; Chernozhukov et al., 2018), thereby preserving root-n consistency and asymptotic normality even when nuisance functions are estimated at slower rates. For the proposed construction, the augmentation term in (6) is chosen to enforce Neyman orthogonality, in the sense that the directional derivative of E{ψ(β0, η; O)}
+
+with respect to η equals zero at η = η0. This design feature distinguishes our moment construction from AIPCW approaches that primarily target censoring adjustment (Tang et al., 2020). In addition to Neyman orthogonality, the proposed moment function is doubly robust (Bang and Robins, 2005). Specifically, we consider the following two specifications for the nuisance functions: 
+
+M1 : {ξ, Λ are correctly specified }, M2 : {G, Λ are correctly specified },
+
+The proposed moment function ψ(β0, η; O) has zero expectation under the union model 
+
+M1∪M 2, that is the expectation of ψ equals zero if either the exposure-related component 
+
+ξ0 or the conditional censoring distribution G0 is correctly specified, but not necessarily both. As a result, identification and consistency of β0 do not require simultaneous correctness of all nuisance functions. This double robustness property provides additional 12 protection against model misspecification, which is particularly valuable in nuisance estimation. The following theorem formalizes the Neyman orthogonality and double robustness properties of the proposed AIPCW moment function. 
+
+Theorem 2. Under Assumptions 2–3, (i) The moment function ψ(β0, η; O) is Neyman orthogonal with respect to η at (β0, η0).(ii) E{ψ(β0, η; O)} = 0 under M1 ∪ M 2.
+
+Together, Neyman orthogonality and double robustness ensure that the proposed moment function is well suited for estimation and inference in right-censored models. Neyman orthogonality shields the asymptotic distribution from first-order nuisance estimation error, while double robustness guarantees consistency even when part of the model is misspecified (Bickel et al., 1993; Chernozhukov et al., 2018). 
+
+# 4 Estimation procedure 
+
+This section presents an implementation of the proposed estimator based on the AIPCW moment functions developed in Section 3. We begin by estimating the nuisance functions required for constructing the AIPCW moment functions. To ensure asymptotic independence between nuisance function estimation and moment evaluation, we employ a cross-fitting scheme (Chernozhukov et al., 2018). Specifically, the sample is randomly partitioned into two folds; nuisance functions are estimated on one fold and the corresponding moment functions are evaluated on the other. The roles of the two folds are then interchanged, and the resulting moment functions are averaged. Let ̂ ζk = n−1 ∑ni=1 Zk,i denote the sample mean of the kth instrument, and let ̂ ζ =(̂ ζ1, . . . , ̂ ζp). For each interaction order k, we regress Y on Vk and D on Vk separately, and denote the resulting coefficient estimators by ̂ ϑk and ̂ ωk. Using these estimators, the uncensored-data interaction-based moment function of order k is defined as 
+
+gk(β, ̂ Λk; O) = Ik(Z;̂ ζ)
+
+> {
+
+(Y − V ⊤ 
+
+> k̂
+
+ϑk) − β(D − V ⊤ 
+
+> k̂
+
+ωk)
+
+> }
+
+,
+
+where ̂ Λk = {̂ ζ,̂ ϑk,̂ ωk} collects the nuisance functions in uncensored-data moment function g of kth order interaction. To account for right censoring, we apply an AIPCW transformation to gk. The conditional censoring survival function G(y | Z, D ) = Pr( C ≥ y | Z, D ) is estimated 13 using a local Kaplan-Meier estimator (Dabrowska, 1989; Tang et al., 2020), ̂
+
+G(y | Z, D ) = 
+
+> n∏
+> i=1
+> [
+
+1 − Bni (Z, D ) 
+
+> ∑nj=1
+
+I(Yj ≥ Yi)Bnj (Z, D )
+
+> ]I(Yi≤y,δ i=0)
+
+,
+
+where 
+
+Bnj (Z, D ) = K( (Z,D )−(Zj ,D j ) 
+
+> h
+> )∑ni=1
+
+K( (Z,D )−(Zi,D i) 
+
+> h
+> )
+
+.
+
+Here K(·) is a kernel function and h is a bandwidth. Next, we estimate ξk(β; u, Z, D ) = E{gk(β, Λk; OT ) | Y ≥ u, Z, D } by ̂
+
+ξk(β; u, z, d ) =  
+
+> ∑nj=1
+
+I(Yj ≥ u) Bnj (z, d ) δĵ  
+
+> G(Yj|z,d )
+
+gk(β, ̂ Λk; Oj ) 
+
+> ∑nj=1
+
+I(Yj ≥ u) Bnj (z, d ) δĵ 
+
+> G(Yj|z,d )
+
+.
+
+Finally, ∫ Y 
+
+> −∞
+
+d ξ k(β; u, Z, D )/G (u|Z, D ) is approximated by a sum over the observed failure times. Let u1 < · · · < u K denote the distinct failure times. For subject i, we approximate ∫ Yi 
+
+> −∞
+
+d̂ ξk(β; u, Zi, D i)/̂G(u | Zi, D i) by  
+
+> ∑
+> uk≤Yi
+
+∆̂ξk (uk; Zi, D i)̂
+
+G(uk | Zi, D i) ,
+
+where ∆̂ξk (uk; Zi, D i) = ̂ ξk(β; uk, Zi, D i) −̂ ξk(β; uk−1, Zi, D i) and u0 = −∞ .The resulting AIPCW-transformed observed data moment function of order k is 
+
+ψk(β, ̂ ηk; O) = δ̂
+
+G(Y | Z, D )
+
+> {
+
+gk(β, ̂ Λk; O) −̂ ξk(β; Y, Z, D )
+
+> }
+
++̂ξk(β; −∞ , Z, D ) +  
+
+> ∫Y
+> −∞
+
+d̂ ξk(β; u, Z, D )̂
+
+G(u | Z, D ) ,
+
+where ̂ ηk collects all nuisance function estimators involved in the kth-order moment function. After constructing the AIPCW moment functions, the remaining task is to aggregate a potentially large collection of interaction-based moment functions into a single estimator of β. In practice, particularly in genetic applications, it is common that the instruments and their interaction terms are only weakly correlated with the treatment variable D (Davies et al., 2015). This weak association implies that the corresponding coefficient φk in the structural equation (4) is small, reflecting limited variation in D
+
+explained by the interaction-based instruments. In the presence of many and weakly informative moment functions, conventional quadratic GMM estimators (Hansen, 1982) may suffer from substantial weak-instrument bias (Newey and Windmeijer, 2009). We therefore aggregate the moment functions using a generalized empirical likelihood (GEL) 14 criterion (Owen, 1988; Qin and Lawless, 1994; Kitamura and Stutzer, 1997). Relative to quadratic GMM, GEL avoids committing to a fixed quadratic approximation and instead determines data-adaptive implied probabilities through a tilting parameter, which can stabilize estimation when the moment functions are nearly redundant, when sample moments and their derivatives are highly correlated, or when identification is weak (Newey and Smith, 2004). We aggregate the moment functions and estimate β by minimizing the GEL objective ̂
+
+β = argmin β∈B ̂ Q(β, ̂ η),̂ Q(β, ̂ η) = sup  
+
+> λ∈L(β, ̂η)
+
+1
+
+n
+
+> n∑
+> i=1
+
+ρ(
+
+λ⊤ψ(β, ̂ η; Oi))
+
+,
+
+where ρ(·) is a concave tilting function and L(β, ̂ η) = {λ : λ⊤ψ(β, ̂ η; Oi) ∈ V , i =1, . . . , n }. Different choices of ρ correspond to familiar members of the GEL family, including empirical likelihood with ρ(v) = log(1 − v) (Owen, 1988), exponential tilting with ρ(v) = −exp( v) + 1 (Qin and Lawless, 1994), and the continuous updating estimator with ρ(v) = −v − v2/2 (Hansen, 1982; Imbens, 2002). These criteria behave similarly in a neighborhood of zero, but they differ substantially in their second-order derivatives, leading to distinct curvature properties. Empirical likelihood and exponential tilting exhibit state-dependent curvature, whereas the continuous updating estimator has constant curvature and is known to suffer from larger higher-order bias and less favorable finite sample performance (Kitamura et al., 2004). For these reasons, we primarily use empirical likelihood or exponential tilting in implementation. Although GEL provides a principled way to aggregate many moment functions, the construction of interaction-based moments can still pose practical challenges in applications. In particular, the number of interaction terms Ik(Z) grows combinatorially with the dimension of the instrument vector Z. For a p-dimensional Z, interaction terms of order 2 to q involves r(p, q ) = ∑qk=2 C(p, k ) terms, so even moderate values of 
+
+p can lead to an extremely large set of candidate interaction terms. To mitigate this dimensionality burden while retaining interaction terms that contribute meaningfully to identification, we introduce a preliminary screening step based on penalized regression. A variety of penalization methods can be used for this screening step, including lasso (Tibshirani, 1996), ridge regression (Hoerl and Kennard, 1970), SCAD (Fan and Li, 2001), and MCP (Zhang, 2010). For simplicity, we employ the adaptive lasso (Zou, 2006) in our implementation. We also conducted a brief comparison with alternative selection procedures and found that the resulting estimates are qualitatively similar across methods. Since identification in our setting requires only that at least one interaction moment be nonzero, the procedure does not rely on selection consistency, and exact recovery of the true nonzero interaction terms is unnecessary. The penalized selection step functions primarily as a dimension-reduction device that removes clearly uninformative components 15 rather than perfectly separating zero from nonzero interactions. Identification is preserved as long as the selected set contains at least one interaction term associated with a nonzero moment condition. As a result, moderate selection errors do not undermine identification, making the method comparatively robust to imperfect model selection. Suppose we retain an m-dimensional moment function via penalized regression, then the above steps together define the proposed estimation procedure, which is summarized in Algorithm 1. Note that the nuisances in the moment function of order k
+
+depend explicitly on k. Therefore, the associated nuisance functions must be estimated individually for each k, rather than pooled across orders. 
+
+Algorithm 1 Estimation Procedure  
+
+> 1:
+
+Split the sample into two folds.  
+
+> 2:
+
+for k = 2 , . . . , q do  
+
+> 3:
+
+for each fold do  
+
+> 4:
+
+Estimate nuisance functions ̂ ηk = ( ̂ ζ,̂ ϑk,̂ ωk,̂ G, ̂ ξk) on the auxiliary fold.  
+
+> 5:
+
+Construct AIPCW moment functions ψk on the evaluation fold.  
+
+> 6:
+
+end for  
+
+> 7:
+
+Concatenate the two-fold moment functions to obtain ψk(β, ̂ ηk; O). 
+
+> 8:
+
+end for  
+
+> 9:
+
+Stack moment functions across orders ψ(β, ̂ η;O) = ( ψ2(β, ̂ η2;O)⊤, . . . , ψ q(β, ̂ ηq;O)⊤)⊤. 
+
+> 10:
+
+Select m interaction terms from all r(q, p ) terms via penalized regression.  
+
+> 11:
+
+Form the final m-dimensional moment vector ψ†(β, ̂ η; O) using the selected components.  
+
+> 12:
+
+Estimate ̂ β by minimizing the GEL criterion ̂ Q(β, ̂ η) based on the selected moments. 
+
+# 5 Asymptotic properties 
+
+This section establishes the consistency and asymptotic normality of the proposed estimator. We first introduce the required notation. Let ψ′(η; O) = ∂ψ (β, η; O)/∂β ,
+
+ψ∗ = Eψ′(η0; O). Moreover, let Ω( β, η; O) = Eψ(β, η; O)ψ(β, η; O)⊤, and 
+
+Ω0 = Ω( β0, η0; O). λmax (Ω) and λmin (Ω) represent the maximal and minimal eigenvalues of matrix Ω. ∥ · ∥ denotes the Euclidean norm for vectors and the Frobenius norm for matrices. For a measurable function f , ∥f ∥ denotes its L2 norm with respect to the underlying probability measure. We next give some regularity conditions required to establish the asymptotic properties. 
+
+Condition 1 (Many weak moment asymptotics) . (i). The total number of moments m
+
+satisfies m3/n → 0.(ii). There exist scalars μn, c, c ′ > 0, such that 
+
+μ2
+
+> n
+
+c ≤ nψ ∗⊤ Ω−10 ψ∗ ≤ μ2
+
+> n
+
+c′,
+
+16 μn satisfies μn → ∞ as n → ∞ and m/μ 2 
+
+> n
+
+is bounded. 
+
+Condition 1 (i) imposes the conditions that m3/n → 0, which restricts how quickly the number of moment functions may diverge. Here m denotes the number of constructed interaction-based moments rather than the dimension of the original instrument vector 
+
+Z, so it can be larger than p. The condition ensures that the expanding moment set remains well behaved for the asymptotic analysis. Condition 1 (ii) places restrictions on the concentration parameter nψ ∗⊤ Ω−10 ψ∗ (Staiger and Stock, 1997), which summarizes the overall strength of the moment functions. When μn scales as √n, it falls into the classical strong moment regime. In contrast, our framework permits μn to increase more slowly than √n, allowing the concentration parameter to diverge at a slower rate and therefore accommodating many weak interactions. The quantity μn governs the convergence rate of the estimator ̂ β, and all asymptotic results remain valid without imposing the conventional √n scaling. 
+
+Condition 2 (Convergence rate of nuisance) . The estimator of G and ξ satisfy ∥̂G −
+
+G0∥ = op(n−1/4m−1/4), and ∥̂ξ − ξ0∥ = op(n−1/4m−1/4).
+
+Condition 2 imposes a generic requirement on the convergence rates of the estimators ̂
+
+G and ̂ ξ. The condition does not rely on any specific estimation procedure, and other approaches, such as Cox model (Cox, 1972), may also be used provided that the required convergence rates are achieved. It only requires that the estimators achieve rates of order op(n−1/4m−1/4), which is commonly required in double robustness literature, such as in Chernozhukov et al. (2018). In our method, G0 is estimated using a local Kaplan-Meier estimator, which attains the rate of O((log( n)/(nh p)) 1/2) (Tang et al., 2020), where 
+
+h is the bandwidth. Further regulartity conditions are included in the supplementary material. 
+
+Theorem 3. Under Conditions 1-2 and Conditions 3-5 in the supplementary material, ̂
+
+β is asymptotically normal as n → ∞ , i.e., 
+
+μn(̂ β − β0)
+
+> √
+
+H−1(H + V )H−1 → N (0 , 1) ,
+
+where H = nψ ∗⊤ Ω−10 ψ∗, V = μ−2 
+
+> n
+
+E[U ⊤ 
+
+> i
+
+Ω−10 Ui], and 
+
+Ui = ψ′(η0; Oi) − ψ∗ − { Ω−10 E(ψ(β0, η0; O)ψ′
+
+(η0; O)⊤)}⊤ψ(β0, η0; Oi) is the population residual of the least squares regression of ψ′
+
+(η0; Oi) − ψ∗ on ψ(β0, η0; Oi).
+
+Theorem 3 establishes that ̂ β attains a convergence rate of μn, which is typically slower than the usual √n rate. This loss in convergence rate is the price paid for weak instruments, under which the moment conditions provide substantially less information than that in the strong moment setting. The variance of ̂ β contains two distinct 17 components. The first variance term H−1 matches the standard GMM variance in settings with strong instruments (Hansen, 1982). The second variance component H−2V
+
+originates from the U -statistic term associated with weak interactions This additional component does not vanish when the number of interactions diverges and plays a central role in delivering valid inference. When all moments are strong and the number of interaction terms stays fixed, the U -statistic variance converges to zero, recovering the classical GMM variance H−1, which coincides with the variance lower bound under the strong moment regime (Tang et al., 2020). In contrast, in the presence of weak moments, the additional variance term reflects the intrinsic loss of information induced by weak identification. The variance lower bound in such weak moment settings remains an open question and deserves further investigation. Figure 3 illustrates the influence of the strength of the moment conditions μn. Panel (a) shows that, under weaker moments, the norm ∥ψ∥ exhibits smaller curvature as 
+
+β deviates from the true value β0, leading to a flatter curve and a more challenging estimation problem for β. Panel (b) further demonstrates the impact of weak moments on inference. In particular, the asymptotic variance of the estimator involves the term 
+
+V = μ−2 
+
+> n
+
+E[U ⊤ 
+
+> i
+
+Ω−10 Ui], which increases as μn decreases. This variance inflation is reflected in the progressively more dispersed density of the GEL estimator in Panel (b), and when 
+
+μn = 1 so that the moment strength does not diverge with n, the resulting limiting distribution departs substantially from normal distribution.    
+
+> (a) Norm of ψ(b) Density of ̂β
+
+Figure 3: Behavior of the moment function and the GEL estimator under different moment strengths indexed by μn. The true value is β0 = 1 . Panel (a) plots the ∥ψ∥
+
+curves under varying moment strengths, where smaller μn yields a flatter norm curve. When μn = 1 ( μn does not diverge with n), the curve becomes flat, indicating lack of identification. Panel (b) displays the density of the GEL estimator of β under the same moment regimes. As μn decreases, the density becomes more dispersed with larger variance; when μn = 1 , the limiting distribution tends to be flat. A distinctive feature of our result is that the moment function is Neyman orthogonal to the nuisance functions. Neyman orthogonality eliminates the first-order impact of estimating η0, ensuring that the asymptotic distribution depends only on the limiting 18 behavior of the moment functions themselves, as long as the nuisance estimators achieve a minimal convergence rate required by the Neyman orthogonality condition. As a result, the influence of nuisance estimation is asymptotically negligible, and the asymptotic variance takes a clean two-component form driven solely by the structure of the weak interactions. In practice, the variance term H and V can be consistently estimated by ̂
+
+H = ∂2̂ Q(̂β, ̂ η)
+
+∂β 2 ,̂ V1 =̂ H−1̂ D⊤ ¯Ω( ̂β, ̂ η)−1̂ D̂ H−1,
+
+respectively, where ̂
+
+D =
+
+> n∑
+> i=1
+
+ρ′
+
+(̂λ(̂β, ̂ η)⊤ψ(̂ β, ̂ η; Oi)) ψ′
+
+(̂β, ̂ η; Oi) 
+
+> ∑nj=1
+
+ρ′ (̂λ(̂β, ̂ η)⊤ψ(̂β, ̂ η; Oj )) ,
+
+and ¯Ω( ̂β, ̂ η) = 1 /n ∑ 
+
+> i=1 n
+
+ψ(̂β, ̂ η; Oi)ψ(̂β, ̂ η; Oi)⊤.
+
+# 6 Model diagnoses 
+
+When more moment conditions are imposed than are needed to identify the parameter of interest, it becomes important to assess whether these restrictions are compatible with the data. This assessment can be formalized as a hypothesis test on the joint validity of the m-dimensional moment functions: 
+
+H0 : E{ψ(β0, η0; O)} = 0.
+
+Under correct specification, the moment conditions are satisfied at the true parameter values. This motivates a specification test analogous to the classical J-test in the GMM literature (Sargan, 1958; Hansen, 1982), which assesses the joint validity of overidentifying restrictions by examining whether the sample moments are sufficiently close to zero. Specifically, we employ the statistic 2n̂Q(̂β, ̂ η) (Newey and Windmeijer, 2009; Ye et al., 2024) to quantify the aggregate deviation of the sample moments from their population counterparts. Under appropriate regularity conditions, this statistic admits a well-defined asymptotic distribution under the null hypothesis and can therefore be used to conduct a formal overidentification test, as stated in the following theorem. 
+
+Theorem 4 (Overidentification test) . Under Conditions 1-2 and Conditions 3-5 in the supplementary material, and m, n → ∞ , if 
+
+E{ψ(β0, η0; O)} = 0,
+
+19 then 
+
+P (
+
+2n̂ Q(̂ β, ̂ η) ≥ χ21−α(m − 1) )
+
+→ α, 
+
+as n → ∞ .
+
+Theorem 4 implies a simple decision rule for assessing the validity of the imposed moment conditions. At significance level α, the null hypothesis is rejected whenever the value of 2n̂Q(̂β, ̂ η) exceeds the corresponding chi-squared critical value. Rejection of the null hypothesis suggests that the moment conditions may fail. 
+
+# 7 Simulation studies 
+
+We assess the finite sample performance of the estimator under several right censoring scenarios. The candidate instruments Z1, . . . , Z p are generated independently from the standard normal distributions. The structural equations for the outcome and exposure are 
+
+T = β0D +
+
+> p∑
+> k=1
+
+ϕkZk + ε, D =
+
+> p∑
+> k=1
+
+θkZk + ∑
+
+> 1≤j<k ≤p
+
+φD,jk Zj Zk + ν, 
+
+where ε and ν are noise terms, generated from a joint normal distribution with mean zero, variance 0.4, and covariance 0.2. The true causal effect is β0 = 1 . The censoring time C is generated from a uniform distribution [τ1, τ 2]. Across different simulation settings, τ1 and 
+
+τ2 are varied to produce empirical censoring rates of approximately 20% , 40% , and 60% ,respectively. The observed failure times are Y = min( T, C ), and indicator δ = I{T ≤ C}.
+
+The interaction coefficients decay with sample size: φD,jk = cn −1/4 with c = 4 ,representing a weak instrumental variables setting. We test two different IV dimensions: 10 and 20. When p = 10 , all interaction terms are set to be nonzero. When p = 20 , we randomly select 40% of the possible interactions and set the corresponding coefficients to be nonzero, with the remaining interactions set to be zero. In the estimation procedure, we use only second-order interaction terms in line with the data-generating process. Moreover, we examine four configurations for (θk, ϕ k), controlling instrument strength and the proportion of invalid instruments: • Case 1: θk = 1 for all k, and 30% of SNPs are invalid with ϕk = 0 .2.• Case 2: θk = 1 for all k, and 60% of SNPs are invalid with ϕk taking values 0.2,
+
+0.4, and 0.6 in equal proportions. • Case 3: θk ∼ N (1 , 1) and ϕk ∼ N (0 .2, 0.2) independently. 20 • Case 4: θk ∼ N (1 , 1) and 70% of SNPs are invalid with ϕk = 0 .5θk.We consider sample sizes n = 10000 and 20000 and repeat each configuration 
+
+500 times. For each simulated data set we implement the estimator in three steps. First, we apply adaptive LASSO to select relevant interaction terms from the set of interaction terms. Second, we estimate the nuisance functions ̂ η and use the selected set of interactions to construct the Neyman orthogonal moment ψ(β, ̂ η; O) with sample-splitting method. Finally, we obtain the estimator of ̂ β by GEL. We also consider the AFT model as a benchmark method, where the relationship between Y and 
+
+D is modeled directly while ignoring the unmeasured confounder U .Table 1 reports the simulation results for sample sizes n = 10000 with censoring rate 0.2. Additional simulation results across different sample sizes and censoring levels are provided in Supplementary Materials. The simulation results are evaluated using four summary measures: the percentage finite sample bias (Bias), the empirical standard deviation over replications (SD), the average estimated standard error (SE), and the empirical coverage probability (CP) of the 95% confidence interval. These metrics jointly assess accuracy, sampling variability, and inferential validity across the considered settings. Table 1: Performance of the proposed estimators for n = 10 ,000 across Cases 1-4, and instrument dimensions p = 10 and p = 20 . BIAS denotes percentage finite sample bias, SD the empirical standard deviation, SE the average estimated standard error, and CP the empirical coverage probability of the 95% confidence interval. 
+
+p = 10 p = 20 
+
+GEL Bias SD SE CP Bias SD SE CP Case 1 CUE 0.238% 0.093 0.087 0.932 -0.511% 0.066 0.071 0.968 EL 0.236% 0.091 0.085 0.926 -0.291% 0.064 0.066 0.952 ET 0.263% 0.091 0.086 0.934 -0.448% 0.064 0.067 0.956 AFT -24.163% 0.462 0.008 0.000 -78.848% 0.418 0.014 0.000 Case 2 CUE 0.618% 0.082 0.088 0.976 -0.429% 0.072 0.072 0.960 EL 0.544% 0.081 0.085 0.966 -0.366% 0.068 0.066 0.936 ET 0.549% 0.082 0.086 0.970 -0.328% 0.070 0.067 0.944 AFT -32.038% 0.554 0.011 0.000 -96.333% 0.201 0.017 0.000 Case 3 CUE -0.047% 0.086 0.088 0.962 -0.292% 0.066 0.072 0.958 EL -0.040% 0.085 0.086 0.970 -0.198% 0.063 0.066 0.950 ET -0.035% 0.085 0.086 0.968 -0.228% 0.064 0.067 0.956 AFT -66.156% 0.498 0.014 0.008 -99.328% 0.083 0.014 0.002 Case 4 CUE 0.995% 0.091 0.088 0.948 0.063% 0.070 0.072 0.960 EL 0.943% 0.089 0.086 0.940 0.065% 0.068 0.066 0.938 ET 1.006% 0.089 0.086 0.942 0.031% 0.069 0.067 0.946 AFT -80.035% 0.444 0.017 0.000 -100.005% 0.001 0.014 0.000 For both n = 10000 and n = 20000 , the three GEL estimators, CUE, EL, and ET, exhibit stable performance across all four cases. The estimated biases remain small, 21 while the SD closely matches the SE, indicating accurate variance estimation. The empirical coverage probabilities stay near the nominal level of 0.95 across censoring levels and instrument dimensions, demonstrating that the proposed AIPCW estimator delivers reliable inference in settings with many weak and invalid instruments. Among the three GEL variants, CUE exhibits modestly larger bias in some settings, particularly under large censoring rate, whereas EL and ET remain comparatively stable. In contrast, the AFT estimator performs poorly across all configurations. The estimated biases are substantial and do not diminish as the sample size increases, reflecting the sensitivity of the AFT specification to unmeasured confounding. Moreover, the estimated standard errors severely understate the sampling variability, leading to empirical coverage probabilities far below the nominal level. These results suggest that the AFT model does not yield reliable causal inference in the presence of many weak interaction instruments. To check whether at least one constructed interaction term is correlated with the exposure in the observed sample, we conduct a heteroskedasticity-robust F test (White, 1980; MacKinnon and White, 1985). Across all simulation designs, the heteroskedasticity-robust F test yields p-values smaller than 0.001 , indicating strong evidence that the interaction component in the first stage is nontrivial and the interaction relevance. To validate Theorem 4, we conduct an overidentification test and report the empirical type I error based on 500 simulation replications. The results are presented in the supplementary materials. Overall, the simulation results provide clear evidence that the proposed GEL estimators maintain accuracy and inferential validity across a wide range of challenging cases, while the standard AFT approach is unable to accommodate the complexities introduced by the unobserved confounding. 
+
+# 8 Application to UK Biobank data 
+
+UK Biobank is a large population-based cohort comprising roughly half a million participants recruited across the United Kingdom between 2006 and 2010. Baseline assessments include anthropometric measurements, blood and urine biomarkers, and detailed lifestyle and medical questionnaires (Sudlow et al., 2015). Longitudinal follow-up is enabled through linkage to national hospital, primary care, and mortality registries, which provide information on diagnoses, procedures, and prescription records. These data allow the construction of prospective time-to-event outcomes from routinely collected electronic health records. In this application, we restrict attention to individuals who were at least 60 years old at baseline, for whom age related cardiovascular and gastrointestinal conditions become 22 increasingly common. We further limit the sample to unrelated participants of white British ancestry and apply standard quality control procedures. These procedures exclude individuals with mismatched genetic and reported sex, excessive genotype missingness, or withdrawn consent. Variants with low imputation quality are also removed (Liu et al., 2023; Ye et al., 2024). We consider two right-censored outcomes derived from phenotype code (phecode) based on ICD-coded hospital and primary care records (Dey et al., 2022). The first outcome is ischemic heart disease (phecode 411), and the second outcome is gastritis and duodenitis (phecode 535). Their sample sizes were 78995 and 80567, with 7155 and 6320 observed events, respectively. The corresponding censoring rates were 0.909 and 0.922. For each phecode, the failure time for uncensored individuals was defined as the logarithm of the age at disease onset minus the age at enrollment into the UK Biobank. For censored individuals, the failure time was defined as the logarithm of the last observed age from hospital admissions, general practice records, or death registries minus the age at enrollment. The exposure of interest is body mass index (BMI). For instrument selection, we identify genetic variants associated with BMI using previously established genome-wide association results (Locke et al., 2015). Among single nucleotide polymorphisms that reach genome-wide significance at the threshold p < 5 × 10 −8, we apply linkage disequilibrium clumping to obtain an approximately independent set, using an r2 threshold 0.001 and distance based pruning consistent with prior Mendelian randomization studies. From the resulting pool, we retain the top 15 single nucleotide polymorphisms with the strongest marginal associations with BMI as candidate instruments. As benchmark methods, we fit two AFT models for disease onset with BMI as the covariate of interest, denoted as AFT (without covariates) and AFT (with covariates), respectively, where the latter further includes age and sex as covariates. Table 2 reports the estimated causal effects of BMI on the two time-to-event outcomes. For interpretability, the estimates are presented on the exponentiated scale, and the corresponding standard errors are obtained via the delta method. For gastritis and duodenitis, all three GEL-based estimators (CUE, EL, ET) yield highly consistent results, with estimated effects ranging from exp( ̂ β) = 0.836 to 0.842. These estimates imply that a one-unit increase in the exposure multiplies the time to onset by approximately 0.84, corresponding to an average 16% shorter time to onset on the multiplicative scale. In contrast, the AFT estimator produces an effect estimate extremely close to one, suggesting almost no detectable association, which is likely attributable to residual confounding not adequately addressed by the standard AFT specification. We also conduct two diagnostic methods to test whether the identification assumption and the moment conditions are satisfied in UK Biobank data. Both test results support the validity of the model. In Table 2, pF denotes the p-value of the 23 Table 2: Estimated causal effect of BMI on two survival outcomes, with exponentiated coefficients and standard errors. pF and pover-id represent the p value for heteroskedasticity-robust F test and overidentification test, respectively. Gastritis and Duodenitis exp (̂β) SE pF pover-id 
+
+CUE 0.8418 0.0163 <0.001 0.605 EL 0.8414 0.0117 0.652 ET 0.8365 0.0156 0.796 AFT (without covariates) 0.9960 0.0013 - -AFT (with covariates) 0.9957 0.0014 - -Ischemic Heart Disease exp (̂β) SE pF pover-id 
+
+CUE 0.8370 0.1490 <0.001 0.303 EL 0.8431 0.0169 0.893 ET 0.8041 0.0351 0.690 AFT (without covariates) 0.9771 0.0014 - -AFT (with covariates) 0.9763 0.0014 - -heteroskedasticity-robust F test (White, 1980; MacKinnon and White, 1985), which is used to assess the interaction relevance assumption. The test results strongly rejects the null hypothesis of no interaction effects, indicating that at least one constructed interaction term is correlated with the exposure. In addition, the overidentification test does not show systematic rejection, providing no evidence against the imposed moment conditions. For ischemic heart disease, the pattern is similar. The GEL estimators produce multiplicative effects between exp( ̂ β) = 0.804 and 0.834, indicating that each one-unit increase in the exposure corresponding to an approximately 17% shorter time to onset. Again, the AFT model yields an estimate near one, substantially attenuated relative to the GEL-based results. This attenuation suggests that the traditional AFT model fails to fully account for unmeasured confounding, leading to underestimation of the true causal effect. The close agreement among CUE, EL, and ET further demonstrates the robustness of our proposed AIPCW-GEL framework in capturing meaningful causal signals across both outcomes. 
+
+# 9 Discussion 
+
+This paper studies causal inference for time-to-event outcomes under right censoring when many candidate instruments may be weak and invalid. We propose a generalized structural accelerated failure time model that generalizes the classical SAFT framework to accommodate potential weak and invalid IVs. Within this framework, we develop a censoring-adjusted moment construction that allows for right censoring. Identification is 24 achieved by exploiting interaction-based moment restrictions, which remain informative even under weak instrument strength and invalidity. Estimation and inference are conducted using generalized empirical likelihood, enabling the combination of many moments and delivering stable performance in the many weak instrument settings. We establish the large-sample properties of the proposed estimator, and demonstrate its finite sample and empirical performance through simulation studies and an application to the UK Biobank. Several directions merit further investigation. First, under weak moment conditions, the existence and characterization of a variance lower bound is still unclear and warrants further investigation. Second, an important direction is to extend the proposed framework to other survival models, such as structural Cox model (Wang et al., 2023) and semiparametric AFT model (Huling et al., 2019). More broadly, it would be of interest to develop data-adaptive procedures for selecting or weighting interaction terms in very large genetic data, with finite sample guarantees in regimes where the number of candidate interactions grows rapidly with sample size. 
+
+# References 
+
+Angrist, J. D. and Krueger, A. B. (2001). Instrumental variables and the search for identification: From supply and demand to natural experiments. Journal of Economic Perspectives , 15(4):69–85. Bang, H. and Robins, J. M. (2005). Doubly robust estimation in missing data and causal inference models. Biometrics , 61(4):962–973. Bickel, P. J., Klaassen, C. A., Bickel, P. J., Ritov, Y., Klaassen, J., Wellner, J. A., and Ritov, Y. (1993). Efficient and adaptive estimation for semiparametric models ,volume 4. Springer. Bowden, J., Davey Smith, G., Haycock, P. C., and Burgess, S. (2016). Consistent estimation in mendelian randomization with some invalid instruments using a weighted median estimator. Genetic Epidemiology , 40(4):304–314. Bowden, J., Smith, G. D., and Burgess, S. (2015). Mendelian randomization with invalid instruments: effect estimation and bias detection through Egger regression. 
+
+International Journal of Epidemiology , 44(2):512–525. Buckley, J. and James, I. (1979). Linear regression with censored data. Biometrika ,66(3):429–436. 25 Burgess, S. and Thompson, S. G. (2011). Bias in causal estimates from mendelian randomization studies with weak instruments. Statistics in Medicine , 30(11):1312– 1323. Cai, T., Huang, J., and Tian, L. (2009). Regularized estimation for the accelerated failure time model. Biometrics , 65(2):394–404. Chernozhukov, V., Chetverikov, D., Demirer, M., Duflo, E., Hansen, C., Newey, W., and Robins, J. (2018). Double/debiased machine learning for treatment and structural parameters. The Econometrics Journal , 21(1):C1–C68. Cox, D. R. (1972). Regression models and life-tables. Journal of the Royal Statistical Society Series B: Statistical Methodology , 34(2):187–202. Cui, Y., Kosorok, M. R., Sverdrup, E., Wager, S., and Zhu, R. (2023). Estimating heterogeneous treatment effects with right-censored data via causal survival forests. 
+
+Journal of the Royal Statistical Society Series B , 85(2):179–211. Dabrowska, D. M. (1989). Uniform consistency of the kernel conditional Kaplan-Meier estimate. The Annals of Statistics , 17(3):1157–1167. Davies, N. M., von Hinke Kessler Scholder, S., Farbmacher, H., Burgess, S., Windmeijer, F., and Smith, G. D. (2015). The many weak instruments problem and mendelian randomization. Statistics in Medicine , 34(3):454–468. Dey, R., Zhou, W., Kiiskinen, T., Havulinna, A., Elliott, A., Karjalainen, J., Kurki, M., Qin, A., FinnGen, Lee, S., et al. (2022). Efficient and accurate frailty model approach for genome-wide survival association analysis in large-scale biobanks. Nature Communications , 13(1):5437. Ertefaie, A., Nguyen, A. P., Harding, D. J., Morenoff, J. D., and Yang, W. (2018). Instrumental variable analysis with censored data in the presence of many weak instruments: application to the effect of being sentenced to prison on time to employment. The Annals of Applied Statistics , 12(4):2647–2673. Fan, J. and Datta, S. (2011). Fitting marginal accelerated failure time models to clustered survival data with potentially informative cluster size. Computational Statistics & Data Analysis , 55(12):3295–3303. Fan, J. and Li, R. (2001). Variable selection via nonconcave penalized likelihood and its oracle properties. Journal of the American Statistical Association , 96(456):1348–1360. Han, C. (2008). Detecting invalid instruments using LASSO and other shrinkage estimators. Econometric Theory , 24(4):1114–1147. 26 Hansen, L. P. (1982). Large sample properties of generalized method of moments estimators. Econometrica , 50(4):1029–1054. He, X., Wang, L., and Hong, H. G. (2013). Quantile-adaptive model-free variable screening for high-dimensional heterogeneous data. The Annals of Statistics , 41(1):342– 369. Hernán, M. A., Cole, S. R., Margolick, J., Cohen, M., and Robins, J. M. (2005). Structural accelerated failure time models for survival analysis in studies with time-varying treatments. Pharmacoepidemiology and Drug Safety , 14(7):477–491. Hoerl, A. E. and Kennard, R. W. (1970). Ridge regression: biased estimation for nonorthogonal problems. Technometrics , 12(1):55–67. Huling, J. D., Yu, M., and O’Malley, A. J. (2019). Instrumental variable based estimation under the semiparametric accelerated failure time model. Biometrics , 75(2):516–527. Imbens, G. W. (2002). Generalized method of moments and empirical likelihood. Journal of Business & Economic Statistics , 20(4):493–506. Jin, Z., Lin, D., Wei, L., and Ying, Z. (2003). Rank-based inference for the accelerated failure time model. Biometrika , 90(2):341–353. Kang, H., Zhang, A., Cai, T., and Small, D. S. (2016). Instrumental variables estimation with some invalid instruments and its application to mendelian randomization. Journal of the American Statistical Association , 111(513):132–144. Katan, M. B. (1986). Apolipoprotein E isoforms, serum cholesterol, and cancer. The Lancet , 327(8479):507–508. Kitamura, Y. and Stutzer, M. (1997). An information-theoretic alternative to generalized method of moments estimation. Econometrica , 65(4):861–874. Kitamura, Y., Tripathi, G., and Ahn, H. (2004). Empirical likelihood-based inference in conditional moment restriction models. Econometrica , 72(6):1667–1714. Kolesár, M., Chetty, R., Friedman, J., Glaeser, E., and Imbens, G. W. (2015). Identification and inference with many invalid instruments. Journal of Business & Economic Statistics , 33(4):474–484. Lewbel, A. (2012). Using heteroscedasticity to identify and estimate mismeasured and endogenous regressor models. Journal of Business & Economic Statistics , 30(1):67–80. 27 Liu, Z., Ye, T., Sun, B., Schooling, M., and Tchetgen Tchetgen, E. (2023). Mendelian randomization mixed-scale treatment effect robust identification and estimation for causal inference. Biometrics , 79(3):2208–2219. Locke, A. E., Kahali, B., Berndt, S. I., Justice, A. E., Pers, T. H., Day, F. R., Powell, C., Vedantam, S., Buchkovich, M. L., Yang, J., et al. (2015). Genetic studies of body mass index yield new insights for obesity biology. Nature , 518(7538):197–206. MacKinnon, J. G. and White, H. (1985). Some heteroskedasticity-consistent covariance matrix estimators with improved finite sample properties. Journal of Econometrics ,29(3):305–325. Newey, W. K. and Smith, R. J. (2004). Higher Order Properties of GMM and Generalized Empirical Likelihood Estimators. Econometrica , 72(1):219–255. Newey, W. K. and Windmeijer, F. (2009). Generalized method of moments with many weak moment conditions. Econometrica , 77(3):687–719. Neyman, J. (1959). Optimal asymptotic tests of composite statistical hypotheses. 
+
+Probability and Statistics , 57:213. Neyman, J. (1979). c(α) tests and their use. Sankhyā , pages 1–21. Nie, H., Cheng, J., and Small, D. S. (2011). Inference for the effect of treatment on survival probability in randomized trials with noncompliance and administrative censoring. Biometrics , 67(4):1397–1405. Owen, A. B. (1988). Empirical likelihood ratio confidence intervals for a single functional. 
+
+Biometrika , 75(2):237–249. Owen, A. B. (2001). Empirical Likelihood . Chapman and Hall/CRC. Purcell, S., Neale, B., Todd-Brown, K., Thomas, L., Ferreira, M. A., Bender, D., Maller, J., Sklar, P., De Bakker, P. I., Daly, M. J., et al. (2007). PLINK: a tool set for whole-genome association and population-based linkage analyses. The American Journal of Human Genetics , 81(3):559–575. Qin, J. and Lawless, J. (1994). Empirical likelihood and general estimating equations. 
+
+The Annals of Statistics , 22(1):300–325. Robins, J. (1992). Estimation of the time-dependent accelerated failure time model in the presence of confounding factors. Biometrika , 79(2):321–334. Robins, J. M. (1993). Analytic methods for estimating hiv-treatment and cofactor effects. In Methodological Issues in AIDS Behavioral Research , page 213. 28 Robins, J. M. and Rotnitzky, A. (1992). Recovery of information and adjustment for dependent censoring using surrogate markers. In AIDS Epidemiology: Methodological Issues , pages 297–331. Springer. Robins, J. M., Rotnitzky, A., and Zhao, L. P. (1994). Estimation of regression coefficients when some regressors are not always observed. Journal of the American Statistical Association , 89(427):846–866. Robins, J. M. and Tsiatis, A. A. (1991). Correcting for non-compliance in randomized trials using rank preserving structural failure time models. Communications in Statistics-Theory and Methods , 20(8):2609–2631. Rubin, D. B. (1974). Estimating causal effects of treatments in randomized and nonrandomized studies. Journal of Educational Psychology , 66(5):688. Sargan, J. D. (1958). The estimation of economic relationships using instrumental variables. Econometrica , 26(3):393–415. Smith, G. D. and Ebrahim, S. (2003). Mendelian randomization: can genetic epidemiology contribute to understanding environmental determinants of disease? 
+
+International Journal of Epidemiology , 32(1):1–22. Smith, R. J. (1997). Alternative semi-parametric likelihood approaches to generalised method of moments estimation. The Economic Journal , 107(441):503–519. Solovieff, N., Cotsapas, C., Lee, P. H., Purcell, S. M., and Smoller, J. W. (2013). Pleiotropy in complex traits: challenges and strategies. Nature Reviews Genetics ,14(7):483–495. Spiller, W., Slichter, D., Bowden, J., and Davey Smith, G. (2019). Detecting and correcting for bias in mendelian randomization analyses using gene-by-environment interactions. International Journal of Epidemiology , 48(3):702–712. Staiger, D. and Stock, J. H. (1997). Instrumental variables regression with weak instruments. Econometrica , 65(3):557–586. Stock, J. H., Wright, J. H., and Yogo, M. (2002). A survey of weak instruments and weak identification in generalized method of moments. Journal of Business & Economic Statistics , 20(4):518–529. Sudlow, C., Gallacher, J., Allen, N., Beral, V., Burton, P., Danesh, J., Downey, P., Elliott, P., Green, J., Landray, M., Liu, B., Matthews, P., Pell, J., Silman, A., Young, A., Ong, G., Sprosen, T., Peakman, T., and Collins, R. (2015). UK Biobank: An open access 29 resource for identifying the causes of a wide range of complex diseases of middle and old age. PLoS Medicine , 12(3):e1001779. Sun, B., Cui, Y., and Tchetgen, E. T. (2022). Selective machine learning of the average treatment effect with an invalid instrumental variable. Journal of Machine Learning Research , 23(204):1–40. Tang, N., Yan, X., and Zhao, X. (2020). Penalized generalized empirical likelihood with a diverging number of general estimating equations for censored data. The Annals of Statistics , 48(1):607–627. Tchetgen Tchetgen, E., Sun, B., and Walter, S. (2021). The GENIUS approach to robust mendelian randomization inference. Statistical Science , 36(3):443–464. Tibshirani, R. (1996). Regression shrinkage and selection via the lasso. Journal of the Royal Statistical Society: Series B , 58(1):267–288. Vandebosch, A., Goetghebeur, E., and Van Damme, L. (2005). Structural accelerated failure time models for the effects of observed exposures on repeated events in a clinical trial. Statistics in Medicine , 24(7):1029–1046. Verbanck, M., Chen, C.-Y., Neale, B., and Do, R. (2018). Detection of widespread horizontal pleiotropy in causal relationships inferred from mendelian randomization between complex traits and diseases. Nature Genetics , 50(5):693–698. Wang, L., Tchetgen Tchetgen, E., Martinussen, T., and Vansteelandt, S. (2023). Instrumental variable estimation of the causal hazard ratio. Biometrics , 79(2):539– 550. White, H. (1980). A heteroskedasticity-consistent covariance matrix estimator and a direct test for heteroskedasticity. Econometrica , 48(4):817–838. Ye, T., Liu, Z., Sun, B., and Tchetgen Tchetgen, E. (2024). GENIUS-MAWII: for robust Mendelian randomization with many weak invalid instruments. Journal of the Royal Statistical Society Series B: Statistical Methodology , 86(4):1045–1067. Ye, T., Shao, J., and Kang, H. (2021). Debiased inverse-variance weighted estimator in two-sample summary-data mendelian randomization. The Annals of Statistics ,49(4):2079–2100. Zhang, C.-H. (2010). Nearly unbiased variable selection under minimax concave penalty. 
+
+The Annals of Statistics , 38(2):894–942. Zhang, D., Yao, M., Liu, Z., and Sun, B. (2025). Mr-magic: Robust causal inference using many weak genetic interactions. arXiv preprint arXiv:2504.13565 .30 Zhao, Q., Wang, J., Hemani, G., Bowden, J., and Small, D. S. (2020). Statistical inference in two-sample summary-data Mendelian randomization using robust adjusted profile score. The Annals of Statistics , 48(3):1742–1769. Zou, H. (2006). The adaptive lasso and its oracle properties. Journal of the American Statistical Association , 101(476):1418–1429. 31

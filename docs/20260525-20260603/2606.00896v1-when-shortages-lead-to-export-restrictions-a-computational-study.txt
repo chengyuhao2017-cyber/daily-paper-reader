@@ -1,0 +1,1826 @@
+Title: When Shortages Lead to Export Restrictions: A Computational Study
+
+URL Source: https://arxiv.org/pdf/2606.00896v1
+
+Published Time: Tue, 02 Jun 2026 01:03:33 GMT
+
+Number of Pages: 43
+
+Markdown Content:
+# When Shortages Lead to Export Restrictions: A Computational Study 
+
+Martha L. Sabogal De La Pava a, Emily L. Tucker a, and Yongjia Song aa Industrial Engineering Department, Clemson University, Clemson, United States 
+
+Abstract 
+
+Globalization has enabled companies to leverage cost efficiencies; however, it has increased exposure to disruption risks that threaten supply stability. Among these, export bans have emerged as a systemic challenge, often arising as a secondary effect of conventional supply capacity disruptions. The pharmaceutical industry is particularly vulnerable to bans because of the criticality of keeping life-saving medications available, yet such disruptions also jeopardize patient health globally as well as challenge company operations. This paper proposes a supply chain design model that incorporates the re-lationship between conventional disruption risks (quality-related capacity failures and natural disasters) and export bans that may be induced when the drug is projected to be in short supply. The model is a two-stage stochastic mixed integer program, where the systemic setting yields a second-stage problem with one binary variable and contin-uous variables. The structure motivates the study of three tailored solution methods: the Alternating Integer L-shaped Cut, Alternating Disjunctive Cut, and Alternating Bilinear Cut methods. In the nearly-continuous second stage context, the Alternating Integer L-shaped cuts perform best. Using an oncology drug case study, we study ef-fects of systemic, induced risk and quantify the value of incorporating disruptions into supply chain design. 
+
+# 1 Introduction 
+
+Pharmaceutical supply chains are global operations that serve patients worldwide. The generic pharmaceutical industry, where multiple companies may produce equivalent prod-ucts, operates in a particularly lean setting due to the underlying economics, where redun-dancy may not be cost-effective (Zhao, 2023; Tucker et al., 2020). The supply chains also tend to be more rigid than in other industries because of safety regulations. As a result, the ability to meet consumer demands is highly dependent on the structure of the supply chain, which is decided far ahead of disruptions. The global setting exposes generic pharmaceutical supply chains to conventional dis-ruptions such as natural disasters or quality disruptions, where plants may be closed for years due to contamination or other risks. For example, contamination risks led to plant 1
+
+> arXiv:2606.00896v1 [math.OC] 30 May 2026
+
+closures in India and widespread oncology drug shortages (Mosbergen and Abbott, 2023), and a tornado shut down a major plant in North Carolina, wiping products off of wholesaler shelves (Lovelace, 2023). These shortages may last for years because of the challenge of recovering and qualifying facilities. Yet, the criticality of life-saving medications has also led to countries to impose or threaten to impose export bans during shortages. These are intended to keep the limited supply available in-country. Bulgarian regulations, for example, stipulate that if the avail-ability of a specific drug falls below 65% of the domestic demand for a period of one month, local authorities may impose export bans on that drug (Bulgarian Drug Agency, 2024); they imposed export bans on insulin and children’s antibiotics in 2024 (Nikolov, 2024). India, Canada, and Italy have threatened similar policies. The risk of export bans imposed by multiple countries due to shortages behaves as an induced systemic disruption, where a conventional disruption, such as a hurricane, may trigger a large-scale, global disruption. Existing supply chain models that include disruptions generally parameterize a single, generic disruption parameter (Snyder et al., 2016; Aldrighetti et al., 2021) and fail to ac-count for simultaneous disruption risks (Ghadge et al., 2022). In the current global setting, supply chain risk is multi-faceted (Shekarian and Mellat Parast, 2021). The uniqueness of the pharmaceutical industry, including the potential for induced export bans, motivates a new study on global supply chain planning with disaggregated disruption dynamics, in-cluding the new prominence of induced disruptions. These disruptions include regional risks (e.g., natural disasters); facility-specific risks that are affected by quality investments; and geopolitical risks such as export bans that are affected by supply decisions and pro-jected shortages. Disaggregating disruptions by source of strain may be critical to develop appropriate supply chain plans in the new era of integrated global disruption risks. In this paper, we propose a two-stage stochastic mixed-integer programming model for the problem of global pharmaceutical supply chain design under conventional and systemic disruptions. It includes: (i) quality-related capacity disruptions, (ii) correlated disruptions due to natural disasters, and (iii) export bans that are induced by projected drug shortages. A key feature of the proposed model is its approach to mathematically formulate the systemic shock of the export ban activation, which results in a special second-stage problem containing continuous variables and a single binary variable per scenario. The general 2case of two-stage stochastic programming with a second-stage mixed-integer program is challenging, and existing methods have been studied for problems with a general number of binary and/or integer variables (van der Laan and Romeijnders, 2024). The unique structure of the pharmaceutical export ban setting, however, allows us to develop tailored cutting plane generation methods. In this work, we evaluate the computational performance of three cutting plane methods based on a Benders-style decomposition framework, and the key contributions of this paper are as follows. 
+
+• It introduces the first supply chain design model in which export bans are a response to projected shortages, stemming from facility quality failures, natural disasters, and supply-demand mismatches. 
+
+• It evaluates the computational performance of three cutting plane methods for solving a two-stage mixed-integer stochastic program with pure binary first-stage decisions and one binary variable and continuous variables per scenario in the second stage. 
+
+• It assesses the value of incorporating systemic and conventional disruption risks into the supply chain planning context by quantifying the benefits of planning for in-dividual disruption risks and their combinations. It further identifies the types of disruptions that have the most influence on supply chain design decisions using a case study in the pharmaceutical industry. 
+
+# 2 Literature Review 
+
+We first review literature related to risks of geopolitical strain, facility quality failures, and natural disasters in the context of supply chain design. Then, we present literature on algorithms for solving two-stage stochastic mixed-integer programs. Research on supply chain design under disruption risks is extensive (see, e.g., reviews by Katsaliaki et al. (2022); Suryawanshi and Dutta (2022)). In this context, disruptions are commonly categorized based on geographic impact as local (e.g., failure in a facility), 
+
+regional (e.g., natural disasters affecting multiple components in a supply chain), and global 
+
+(e.g., major strikes and pandemics) (Roshani et al., 2024). The majority of existing studies focus on local disruptions (Roshani et al., 2024). Typically, design optimization models do not integrate multiple types of disruptions (Ghadge et al., 2022) and are often included 3using a single parameter (Snyder et al., 2016; Aldrighetti et al., 2021), representing partial or complete failures of suppliers, facilities, links, and networks (Hart Nibbrig et al., 2025). Geopolitical risks such as wars, political instability, and terrorism may lead to strikes, trade restrictions, and regulatory barriers that may disrupt supply chain operations (Roscoe et al., 2022). Despite their growing relevance, research on these risks remains limited (Bed-narski et al., 2025). Most studies are in the operations management literature, including frameworks such as diffusion style models, variational inequality approaches, and empirical studies (Bednarski et al., 2025); and focus on specific industries, e.g., lithium-ion batteries (Ren et al., 2024), medical goods (Grassia et al., 2021), semiconductors (Tse et al., 2024), and agriculture (Hassani et al., 2025). Optimization-based models that incorporate geopo-litical risks into supply chain design are largely underexplored. One exception is proposed by Sabogal De La Pava and Tucker (2025). They model export bans as an uncertain, ex-ogenous parameter based on the realized availability of raw materials; this represents one leading indicator of potential shortages. Building on this idea, our work increases realism by modeling export bans as triggered when shortages themselves are projected to occur, which reflects what decision-makers may focus on when making decisions to activate bans. While shortages are regularly included within optimization models with a penalty cost (Guo et al., 2025), our approach links projected shortages to a new risk: induced disruptions. Quality is a traditional performance indicator for supply chain design (Maharjan and Kato, 2022), and extensive research has focused on integrating quality concerns into supply chain design models (e.g., Franca et al. (2010); Ramezani et al. (2013)). In the context of facility disruptions, some studies have explicitly considered quality failures and quality levels in their modeling approaches (e.g., Madadi et al. (2014); Tucker and Daskin (2022)). These studies show the value of considering quality-related factors in enhancing supply chain reliability and reducing shortages. Our paper includes facility disruptions as a func-tion of the selected quality levels, where higher-quality facilities are assumed to be more reliable. This relates to the reliable network design and infrastructure protection literature, in which a facility’s post-disruption capacity depends on protection investment decisions (e.g., Bhuiyan et al. (2020); Hu and Tang (2025)). One difference, however, between infras-tructure and supply chain planning is that infrastructure planning focuses on access, while for-profit supply chains (like our problem setting) prioritize profitability. 4Natural disasters can induce correlations in disruptions across facilities (Wang and Zhong, 2024), and they are often studied in the context of reliable facility location. The two main approaches to incorporate correlated disruptions are the use of supporting sta-tion models and shared hazards with propagation effects. In a supporting station modeling approach, the interdependent and positively correlated facility failures are transformed into a supporting structure with i.i.d. disruptions. A pioneering paper in this line of research is from Li et al. (2013) with extensions that consider probabilistic (Xie et al., 2015) and gen-eralized correlation patterns (Xie et al., 2019). A shared hazard exposure and propagation approach is proposed by Li and Ouyang (2010), considering spatially correlated disrup-tions (e.g., based on distance) with site-dependent disruption probabilities in a continuum approximation model. Lu et al. (2015) and Li and Zhang (2018) extend this research by considering a distributionally robust optimization approach and a stochastic programming framework, respectively. Alternative approaches are also possible, e.g., Liberatore et al. (2012) present a tri-level fortification model with a correlation matrix. Research on phar-maceutical supply chains with correlated disruptions is limited (Hasani and Khosrojerdi, 2016; Pariazar et al., 2017), and in general, the challenge of including correlated disrup-tions in optimization models is computational tractability (Xie et al., 2019). These aspects motivate further study on computational performance when correlated disruptions are in-tegrated into new model structures, as in this paper, where strategic facility choices with correlated disruption risks may induce a systemic disruption. The model we present is a two-stage stochastic mixed-integer program, and this struc-ture has been used to model a wide range of problems, including the supply chain design problem (K¨ u¸ c¨ ukyavuz and Sen, 2017). These models can be challenging to solve as they combine the complexities of solving integer programs, such as non-convexity and disconti-nuity, with the large-scale context of stochastic programs (Keller and Bayraksan, 2012). When integer variables are only in the first stage and the second-stage problems are linear programs, Benders decomposition (also called the L-shaped method) can be applied since the recourse function is convex and can be approximated by piecewise linear func-tions (Birge and Louveaux, 2011). When there are integer variables in both stages, these properties do not hold, and to solve these programs, modified Benders decomposition and dual decomposition are the most common approaches (Chen and Luedtke, 2022). 5There is growing research on cutting planes to improve Benders-style decompositions. We focus our discussion on these methods. A seminal work by Laporte and Louveaux (1993) proposes the integer L-shaped method for stochastic programs with binary first-stage variables and arbitrary second-stage variables. When the second-stage problem (also called subproblem) is a mixed-integer program, the integer L-shaped method requires the exact solution of the subproblem. To improve this method, Angulo et al. (2016) propose the alternating cuts strategy and the use of a cut-generating linear program-based optimality cuts. The alternating strategy aims to reduce the expensive evaluation of the second-stage value function by alternating between solving linear and mixed-integer subproblems. The new optimality cuts enhance the approximation of the value function. Another approach is disjunctive decomposition, where disjunctive programming theory is used to convexify the mixed-integer feasible region of the second-stage problem (Sen and Higle, 2005). Disjunctive decomposition solves the linear relaxation of the subproblem. This provides a computational advantage over the integer L-shaped method, which requires solving the subproblem as a mixed-integer program. However, when solving the subproblem relaxation, if the solution does not satisfy the integrality constraints, a cut-generating problem needs to be solved to find a disjunctive cut (Keller and Bayraksan, 2012). In particular, Sen and Sherali (2006) propose to combine disjunctive decomposition with the branch-and-cut method; the method adds disjunctive cuts formed on the subproblems’ value functions to the master problem. Gomory cuts can also be used within a Benders framework. For instance, Gade et al. (2014) propose an algorithm to solve stochastic programs with pure binary first-stage and integer second-stage variables, and Zhang and K¨ u¸ c¨ ukyavuz (2014) propose an algorithm for the general pure integer case in both stages. van der Laan and Romeijnders (2024) focus on a general two-stage stochastic mixed-integer model and introduce scaled cuts that can be used to recover the convex envelope of the expected second-stage objective function. In summary, this paper contributes to the literature with a supply chain design model that considers multiple sources of disruptions within a unified framework, including emerg-ing threats of shortage-induced export bans, and provides a computational study of three cutting plane methods to solve a two-stage stochastic program with pure binary first-stage variables and a second stage with continuous variables and one binary variable per scenario. 63 Model Description 
+
+The model takes the perspective of a generic pharmaceutical company that seeks to maxi-mize its expected profit by producing and selling a drug under conventional and systemic disruptions and operational uncertainty. It is formulated as a two-stage stochastic program. In the first stage, the company selects the location and quality level of its manufacturing plants ( yjl ∈ { 0, 1} for each candidate plant j ∈ J and quality level l ∈ L). Then, all uncer-tainty is realized. In each second-stage scenario ( ω ∈ Ω), the company orders raw materials (uωij ) based on the production plan ( xωj ), transships between plants ( τ ωjj ′ ), and produces the finished product and ships to customers ( vωjk ), indexed by supplier i ∈ I, candidate plant 
+
+j ∈ J, and country with demand k ∈ K.The new feature is the risk of induced export bans. The company’s ability to ship finished product from a plant where it was manufactured to other countries (i.e., exports) depends on if the country in which it was manufactured allows exports of the drug. We model export ban activation following the threshold-based design of drug shortage-related export ban policies (e.g., Bulgarian Drug Agency (2024)). At a high-level, if a country 
+
+j has an exogenous export ban policy ( j ∈ ¯J ⊆ J), then the country j will impose an export ban if the projected global drug supply is below a threshold on the nominal global drug availability . The projected global drug supply is based on the (i) company’s projected production, considering conventional disruptions and operational uncertainty and (ii) the exogenous drug production from other companies that produce the drug. Nominal global drug availability is based on a model without disruptions. Because export ban thresholds may be written into law, the activation is modeled as a second-stage decision; the company whose perspective we take has information on how their choices will contribute to the projected global supply and whether there will be a resulting systemic disruption. Export allowability is expressed with the decision variable, zω ∈ { 0, 1} where a value of 1 allows exports and 0 bans exports from all countries in set ¯J in scenario ω ∈ Ω, representing a systemic, induced disruption. The resulting model is a two-stage mixed-integer stochastic program with binary first-stage variables and a second-stage with continuous variables and a single binary variable per scenario (i.e., the export ban activation). Next, we discuss the disruption and operational uncertainty in more detail. There are two types of conventional capacity disruptions that represent long-term facility closures: 7Table 1: Optimization Model Notation 
+
+Sets 
+
+I supplier countries. 
+
+J potential countries to locate a manufacturing plant. ¯J countries that ban exports, where ¯J ⊆ J.
+
+K countries with drug demand, where I ⊆ K and J ⊆ K.
+
+L levels of manufacturing plant quality. Ω scenarios. 
+
+Parameters 
+
+ϱω probability of scenario ω ∈ Ω. 
+
+csi unit cost of raw material purchased from supplier i ∈ I.
+
+cpj unit drug production cost at plant j ∈ J.
+
+cfjl annualized fixed cost to produce drug at plant j ∈ J with quality l ∈ L.
+
+ctkk ′ unit transportation cost from country k ∈ K to country k′ ∈ K.
+
+chj unit excess raw material holding cost in plant j ∈ J.
+
+pk drug’s unit price in country k ∈ K.
+
+qsi drug capacity of supplier i ∈ I.
+
+qpj drug capacity of plant j ∈ J.
+
+ηk exogenous drug exports from country k ∈ K.¯g nominal global drug production. 
+
+r sensitivity threshold for the nominal global drug availability. 
+
+Random Parameters (All associated with a scenario index ω)
+
+Operational Uncertainty 
+
+γs,ω i proportion of capacity of supplier i ∈ I that is available (operational strain). 
+
+γp,ω jl proportion of capacity of plant j ∈ J with quality l ∈ L that is available (operational strain). 
+
+dωk company-experienced drug demand in country k ∈ K.
+
+Disruption Risks 
+
+ξnd,ω k binary parameter that equals 1 if capacity in country k ∈ K is not disrupted by natural disasters. 
+
+ξqs,ω i binary parameter that equals 1 if supplier i ∈ I does not experience a quality-type disruption. 
+
+ξqp,ω jl binary parameter that equals 1 if plant j ∈ J with quality l ∈ L does not experience a quality-type disruption. 
+
+Decision Variables 
+
+First-Stage 
+
+yjl binary variable that equals 1 if plant j ∈ J with quality l ∈ L is selected and 0 otherwise. 
+
+Second-Stage (All associated with a scenario index ω)
+
+uωij raw material purchased from supplier i ∈ I and sent to plant j ∈ J.
+
+xωj planned drug production in plant j ∈ J.
+
+τ ωjj ′ raw materials transshipped from plant j ∈ J to plant j′̸ = j ∈ J.
+
+eωj excess raw materials in plant j ∈ J.
+
+vωjk drugs produced by plant j ∈ J and sent to country k ∈ K.
+
+zω auxiliary binary variable that equals 0 if countries in set ¯J impose export bans. 
+
+quality disruptions and disruptions due to natural disasters (e.g., Mosbergen and Abbott (2023); Lovelace (2023)). Both are modeled as a binary parameter where a value of 1 represents availability, and 0 represents a disruption. Quality disruptions may occur at suppliers ( ξqs,ω i = 0 , i ∈ I) or at plants with a selected quality level ( ξqp,ω jl = 0 , j ∈ J, l ∈ L). The probability of a quality disruption at a plant j ∈ J varies by the selected quality level l ∈
+
+8L (yjl ) where higher quality plants experience fewer disruptions. Natural disaster-induced disruptions ( ξnd,ω k ) may occur at suppliers k ∈ I ⊆ K and at plants k ∈ J ⊆ K if they are in a country affected by a natural disaster. Natural disaster-induced disruptions are correlated, following the shared hazard and propagation approach: if a natural disaster occurs, it may propagate to countries with shared hazards, and facilities within affected countries may be disrupted. Conventional operational uncertainty is represented by operational strain at suppliers and plants (i.e., the proportion of capacity that is available at supplier i (γs,ω i ) and plant j (γp,ω jl ) with quality level l, for all i ∈ I, j ∈ J, l ∈ L) as well as company-experienced demand ( dωk ) in country k ∈ K. Further details are in the supplementary materials (S1). Export bans are then an induced, systemic response to realized conventional disruptions and operational uncertainty; the relationship is given in Inequality (1). 
+
+X
+
+> j∈J
+
+xωj + X
+
+> k∈K
+
+ξnd,ω k ηk < r ¯g ⇒ zω = 0 , ω ∈ Ω. (1) The left-hand side represents the projected worldwide drug supply in a scenario ω ∈ Ω. The first term is the company’s planned production, xωj , at plant j ∈ J based on the realized natural disasters, quality disruptions, and operational uncertainty. The second term represents total production of the drug from other companies manufacturing in country 
+
+k ∈ K that is not disrupted by a natural disaster; other companies’ production ηk is an exogenous parameter representing production that would nominally be exported from country k ∈ K if exports are allowed from k. The right-hand side represents the threshold for nominal global drug availability below which would activate an export ban for countries in ¯J. The nominal global drug availability, ¯ g, is the total drug production (company and others) under regular supply chain operations, i.e., when the model is optimized without disruptions (supplementary materials (S2)). The threshold r represents the sensitivity of countries in set ¯J to activating export bans; a higher value indicates higher sensitivity. For example, a threshold of r = 0 .8 indicates that if projected drug supply is below 80% of nominal supply, then there will be systemic bans. We draw attention to two subtleties with respect to how demand and export bans are defined. Countries in set ¯J are sensitive to the worldwide projected supply (1) that includes both the company’s production and other companies’ exogenous production; this reflects policymakers’ focus on availability of the drug from any manufacturer rather than from one 9in particular. In contrast, the company can sell up to a portion of the total demand, and this is expressed as the company-experienced demand, dωk , in country k ∈ K in scenario ω ∈ Ω. We further note that export bans are activated based on projected vs. nominal production rather than projected vs. 0% shortages because there may be production shortfalls even in the nominal case, due to the underlying economics of generic injectable drugs (Sabogal De La Pava and Tucker, 2025). 
+
+# 3.1 Model Formulation 
+
+Next, we present a two-stage stochastic program for the supply chain design of a generic injectable drug manufacturer considering conventional and systemic disruption risks (2). 
+
+max 
+
+> y
+
+(
+
+− X
+
+> j∈J
+
+X
+
+> l∈L
+
+cfjl yjl + X
+
+> ω∈Ω
+
+ϱω Qω (y)
+
+)
+
+(2a) s.t. X
+
+> l∈L
+
+yjl ≤ 1 ∀j ∈ J (2b) 
+
+yjl ∈ { 0, 1} ∀j ∈ J, l ∈ L (2c) 
+
+Qω (y) := max X
+
+> j∈J
+
+X
+
+> k∈K
+
+(pk − cpj − ctjk )vωjk − X
+
+> i∈I
+
+X
+
+> j∈J
+
+(csi + ctij )uωij − X
+
+> j∈J
+
+
+
+chj eωj + X 
+
+> j′̸=j∈J
+
+ctjj ′ τ ωjj ′
+
+
+
+(2d) s.t. X
+
+> j∈J
+
+uωij ≤ qsi γs,ω i ξnd,ω i ξqs,ω i ∀i ∈ I (2e) 
+
+xωj ≤ qpj ξnd,ω j
+
+X
+
+> l∈L
+
+γp,ω jl ξqp,ω jl yjl ∀j ∈ J (2f) 
+
+xωj = X
+
+> i∈I
+
+uωij ∀j ∈ J (2g) 
+
+X
+
+> j∈J
+
+xωj ≤ X
+
+> k∈K
+
+dωk (2h) 
+
+X
+
+> k∈K
+
+vωjk ≤ qpj ξnd,ω j
+
+X
+
+> l∈L
+
+γp,ω jl ξqp,ω jl yjl ∀j ∈ J (2i) 
+
+X
+
+> k∈K
+
+vωjk + eωj + X 
+
+> j′̸=j∈J
+
+τ ωjj ′ = X
+
+> i∈I
+
+uωij + X 
+
+> j′̸=j∈J
+
+τ ωj′j ∀j ∈ J (2j) 
+
+X 
+
+> j′̸=j∈J
+
+τ ωj′j ≤ M3
+
+X
+
+> l∈L
+
+yjl ∀j ∈ J (2k) 
+
+X
+
+> j∈J
+
+vωjk ≤ dωk ∀k ∈ K (2l) 
+
+r¯g − X
+
+> j∈J
+
+xωj + X
+
+> k∈K
+
+ξnd,ω k ηk
+
+!
+
+≤ M1(1 − zω ) (2m) 
+
+vωjk ≤ M2zω ∀j ∈ ¯J, k ̸ = j ∈ K (2n) 
+
+uωij , x ωj , e ωj , τ ωjj ′ , v ωjk ≥ 0 ∀i ∈ I, j ∈ J, j ′̸ = j ∈ J, k ∈ K (2o) 
+
+10 zω ∈ { 0, 1} (2p) 
+
+The objective of the model is to maximize the expected profit (2a). This includes the fixed costs of plants and the expected profit across scenarios ω ∈ Ω given by function Qω(y). The second-stage objective function (2d) considers the costs to produce and ship the finished form of the drug, the costs to purchase raw materials and ship them to plants, and excess costs of raw material and transshipment, respectively. In the first stage, constraints (2b) enforce that the drug can be produced in at most one plant in a given country, and (2c) enforce the variable domains. In the second stage, raw materials purchases (2e) and drug production plans (2f) are limited by the available capacity, which are affected by conventional disruptions (natural disasters and quality disruptions) and operational strain. Raw materials are purchased and shipped to plants to meet production plans (2g). Production plans cannot exceed company-experienced demand (2h). Constraints (2i) limit the actual drug production in each plant to the capacity available (affected by conventional disruptions and operational strain). Drugs are produced using raw materials at plant j ∈ J or obtained through transshipment between plants (2j). The transshipment of raw materials is allowed only between plants that are open (2k). Constraints (2l) ensure that the company does not produce and sell more drugs than company-experienced demand. Export bans are expressed with constraints (2m)–(2n) representing the relationship given in (1). That is, when the projected worldwide drug supply falls short of the threshold for the nominal global drug availability, the auxiliary binary variable zω is forced to be 0 (2m), and thereby, plants in countries in set ¯J are prevented from exporting drugs. Otherwise, zω may be 0 or 1 without influence (see supplementary materials (S3) for further details). Finally, constraints (2o) and (2p) enforce the variable domains. Note that we can set the big-M parameters as follows: M1 = r¯g, M2 = max {qpj |j ∈ J}, and M3 = P 
+
+> i∈I
+
+qsi .
+
+# 3.2 Model Features and Assumptions 
+
+First, the model only considers direct, first-order effects of export bans (i.e., the prohibition of international flows), as the focus of this paper is the study of systemic disruptions induced by conventional disruptions. Additional factors such as price increases (studied elsewhere, Sabogal De La Pava and Tucker (2025)) and second-order stochastic and competitive effects 11 of other companies’ response (unstudied elsewhere) are not included, e.g., other companies’ production is modeled as exogenous. Focusing on the first-order effects for a particular company allows the paper to study the fundamental relationships of induced disruptions as well as explore decomposition approaches for the unique model structure. The model applies a common global threshold for triggering such bans ( r); this could be relaxed by stratifying parameter r by j ∈ ¯J. We apply export bans exclusively to flows of final products (rather than raw materials) because these are the most affected by export prohibitions (WTO, 2022a,b). For simplicity, we assume that there is at most one supplier and one candidate plant location in each country, consistent with previous work (Sabogal De La Pava and Tucker, 2025); this assumption could be relaxed by adding sets of suppliers and candidate plant locations in each country. Finally, conventional and induced disruptions represent long-term capacity interruptions. This follows the real-world rigidity of recovering pharmaceutical supply chains, and the probability distributions used to parameterize them represent these low-likelihood but high-impact events (see supplementary materials (S4)). The model has fixed recourse and holds the complete recourse property because we allow shortages in the second stage. The recourse function Qω(y) < ∞ for all first-stage decisions 
+
+y and scenarios ω ∈ Ω because of demand and capacity constraints. In addition, Qω(y) ≥ 0since this is a maximization problem and there is always the option of not producing, i.e., 
+
+xωj = 0 for all j ∈ J, uωij = 0 for all i ∈ I, j ∈ J and vωjk = 0 for all j ∈ J, k ∈ K.
+
+# 4 Solution Methods 
+
+The proposed model (2) is a two-stage stochastic mixed-binary program with binary deci-sion variables in the first and second stages. Solving its deterministic equivalent formulation (also known as the extensive form) using advanced commercial solvers is computationally intractable when the number of scenarios |Ω| is large. To address this limitation, decom-position approaches can be used that iteratively solve smaller problems until convergence is reached. We use the unique structure of a single binary variable per scenario to adopt three Benders-style decomposition approaches. The core of the approach follows Benders decomposition. Program (2) is decomposed into a master problem, ( M P ), that contains first-stage variables and constraints (model (3)) and Benders subproblems, each with only second-stage variables and constraints for 12 a given scenario ( Qω(y)). The variable θω is an upper-estimator of Qω(y) and is used to approximate Qω(y) through cuts. These cuts are stored in the set O. We do not generate feasibility cuts because the problem has complete recourse (Section 3.2). We use the notation θ to represent the vector of all θω for ω ∈ Ω. 
+
+(M P ) : max  
+
+> y
+
+− X
+
+> j∈J
+
+X
+
+> l∈L
+
+cfjl yjl + X
+
+> ω∈Ω
+
+ϱω θω (3a) s.t. (2b) − (2c) (3b) (y, θ) ∈ O (3c) 
+
+We follow the alternating strategy proposed by Angulo et al. (2016). We first attempt to cut off an incumbent master solution using Benders (L-shaped) optimality cuts before trying to add other, more complex alternative cuts, such as integer L-shaped cuts, disjunctive cuts, or bilinear cuts. Note that given an incumbent master solution (ˆ y, ˆθω), the linear relaxation of subproblem Qω(ˆy) (denoted Qω
+
+> LP
+
+(ˆy)) provides an upper bound, i.e., Qω
+
+> LP
+
+(ˆy) ≥ Qω(ˆy). Then, a sufficient condition to reject (ˆ y, ˆθω) is ˆθω > Qω
+
+> LP
+
+(ˆy). If this condition is met, we add a Benders optimality cut of the form (4) to set O of the master problem ( M P ) to cut off this solution, ˆy. Otherwise, we seek to generate an alternative cut. We next describe the Benders optimality cut that will be used throughout the methods. Subproblem Qω(ˆy) is a mixed-binary program that contains a single binary variable ( zω). Relaxing the binary variable allows us to use duality to construct Benders optimality cuts (4) to obtain Qω
+
+> LP
+
+(ˆy), which is an upper bound for Qω(ˆy). 
+
+θω ≤ X
+
+> j∈J
+
+X
+
+> l∈L
+
+αωjl yjl + βω (4) The coefficients βω and αωjl are calculated using the optimal dual variables φ(·),ω of Qω
+
+> LP
+
+(ˆy)as follows, where ( ·) refers to the corresponding constraint in (2). 
+
+βω = X
+
+> i∈I
+
+φ(2e) ,ω i qsi γs,ω i ξnd,ω i ξsq,ω i + X
+
+> k∈K
+
+
+
+(φ(2h) ,ω + φ(2l) ,ω k )dωk + φ(2m) ,ω ηkξnd,ω k
+
+
+
+αωjl = qpj ξnd,ω j γp,ω jl ξpq,ω jl 
+
+ φ(2f) ,ω j + φ(2i) ,ω j
+
+ + φ(2k) ,ω j M3
+
+# 4.1 Integer L-shaped Cut 
+
+The integer L-shaped cut introduced by Laporte and Louveaux (1993) is designed to solve two-stage stochastic programs with binary first-stage decision variables (Angulo et al., 13 2016). This cut is given by (5) and requires the optimal objective value of the mixed-integer subproblem Qω(ˆy), as well as an upper bound U ω ∈ R on Qω(y). 
+
+θω ≤ Qω(ˆy) + ( U ω − Qω(ˆy)) 
+
+ X
+
+> (j,l ):ˆ yjl =0
+
+yjl + X
+
+> (j,l ):ˆ yjl =1
+
+(1 − yjl )
+
+ (5) 
+
+U ω = X
+
+> k∈K
+
+dωk
+
+ pk − min  
+
+> j∈J
+
+{cpj } − min  
+
+> i∈I
+
+{csi } (6) The upper bound U ω is defined as the total profit obtained by satisfying all demand, having the lowest possible raw material and production costs, and incurring no logistical costs (6). Note this bound is valid for instances where pk ≥ min j∈J {cpj } + min i∈I {csi }, ∀k ∈
+
+K, including those we study in the computational experiments. 
+
+Algorithm 1: Alternating Integer L-shaped Cut Method  
+
+> 1:
+
+Input: Incumbent solution ( ˆθ, ˆy) of ( M P ) 
+
+> 2:
+
+for ω ∈ Ω do  
+
+> 3:
+
+Solve Qω
+
+> LP
+
+(ˆy) 
+
+> 4:
+
+if ˆθω > Qω
+
+> LP
+
+(ˆy) then  
+
+> 5:
+
+Add a Benders optimality cut (4) to set O 
+
+> 6:
+
+if optimal zω ∈ { 0, 1} then  
+
+> 7:
+
+Add an integer L-shaped cut (5) to set O 
+
+> 8:
+
+end if  
+
+> 9:
+
+else  
+
+> 10:
+
+Solve Qω (ˆy) 
+
+> 11:
+
+if ˆθω > Qω (ˆy) then  
+
+> 12:
+
+Add an integer L-shaped cut (5) to set O 
+
+> 13:
+
+end if  
+
+> 14:
+
+end if  
+
+> 15:
+
+end for 
+
+Given an incumbent solution to the master problem (ˆ y, ˆθω), if ˆθω > Qω(ˆy), then an integer L-shaped cut (5) can be added to set O of ( M P ) to cut off that solution. Algorithm 1 presents a cutting plane method that alternates between Benders optimality cuts (4) and integer L-shaped cuts (5) to solve the proposed model (2). Note that if the auxiliary variable 
+
+zω is binary in the optimal solution of Qω
+
+> LP
+
+(ˆy), then an integer L-shaped cut (5) can be generated as a byproduct when attempting to add a Benders optimality cut. Numerical experiments indicate that, in this situation, it is more effective to add both the Benders and the integer L-shaped cuts rather than only one (see supplementary materials (S6)). 14 4.2 Disjunctive Cut 
+
+The unique characteristic of the second-stage problem, i.e., a single binary variable per scenario ω, motivates the study of an enumeration-style approach that may be inefficient for models that have more binary variables in the second-stage. We generate a disjunctive cut by first solving two linear subproblems per scenario ω: (i) Qω
+
+> LP
+
+(ˆy) with constraint 
+
+zω ≤ 0 that enforces export bans, and (ii) Qω
+
+> LP
+
+(ˆy) with constraint zω ≥ 1. We refer to (i) and (ii) as Qω
+
+> LP
+
+(ˆy, z ω = 0) and Qω
+
+> LP
+
+(ˆy, z ω = 1), respectively. Then, we use duality to build a Benders optimality cut for each problem. Applying the disjunctive cut principle to these two cuts, we obtain a valid inequality (disjunctive cut) that can be passed to ( M P ) since it approximates the subproblem value function, Qω(y). We follow the procedure presented by Sen and Sherali (2006) to generate the disjunctive cuts. The following presents the detailed walkthrough of the approach. The optimal solution for Qω(ˆy) must be associated with at least one of the two nodes, Qω
+
+> LP
+
+(ˆy, z ω = 0) or 
+
+Qω
+
+> LP
+
+(ˆy, z ω = 1). Then, disjunction (7) must hold: 
+
+θω ≤ X
+
+> j∈J
+
+X
+
+> l∈L
+
+αω
+
+> 0jl
+
+yjl + βω 
+
+> 0
+
+∨ θω ≤ X
+
+> j∈J
+
+X
+
+> l∈L
+
+αω
+
+> 1jl
+
+yjl + βω 
+
+> 1
+
+, (7) where coefficients ( αω
+
+> 0jl
+
+, β ω 
+
+> 0
+
+) and ( αω
+
+> 1jl
+
+, β ω 
+
+> 1
+
+) are calculated using the optimal dual variables of Qω
+
+> LP
+
+(ˆy, z ω = 0) and Qω
+
+> LP
+
+(ˆy, z ω = 1), respectively, as presented in (8), (9) and (10). 
+
+βω 
+
+> 0
+
+= X
+
+> i∈I
+
+φ(2e) ,ω i qsi γs,ω i ξnd,ω i ξsq,ω i + X
+
+> k∈K
+
+
+
+(φ(2h) ,ω + φ(2l) ,ω k )dωk + φ(2m) ,ω ηkξnd,ω k
+
+
+
+(8) 
+
+βω 
+
+> 1
+
+= X
+
+> i∈I
+
+φ(2e) ,ω i qsi γs,ω i ξnd,ω i ξsq,ω i + X
+
+> k∈K
+
+
+
+(φ(2h) ,ω + φ(2l) ,ω k )dωk + φ(2m) ,ω ηkξnd,ω k
+
+
+
+− φ(−z≤− 1) ,ω (9) 
+
+αωzjl = qpj ξnd,ω j γp,ω jl ξpq,ω jl 
+
+ φ(2f) ,ω j + φ(2i) ,ω j
+
+ + φ(2k) ,ω j M3 for z ∈ { 0, 1} (10) 
+
+Let the disjunctive set Π( ω) be the set of points ( θω, y) that are in at least one of the next two polyhedra. 
+
+Π( ω) = 
+
+
+
+(θω , y) ∈
+
+
+
+θω − X
+
+> j∈J
+
+X
+
+> l∈L
+
+αω
+
+> 0jl
+
+yjl ≤ βω
+
+> 0
+
+X
+
+> l∈L
+
+yjl ≤ 1 ∀j ∈ Jyjl ≤ 1 ∀j ∈ J, l ∈ Lyjl ≥ 0 ∀j ∈ J, l ∈ L
+
+[
+
+θω − X
+
+> j∈J
+
+X
+
+> l∈L
+
+αω
+
+> 1jl
+
+yjl ≤ βω
+
+> 1
+
+X
+
+> l∈L
+
+yjl ≤ 1 ∀j ∈ Jyjl ≤ 1 ∀j ∈ J, l ∈ Lyjl ≥ 0 ∀j ∈ J, l ∈ L
+
+
+
+15 Applying the disjunctive cut principle (Balas, 2018; Sen and Higle, 2005), we can find non-negative multipliers λ := [ λc
+
+> 0
+
+, λ c
+
+> 1
+
+, λ m 
+
+> 0j
+
+, λ m 
+
+> 1j
+
+, λ u
+
+> 0jl
+
+, λ u
+
+> 1jl
+
+]T to form a valid inequality (dis-junctive cut) for the convex hull of the union of the two polyhedrons. This cut is defined as (11) and provides an upper bound on Qω(y). ¯δωθω + X
+
+> j∈J
+
+X
+
+> l∈L
+
+¯αωjl yjl ≤ ¯βω (11) The cut coefficients ¯δω, ¯ αωjl and ¯βω are given by: 
+
+¯δω = min {λc 
+
+> 0
+
+, λ c
+
+> 1
+
+}
+
+¯αωjl = min 
+
+n
+
+− αω
+
+> 0jl
+
+λc 
+
+> 0
+
++ λm 
+
+> 0j
+
++ λu 
+
+> 0jl
+
+, −αω
+
+> 1jl
+
+λc 
+
+> 1
+
++ λm 
+
+> 1j
+
++ λu
+
+> 1jl
+
+,
+
+o
+
+∀j ∈ J, l ∈ L
+
+¯βω = max 
+
+(
+
+βω 
+
+> 0
+
+λc 
+
+> 0
+
++ X
+
+> j∈J
+
+λm 
+
+> 0j
+
++ X
+
+> j∈J
+
+X
+
+> l∈L
+
+λu 
+
+> 0jl
+
+, β ω 
+
+> 1
+
+λc 
+
+> 1
+
++ X
+
+> j∈J
+
+λm 
+
+> 1j
+
++ X
+
+> j∈J
+
+X
+
+> l∈L
+
+λu
+
+> 1jl
+
+)
+
+Algorithm 2 in the supplementary materials (S5) presents a cutting plane method that alternates between Benders optimality cuts and disjunctive cuts to solve the proposed model (2). Note that the problem Qω
+
+> LP
+
+(ˆy, z ω = 0) is always feasible, since constraint (2m) is feasible for xωj ≥ 0 for all j ∈ J and (2n) is feasible by setting vωjk = 0 for j ∈ ¯J, k ̸ = j ∈ K.However, Qω
+
+> LP
+
+(ˆy, z ω = 1) may be infeasible due to constraint (2m). The algorithm describes procedures for both cases. 
+
+# 4.3 Bilinear Cut 
+
+Finally, we observe that the single binary variable, zω, in subproblem Qω(ˆy) serves a similar role as the binary variable commonly included in the bilinear formulations of chance-constrained problems (e.g., Haghighat and Zeng (2018)). Specifically, when export bans are activated ( zω = 0), the constraints that limit exports (2n) are enforced, and when zω = 1, such constraints become redundant. In addition, the recourse function can be approximated using zω as a “weight” that defines subproblem Qω(ˆy) as the convex combination of two linear subproblems Qω
+
+> LP
+
+(ˆy, z ω = 0) and Qω
+
+> LP
+
+(ˆy, z ω = 1). From this, duality can be used to build Benders optimality cuts, as presented by (12) and simplified to (13). 
+
+θω ≤
+
+ X
+
+> j∈J
+
+X
+
+> l∈L
+
+αω
+
+> 0jl
+
+yjl + βω
+
+> 0
+
+
+
+(1 − zω) + 
+
+ X
+
+> j∈J
+
+X
+
+> l∈L
+
+αω
+
+> 1jl
+
+yjl + βω
+
+> 1
+
+
+
+zω (12) 
+
+θω ≤ X
+
+> j∈J
+
+X
+
+> l∈L
+
+ yjl zω(αω 
+
+> 1jl
+
+− αω
+
+> 0jl
+
+) + αω
+
+> 0jl
+
+yjl 
+
+ + ( βω 
+
+> 1
+
+− βω 
+
+> 0
+
+)zω + βω 
+
+> 0
+
+(13) 16 Note that the bilinear term yjl zω corresponds to the product of two binary variables. This term is linearized by introducing the auxiliary variable wωjl that captures the product of the binary variables ( yjl zω) with the help of additional constraints in the master problem (see supplementary materials (S5)). The reformulated linear cut is given by (14) and is added iteratively in the algorithm. 
+
+θω ≤ X
+
+> j∈J
+
+X
+
+> l∈L
+
+ wωjl (αω 
+
+> 1jl
+
+− αω
+
+> 0jl
+
+) + αω
+
+> 0jl
+
+yjl 
+
+ + ( βω 
+
+> 1
+
+− βω 
+
+> 0
+
+)zω + βω 
+
+> 0
+
+(14) The master problem for solving model (2) using linearized bilinear cuts is given by (M P ′), where yjl , θ ω, z ω and wωjl for j ∈ J, l ∈ L, ω ∈ Ω are variables, and set O′ stores Benders optimality cuts and linearized bilinear cuts added iteratively. We use notation z
+
+and w to represent the vectors of all zω and wωjl for ω ∈ Ω, j ∈ J, l ∈ L, respectively. 
+
+(M P ′) : max  
+
+> y
+
+− X
+
+> j∈J
+
+X
+
+> l∈L
+
+cfjl yjl + X
+
+> ω∈Ω
+
+ϱω θω (15a) s.t. (2b) − (2c) (15b) (19a) − (19d) (15c) (y, θ, z, w) ∈ O ′ (15d) 
+
+zω ∈ { 0, 1} ∀ω ∈ Ω (15e) 
+
+Algorithm 3 (supplementary materials (S5)) presents a cutting plane method that alternates between Benders optimality cuts and linearized bilinear cuts to solve model (2). 
+
+# 5 Computational Experiments 
+
+In this section, we report the computational results of applying the three cutting plane methods to solve model (2) and solving its extensive form with a commercial solver. 
+
+# 5.1 Data Description and Test Instances 
+
+The dataset used for the computational analyses and case study is based on vincristine (an oncology drug). It extends the dataset presented by Sabogal De La Pava and Tucker (2025) to include export prohibitions and natural disasters. It includes 11 suppliers of raw materials ( I), 60 potential plant locations ( J) each with three quality levels ( L), and 179 countries with demand ( K). The subset of countries that may implement export bans 17 when nominal global drug availability falls below a threshold ( ¯J) consists of 18 countries that have implemented export prohibitions on pharmaceutical products (WTO, 2022a,b). Each scenario is equally likely ( ϱω = 1 /|Ω| for all ω ∈ Ω). Complete details are in the supplementary materials (S4). We evaluate three sets of instances. Set I represents baseline case study parameters and is tested under export ban threshold values r ∈ { 0.65 , 0.8, 0.95 } and sample sizes 
+
+|Ω| ∈ { 100 , 500 , 1000 }, resulting in a total of nine instances. Sets II and III are designed to evaluate the computational effects of having export bans be activated more often and their implications (constraints (2m) and (2n)). In Set II, we double the number of countries that implement export bans ( | ¯J| = 36). In Set III, we increase the strength of the disruption propagation effect of natural disasters from a medium to a high level ( ζ = 1300 km), aligning with values reported in related studies (e.g., Li and Zhang (2018)). Since our goal is to test more challenging instances, we test Sets II and III with the export ban threshold r = 0 .95 and sample sizes |Ω| ∈ { 100 , 500 , 1000 } representing a total of six additional instances. We generate five independent replications for each instance. 
+
+# 5.2 Implementation Details 
+
+All experiments are run on a single thread of a computational cluster (Palmetto) with eight cores, 50GB RAM, a time limit of 3600 seconds, and optimization solver Gurobi v11.0.0. For our cutting plane methods, we use the lazy constraint callback function available in Gurobi to add the cuts whenever a new master problem solution satisfying the integrality constraints is found. For all methods, a cut violation of ϵ = 10 −5 is used. The initial master problem includes upper bounds for the θω variables, denoted by U ω and computed as in (6). In Algorithm 1 (Alternating Integer L-shaped Cut), subproblem Qω(ˆy) is solved as a mixed-integer program ( zω as a binary variable). In the other algorithms, Algorithm 2 (Alternating Disjunctive Cut) and Algorithm 3 (Alternating Bilinear Cut), two linear subproblems are solved per scenario: Qω
+
+> LP
+
+(ˆy, z ω = 0) and Qω
+
+> LP
+
+(ˆy, z ω = 1). In the proposed solution methods, the alternating strategy means first solving Qω
+
+> LP
+
+(ˆy). If the variable zω is binary in the optimal solution of Qω
+
+> LP
+
+(ˆy), Algorithm 1 adds two cuts to the master problem: a Benders optimality cut and an integer L-shaped cut. Algorithms 2 18 and 3 require one additional linear subproblem to be solved. For instance, if for a particular scenario ˆ ω, solving Qˆω
+
+> LP
+
+(ˆy) yields z ˆω = 1, and a Benders cut is not violated, then to generate a disjunctive or bilinear cut, we need to solve Qˆω
+
+> LP
+
+(ˆy, z ˆω = 0). A computational issue can arise when generating the cuts in Algorithm 2 if the resulting coefficient ¯δω = 0. In this case, a disjunctive cut is not generated for scenario ω, and the algorithm proceeds to the next scenario. To avoid numerical issues, cut coefficients smaller than 10 −6 are set to zero. 
+
+# 5.3 Algorithms’ Performance 
+
+In this section, we assess the computational performance of the three previously presented cutting plane methods (Algorithm 1 to Algorithm 3) and the performance of the extensive form solved by Gurobi directly using its default setting. Table 2 presents a summary of the computational results for baseline instances (Set I) across all methods. For each method, the table reports the average solution time (s) and the average number of branch-and-bound nodes explored of the instances solved to optimality within the time limit. These are under columns “T” and “Nds”, respectively. The column “Solved” indicates the number of instances (out of five) that were solved to optimality within the time limit. The column “Gap” reports the average gap of the instances that were not solved to optimality. Table 2: Computational performance for Set I (baseline case study)                                                                                                                                                         
+
+> Set I Alt. Integer L-shaped Alt. Disjunctive Alt. Bilinear Extensive Form
+> r|Ω|TNds Solved Gap TNds Solved Gap TNds Solved Gap TNds Solved Gap
+> 0.65 100 39 163 50.0% 65 172 50.0% 245 612 50.0% 815 100 50.0% 500 360 430 50.0% 380 299 50.0% 928 666 50.0% --0-1000 675 366 50.0% 683 203 50.0% 1387 567 50.0% --0-0.80 100 39 163 50.0% 67 172 50.0% 255 607 50.0% 754 104 50.0% 500 360 430 50.0% 371 300 50.0% 837 715 50.0% --0-1000 679 366 50.0% 789 221 50.0% 1493 568 50.0% --0-0.95 100 108 389 50.0% 103 230 50.0% 302 633 50.0% 1365 126 50.0% 500 698 702 50.0% 932 524 50.0% 1116 630 50.0% --0-1000 1054 463 42.3% 1476 446 50.0% 1935 632 50.0% --0-
+
+Our results indicate that the proposed decomposition methods are highly effective for solving problem (2). In contrast, solving the extensive form with a commercial solver fails 19 to yield optimal solutions for instances with a large number of scenarios (500 or 1000) within the one-hour time limit. In these instances, no incumbent solution is found. All 45 test instances are solved to optimality by the three proposed cutting plane methods, with the exception of one instance using the Alternating Integer L-shaped Cut Method, which ends with a gap of 2.3%. The Alternating Integer L-shaped Cut Method (Algorithm 1) reports the best average computational time, followed by the Alternating Disjunctive Cut Method (Algorithm 2). Only in one instance ( r = 0 .95 , |Ω| = 100), Algorithm 2 slightly outperforms Algorithm 1, with an average solution time of 4.4 s faster. Additionally, for the instance ( r = 0 .95 , |Ω| =1000), Algorithm 2 presents the lowest computational times in two out of the five instances. Algorithm 1 is, on average, 20.1 times faster (standard deviation 7.1) than solving the extensive form for the case of |Ω| = 100. It is surprising that Algorithm 2 presents better average computational time than Algorithm 3, despite requiring the solution of up to three linear optimization problems for each scenario to generate a disjunctive cut. This is in contrast to Algorithm 3, which requires solving up to two linear optimization problems to generate a bilinear cut every time a feasible binary y solution is encountered. This result can be due to the larger size of the master problem in Algorithm 3, since the additional variables and constraints introduced by the linearization and the cut space ( zω, y, w ω, θ ω). The computational performance for Sets II and III is presented in Table 3. Both sets represent more challenging problem instances. Set II considers an increased number of countries that ban exports ( | ¯J| = 36). Set III considers natural disasters with a high strength of propagation effect ( ζ = 1300 km). Table 3: Computational performance for Sets II ( | ¯J| = 36) and III (high propagation)                                                                                                             
+
+> r= 0 .95 Alt. Integer L-shaped Alt. Disjunctive Alt. Bilinear Extensive Form Set |Ω|TNds Solved Gap TNds Solved Gap TNds Solved Gap TNds Solved Gap
+> II 100 342 932 50.0% 692 629 50.0% 754 707 50.0% 1411 70 41.0% 500 3211 1500 23.1% --05.2% --01.2% --0-1000 --06.8% --032.8%* --09.1% --0-III 100 72 173 50.0% 125 398 50.0% 383 499 50.0% 1485 151 50.0% 500 743 506 50.0% 1384 621 50.0% 1099 607 50.0% --0-1000 1509 470 50.0% 1656 466 50.0% 2986 616 40.5% --0-*Average of three instances since the other two reported unbounded gaps
+
+Results in Table 3 demonstrate the increased complexity of decision-making under high 20 levels of disruption risks. Among all implemented methods, Algorithm 1 (Alternating Integer L-shaped Cut) remains the most effective. It solves all 15 instances in Set III to optimality within one hour, as well as seven out of 15 instances in Set II. None of the methods are able to solve any instances from the most challenging instance to optimality within the time limit (Set II, |Ω| = 1000, r = 0 .95); however, Algorithm 1 achieves the lowest average optimality gap in that case. In addition, for Set II with a high number of scenarios (500, 1000), Algorithm 3 (Alternating Bilinear Cut) reports lower average gaps than Algorithm 2 (Alternating Disjunctive Cut). For Set III, similar to Set I, Algorithm 2 exhibits better computational performance than Algorithm 3. Considering the 64 instances that are solved to optimality by both Algorithms 1 and 2 across the three instance sets, Algorithm 1 is, on average, 1.6 times faster, with a standard deviation of 1.1. Next, we discuss additional implementations and combinations that are tested. Detailed results are presented in the supplementary materials (S6). We evaluate the single-cut ver-sions of Algorithms 1 to 3 using Set I (baseline case study) under sensitivity threshold values r ∈ { 0.65 , 0.8, 0.95 } and sample sizes |Ω| ∈ { 100 , 500 , 1000 }. In our results, among the single-cut methods, Algorithm 1 (Alternating Integer L-shaped Cut) achieves the best average computational time, followed by Algorithm 2 (Alternating Disjunctive Cut). Ad-ditionally, the single-cut methods exhibit higher computational times compared to their multi-cut counterparts. We also assess two additional cutting plane methods that combine three types of cuts. We consider the Alternating Integer L-shaped + Disjunctive Cuts and the Alternating Integer L-shaped + Bilinear Cuts. In these new methods, every time a disjunctive cut (bilinear cut) is added, an integer L-shaped cut is also added. This integration eliminates the need to solve the mixed-integer subproblem Qω(ˆy), as the procedures for generating disjunctive and bilinear cuts compute Qω(ˆy) through linear subproblems Qω
+
+> LP
+
+(ˆy, z ω = 0) and Qω
+
+> LP
+
+(ˆy, z ω = 1). We test these two additional algorithms with Set I under geopolitical threshold r = 0 .95 and sample sizes |Ω| ∈ { 100 , 500 , 1000 }. Our results suggest that Algorithms 1 to 3 are more effective than the combination of integer L-shaped cuts with disjunctive or bilinear cuts. This may be due to the larger size of the master problem, since for each scenario, two cuts are added instead of one, which also affects the scalability of the method as the number of scenarios grows. 21 Finally, we implement feasibility cuts in Algorithm 3 when Qω
+
+> LP
+
+(ˆy, z ω = 1) is infeasible. This variation of Algorithm 3 does not exhibit improved computational performance. 
+
+# 6 Case Study 
+
+Next, we evaluate the real-world implications of planning for systemic export bans. 
+
+# 6.1 Impact of Systemic Disruptions on Global Supply Chains 
+
+For these analyses, we consider one sample of 1000 scenarios for each instance in Sets I, II, and III, all solved to optimality using the Alternating Integer L-Shaped Method (Algorithm 1). For each instance set, we observe that export bans are not triggered when the sensitivity to projected global drug supply is r = 0 .8 or below ( r = 0 .65), and the results are the same. When there is a higher sensitivity to projected supply shortages (here, r = 0 .95), there may be export bans. Accordingly, we compare the two cases r = 0 .8 and r = 0 .95, below. The results for the baseline instances (Set I) are shown in Figure 1. Both supply chains consist of four plants at the lowest quality level, with three plants primarily serving demand, and one acting as a back-up. The primary plants are not at risk of imposing export bans (not in set ¯J) and are the same in both cases (Indonesia, Malaysia and Chile). These represent the three countries with the lowest production and fixed costs. There is a difference in the back-up plants between the two cases. Under moderate geopolitical risk ( r = 0 .8), the back-up plant location, Greece is at risk of imposing export bans, whereas the back-up plant when there is higher sensitivity ( r = 0 .95), Thailand is not at risk of imposing bans. Both Greece and Thailand have the same fixed costs, suggesting that planning for strain does not necessarily have higher strategic (first-stage) costs. Nonetheless, higher sensitivity to projected shortages do have minor negative effects on expected profits (0.2% reduction), units sold (0.4% decrease), and expected global shortages (0.3 absolute percentage points (pp) increase). The instances took 938 s ( r = 0 .8) and 4,929 s ( r = 0 .95) to solve. Next, we discuss the results for Set II where more countries are at risk of imposing export bans ( | ¯J| = 36). A risk threshold of 0.95 vs. 0.8 reduces expected profits by 0.8% ( $12,648) and increases fixed costs by 0.9% ( $1,604), while the number of units sold remains unchanged. With r = 0 .95, all four selected countries (Greece, Malaysia, Indonesia 22 Note: C ountries in are labeled in red italics, country color intensity indicates production (darker colors represent higher valu es) .      
+
+> 1st stage objective value ($) 1,660,893
+> Fixed costs ($) 169,753
+> 2nd stage objective value ($) 1,830,646
+> Global company production (units) 340,526
+
+(b) 𝒓 = 0.95 
+
+(a) 𝒓 = 0.8       
+
+> 1st stage objective value ($) 1,664,161
+> Fixed costs ($) 169,753
+> 2nd stage objective value ($) 1,833,914
+> Global company production (units) 341,739
+> ҧ
+> 𝑗
+
+Figure 1: Plant locations for Set I instances with (a) r = 0 .8 and (b) r = 0 .95. and India) are in set ¯J. The backup plant is located in India, whose production costs are slightly higher than in Greece but still low (the seventh lowest production costs of all countries in J). To assess the challenge of a larger set of countries that may ban exports (Set II vs. Set I, r = 0 .95), we observe a 0.6% ( $9,380) reduction in expected profits and a 0.9% ( $1,604) increase in fixed costs. Surprisingly, the units sold increase by 0.4% ( $1,309), and the expected global shortage decreases by 0.3 pp. Computationally, the model took 2.55 times longer to solve (17,506 s vs. 4,929 s). With r = 0 .8, it took 581 s to solve. Finally, we discuss the results for Set III, which represents contexts with high propaga-tion effects of natural disasters ( ζ = 1300 km) and a moderate number of countries imposing export bans ( | ¯J| = 18). Under both thresholds (0.8 and 0.95), the obtained supply chains are formed by Chile, Malaysia, Indonesia and Russia. None represent a threat of export bans (none belong to the set ¯J), and Russia has not experienced major natural disasters that completely disrupt manufacturing capabilities (CRED, 2024). The performance of this supply chain does not substantially change compared to baseline disaster risks (Figure 1). These instances took 849 ( r = 0 .8) and 927 s ( r = 0 .95) to solve. 23 6.2 Value of Considering Disruption Risks 
+
+In this section, we quantify the value of integrating different types of disruption uncertainty into global supply chain design in two mis-specified settings: baseline that does not account for any disruptions and partial that accounts for some but not all disruptions. To capture the baseline value of planning for disruptions, we first solve the nominal model that does not include them (presented in supplementary materials (S2)). We evaluate the resulting first-stage decisions, ¯y, by fixing them as the first-stage decisions of (2) and solving with the uncertainty set that includes all disruptions, across different instances. Table 4 reports the benefits of planning for disruption risks vs. the mis-specified baseline. Across all considered instances, planning against disruptions leads to an increase in expected profits. For example, in the more challenging instance, Set II ( ¯J = 36) under high sensitivity threshold ( r = 0 .95), the company achieves a 7 .7% increase in expected profits. Moreover, planning for disruptions also results in substantial reductions in the expected global drug shortage, explained by improved resilience. When planning for disruptions, four plants are selected, instead of three, enhancing the company’s flexibility and ability to respond to disruptions. Table 4: Value of considering disruption risks in supply chain design                
+
+> Instance Value of Planning for Disruption Risks Set rChange in Expected Profits Change in Expected Global Shortage
+> I0.95 $40,777 (2.5%) -22.6% (-6.0 pp) 0.80 and 0.65 $17,002 (1.0%) -19.2% (-4.8 pp) II 0.95 $118,327 (7.7%) -30.4% (-8.8 pp) III 0.95 $45,552 (2.8%) -24.1% (-6.4 pp)
+> Note: pp, absolute percentage points
+
+Next, we evaluate the value of planning for all three types of disruption risks (quality failures, Q, natural disasters, N D , and export bans, EB ) against four partial settings that only consider a subset. The latter are called reference cases. The comparator with all disruption risks (model (2)) applies a geopolitical threshold of r = 0 .95 and uses Instance Set I. Case Q+EB represents a model that only includes quality failures and export bans. This situation is implemented by fixing the natural disaster stochastic parameter ξnd,ω k = 1 for all k ∈ K, ω ∈ Ω and the sensitivity threshold to r = 0 .95. Case ND+EB represents natural disasters and export bans only. This is done by setting the manufacturing quality 24 failure stochastic parameter ξqp,ω jl = 1 for all j ∈ J, l ∈ L, ω ∈ Ω and the sensitivity threshold to r = 0 .95. Case Q represents only quality failure disruptions. This is modeled by setting 
+
+ξnd,ω k = 1 for all k ∈ K, ω ∈ Ω and a very low sensitivity threshold of r = 0 .1. The latter value means that export bans are practically negligible, and results confirm that there are no export bans induced in this case. Finally, Case ND represents only natural disaster disruptions. This is represented by fixing ξqp,ω jl = 1 for all j ∈ J, l ∈ L, ω ∈ Ω and setting 
+
+r = 0 .1, again rendering no export bans. Table 5: Value of considering conventional and systemic disruption risks                         
+
+> Ref. Case Comparator Change in Expected Profits Change in Expected Global Shortage
+> Q+EB All $0 (0.0%) 0.0% (0.0 pp)
+> N D +EB All +$18,522 (+1.1%) -18.2% (-4.5 pp)
+> QAll +$1,011 (+0.1%) +0.3% (+0.1 pp)
+> N D All +$40,777 (+2.5%) -22.6% (-6.00 pp)
+> Note: ref., reference; pp, absolute percentage points; +, increase; -, decrease; all, Q+N D +EB
+
+The value of considering all three disruptions is presented in Table 5. Our results suggest that when the company plans for all three risks, it achieves the same expected profit and global shortage as when it plans for quality failures and export bans (Case Q+EB ) alone. This occurs because the plans with and without considering natural disasters result in identical supply chain configurations, with plants located in Indonesia, Malaysia, Thailand, and Chile. This finding suggests that, for the case study considered, natural disasters have limited influence on the company’s strategic decisions. Under this four-plant structure, the sampled natural disaster events do not occur simultaneously across these countries, and a single backup facility is sufficient to mitigate capacity disruptions. In contrast, including quality disruptions (all vs. N D + EB and all vs. N D ), increases expected profits and decreases expected global shortages. Furthermore, planning for export bans (all vs. Q and all vs. N D ) also increases expected profits and decreases expected global shortages. 
+
+# 7 Conclusion 
+
+In this article, we introduce a global supply chain design model that integrates conventional and systemic disruption risks to produce a mixed-integer program with a pure binary first-stage problem and a nearly continuous second-stage problem. It is the first to consider 25 induced export bans in a supply chain design context, and its special structure motivates a computational study on cutting plane methods. Experiments demonstrate that the Al-ternating Integer L-shaped Cut Method presents the best computational performance, fol-lowed by the Alternating Disjunctive Cut Method. Moreover, all three methods exhibit far superior performance compared to the extensive form. We apply the model to a case study of a life-saving oncology drug supply chain and eval-uate how systemic disruptions may affect global strategy. We observe that both companies and patients benefit when the risks of systemic disruptions (export bans) are incorporated into supply chain design, with the most benefit for patients, i.e., lower shortages. We also observe that planning for quality disruptions and export bans capture most of the value of modeling disruptions, with the inclusion of correlated natural disasters having marginal effects on outcomes. This reflects our real-world observations as well, with quality issues more likely to cause drug shortages than natural disasters. It is interesting that despite this, all selected plants are the lowest quality level, suggesting that the marginal costs of in-creasing quality may not be worth the opportunity costs of quality-related disruption risks. We note however that if natural disaster frequency and severity increase, these disruptions may begin to have a more pronounced impact on supply chain design. Broadly, we observe that the effects of systemic disruptions are most influential when the countries’ sensitivity to imposing them are high r = 0 .95; this suggests the utility of this modeling approach may increase in riskier environments. Future research in systemic, induced disruptions could focus on generating stronger disjunctive cuts in Algorithm 2. This algorithm generally exhibits the second-best compu-tational time, with some cases achieving the best performance. Further, as systemic, global disruptions become more common, future work could also consider addressing key model-ing limitations (see Section 3.2). In particular, a study of competitive dynamics between generic pharmaceutical companies under the risk of bans could be worthwhile. 
+
+# References 
+
+Aldrighetti, R., D. Battini, D. Ivanov, and I. Zennaro (2021). Costs of resilience and dis-ruptions in supply chain network design models: A review and future research directions. 
+
+International Journal of Production Economics 235 , 108103. 26 Angulo, G., S. Ahmed, and S. S. Dey (2016). Improving the integer l-shaped method. 
+
+INFORMS Journal on Computing 28 (3), 483–499. Balas, E. (2018). Disjunctive Programming . Springer International Publishing AG. Bednarski, L., S. Roscoe, C. Blome, and M. C. S. and (2025). Geopolitical disruptions in global supply chains: a state-of-the-art literature review. Production Planning & Control 36 (4), 536–562. Bhuiyan, T. H., H. R. Medal, and S. Harun (2020). A stochastic programming model with endogenous and exogenous uncertainty for reliable network design under random disruption. European Journal of Operational Research 285 (2), 670–694. Birge, J. R. and F. Louveaux (2011). Introduction to stochastic programming . Springer New York. Bulgarian Drug Agency (2024). Medicinal products in human medicine act. Retrieved from 
+
+https:https://www.bda.bg/en/legal-acts . Accessed November 12, 2024. Chen, R. and J. Luedtke (2022). On generating lagrangian cuts for two-stage stochastic integer programs. INFORMS Journal on Computing 34 (4), 2332–2349. CRED (2024). EM-DAT the international disaster database. Retrieved from https://www. emdat.be . Accessed March 13, 2024. Franca, R. B., E. C. Jones, C. N. Richards, and J. P. Carlson (2010). Multi-objective stochastic supply chain modeling to evaluate tradeoffs between profit and quality. Inter-national Journal of Production Economics 127 (2), 292–299. Gade, D., S. K¨ u¸ c¨ ukyavuz, and S. Sen (2014, 04). Decomposition algorithms with para-metric gomory cuts for two-stage stochastic integer programs. Mathematical Program-ming 144 (1-2), 39–64. Ghadge, A., M. Er, D. Ivanov, and A. C. and (2022). Visualisation of ripple effect in supply chains under long-term, simultaneous disruptions: a system dynamics approach. 
+
+International Journal of Production Research 60 (20), 6173–6186. Grassia, M., G. Mangioni, S. Schiavo, and S. Traverso (2021, 12). (Unintended) conse-quences of export restrictions on medical goods during the covid-19 pandemic. Journal of Complex Networks 10 (1), cnab045. Guo, Y., F. Liu, J.-S. Song, and S. Wang (2025). Supply chain resilience: A review from the inventory management perspective. Fundamental Research 5 (2), 450–463. Haghighat, H. and B. Zeng (2018). Stochastic and chance-constrained conic distribution system expansion planning using bilinear benders decomposition. IEEE Transactions on Power Systems 33 (3), 2696–2705. Hart Nibbrig, M., S. Sharif Azadeh, and M. Maknoon (2025). Adaptive resilience strategies for supply chain networks against disruptions. Transportation Research Part E: Logistics and Transportation Review 200 , 104172. 27 Hasani, A. and A. Khosrojerdi (2016). Robust global supply chain network design under disruption and uncertainty considering resilience strategies: A parallel memetic algorithm for a real-life case study. Transportation Research Part E: Logistics and Transportation Review 87 , 20–52. Hassani, D., A. Nagurney, O. Nivievskyi, and P. Martyshev (2025). A multiperiod, multi-commodity, capacitated international agricultural trade network equilibrium model with applications to ukraine in wartime. Transportation Science 59 (1), 143–164. Hu, H. and J. Tang (2025). Robust facility location considering protection and backup under facility disruptions with decision-dependent uncertainty. European Journal of Operational Research 325 (3), 474–486. Katsaliaki, K., P. Galetsi, and S. Kumar (2022). Supply chain disruptions and resilience: a major review and future research agenda. Annals of Operations Research 319 (1), 965– 1002. Keller, B. and G. Bayraksan (2012). Disjunctive decomposition for two-stage stochastic mixed-binary programs with generalized upper bound constraints. INFORMS Journal on Computing 24 (1), 172–186. K¨ u¸ c¨ ukyavuz, S. and S. Sen (2017). An introduction to two-stage stochastic mixed-integer programming. INFORMS TutORials in Operations Research 0 (0), 1–27. Laporte, G. and F. V. Louveaux (1993). The integer l-shaped method for stochastic integer programs with complete recourse. Operations Research Letters 13 (3), 133–142. Li, X. and Y. Ouyang (2010). A continuum approximation approach to reliable facility location design under correlated probabilistic disruptions. Transportation Research Part B: Methodological 44 (4), 535–548. Li, X., Y. Ouyang, and F. Peng (2013). A supporting station model for reliable infrastruc-ture location design under interdependent disruptions. Transportation Research Part E: Logistics and Transportation Review 60 , 80–93. Li, X. and K. Zhang (2018). A sample average approximation approach for supply chain network design with facility disruptions. Computers and Industrial Engineer-ing 126 (August), 243–251. Liberatore, F., M. P. Scaparra, and M. S. Daskin (2012). Hedging against disruptions with ripple effects in location analysis. Omega 40 (1), 21–30. Lovelace, B. (2023). Tornado that struck Pfizer plant ripped through warehouse where drugs were stored. Retrieved from https://www.nbcnews.com/health/health-news/ tornado-struck-pfizer-plant-ripped-warehouse-drugs-stored-rcna95384 .Accessed Jan 2, 2025. Lu, M., L. Ran, and Z. J. M. Shen (2015). Reliable Facility Location Design Under Uncer-tain Correlated Disruptions. Manufacturing and Service Operations Management 17 (4), 445–455. 28 Madadi, A., M. E. Kurz, S. J. Mason, and K. M. Taaffe (2014). Supply chain design under quality disruptions and tainted materials delivery. Transportation Research Part E: Logistics and Transportation Review 67 , 105–123. Maharjan, R. and H. Kato (2022). Resilient supply chain network design: A systematic literature review. Transport Reviews 42 (6), 739–761. Mosbergen, D. and B. Abbott (2023). Drug Shortages Stem From Quality Prob-lems in Indian Factories. Retrieved from https://www.wsj.com/articles/ drug-shortages-stem-from-quality-problems-in-indian-factories-20accc00 .Accessed Jan 2, 2025. Nikolov, K. (2024). Bulgaria extends ban on exports of insulin, antibiotics for chil-dren. Retrieved from https://www.euractiv.com/section/health-consumers/news/ bulgaria-extends-ban-on-exports-of-insulin-antibiotics-for-children/ . Ac-cessed Jan 2, 2025. Pariazar, M., S. Root, and M. Y. Sir (2017). Supply chain design considering correlated fail-ures and inspection in pharmaceutical and food supply chains. Computers and Industrial Engineering 111 , 123–138. Ramezani, M., M. Bashiri, and R. Tavakkoli-Moghaddam (2013). A new multi-objective stochastic model for a forward/reverse logistic network design with responsiveness and quality level. Applied Mathematical Modelling 37 (1), 328–344. Ren, H., D. Mu, C. Wang, X. Yue, Z. Li, J. Du, L. Zhao, and M. K. Lim (2024). Vulnerability to geopolitical disruptions of the global electric vehicle lithium-ion battery supply chain network. Computers and Industrial Engineering 188 , 109919. Roscoe, S., E. Aktas, K. J. Petersen, H. D. Skipworth, R. B. Handfield, and F. Habib (2022). Redesigning global supply chains during compounding geopolitical disruptions: the role of supply chain logics. International Journal of Operations & Production Man-agement 42 (9), 1407–1434. Roshani, A., P. Walker-Davies, and G. Parry (2024). Designing resilient supply chain networks: a systematic literature review of mitigation strategies. Annals of Operations Research 341 (2), 1267–1332. Sabogal De La Pava, M. L. and E. L. Tucker (2025). Effects of geopolitical strain on global pharmaceutical supply chain design and drug shortages. European Journal of Operational Research 327 (2), 641–654. Sen, S. and J. L. Higle (2005). The c3 theorem and a d2 algorithm for large scale stochastic mixed-integer programming: Set convexification. Mathematical Programming 104 (1), 1–20. Sen, S. and H. D. Sherali (2006). Decomposition with branch-and-cut approaches for two-stage stochastic mixed-integer programming. Mathematical Programming 106 , 203–223. Shekarian, M. and M. Mellat Parast (2021). An Integrative approach to supply chain disruption risk and resilience management: a literature review. International Journal of Logistics Research and Applications 24 (5), 427–455. 29 Snyder, L. V., Z. Atan, P. Peng, Y. Rong, A. J. Schmitt, and B. Sinsoysal (2016). OR/MS models for supply chain disruptions: A review. IIE Transactions 48 (2), 89–109. Suryawanshi, P. and P. Dutta (2022). Optimization models for supply chains under risk, un-certainty, and resilience: A state-of-the-art review and future research directions. Trans-portation Research Part E: Logistics and Transportation Review 157 (Dec 2021), 1–45. Tse, Y. K., K. Dong, R. Sun, and R. Mason (2024). Recovering from geopolitical risk: An event study of huawei’s semiconductor supply chain. International Journal of Production Economics 275 , 109347. Tucker, E. L. and M. S. Daskin (2022). Pharmaceutical supply chain reliability and effects on drug shortages. Computers and Industrial Engineering 169 , 108258. Tucker, E. L., M. S. Daskin, B. V. Sweet, and W. J. Hopp (2020). Incentivizing resilient supply chain design to prevent drug shortages: Policy analysis using two- and multi-stage stochastic programs. IISE Transactions 52 (4), 394–412. van der Laan, N. and W. Romeijnders (2024). A converging benders’ decomposition al-gorithm for two-stage mixed-integer recourse models. Operations Research 72 (5), 2190– 2214. Wang, C. and L. M. T. Zhong (2024). Reliable design of humanitarian supply chain under correlated disruptions: a two-stage distributionally robust approach. Annals of Opera-tions Research .WTO (2022a). Quantitative restrictions database. Retrieved from https://qr.wto.org/ en\#/home . Accessed October 1, 2022. WTO (2022b). Trade monitoring database. Available at https://tmdb.wto.org/en/ explore/goods\#nogo\%0A (accessed 1 October 2022). Xie, S., K. An, and Y. Ouyang (2019). Planning facility location under generally correlated facility disruptions: Use of supporting stations and quasi-probabilities. Transportation Research Part B: Methodological 122 , 115–139. Xie, S., X. Li, and Y. Ouyang (2015). Decomposition of general facility disruption correla-tions via augmentation of virtual supporting stations. Transportation Research Part B: Methodological 80 , 64–81. Zhang, M. and S. K¨ u¸ c¨ ukyavuz (2014). Finitely convergent decomposition algorithms for two-stage stochastic pure integer programs. SIAM Journal on Optimization 24 (4), 1933– 1951. Zhao, H. (2023). Pharmaceutical supply chains and drug shortages. INFORMS TutORials in Operations Research 0 (0), 228–245. 30 Supplementary Materials for “When Shortages Lead to Export Restrictions: A Computational Study” 
+
+Further details on the capacity-related model parameters are presented in Section 1. The nominal model (that does not include disruptions) is in Section 2. A walkthrough of the export ban constraints is presented in Section 3. Details on the data used in the case example are in Section 4. Additional algorithmic details are presented in Section 5. Finally, additional results related to computational performance are in Section 6. 
+
+# 1 Description of Capacity-Related Parameters 
+
+In this section, we provide further details on the operational and disruption uncertainty. Recall that yield-style uncertainty is modeled as a proportion of total capacity available. For disruption uncertainty, a value of 1 indicates availability (non-disrupted), and a value of 0 indicates a disruption. 
+
+Quality disruptions (ξqp,ω jl , ξ qs,ω i ) represent the complete unavailability of capacity due to quality failures in the plants and suppliers, respectively. These are associated with candidate plant locations j ∈ J, quality levels l ∈ L, and supplier countries i ∈ I. ξqp,ω jl ∼
+
+Bernoulli( ρqp jl ) for all j ∈ J and l ∈ L, where ρqp jl represents the probability that facility j
+
+with quality l is available. Similarly, ξqs,ω i ∼ Bernoulli( ρqs i ) for all i ∈ I, where ρqs i represents the probability that supplier i is available. 
+
+Capacity strains (γp,ω jl , γ s,ω i ) are partial capacity interruptions of manufacturing plants and suppliers due to the regular uncertainty of the processes. Those are modeled with discrete random variables with probability mass functions p(n), where n represents capacity levels. 
+
+Natural disaster disruptions (ξnd,ω k ) represent the complete unavailability of the capacity of the company decision-maker and any exogenous producers in country k ∈ k. Specifically, 
+
+ξnd,ω k is a binary random parameter that equals 0 if production capacity in country k ∈ K
+
+is disrupted by natural disasters that impacted country k. To generate (sample) capacity disruptions due to natural disaster disruptions in a particular country (i.e., the parameter used in the model), we step through three levels of their effects: 1. Occurrence (epicenter) of natural disaster in country k′ ∈ K
+
+12. Propagation of natural disaster from epicenter country k′ ∈ K to other country k ∈ K
+
+3. Risk of capacity disruption if country is affected by disaster (as an epicenter or via propagation) Level (1): the occurrence of natural disasters. Let Uωk′ be a random parameter represent-ing the non-occurrence of a natural disaster in country k′ ∈ K. Uωk′ ∼ Bernoulli(1 − ψk′ ), where ψk′ is the probability that a natural disaster occurs in country k′. If Uωk′ equals 0, it means that country k′ is the epicenter of a natural disaster. Consider ¯U as the set of countries that are epicenters of natural disasters, i.e., ¯U := {k′ ∈ K|U ωk′ = 0 }.Level (2): the propagation effect between an epicenter of a natural disaster, k′ ∈ ¯U, and the countries with shared hazards with k′. Let Hk′ be the set of countries with common hazards with country k′. This set is defined based on proximity in this paper. If a country 
+
+k ∈ K is not the epicenter of a natural disaster ( k / ∈ ¯U), and it does not have shared hazards with any country where a natural disaster occurred ( k / ∈ Hk′ for all k′ ∈ ¯U), then capacity is not disrupted by a natural disaster in country k ∈ K, i.e., ξnd,ω k = 1. Next, we consider the case when a country is not the epicenter of a natural disaster (k / ∈ ¯U), but it has common hazards with another country where a natural disaster occurred (k ∈ Hk′ for some k′ ∈ ¯U). Let Fωkk ′ be a binary random parameter that is equal to 1 if country k ∈ Hk′ is not impacted by a natural disaster that occurred in country k′ ∈ ¯U.
+
+Fωkk ′ ∼ Bernoulli(1 − ρnd kk ′ ), where ρnd kk ′ is the probability that country k is impacted by a natural disaster that occurred in country k′. This probability is estimated as ρnd kk ′ = e 
+
+> −Dkk ′
+> ζ
+
+,where Dkk ′ is the distance between countries k and k′, and ζ represents the strength of the disruption propagation effect. Consider ¯F as the set of countries that were impacted by natural disasters due to propagation effects, i.e, k ∈ K \ ¯U and k ∈ S  
+
+> k′∈¯U
+
+Hk′ such that min {F ωkk ′ |k′ ∈ ¯U and k′ ∈ Hk} = 0. The approach to modeling the propagation effect follows standard methods used in other supply chain models (e.g., Lu et al. (2015) and Li and Zhang (2018)), where correlation is induced by shared hazard exposure and ripple effect-style disruptions. Level (3): risk of capacity disruption for countries impacted by natural disasters, i.e., 
+
+k ∈ ¯U ∪ ¯F. Plants in affected countries may (or may not) suffer disruptions in their produc-tion capacity. We sample whether production capacity is disrupted, using the conditional probability that manufacturing capacity in country k is disrupted given that country k was 2hit by natural disasters. 
+
+# 2 Nominal Model 
+
+To calculate the nominal global drug availability, ¯ g, we use a supply chain design model with-out disruptions (model (16)). Similar to the two-stage stochastic program (2), ¯ y, ¯u, ¯x, ¯τ , ¯e,and ¯ v of model (16) are variables representing the location of manufacturing plants, pur-chases of raw materials, production plan, raw materials transshipment, excess of raw ma-terials, and distribution of final products, respectively. ϱ¯ω corresponds to the probability of scenario ¯ ω ∈ ¯Ω, given by the realization of operational uncertainties ( γp, ¯ω, γ s, ¯ω, d ¯ω). 
+
+max − X
+
+> j∈J
+
+X
+
+> l∈L
+
+cfjl ¯yjl + X 
+
+> ¯ω∈¯Ω
+
+ϱ¯ω
+
+ X
+
+> k∈K
+
+X
+
+> j∈J
+
+(pk − cpj − ctjk )¯ v ¯ωjk − X
+
+> i∈I
+
+X
+
+> j∈J
+
+(csi + ctij )¯ u¯ωij − X
+
+> j∈J
+
+
+
+chj ¯e¯ωj + X 
+
+> j′̸=j∈J
+
+ctjj ′ ¯τ ¯ωjj ′
+
+
+
+(16a) s.t. X
+
+> l∈L
+
+¯yjl ≤ 1 ∀j ∈ J (16b) 
+
+X
+
+> j∈J
+
+¯u¯ωij ≤ qsi γs, ¯ωi ∀i ∈ I, ¯ω ∈ ¯Ω (16c) ¯x¯ωj ≤ qpj
+
+X
+
+> l∈L
+
+γp, ¯ωjl ¯yjl ∀j ∈ J, ¯ω ∈ ¯Ω (16d) ¯x¯ωj = X
+
+> i∈I
+
+¯u¯ωij ∀j ∈ J, ¯ω ∈ ¯Ω (16e) 
+
+X
+
+> j∈J
+
+¯x¯ωj ≤ X
+
+> k∈K
+
+d¯ωk ∀¯ω ∈ ¯Ω (16f) 
+
+X
+
+> k∈K
+
+¯v ¯ωjk ≤ qpj
+
+X
+
+> l∈L
+
+γp, ¯ωjl ¯yjl ∀j ∈ J, ¯ω ∈ ¯Ω (16g) 
+
+X
+
+> k∈K
+
+¯v ¯ωjk + ¯ e¯ωj + X 
+
+> j′̸=j∈J
+
+¯τ ¯ωjj ′ = X
+
+> i∈I
+
+¯u¯ωij + X 
+
+> j′̸=j∈J
+
+¯τ ¯ωj′j ∀j ∈ J, ¯ω ∈ ¯Ω (16h) 
+
+X 
+
+> j′̸=j∈J
+
+¯τ ¯ωj′j ≤ M3
+
+X
+
+> l∈L
+
+¯yjl ∀j ∈ J, ¯ω ∈ ¯Ω (16i) 
+
+X
+
+> j∈J
+
+¯v ¯ωjk ≤ d¯ωk ∀k ∈ K, ¯ω ∈ ¯Ω (16j) ¯yjl ∈ { 0, 1} ∀j ∈ J, l ∈ L (16k) ¯u¯ωij , ¯v ¯ωjk , ¯x¯ωj , ¯e¯ωj , ¯τ ¯ωjj ′ ≥ 0 ∀i ∈ I, j ∈ J, j ′̸ = j ∈ J, k ∈ K, ¯ω ∈ ¯Ω (16l) 
+
+The objective function (16a) maximizes the expected profits when there are no disruptions. Constraints (16b) ensure that at most one plant is open in every country. Constraints (16c), (16d) and (16g) are capacity constraints, limiting the purchases of raw materials, drug production plan and final drug production, respectively. Constraints (16f) and (16j) are demand constraints. The balance constraints are (16e) and (16h), balancing production 3plan with purchases of raw materials and final drug production with raw materials available in each manufacturing plant, respectively. Raw materials transshipment is only allowed between open plants (16i). Finally, constraints (16k) and (16l) enforce the domain. After the model is solved, the nominal global drug availability, ¯ g, is calculated by equation (17). This represents the sum of the company’s expected production and the exogenous drug production of other companies when there are not disruptions. ¯g = X 
+
+> ¯ω∈¯Ω
+
+ϱ¯ω X
+
+> j∈J
+
+X
+
+> k∈K
+
+¯v¯ωjk + X
+
+> k∈K
+
+ηk (17) 
+
+# 3 Further Detail on Export Ban Constraints 
+
+For clarity, in this section, we walk through how Inequality (1) is enforced in Model (2). There are two cases. When the left-hand side of constraint (2m) is positive , the projected global drug supply in a scenario ω ∈ Ω is below a threshold r of the nominal global production ¯ g. This relationship forces the binary auxiliary variable zω to be zero, i.e., countries in set ¯J impose export bans (modeled via constraints (2n)). Conversely, when the left-hand side of constraint (2m) is non-positive , there is not a major projected shortage in the global drug supply. In this case, the binary auxiliary variable zω can take the value of zero or one. 
+
+• If there exists j′ ∈ ¯J such that yj′l = 1 for any l ∈ L and there is economically attractive demand to meet, then zω = 1 by constraints (2n) and the sense of the objective function (2d), maximization of profits. 
+
+• If ∄j′ ∈ ¯J such that yj′l = 1 for any l ∈ L, then zω can be zero or one. In this case, the value that zω takes will not affect model results since it will not affect the objective function and the international flows. 
+
+# 4 Data 
+
+This section presents a description of each dataset used for the sets and parameters. 44.1 Sets 
+
+The sets of suppliers ( I), potential locations of manufacturing plants ( J), and demand countries ( K) are from Sabogal De La Pava and Tucker (2025). The set of manufacturing quality levels of facilities ( L) is defined as {1, 2, 3}, where l = 3 represents the highest level of quality. Set ¯J, following procedures presented by Sabogal De La Pava and Tucker (2025), corresponds to countries that have banned the export of drugs according to the World Trade Organization databases (WTO, 2022a,b). 
+
+# 4.2 Stochastic Parameters 
+
+Supplier capacity strains ( γsi ) and demand ( dk) are obtained from Sabogal De La Pava and Tucker (2025). The production capacity strains ( γpjl ) are estimated as follows. For quality level l = 2, γpj2 is set equal to the probability mass functions estimated by Sabogal De La Pava and Tucker (2025). For l = 1 and l = 3, probability mass functions of γpj2 are modified such that E[γp,ω j2 ] is decreased by 1% and increased by 1%, respectively. 
+
+Disruption risks: Supplier quality disruptions ( ξqs i ) are modeled with Bernoulli dis-tributions as presented by Sabogal De La Pava and Tucker (2025). Manufacturing plant quality disruptions ( ξqp jl ) are estimated as follows. For quality level l = 2, ξqp j2 are set equal to Bernoulli distributions estimated by Sabogal De La Pava and Tucker (2025). For l = 1 and l = 3, ξqp j1 ∼ Bernoulli( ρqp j1), and ξqp j3 ∼ Bernoulli( ρqp j3), where ρqp j1 and ρqp j3 are estimated using the disruptions per year rate presented by Tucker et al. (2020) increased by 90% and decreased by 90%, respectively. Data to parameterize the natural disaster disruptions ( ξnd k ) approach from Section (S1) are given as follows.Level (1): the occurrence of a natural disaster in country k′ ∈ K,is modeled with the Bernoulli random variable Uk′ , that equals zero with probability ψk′
+
+indicating that country k′ is the origin of a natural disaster. ψk′ is estimated using The International Disaster Database EM-DAT (CRED, 2024). We obtained information on natural disasters that occurred around the world between the years 2000-2022, and that affected large populations (more than 500000 people). We considered the top hazards that affect pharmaceutical supply chains, i.e., flood, storm, wildfire and earthquake (Rumrill, Matthew and Rossi, Clifford, 2024). 5Level (2): the propagation effects of natural disasters exist between countries with common hazards. The set Hk for every k ∈ K, represents the set of countries with common hazards with country k, and is defined based on proximity. At the base case, for country k we consider the countries that are at most 3218 km (2000 miles) from country k. According to the EM-DAT database (CRED, 2024), most natural disasters that impact multiple countries occur between countries that are less than 2000 miles apart. We set the baseline strength of the disaster propagation to be ζ = 1000 km as base case (medium propagation), which is in the same order of magnitude as other works in this area (e.g., Lu et al. (2015); Li and Zhang (2018)). We evaluate the effects of a high propagation value ( ζ = 1300 km) in the Set III instances. Level (3): When a country is impacted by a natural disaster, it is not always the case that the production facilities will be disrupted. We consider the probability that manufacturing capacity in country k is disrupted given that a natural disaster hits country 
+
+k. It is parameterized according to the same set of natural disasters from Level (1). We estimate the conditional probability as the average of the affected population in country k
+
+vs. the total population of the country k across all included disasters that affected country 
+
+k (CRED, 2024). 
+
+# 4.3 Deterministic Parameters 
+
+Raw materials costs ( cs), production costs ( cp), transportation costs ( ct), prices ( p), supplier capacity ( qs), manufacturing plants capacity ( qp), and exogenous drug exports ( η) are taken from Sabogal De La Pava and Tucker (2025). Fixed costs for opening and operating manufacturing plants ( cfjl ) are estimated as fol-lows. For quality level l = 2, cfj2 are set equal to the data provided by Sabogal De La Pava and Tucker (2025). For l = 1, fixed costs are set equal to cfj2 reduced by 25% of the change in quality with respect to l = 2 (-90%). For l = 3, fixed costs are set equal to cfj2 increased by 50% of the improvement in quality with respect to l = 2 (90%). The holding costs of raw materials inventory ( ch) are set as 36% of the price (Tucker et al., 2020). One value for the threshold to impose export bans ( r) is set to 0.65 based on (Bulgarian Drug Agency, 2024). In Bulgaria, if the availability of a specific drug is less than 65% of the domestic demand for a period of one month, local authorities may implement export 6bans on that drug. Additional cases r ∈ { 0.8, 0.95 } are included to evaluate the effects of higher sensitivity. 
+
+# 5 Additional Details of Algorithms 
+
+# 5.1 Alternating Disjunctive Cut Method 
+
+A cut-generating linear program (18) that reflects the dynamics presented in Section 4.2, together with a normalizing constraint (18h), is used to find the multipliers and coefficients of the disjunctive cut. 
+
+max ˆθω ¯δω + X
+
+> j∈J
+
+X
+
+> l∈L
+
+ˆyjl ¯αωjl − ¯βω (18a) s.t. βω 
+
+> 0
+
+λc 
+
+> 0
+
++ X
+
+> j∈J
+
+λm 
+
+> 0j
+
++ X
+
+> j∈J
+
+X
+
+> l∈L
+
+λu 
+
+> 0jl
+
+≤ ¯βω (18b) 
+
+βω 
+
+> 1
+
+λc 
+
+> 1
+
++ X
+
+> j∈J
+
+λm 
+
+> 1j
+
++ X
+
+> j∈J
+
+X
+
+> l∈L
+
+λu 
+
+> 1jl
+
+≤ ¯βω (18c) ¯αωjl ≤ − αω
+
+> 0jl
+
+λc 
+
+> 0
+
++ λm 
+
+> 0j
+
++ λu 
+
+> 0jl
+
+∀j ∈ J, l ∈ L (18d) ¯αωjl ≤ − αω
+
+> 1jl
+
+λc 
+
+> 1
+
++ λm 
+
+> 1j
+
++ λu 
+
+> 1jl
+
+∀j ∈ J, l ∈ L (18e) ¯δω ≤ λc 
+
+> 0
+
+(18f) ¯δω ≤ λc 
+
+> 1
+
+(18g) 
+
+λc 
+
+> 0
+
++ λc 
+
+> 1
+
+= 1 (18h) 
+
+λc
+
+> 0
+
+, λ c
+
+> 1
+
+, λ m 
+
+> 0j
+
+, λ m 
+
+> 1j
+
+, λ u
+
+> 0jl
+
+, λ u 
+
+> 1jl
+
+≥ 0 ∀j ∈ J, l ∈ L (18i) 
+
+Algorithm 2 presents the Alternating Disjunctive Cut Method that alternates between Benders optimality cuts and disjunctive cuts to solve model (2). 7Algorithm 2: Alternating Disjunctive Cut Method 
+
+1: Input: Incumbent solution ( ˆθ, ˆy) of ( M P )
+
+2: for ω ∈ Ω do 
+
+3: Solve Qω
+
+> LP
+
+(ˆy)
+
+4: if ˆθω > Qω
+
+> LP
+
+(ˆy) then 
+
+5: Add a Benders optimality cut (4) to set O
+
+6: else 
+
+7: Solve Qω
+
+> LP
+
+(ˆy, z ω = 0) 
+
+8: Calculate Benders optimality cut coefficients ( αω 
+
+> 0
+
+, β ω 
+
+> 0
+
+) with (8)-(10) 
+
+9: Solve Qω
+
+> LP
+
+(ˆy, z ω = 1) 
+
+10: if Q ω
+
+> LP
+
+(ˆy, z ω = 1) is feasible then 
+
+11: Calculate Benders optimality cut coefficients ( αω 
+
+> 1
+
+, β ω 
+
+> 1
+
+) with (8)-(10) 
+
+12: Qω (ˆy) ← max {Qω
+
+> LP
+
+(ˆy, z ω = 0) , Qω
+
+> LP
+
+(ˆy, z ω = 1) }
+
+13: Solve cut-generating linear program (18) using ( ˆθω , ˆy, α ω 
+
+> 0
+
+, β ω 
+
+> 0
+
+, α ω 
+
+> 1
+
+, β ω 
+
+> 1
+
+) to find (¯δω ,¯ αω , ¯βω ) coefficients of disjunctive cut (11) 
+
+14: αω ← − ¯αω /¯δω , βω ← ¯βω /¯δω
+
+15: else 
+
+16: Qω (ˆy) ← Qω
+
+> LP
+
+(ˆy, z ω = 0) , α ω ← αω 
+
+> 0
+
+, β ω ← βω
+
+> 0
+
+17: end if 
+
+18: if ˆθω > Qω (ˆy) then 
+
+19: Add cut θω ≤ αω y + βω to set O
+
+20: end if 
+
+21: end if 
+
+22: end for 
+
+# 5.2 Alternating Bilinear Cut Method 
+
+As discussed in Section 4.3, constraints (19a)–(19d) are used to linearize yjl zω (a product of binary variables) through the use of an auxiliary binary variable, wωjl .
+
+wωjl ≤ zω ∀j ∈ J, l ∈ L, ω ∈ Ω (19a) 
+
+wωjl ≤ yjl ∀j ∈ J, l ∈ L, ω ∈ Ω (19b) 
+
+wωjl ≥ zω + yjl − 1 ∀j ∈ J, l ∈ L, ω ∈ Ω (19c) 
+
+wωjl ≥ 0 ∀j ∈ J, l ∈ L, ω ∈ Ω (19d) 
+
+Algorithm 3 is the Alternating Bilinear Cut Method. It alternates between Benders optimality cuts and linearized bilinear cuts. 8Algorithm 3: Alternating Bilinear Cut Method  
+
+> 1:
+
+Input: Incumbent solution ( ˆθ, ˆy) of ( M P ′) 
+
+> 2:
+
+for ω ∈ Ω do  
+
+> 3:
+
+Solve Qω
+
+> LP
+
+(ˆy) 
+
+> 4:
+
+if ˆθω > Qω
+
+> LP
+
+(ˆy) then  
+
+> 5:
+
+Add a Benders optimality cut (4) to set O′ 
+
+> 6:
+
+else  
+
+> 7:
+
+Solve Qω
+
+> LP
+
+(ˆy, z ω = 0)  
+
+> 8:
+
+Calculate Benders optimality cut coefficients ( αω 
+
+> 0
+
+, β ω 
+
+> 0
+
+) with (8)-(10)  
+
+> 9:
+
+Solve Qω
+
+> LP
+
+(ˆy, z ω = 1)  
+
+> 10:
+
+if Q ω
+
+> LP
+
+(ˆy, z ω = 1) is feasible then  
+
+> 11:
+
+Calculate Benders optimality cut coefficients ( αω 
+
+> 1
+
+, β ω 
+
+> 1
+
+) with (8)-(10)  
+
+> 12:
+
+Qω (ˆy) ← max {Qω
+
+> LP
+
+(ˆy, z ω = 0) , Qω
+
+> LP
+
+(ˆy, z ω = 1) } 
+
+> 13:
+
+else  
+
+> 14:
+
+Qω (ˆy) ← Qω
+
+> LP
+
+(ˆy, z ω = 0) , α ω 
+
+> 1
+
+← 0, β ω 
+
+> 1
+
+← 0 
+
+> 15:
+
+end if  
+
+> 16:
+
+if ˆθω > Qω (ˆy) then  
+
+> 17:
+
+Add cut (14) to set O′ 
+
+> 18:
+
+end if  
+
+> 19:
+
+end if  
+
+> 20:
+
+end for 
+
+# 6 Additional Computational Results 
+
+# 6.1 Single-Cut Adaptations of Our Cutting Plane Methods 
+
+In this subsection, we present the computational performance of the single-cut variants of the proposed algorithms. In these versions, a single cut is intended to be added to the master problem every time a feasible binary master problem solution is found. Table 1 summarizes the computational results for these modified methods. For each method, the table reports the average solution time (seconds) and the average number of branch-and-bound nodes explored of the samples solved to optimality within the time limit. These are under columns “Time” and “Nodes”, respectively. The column “Solved” indicates the number of samples (out of five) that were solved to optimality within the time limit. The column “Gap” reports the average gap of the samples that were not solved to optimality. 9Table 1: Computational performance for Set I (baseline) across single-cut methods                                                                                                                             
+
+> Set I Alt. Integer L-shaped Alt. Disjunctive Alt. Bilinear
+> r|Ω|Time Nodes Solved Gap Time Nodes Solved Gap Time Nodes Solved Gap
+> 0.65 100 101 1262 50.0% 115 1086 50.0% 120 1196 50.0% 500 695 1228 50.0% 742 1188 50.0% 793 1010 50.0% 1000 1588 1763 50.0% 1923 1438 50.0% 2000 1389 50.0% 0.80 100 102 1262 50.0% 111 1086 50.0% 122 1196 50.0% 500 677 1228 50.0% 744 1188 50.0% 771 1010 50.0% 1000 1593 1763 50.0% 1841 1438 50.0% 1961 1389 50.0% 0.95 100 159 1071 50.0% 198 1191 50.0% 249 1547 50.0% 500 878 1457 50.0% 1007 1356 50.0% 2541 2986 50.0% 1000 2446 2029 40.8% 2841 2085 40.2% --03.1%
+
+# 6.2 Alternating Integer L-Shaped Method with Disjunctive and Bilinear Cuts 
+
+We implemented two additional methods: (i) a combination of Integer L-shaped cuts with Disjunctive cuts and (ii) a combination of Integer L-shaped cuts with Bilinear cuts. Both methods were evaluated using instances in Set I with a geopolitical threshold of r = 0 .95. For these experiments, we tested the multi-cut versions of the proposed approaches and used the alternating strategy with the Benders optimality cuts. Computational results are presented in Table 2. Table 2: Computational performance of combined methods for Set I (baseline) with r = 0 .95 
+
+Set I Alt. Integer L-shaped + Disjunctive cuts Alt. Integer L-shaped + Bilinear cuts 
+
+|Ω| Time Nodes Solved Time Nodes Solved 
+
+100 139 365 5 271 609 5500 792 497 5 1168 719 51000 1761 501 5 2239 617 5
+
+# 6.3 Additional Results of the Alternating Integer L-Shaped Method 
+
+In this subsection, we present computational results for variants of the Alternating Integer L-shaped Cut Method. As explained in the manuscript, when variable zω is binary in the optimal solution of Qω
+
+> LP
+
+(ˆy), then an integer L-shaped cut can be generated as a byprod-10 uct when attempting to add a Benders optimality cut for scenario ω ∈ Ω. Considering this situation, we tested adding both cuts (Benders and Integer L-shaped), adding only a Benders cut, and adding only an Integer L-shaped cut. Table 3 reports the results of these experiments. We used three independent samples of 1000 scenarios under Set I and 
+
+r = 0 .95. All experiments were conducted with a time limit of 3600 seconds. Table 3: Computational results of Alternating Integer L-shaped Method variants with 
+
+|Ω| = 1000                             
+
+> r= 0 .95 Both Cuts Only Benders Only Integer L-shaped Sample Time Gap Time Gap Time Gap
+> a1154 0.0% 1183 0.0% >3600 1.6% b1081 0.0% 1314 0.0% 2188 0.0% c1089 0.0% 1153 0.0% >3600 2.4%
+
+# 6.4 Additional Results of the Alternating Bilinear Cut Method 
+
+In this subsection, we present computational results for a variant of the Alternating Bilinear Cut Method. In this variant, we include a feasibility cut for scenario ω ∈ Ω when solving 
+
+Qω
+
+> LP
+
+(ˆy, z ω = 1) is infeasible. The feasibility cut that is added to the master problem ( M P ′)is presented in (20). Table 4 reports the results of this variant and compares them with the original implementation. 
+
+zω ≤ | ¯Y1| − X 
+
+> (j,l )∈¯Y1
+
+yjl + X 
+
+> (j,l )∈¯Y0
+
+yjl (20) Where, ¯Y1 = {(j, l ) : yjl = 1 for all j ∈ J, l ∈ L} and ¯Y0 = {(j, l ) : yjl = 0 for all j ∈ J, l ∈ L}
+
+11 Table 4: Computational results for the Alternating Bilinear Cut Method variants under Set I                                                                
+
+> Alt. Bilinear Cut Without Feasibility Cut With Feasibility Cut
+> r|Ω|Time Nodes Solved Time Nodes Solved
+> 0.65 100 245 612 5242 612 5500 928 666 5972 666 51000 1387 567 51370 567 50.80 100 255 607 5247 607 5500 837 715 5952 659 51000 1493 568 51483 512 50.95 100 302 633 5279 617 5500 1116 630 51194 667 51000 1935 632 52507 595 5
+
+# References 
+
+Bulgarian Drug Agency (2024). Medicinal products in human medicine act. Retrieved from 
+
+https:https://www.bda.bg/en/legal-acts . Accessed November 12, 2024. CRED (2024). EM-DAT the international disaster database. Retrieved from https://www. emdat.be . Accessed March 13, 2024. Li, X. and K. Zhang (2018). A sample average approximation approach for supply chain network design with facility disruptions. Computers and Industrial Engineer-ing 126 (August), 243–251. Lu, M., L. Ran, and Z.-j. M. Shen (2015). Reliable Facility Location Design Under Uncertain Correlated Disruptions. Manufacturing and Service Operations Management 17 (4), 445– 455. Rumrill, Matthew and Rossi, Clifford (2024). How vulnerable is your pharma facility to natural disaster? Pharma Manufacturing . Retrieved from 
+
+https://www.pharmamanufacturing.com/facilities/article/33017109/ how-vulnerable-is-your-pharma-facility-to-natural-disaster . Accessed November 11, 2024. Sabogal De La Pava, M. L. and E. L. Tucker (2025). Effects of geopolitical strain on global pharmaceutical supply chain design and drug shortages. European Journal of Operational Research 327 (2), 641–654. Tucker, E. L., M. S. Daskin, B. V. Sweet, and W. J. Hopp (2020). Incentivizing resilient supply chain design to prevent drug shortages: Policy analysis using two- and multi-stage stochastic programs. IISE Transactions 52 (4), 394–412. WTO (2022a). Quantitative restrictions database. Retrieved from https://qr.wto.org/ en\#/home . Accessed October 1, 2022. 12 WTO (2022b). Trade monitoring database. Retrieved from https://tmdb.wto.org/en/ explore/goods\#nogo\%0A . Accessed October 1, 2022. 13

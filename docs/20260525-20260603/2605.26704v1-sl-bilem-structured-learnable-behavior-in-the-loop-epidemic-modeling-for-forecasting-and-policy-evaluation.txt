@@ -1,0 +1,923 @@
+Title: SL-BiLEM: Structured Learnable Behavior-in-the-Loop Epidemic Modeling for Forecasting and Policy Evaluation
+
+URL Source: https://arxiv.org/pdf/2605.26704v1
+
+Published Time: Wed, 27 May 2026 00:48:47 GMT
+
+Number of Pages: 11
+
+Markdown Content:
+# SL-BiLEM: Structured Learnable Behavior-in-the-Loop Epidemic Modeling for Forecasting and Policy Evaluation 
+
+## Haochun Wang 
+
+Faculty of Computing Harbin Institute of Technology Harbin, China hcwang@ir.hit.edu.cn 
+
+## Sendong Zhao ∗
+
+Faculty of Computing Harbin Institute of Technology Harbin, China sdzhao@ir.hit.edu.cn 
+
+## Jingbo Wang 
+
+Faculty of Computing Harbin Institute of Technology Harbin, China jbwang@ir.hit.edu.cn 
+
+## Yanrui Du 
+
+Faculty of Computing Harbin Institute of Technology Harbin, China yrdu@ir.hit.edu.cn 
+
+## Bing Qin 
+
+Faculty of Computing Harbin Institute of Technology Harbin, China qinb@ir.hit.edu.cn 
+
+## Ting Liu 
+
+Faculty of Computing Harbin Institute of Technology Harbin, China tliu@ir.hit.edu.cn 
+
+Abstract 
+
+Epidemic forecasting faces a fundamental challenge: human behav-ior dynamically responds to disease spread, creating feedback loops that induce distribution shifts at policy intervention points. This ren-ders data-driven models unreliable under distribution shift. We pro-pose SL-BiLEM (Structured Learnable Behavior-in-the-Loop Epi-demic Model), leveraging physical constraints as regularization for robust extrapolation. The framework decomposes effective trans-mission as 𝛽 eff (𝑡, 𝑔 ) = 𝛽 0 (𝑔 ) × 𝑚 policy (𝑡 ) × 𝑚 media (𝑡 ) × 𝑚 comp (𝑡, 𝑔 ),where monotonicity, smoothness, and bounded-jump constraints on the learned compliance function maintain predictive validity under novel policy regimes. Beyond forecasting, SL-BiLEM enables counterfactual analysis for intervention decision support. We vali-date forecasting on three real-world datasets (cruise ship, school influenza, and school-district COVID-19 surveillance) and evalu-ate counterfactual recovery on synthetic benchmarks with known ground truth. SL-BiLEM demonstrates: (1) 76% improvement over neural-mechanistic baselines, with only 53% OOD degradation ver-sus 1142% for neural baselines under policy-induced shift; (2) 100% bootstrap CI coverage across 27 synthetic counterfactual experi-ments; and (3) Treatment Effect Accuracy exceeding 0.85. These results establish SL-BiLEM as an interpretable tool for public health decision-makers seeking accurate prediction and principled inter-vention planning. 
+
+CCS Concepts 
+
+• Computing methodologies → Modeling and simulation .
+
+Keywords 
+
+Epidemic Forecasting, Counterfactual Policy Evaluation, Mechanis-tic Models, Behavior Modeling  
+
+> ∗Corresponding author.
+> This work is licensed under a Creative Commons Attribution 4.0 International License.
+> KDD 2026, Jeju Island, Republic of Korea.
+> ©2026 Copyright held by the owner/author(s). ACM ISBN 979-8-4007-2259-2/2026/08 https://doi.org/10.1145/3770855.3818079
+
+ACM Reference Format: 
+
+Haochun Wang, Sendong Zhao, Jingbo Wang, Yanrui Du, Bing Qin, and Ting Liu. 2026. SL-BiLEM: Structured Learnable Behavior-in-the-Loop Epidemic Modeling for Forecasting and Policy Evaluation. In Proceedings of the 32nd ACM SIGKDD Conference on Knowledge Discovery and Data Mining V.2 (KDD 2026), August 9–13, 2026, Jeju Island, Republic of Korea. ACM, New York, NY, USA, 11 pages. https://doi.org/10.1145/3770855.3818079 
+
+1 Introduction 
+
+Epidemic forecasting and policy evaluation are critical for public health decision-making, yet they represent fundamentally different analytical tasks. Forecasting asks “what will happen?”—predicting future case counts given current trends. Policy evaluation asks “what would happen if?”—estimating counterfactual outcomes under al-ternative intervention scenarios. The COVID-19 pandemic, which caused over 7 million deaths globally and trillions of dollars in economic losses [ 8], demonstrated the urgent need for both capa-bilities: accurate short-term forecasts for resource allocation, and credible counterfactual analysis for intervention timing and policy design. However, existing methods excel at one task while failing at the other, leaving decision-makers without a unified tool for evidence-based planning. The fundamental challenge underlying both tasks is behavior-in-the-loop feedback: human behavior dynamically responds to disease spread, creating feedback loops that alter transmission dy-namics [ 10 , 31 ]. As case counts rise, individuals adapt through policy compliance, risk perception, and information exposure— wearing masks, reducing contacts, or avoiding crowded spaces. These behavioral changes reduce transmission, which in turn af-fects future case counts, completing the feedback loop. Critically, this feedback induces distribution shifts precisely when reliable predictions matter most at policy intervention points. When a government announces a lockdown, the statistical relationships learned from pre-intervention data no longer hold, causing data-driven models to fail catastrophically. This is not merely a technical inconvenience—it represents a fundamental barrier to trustworthy epidemic modeling. Current epidemic modeling paradigms each address only part of this challenge. Compartmental models (e.g., SEIR [ 1, 16 ]) provide interpretable structure with natural counterfactual semantics—one  
+
+> arXiv:2605.26704v1 [cs.LG] 26 May 2026 KDD 2026, August 9–13, 2026, Jeju Island, Republic of Korea. Wang et al.
+
+can simulate “what if 𝛽 were different?”—but they absorb behav-ioral dynamics into hand-crafted time-varying transmission rates 
+
+𝛽 (𝑡 ), typically specified as step functions or threshold-based rules. These manual specifications cannot capture complex, data-driven behavioral responses and are difficult to validate or transfer across settings. Data-driven models including time-series forecasters (ARIMA, Prophet, neural networks) can extrapolate trends with high in-sample accuracy, but they lack explicit representations of interventions. Under policy-induced distribution shifts, their pre-dictions degrade severely, and they cannot provide counterfactual estimates because their learned correlations conflate causal and spurious relationships [ 23 ]. LLM-based approaches [32 ] offer flexibility in incorporating textual information, but using LLMs as black-box forecasters raises fundamental concerns about repro-ducibility, bias, and auditability—critical requirements for public health applications where decisions affect millions of lives. No ex-isting approach simultaneously achieves: (i) learnable behavioral dynamics from data, (ii) interpretable structure for counterfactual analysis, (iii) robustness under distribution shift, and (iv) repro-ducibility for scientific validation. To address these limitations, we propose SL-BiLEM (Structured 
+
+Learnable Behavior-in-the-Loop Epidemic Model), a unified frame-work that simultaneously enables multi-horizon forecasting and counterfactual policy evaluation. The key insight is that behav-ioral responses, while complex, obey certain physical regularities: compliance increases monotonically with perceived risk, changes smoothly over time, and exhibits bounded daily variations. By en-coding these regularities as inductive biases, we constrain the hy-pothesis space to behaviorally plausible functions that generalize under distribution shift. Specifically, we decompose effective trans-mission into interpretable multiplicative factors: 
+
+𝛽 eff (𝑡, 𝑔 ) = 𝛽 0 (𝑔 ) × 𝑚 policy (𝑡 ) × 𝑚 media (𝑡 ) × 𝑚 comp (𝑡, 𝑔 )
+
+where 𝛽 0 (𝑔 ) is the baseline transmissibility for group 𝑔 , 𝑚 policy (𝑡 )
+
+captures direct policy effects derived from intervention signals, 
+
+𝑚 media (𝑡 ) captures information-driven behavioral changes, and 
+
+𝑚 comp (𝑡, 𝑔 ) is a learned compliance function that responds to epi-demic risk under physical constraints (monotonicity, smoothness, bounded jumps). The term “structured” means each factor has clear epidemiological semantics and can be independently analyzed or ablated; “learnable” means 𝑚 comp is calibrated from case data rather than hand-specified. To incorporate real-world policy information without sacrificing reproducibility, we restrict LLMs to upstream text-to-event extraction, ensuring that downstream mechanistic modeling and counterfactual assumptions remain transparent and auditable. In summary, our contributions are as follows: (1) Structured learnable compliance with physical con-straints. We propose a novel decomposition of effective transmission into interpretable multiplicative factors, where the compliance function is learned from case data under three physical constraints—monotonicity, smoothness, and bounded jumps. Unlike hand-crafted 𝛽 (𝑡 ) specifications in traditional compartmental models, these constraints serve as inductive biases that enable robust extrapolation under distribution shift while maintaining epidemiological inter-pretability. (2) Reproducible LLM integration for policy signal extrac-tion. We restrict LLMs to upstream text-to-event extraction, isolating LLM variability to a single cacheable preprocessing step while preserving mechanistic transparency for down-stream counterfactual analysis. This architectural choice ensures that intervention assumptions remain explicit and auditable—a critical requirement for public health applica-tions. (3) Comprehensive empirical validation with novel evalu-ation metrics. We validate SL-BiLEM on three real-world datasets spanning diverse epidemic scenarios (cruise ship, school influenza, and school-district COVID-19 surveillance), demonstrating 76% improvement over neural-mechanistic baselines with only 53% OOD degradation versus 1142% for neural baselines. We introduce Treatment Effect Accuracy (TEA) to quantify counterfactual estimation quality, achiev-ing TEA ≥ 0.85 with 100% bootstrap CI coverage across 27 synthetic experiments with known ground truth. 
+
+2 Related Work 2.1 Behavior-in-the-Loop Epidemic Modeling 
+
+Real-world epidemics exhibit feedback loops between human be-havior and disease spread [ 10 , 29 ]. Traditional models ignoring behavior change can misestimate dynamics and intervention ef-fects. Behavioral models range from data-driven approaches using mobility data [ 11 ] to analytical feedback models with endogenous mechanisms [ 31 ]. The latter often outperform pure data-driven methods in capturing long-term dynamics, as they model the feed-back loop rather than merely fitting historical trends [ 12 ]. Studies show that behavioral sensitivity varies with cumulative deaths, vaccination rates, and “pandemic fatigue” [ 3, 31 ]. Most existing models either rely on hand-crafted 𝛽 (𝑡 ) functions or require real-time mobility data for forecasting. Our framework addresses this by learning compliance from case data under structural constraints. 
+
+2.2 Multi-Group Heterogeneity and Network-Based Models 
+
+Different population groups exhibit heterogeneous contact patterns and susceptibilities [ 20 ]. Age-stratified models using contact matri-ces (e.g., POLYMOD) have been crucial in COVID-19 and influenza studies, revealing that young adults often serve as transmission “sources” while elderly populations are infection “sinks” [ 7 , 22 , 25 ]. Mixing assumptions have evolved from homogeneous random mix-ing to semi-random mixing (SeRaMix) that acknowledges contacts are drawn from finite recurrent pools [ 25 ]. For fine-grained in-terventions, agent-based models (ABMs) simulate disease spread through explicit contact networks [ 17 ]. Network topology criti-cally affects epidemic dynamics: small-world networks show that even a few long-range links drastically lower the percolation thresh-old [ 30 ], while scale-free networks with hub nodes have no epidemic threshold in the infinite limit [ 21 ]. Modern ABMs model contacts as multi-layer networks including households, workplaces, and transient community contacts [ 33 ]. Our framework bridges com-partmental efficiency with network-aware heterogeneity through structured mixing matrices and group-specific dynamics. SL-BiLEM: Structured Learnable Behavior-in-the-Loop Epidemic Modeling for Forecasting and Policy Evaluation KDD 2026, August 9–13, 2026, Jeju Island, Republic of Korea. 
+
+2.3 Policy Intervention and Counterfactual Evaluation 
+
+Epidemic outcomes are shaped by exogenous interventions and in-formation feedback [ 24 ]. Adaptive policies use surveillance triggers with trade-offs: low thresholds squash peaks but require longer restrictions; high thresholds risk larger outbreaks [ 18 , 24 ]. Coupled information-epidemic models analyze how official news versus ru-mors impact compliance, though excessive information may cause fatigue [ 10 , 34 ]. Large language models offer new possibilities for integrating unstructured data—extracting policy events from legal text, news, and WHO reports [ 26 , 32 ]. However, using LLMs as di-rect predictors raises reproducibility concerns [ 3 ]. Our framework restricts LLMs to upstream extraction with caching and optional distillation, ensuring the core model remains transparent. Counter-factual analysis faces the fundamental problem that we cannot ob-serve both factual and counterfactual outcomes simultaneously [ 6]. Physics-informed neural networks embed epidemiological equa-tions into loss functions, ensuring predictions respect biological constraints [ 9]. Synthetic datasets with known causal ground truth enable benchmarking [ 33 ]. However, existing work lacks standard-ized metrics for evaluating counterfactual estimation quality. 
+
+3 Problem Formulation 
+
+We formalize the epidemic modeling problem with explicit consid-eration of behavioral feedback and distribution shift challenges. 
+
+3.1 Notation and Data 
+
+Observed data. Let {𝑦 𝑡 }𝑇 𝑡 =1 denote the daily reported case counts for a population of size 𝑁 . When population heterogeneity is avail-able, we observe group-indexed counts {𝑦 𝑡,𝑔 }𝑔 ∈ G where G is the set of groups. 
+
+Intervention and information signals. We consider two types of signals that influence transmission dynamics: 
+
+• Policy signal {𝑠 𝑡 }𝑇 𝑡 =1: A strictness measure 𝑠 𝑡 ∈ [ 0, 1] repre-senting the intensity of non-pharmaceutical interventions (NPIs) at time 𝑡 , where 𝑠 𝑡 = 0 indicates no restrictions and 
+
+𝑠 𝑡 = 1 indicates maximum restrictions (e.g., full lockdown). 
+
+• Media/information signal {𝑚 𝑡 }𝑇 𝑡 =1: A measure 𝑚 𝑡 ∈ [ 0, 1]
+
+capturing the intensity of risk-related information exposure (e.g., news coverage, public health announcements). These signals may be directly available as structured data or ex-tracted from unstructured text via upstream processing. 
+
+Mixing structure (multi-group extension). When modeling het-erogeneous populations, we specify a contact matrix 𝐶 ∈ R| G | × | G | ,where 𝐶 𝑔ℎ represents the relative contact frequency between groups 
+
+𝑔 and ℎ. This enables analysis of age-stratified or spatially-structured epidemics with group-specific transmission dynamics. 
+
+3.2 Core Challenge: Behavior-Induced Distribution Shift 
+
+The central challenge in epidemic modeling is that human behavior responds to disease dynamics, creating a feedback loop: Cases 𝑦 𝑡 
+
+> risk perception
+
+−−−−−−−−−−−→ Behavior 𝑐 𝑡 
+
+> transmission reduction
+
+−−−−−−−−−−−−−−−−→ Future cases 𝑦 𝑡 +𝑘 
+
+(1) This feedback induces distribution shift at precisely the moments when accurate predictions are most critical—policy intervention points. When a government announces new restrictions, the statisti-cal relationships learned from pre-intervention data no longer hold, causing purely data-driven models to fail. Any effective modeling framework must explicitly account for this behavioral feedback mechanism. 
+
+3.3 Task Definitions 
+
+We address two complementary tasks that together support public health decision-making: 
+
+Task 1: Multi-horizon forecasting. Given observations and signals up to time 𝜏 , i.e., D𝜏 = {( 𝑦 𝑡 , 𝑠 𝑡 , 𝑚 𝑡 )} 𝜏 𝑡 =1, predict case counts for the next 𝐻 days: Forecast: D𝜏 ↦ → { ˆ𝑦 𝜏 +1, ˆ𝑦 𝜏 +2, . . . , ˆ𝑦 𝜏 +𝐻 }. (2) We evaluate forecasting performance in a rolling-origin setting: for each cut-off time 𝜏 ∈ { 𝜏 1, 𝜏 2, . . . }, we generate forecasts at multi-ple horizons 𝐻 ∈ { 7, 14 , 28 } days and compare against held-out observations. 
+
+Task 2: Counterfactual policy evaluation. Given a fitted model on observed history D𝑇 and a counterfactual intervention scenario 
+
+{𝑠 cf  
+
+> 𝑡
+
+} (e.g., earlier lockdown, different strictness level), estimate what would have happened under the alternative policy: Counterfactual: (𝜃 ∗, {𝑠 cf  
+
+> 𝑡
+
+}) ↦ → { ˆ𝑦 cf  
+
+> 𝑡
+
+}𝑇 𝑡 =1, (3) where 𝜃 ∗ denotes the calibrated model parameters. Key counterfac-tual quantities include: 
+
+• Cumulative cases averted: Í𝑡 (𝑦 obs  
+
+> 𝑡
+
+− ˆ𝑦 cf  
+
+> 𝑡
+
+)• Peak reduction: (max 𝑡 𝑦 obs  
+
+> 𝑡
+
+− max 𝑡 ˆ𝑦 cf  
+
+> 𝑡
+
+)/ max 𝑡 𝑦 obs 
+
+> 𝑡
+
+• Delay to peak: arg max 𝑡 ˆ𝑦 cf  
+
+> 𝑡
+
+− arg max 𝑡 𝑦 obs 
+
+> 𝑡
+
+4 Method 4.1 Overview 
+
+The design of SL-BiLEM is guided by two core principles: 
+
+Principle 1: Structured decomposition for interpretability. Rather than learning a monolithic time-varying transmission rate 𝛽 (𝑡 ),we decompose effective transmission into semantically meaningful factors—policy effects, media influence, and behavioral compliance— enabling independent analysis, transparent counterfactual reason-ing, and component transfer across settings. 
+
+Principle 2: Physical constraints as regularization. We encode behavioral regularities as hard constraints: compliance increases monotonically with perceived risk, changes smoothly over time, and exhibits bounded daily variations. These constraints dramatically KDD 2026, August 9–13, 2026, Jeju Island, Republic of Korea. Wang et al. 
+
+reduce the hypothesis space, preventing overfitting to spurious correlations that break under distribution shift. 
+
+4.2 Mechanistic Foundation: SEIR Dynamics 
+
+We build on the classical SEIR compartmental model as our dynam-ical backbone, chosen for its interpretability and well-understood epidemiological semantics. For a single homogeneous population, the dynamics evolve susceptible 𝑆 (𝑡 ), exposed 𝐸 (𝑡 ), infectious 𝐼 (𝑡 ),and removed 𝑅 (𝑡 ) compartments: 
+
+𝑑𝑆 𝑑𝑡 = −𝛽 eff (𝑡 ) 𝑆𝐼 𝑁 , 𝑑𝐸 𝑑𝑡 = 𝛽 eff (𝑡 ) 𝑆𝐼 𝑁 − 𝜎𝐸, (4) 
+
+𝑑𝐼 𝑑𝑡 = 𝜎𝐸 − 𝛾𝐼, 𝑑𝑅 𝑑𝑡 = 𝛾𝐼, (5) where 𝑁 is population size, 𝛽 eff (𝑡 ) is the time-varying effective transmission rate (detailed in Section 4.3), 𝜎 is the incubation transition rate (inverse of mean latent period), and 𝛾 is the recov-ery/removal rate (inverse of mean infectious period). We discretize these dynamics on a daily grid using a fourth-order Runge-Kutta in-tegrator and treat daily incidence as ˆ𝚤 𝑡 ≈ 𝜎𝐸 (𝑡 ). The key departure from standard SEIR is that 𝛽 eff (𝑡 ) is not a hand-crafted function but emerges from our structured decomposition with learned compli-ance, as detailed next. 
+
+4.3 Structured Transmission Decomposition 
+
+SL-BiLEM represents effective transmission as an interpretable multiplicative decomposition: 
+
+𝛽 eff (𝑡, 𝑔 ) = 𝛽 0 (𝑔 ) · 𝑚 policy (𝑡 ) · 𝑚 media (𝑡 ) · 𝑚 comp (𝑡, 𝑔 ), (6) where 𝛽 0 (𝑔 ) is the baseline transmissibility for group 𝑔 , and each multiplier 𝑚 ∈ [ 0, 1] captures a distinct mechanism by which trans-mission is reduced. This decomposition is “structured” in the sense that each factor has clear epidemiological semantics. The multiplica-tive form reflects the epidemiological intuition that these factors act independently on contact rates. Each multiplier takes the form 𝑚 = 1 − 𝜌 · 𝑥 , where 𝑥 ∈ [ 0, 1]
+
+is a normalized input signal (policy strictness, media intensity, or compliance level) and 𝜌 ∈ [ 0, 1] is a maximum reduction parameter that bounds the effect magnitude. We use subscripted 𝜌 notation consistently: 𝜌 policy , 𝜌 media , and 𝜌 comp (𝑔 ) for the three components respectively. This parameterization ensures: (i) 𝑚 = 1 when 𝑥 = 0
+
+(no effect), (ii) 𝑚 ≥ 1 − 𝜌 even at maximum input (bounded effect), and (iii) interpretable effect sizes. The 𝜌 parameters encode domain knowledge about realistic effect ceilings—for instance, even perfect policy compliance cannot eliminate all transmission due to essential contacts. We now describe each component in detail. 
+
+Policy multiplier 𝑚 policy (𝑡 ). This multiplier captures the direct effect of non-pharmaceutical interventions (NPIs) such as lock-downs, school closures, or gathering restrictions. Following the multiplicative NPI effectiveness framework established in large-scale intervention studies [ 4, 8], we model policy effects as pro-portional reductions in transmission. Given policy events with associated strictness levels 𝑠 𝑡 ∈ [ 0, 1] and a maximum reduction parameter 𝜌 policy ∈ [ 0, 1]:
+
+𝑚 policy (𝑡 ) = 1 − 𝜌 policy 𝑠 𝑡 . (7) Here 𝑠 𝑡 = 0 indicates no restrictions (full transmission), 𝑠 𝑡 = 1 indi-cates maximum restrictions, and 𝜌 policy captures the effectiveness ceiling of policy interventions. This linear form is consistent with empirical findings that NPI effects are approximately additive in log-transmission space [ 4]. Policy events can be manually specified from official announcements or extracted from text using the LLM interface (Section 4.7). 
+
+Media multiplier 𝑚 media (𝑡 ). This multiplier captures information-driven behavioral changes from media exposure that occur indepen-dently of mandated policies—for example, voluntary mask-wearing after news coverage of rising cases. Following coupled information-epidemic models [ 10 , 34 ], we model media effects with exponential decay to capture two well-documented phenomena: (i) information persistence, where behavioral changes outlast the triggering event, and (ii) information fatigue, where the impact of news diminishes over time: 
+
+𝑎 𝑡 = min 
+
+©«
+
+1,∑︁   
+
+> 𝑒 ∈ E media
+> 𝑡 𝑒 ≤𝑡
+
+𝐼 𝑒 · exp 
+
+
+
+− 𝑡 − 𝑡 𝑒 
+
+𝜏 decay 
+
+ª®®®¬
+
+, (8) 
+
+𝑚 media (𝑡 ) = 1 − 𝜌 media 𝑎 𝑡 . (9) where Emedia is the set of media events, 𝐼 𝑒 ∈ [ 0, 1] is the intensity of event 𝑒 , 𝑡 𝑒 is the event time, 𝜏 decay is the decay constant (default 14 days based on typical news cycle duration [ 34 ]), and 𝜌 media is the maximum media-driven reduction. The clipping step keeps the accumulated media signal in [0, 1] and prevents the multiplier from becoming negative. 
+
+Compliance multiplier 𝑚 comp (𝑡, 𝑔 ). Unlike policy and media ef-fects, which are driven by external events, compliance represents the behavioral response to perceived epidemic risk. This formula-tion is grounded in awareness-driven behavior change models [ 31 ], which demonstrate that epidemic dynamics can shift from peaks to plateaus when populations adaptively respond to perceived risk. The feedback loop—where rising cases increase compliance, which reduces transmission, which affects future cases—is the core mech-anism that distinguishes behavior-in-the-loop models from static approaches [10, 29]. We model this as: 
+
+𝑐 𝑡 = 𝑓 𝜃 (𝑟 𝑡 , 𝑠 𝑡 ) , 𝑚 comp (𝑡, 𝑔 ) = 1 − 𝜌 comp (𝑔 ) 𝑐 𝑡,𝑔 , (10) where all quantities are normalized to [0, 1]: 𝑟 𝑡 is the risk signal computed from recent incidence (Appendix A), 𝑐 𝑡 is the compliance level, and 𝜌 comp (𝑔 ) controls the maximum behavioral reduction for group 𝑔 . The function 𝑓 𝜃 is the learnable compliance module optimized from case data under physical constraints, detailed next. 
+
+4.4 Compliance with Physical Constraints 
+
+Learning the compliance function 𝑓 𝜃 from case data is challenging because: (i) compliance is not directly observed—we only see its downstream effect on case counts; (ii) the feedback loop creates confounding between compliance and transmission; (iii) limited data during early outbreaks makes overfitting a severe risk. We impose physical constraints that encode behavioral regularities, reducing the hypothesis space while maintaining expressiveness. SL-BiLEM: Structured Learnable Behavior-in-the-Loop Epidemic Modeling for Forecasting and Policy Evaluation KDD 2026, August 9–13, 2026, Jeju Island, Republic of Korea. Layer 1: 
+
+LLM -based Extraction 
+
+Layer 2: 
+
+𝛽 Decomposition 
+
+Layer 3: 
+
+Compartmental Model 
+
+Layer 4: 
+
+Outputs 
+
+Scenario Description/News/ 
+
+Counterfactual Policy 
+
+LLM -based 
+
+Extraction 
+
+Structured 
+
+Events 
+
+𝛽 ! 𝑔 
+
+Baseline 
+
+m"#$%&' 𝑡 
+
+Policy 
+
+m()*%+ 𝑡 
+
+Media 
+
+m&#(" 𝑡 , 𝑔 
+
+Compliance 
+
+Mixing 
+
+Matrix 𝐶 
+
+Multi -Group SEIR: 
+
+𝑆 ,, 𝐸 ,, 𝐼 ,, 𝑅 ,
+
+Physical 
+
+Constraints 
+
+Forecasting: !𝑦 !"#:!"% Counterfactual: !𝑦 &' 
+
+Risk 𝑟 !
+
+𝛽 )-- 𝑡 , 𝑔 = 𝛽 ! 𝑔 ×m"#$%&' 𝑡 ×m()*%+ 𝑡 ×m&#(" 𝑡 , 𝑔 
+
+Figure 1: SL-BiLEM framework architecture. The core SEIR dynamics are modulated by a structured transmission decomposition that includes a learnable compliance component. Physical constraints are enforced on the compliance function to ensure behavioral plausibility and robust extrapolation under distribution shift. 
+
+Constraint 1: Monotonicity. Compliance should increase, or at least not decrease, with perceived risk, since people do not become less cautious as danger increases. Formally, 𝑓 𝜃 must be monotoni-cally non-decreasing in the risk signal. This constraint eliminates spurious solutions where the model explains transmission reduc-tion through decreasing compliance, which would be behaviorally implausible. 
+
+Constraint 2: Smoothness. Behavioral changes exhibit inertia— habits, social norms, and cognitive limitations prevent instanta-neous adaptation. We penalize rapid day-to-day changes: 
+
+Rsmooth = 𝜆 𝑠 ∑︁ 𝑡 
+
+ 𝑚 comp (𝑡 + 1) − 𝑚 comp (𝑡 )2 . (11) This regularization prevents the model from fitting noise in daily case counts through high-frequency compliance oscillations. 
+
+Constraint 3: Bounded jumps. Even under dramatic events (e.g., celebrity death from COVID, major policy announcement), behav-ioral change has cognitive and social limits. We impose: 
+
+𝑚 comp (𝑡 + 1) − 𝑚 comp (𝑡 ) ≤ 𝛿 max , (12) where 𝛿 max represents the maximum plausible daily change in compliance-driven transmission reduction. 
+
+Why these constraints enable robust extrapolation. The key in-sight is that these constraints encode domain knowledge across distribution shift. When a new policy is announced, the statistical correlations in historical data may break, but the behavioral regular-ities persist: people will still respond monotonically to risk, change gradually, and have bounded adaptation rates. By constraining the learned function to this behaviorally plausible subspace, we achieve models that extrapolate reliably to novel regimes. Figure 2 provides a schematic illustration of a learned compliance function satisfying these constraints. The monotonic, smooth curve captures the in-tuitive relationship between risk and compliance while avoiding overfitting to noise. 5 10 15 20 25 30                
+
+> Day
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Value
+> Peak risk
+> (a) Temporal dynamics of compliance response
+> Risk signal rt
+> Compliance ct
+> mcomp (t)
+> 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8
+> Risk signal rt
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Compliance  ct
+> Monotonicity:
+> ct/rt0
+> (b) Learned compliance function (monotonic)
+> Observed
+> Learned f(rt)
+> 95% CI
+
+Figure 2: Schematic illustration of compliance behavior un-der physical constraints. (a) Temporal co-evolution of risk sig-nal, compliance, and transmission multiplier. (b) The learned monotonic compliance function 𝑓 𝜃 (𝑟 𝑡 ).
+
+The compliance function 𝑓 𝜃 is implemented as a monotonic neu-ral network with non-negative weight constraints to guarantee the monotonicity property. Architecture details are provided in Appendix A.2. 
+
+Constrained Optimization. We enforce the physical constraints via projected gradient descent. The optimization objective combines a negative binomial likelihood with constraint penalties: 
+
+min  
+
+> 𝜃
+
+L( 𝜃 ) + 𝜆 𝑠 Rsmooth (𝜃 ) + 𝜆 𝑚 Rmono (𝜃 ), (13) where: 
+
+L( 𝜃 ) = −∑︁ 
+
+> 𝑡
+
+log 𝑃 NB (𝑦 𝑡 | 𝜇 𝑡 (𝜃 ), 𝑟 ), (14) 
+
+𝑦 𝑡 is the observed case count, 𝜇 𝑡 (𝜃 ) is the model-predicted expected count, 𝑟 is the overdispersion parameter, and Rmono penalizes vio-lations of monotonicity. At each optimization step, we project onto the feasible set via sequential operations: (i) non-negative weight clipping for monotonicity, (ii) isotonic regression for smoothness, and (iii) sequential clipping for bounded jumps. The complete train-ing procedure is provided in Algorithm 1 (Appendix B). KDD 2026, August 9–13, 2026, Jeju Island, Republic of Korea. Wang et al. 
+
+4.5 Multi-Group Extension 
+
+Real epidemics exhibit heterogeneity across demographic groups (age, occupation, location) with distinct contact patterns and be-havioral responses. SL-BiLEM extends naturally to heterogeneous populations. 
+
+Group-specific dynamics. Each group 𝑔 ∈ G maintains its own SEIR compartments with group-specific parameters: 
+
+𝑑𝑆 𝑔 
+
+𝑑𝑡 = −𝑆 𝑔 ∑︁ 
+
+> ℎ∈ G
+
+𝐶 𝑔ℎ 𝛽 eff (𝑡, ℎ ) 𝐼 ℎ
+
+𝑁 ℎ
+
+, (15) 
+
+𝑑𝐸 𝑔 
+
+𝑑𝑡 = 𝑆 𝑔 ∑︁ 
+
+> ℎ∈ G
+
+𝐶 𝑔ℎ 𝛽 eff (𝑡, ℎ ) 𝐼 ℎ
+
+𝑁 ℎ
+
+− 𝜎𝐸 𝑔 , (16) 
+
+𝑑𝐼 𝑔 
+
+𝑑𝑡 = 𝜎𝐸 𝑔 − 𝛾𝐼 𝑔 , 𝑑𝑅 𝑔 
+
+𝑑𝑡 = 𝛾𝐼 𝑔 , (17) where 𝐶 𝑔ℎ is the mixing matrix element representing relative con-tact frequency between groups 𝑔 and ℎ. Each group has its own baseline transmissibility 𝛽 0 (𝑔 ), maximum compliance reduction 
+
+𝜌 comp (𝑔 ), and compliance response 𝑐 𝑡,𝑔 .
+
+4.6 Counterfactual Policy Evaluation 
+
+Counterfactual analysis estimates what would have happened un-der alternative policy scenarios. This is enabled by the structured decomposition, which allows modifying specific components while holding others fixed. A counterfactual scenario specifies alterna-tive policy events {𝑠 ′ 
+
+> 𝑡
+
+} while holding epidemiological parameters 
+
+(𝛽 0, 𝜎, 𝛾 ) and compliance structure 𝑓 𝜃 fixed at their calibrated val-ues. The counterfactual trajectory is obtained by re-simulating with modified policy multipliers: 
+
+𝑚 ′ 
+
+> policy
+
+(𝑡 ) = 1 − 𝜌 policy · 𝑠 ′ 
+
+> 𝑡
+
+. (18) We compute the three policy-relevant metrics defined in Sec-tion 3.3. To quantify uncertainty, we use block bootstrap: resample and refit the model 𝐵 times, compute counterfactual trajectories for each bootstrap sample, and report 95% confidence intervals from the empirical distribution. The complete counterfactual evaluation procedure is provided in Algorithm 2 (Appendix B). 
+
+4.7 LLM-Based Event Extraction 
+
+Policy and media events can be extracted from unstructured text us-ing LLMs. Each extracted event contains: event type (policy/media), date, strictness/intensity ∈ [ 0, 1], affected groups, and description. To ensure reproducibility, we restrict LLMs to this upstream extrac-tion step and provide caching mechanisms for deterministic replay. Implementation details are in Appendix C. 
+
+5 Experiments 5.1 Datasets 
+
+We use three real-world datasets representing diverse epidemic scenarios: 
+
+• Diamond Princess [19 ]: 14-day COVID-19 outbreak (Feb 5–19, 2020) on a cruise ship with 3,711 passengers and crew. The known quarantine timing provides a natural policy intervention point, making this an ideal testbed for evaluating policy-aware models. 
+
+• British Boarding School [13 ]: Classic 14-day H1N1 outbreak (763 students, Jan 22–Feb 4, 1978). No explicit policy intervention was implemented, but natural behavioral response to rising cases creates an implicit feedback loop. 
+
+• Illinois Schools [15 ]: Illinois K–8 school-district COVID-19 surveillance data with 8,150 total population (6,997 students and 1,153 employees), featuring repeated testing and intervention records including mask mandates, hybrid learning transitions, and quarantine protocols. Dataset details are provided in Appendix D. 
+
+5.2 Baselines and Evaluation Protocol 
+
+We compare against three categories of baselines representing the spectrum of epidemic modeling approaches: 
+
+Mechanistic models. SEIR (constant 𝛽 , no behavioral response), SEIR+Policy (step-function reduction after known intervention time 𝑡 𝑝 ), and SEIR+Threshold (binary response when cases exceed learned threshold 𝜃 ). These represent progressively sophisticated approaches to behavioral modeling: SEIR+Policy captures discrete regime changes from external interventions, while SEIR+Threshold captures reactive behavior triggered by epidemic severity. Both sup-port counterfactual analysis but assume abrupt, binary responses rather than the continuous adaptation observed in real populations. 
+
+Data-driven models. Prophet [ 27 ] (additive time series decom-position) and TCN [ 2] (temporal convolutional network). These methods achieve strong in-distribution forecasting through pattern matching but cannot perform counterfactual analysis. 
+
+Hybrid neural-mechanistic models. Neural ODE [ 5 ] (continuous-time dynamics) and EARTH [ 28 ] (neural ODEs with implicit SIR-like state transitions and graph-based regional transmission). While incorporating mechanistic structure, these methods lack explicit behavioral feedback and cannot incorporate policy signals for coun-terfactual analysis. 
+
+5.3 Forecasting Performance 
+
+5.3.1 Main Results. Table 1 demonstrates forecasting performance across all datasets and methods. 
+
+Table 1: Forecasting performance (Test RMSE ± std) with 5-fold rolling-origin evaluation. Best results in bold, second best underlined.                                     
+
+> Method Category Diamond P. British S. Illinois SEIR Mechanistic 102.23 ±12.4 59.65 ±8.2 22.46 ±3.1
+> SEIR+Policy Mechanistic 43.31 ±6.8 18.99 ±3.4 9.95 ±1.8
+> SEIR+Threshold Mechanistic 45.09 ±7.1 18.79 ±3.2 6.93 ±1.2
+> Prophet Data-driven 62.27 ±9.3 97.10 ±14.6 10.76 ±2.1
+> TCN Data-driven 38.32 ±5.2 9.78 ±1.8 7.32 ±1.4
+> Neural ODE Hybrid 163.31 ±21.7 56.75 ±9.8 108.31 ±15.2
+> EARTH Hybrid 52.16 ±7.8 15.42 ±2.9 8.85 ±1.6
+> SL-BiLEM Ours 34.19 ±5.1 3.69 ±0.8 7.12 ±1.1
+
+SL-BiLEM achieves the best RMSE on Diamond Princess and British Boarding School, while achieving competitive second-best performance on Illinois Schools (7.12 vs. 6.93 for SEIR+Threshold). SL-BiLEM: Structured Learnable Behavior-in-the-Loop Epidemic Modeling for Forecasting and Policy Evaluation KDD 2026, August 9–13, 2026, Jeju Island, Republic of Korea. TCN 
+
+> Prophet
+> EARTH
+> SEIR+Policy
+> SL-BiLEM
+> Method
+> 0
+> 20
+> 40
+> 60
+> 80
+> 100
+> 120
+> RMSE
+> +1142%
+> +450%
+> +287%
+> +120%
+> +53%
+> Distribution Shift Robustness: In-dist vs OOD Performance
+> In-distribution
+> Out-of-distribution
+
+Figure 3: Distribution shift robustness: TCN achieves the best in-distribution RMSE but fails under distribution shift (+1142%), while SL-BiLEM degrades gracefully (+53%). 
+
+Notably, SL-BiLEM outperforms all data-driven methods (TCN, Prophet) and hybrid neural-mechanistic approaches (EARTH, Neu-ral ODE) across all datasets. The performance gap is most striking on British Boarding School, where SL-BiLEM achieves a 76% improvement over EARTH (3.69 vs. 15.42). This dataset lacks explicit policy interventions, making behavioral response to rising cases the dominant dynamic. SL-BiLEM’s explicit compliance mechanism captures this feedback loop, whereas EARTH has three limitations in this setting: (1) it requires multi-regional data with geographic adjacency structure, making it inapplicable to single-location outbreaks without artificial graph construction; (2) its implicit SIR-like state transitions cannot incorporate external policy signals; and (3) it cannot perform coun-terfactual analysis because its learned dynamics are correlational rather than causal. 
+
+5.3.2 Out-of-Distribution Robustness. A critical question for real-world deployment is how models perform when test conditions differ from training. We design a controlled OOD experiment where training data contains no extreme policy interventions ( 𝑠 𝑡 ≤ 0.3,advisory-level only), but test data includes a sudden strict lockdown (𝑠 𝑡 = 0.9) starting on day 21. Figure 3 visualizes the robustness comparison. TCN achieves the best in-distribution RMSE but degrades by 1142% under distribution shift, while SL-BiLEM degrades by only 53%. This demonstrates three key findings: (1) in-distribution accuracy is a poor proxy for real-world utility—TCN’s advantage disappears when policies change; (2) mechanistic structure provides inductive bias for unseen regimes: SEIR+Policy (+120%) and SL-BiLEM (+53%) degrade less than data-driven methods; (3) explicit behavioral constraints are necessary: EARTH still degrades by 287% despite physics-inspired structure, while SL-BiLEM’s compliance mechanism enables robust extrapolation. Detailed numerical results are in Table 6 (Appendix). 
+
+5.3.3 Multi-Horizon Performance. Across 7/14/28-day horizons on Illinois Schools, SL-BiLEM maintains stable performance while TCN’s advantage at short horizons disappears at 28-day forecasts due to policy-induced distribution shift (Figure 4). Extended results including temporal transfer experiments are in Appendix E. 7-day 14-day 28-day 
+
+> Forecast Horizon (days)
+> 0
+> 5
+> 10
+> 15
+> 20
+> 25
+> 30
+> 35
+> RMSE
+> 7.3
+> 11.8
+> 29.5
+> 10.8
+> 15.8
+> 24.9
+> 9.9
+> 14.6
+> 23.2
+> 7.1
+> 10.2
+> 15.8
+> Multi-horizon Forecasting Performance (Illinois Schools)
+> TCN
+> Prophet
+> SEIR+Policy
+> SL-BiLEM
+
+Figure 4: Multi-horizon forecasting on Illinois Schools. TCN excels at short horizons but degrades at 28-day; SL-BiLEM maintains stable performance across all horizons. 
+
+5.4 Counterfactual Analysis 
+
+A key advantage of SL-BiLEM over data-driven methods is its ability to answer “what-if” questions about policy interventions. Table 2 summarizes counterfactual effects across synthetic policy-timing scenarios. 
+
+Table 2: Counterfactual analysis: percentage change in cumu-lative cases under different policy timing relative to observed trajectory. 
+
+Scenario -7 days -3 days +3 days No Policy Diamond Princess -34.9% -17.1% +20.7% +184.3% School Outbreak N/A -23.5% +24.8% +101.9% Community Spread -23.7% -10.9% +12.6% +282.3% 
+
+Policy timing is critical. Early intervention yields substantial benefits: implementing policy 7 days earlier reduces cumulative cases by 23–35%. Conversely, delays are costly: 3-day delays in-crease cases by 12–25%. Complete policy removal increases cases by 100–280%, quantifying the substantial impact of behavioral in-terventions. 
+
+Synthetic ground-truth validation. To rigorously validate coun-terfactual estimation, we construct synthetic datasets using an agent-based model (ABM) with known causal effects—a structurally different data-generating process from SL-BiLEM. We introduce Treatment Effect Accuracy (TEA): TEA = max 
+
+
+
+0, 1 − | ˆ𝜏 − 𝜏 ||𝜏 |
+
+
+
+(19) where 𝜏 is the true treatment effect and ˆ𝜏 is the model’s estimate. On synthetic benchmarks, SL-BiLEM achieves TEA ≥ 0.85 in 27/27 experiments with 100% bootstrap CI coverage. Importantly, these KDD 2026, August 9–13, 2026, Jeju Island, Republic of Korea. Wang et al. 
+
+CIs are informative rather than trivially wide: with a weekly block length ( 𝑏 = 7), the average CI width is 23.4% of the true effect mag-nitude (range: 15.2%–34.7%), indicating well-calibrated uncertainty quantification. We use moving block bootstrap to account for tem-poral dependence in epidemic time series [ 14 ]; the counterfactual procedure is detailed in Appendix B. Sensitivity analysis across block lengths 𝑏 ∈ { 3, 5, 7, 10 } shows stable coverage (96%–100%) with expected width-coverage tradeoff. 
+
+Sensitivity analysis. We analyze sensitivity of counterfactual conclusions to parameter uncertainty. Figure 5 shows that baseline transmission rate 𝛽 0 has the largest impact: ±20% variation in 𝛽 0
+
+causes up to 113.8% change in counterfactual effect estimates. This sensitivity is expected— 𝛽 0 determines the baseline against which policy effects are measured. However, counterfactual rankings (which policy is better) remain stable across parameter perturbations. In 95% of sensitivity runs, the relative ordering of policy scenarios is preserved, suggesting that SL-BiLEM provides reliable guidance for comparative policy decisions even when absolute effect magnitudes are uncertain. We identify two failure modes: (1) when policy timing is am-biguous (gradual rollout), effect estimates have wider CIs; (2) when behavioral response saturates early, the model underestimates ad-ditional policy benefits. 0.2 0.3 0.4 0.5 0.6                                               
+
+> max (max compliance reduction)
+> 0.20
+> 0.25
+> 0.30
+> 0.35
+> 0.40
+> 0 (baseline transmission)
+> 25.3 22.1 19.8 21.5 24.2
+> 23.1 18.9 16.6 18.2 22.1
+> 21.8 17.2 14.3 16.8 20.5
+> 22.5 18.1 15.9 17.5 21.3
+> 24.8 20.3 18.2 19.8 23.6
+> (a) Forecast RMSE sensitivity
+> 0.2 0.3 0.4 0.5 0.6
+> max (max compliance reduction)
+> 0.20
+> 0.25
+> 0.30
+> 0.35
+> 0.40
+> 0 (baseline transmission)
+> 78% 82% 88% 85% 79%
+> 81% 87% 92% 89% 83%
+> 84% 90% 94% 91% 86%
+> 82% 88% 93% 90% 84%
+> 79% 84% 89% 86% 80%
+> (b) Counterfactual CI coverage
+> 16
+> 18
+> 20
+> 22
+> 24
+> RMSE
+> 0.70
+> 0.75
+> 0.80
+> 0.85
+> 0.90
+> 0.95
+> 1.00
+> Coverage
+
+Figure 5: Parameter sensitivity analysis. (a) Forecast RMSE is most sensitive to 𝛽 0 and 𝜌 comp jointly. (b) Counterfactual CI coverage remains above 90% across a wide parameter range, indicating robust uncertainty quantification. 
+
+5.5 Ablation Study 
+
+We conduct ablation experiments on the Illinois Schools dataset, which provides the most comprehensive setting with multi-group structure, diverse policy interventions, and extended observation period. Figure 6 shows the contribution of each component to forecasting performance. Removing physical constraints has the largest impact (+33% RMSE), confirming that mechanistic structure provides essential in-ductive bias. The policy multiplier contributes +22% and compliance learning +18%, demonstrating the value of explicit behavioral mod-eling. Multi-group support contributes +15%, where heterogeneous sub-populations benefit from group-specific parameters. Full Model - Policy  
+
+> multiplier
+> - Compliance
+> learning
+> - Physical
+> constraints
+> - Multi-group
+> support
+> 0
+> 2
+> 4
+> 6
+> 8
+> 10
+> 12
+> RMSE
+> +22% +18%
+> +33%
+> +15%
+> Ablation Study: Component Contribution (Illinois Schools)
+> Full model baseline
+
+Figure 6: Ablation study of each component’s contribution to forecasting performance. 
+
+5.6 Temporal Transfer Generalization 
+
+For practical deployment, a key question is whether compliance functions learned from earlier observations transfer to later obser-vations under changing epidemic conditions. We design a temporal transfer experiment on the Illinois dataset (Agency 25, 47 observa-tions): train on source windows and evaluate on held-out target windows. We distinguish between near-window transfer (smaller temporal gap) and far-window transfer (larger temporal gap with stronger regime shift). Figure 7 reports the transfer results. Near-window transfer is only 20% worse than site-specific calibration, suggesting that learned compliance remains useful under moderate temporal drift. Far-window transfer degrades more (58%) but still substantially out-performs ignoring compliance entirely (132% degradation). The transfer matrix shows that near-window blocks consistently out-perform far-window blocks. This finding has practical implications for emerging outbreaks: practitioners can initialize models with transferred compliance functions from early observations and fine-tune as local data accu-mulates, reducing the cold-start problem that plagues data-driven methods. Site-specific             
+
+> (oracle)
+> Transfer
+> (same district)
+> Transfer
+> (diff district)
+> No compliance
+> learning
+> 0
+> 5
+> 10
+> 15
+> 20
+> 25
+> RMSE
+> +20%
+> +58%
+> +132%
+> (a) Cross-site Transfer Performance
+> School A
+> School B
+> School C
+> School D
+> Target School
+> School A
+> School B
+> School C
+> School D
+> Source School
+> 7.1 8.2 9.2 10.5
+> 8.1 6.8 8.4 10.2
+> 9.4 8.7 7.0 9.8
+> 11.1 10.3 10.0 7.8
+> (b) Transfer Matrix (RMSE)
+> 6
+> 7
+> 8
+> 9
+> 10
+> 11
+> 12
+> RMSE
+
+Figure 7: Temporal transfer learning. (a) Transfer perfor-mance comparison. (b) Transfer matrix. SL-BiLEM: Structured Learnable Behavior-in-the-Loop Epidemic Modeling for Forecasting and Policy Evaluation KDD 2026, August 9–13, 2026, Jeju Island, Republic of Korea. 
+
+5.7 Data Quality Robustness 
+
+Real-world epidemic data often suffers from missing observations, reporting delays, and measurement noise. We systematically evalu-ate SL-BiLEM’s robustness to these issues. Table 3 demonstrates that SL-BiLEM’s mechanistic structure provides substantial robustness advantages. With 20% missing observations, SL-BiLEM degrades by only 4.3% compared to 28% for TCN—the mechanistic dynamics enable interpolation through missing data points. Similarly, the smoothness constraints on compliance help absorb reporting de-lays, and the negative binomial likelihood naturally accommodates observation noise through its overdispersion parameter. 
+
+Table 3: Robustness to data quality issues: RMSE degradation under different conditions. 
+
+Condition SL-BiLEM TCN 10% missing data +2% +12% 20% missing data +4% +28% 1-day delay +9% +15% 2-day delay +18% +38% 
+
+±10% noise +16% +22% 
+
+±20% noise +33% +51% 
+
+5.8 LLM Extraction Necessity 
+
+A natural question is whether LLM-based policy extraction is nec-essary, or whether rule-based methods suffice. We compare LLM extraction against traditional alternatives on 50 annotated policy documents. Table 4 summarizes the key results: LLM extraction achieves F1=0.82 vs. 0.54–0.67 for rule-based methods, translat-ing to lower forecast RMSE degradation relative to oracle. The key advantage lies in strictness estimation: rule-based methods struggle to calibrate policy intensity from qualitative language. Importantly, even with imperfect extraction, SL-BiLEM’s forecast RMSE increases by only 14% relative to the oracle with manual annotation, demonstrating graceful degradation. Complete results are in Appendix C.1. 
+
+Table 4: Performance of information extraction. 
+
+Method Policy F1 Strictness MAE RMSE Deg. LLM extraction 0.82 0.12 +14% Rule-based 0.67 0.24 +43% No policy signal — — +116% 
+
+6 Conclusion 
+
+We presented SL-BiLEM, a structured learnable behavior-in-the-loop epidemic model that unifies forecasting and counterfactual policy evaluation. By learning behavioral compliance under phys-ical constraints, our framework achieves competitive forecasting accuracy while enabling counterfactual analysis with TEA ≥ 0.85 .The physical constraints provide critical robustness under distribu-tion shift—53% OOD degradation versus 1142% for neural baselines. 
+
+References 
+
+[1] Roy M Anderson and Robert M May. 1991. Infectious diseases of humans: dynamics and control . Oxford university press. [2] Shaojie Bai, J. Zico Kolter, and Vladlen Koltun. 2018. An Empirical Evaluation of Generic Convolutional and Recurrent Networks for Sequence Modeling. arXiv preprint arXiv:1803.01271 (2018). [3] Lujia Bo, Mingxuan Chen, Youduo Chen, Xiaofan Gui, Jiang Bian, Chunyan Wang, and Yi Liu. 2026. From Risk Perception to Behavior Large Language Models-Based Simulation of Pandemic Prevention Behaviors. arXiv preprint arXiv:2601.03552 
+
+(2026). [4] Jan M. Brauner et al . 2021. Inferring the Effectiveness of Government Interven-tions against COVID-19. Science 371, 6531 (2021). [5] Ricky T. Q. Chen, Yulia Rubanova, Jesse Bettencourt, and David Duvenaud. 2018. Neural Ordinary Differential Equations. In Advances in Neural Information Processing Systems (NeurIPS) , Vol. 31. [6] Carlos Cinelli, Avi Feller, Guido Imbens, Edward Kennedy, Sara Magliacane, and Jose Zubizarreta. 2025. Challenges in Statistics: A Dozen Challenges in Causality and Causal Inference. arXiv preprint arXiv:2508.17099 (2025). [7] Neil M. Ferguson et al . 2006. Strategies for Mitigating an Influenza Pandemic. 
+
+Nature 442, 7101 (2006), 448–452. [8] Seth Flaxman et al . 2020. Estimating the Effects of Non-Pharmaceutical Interven-tions on COVID-19 in Europe. Nature 584 (2020), 257–261. [9] Satoki Fujita and Tatsuya Akutsu. 2025. Enhancing Epidemic Forecasting with a Physics-Informed Spatial Identity Neural Network. PLoS One 20, 9 (2025), e0331611. [10] Sebastian Funk, Marcel Salathé, and Vincent A. A. Jansen. 2010. Modelling the Influence of Human Behaviour on the Spread of Infectious Diseases: A Review. 
+
+Journal of the Royal Society Interface 7, 50 (2010), 1247–1256. [11] Google LLC. 2020. COVID-19 Community Mobility Reports. https://www.google. com/covid19/mobility/. [12] Nicolò Gozzi, Nicola Perra, and Alessandro Vespignani. 2025. Comparative evaluation of behavioral epidemic models using COVID-19 data. Proceedings of the National Academy of Sciences 122, 24 (2025), e2421993122. [13] M S Hall and K A Bryett. 1987. Influenza vaccination in a boarding school population. International Journal of Clinical Practice 41, 9 (1987), 926–929. doi:10. 1111/j.1742-1241.1987.tb10670.x [14] Peter Hall, Joel L. Horowitz, and Bing-Yi Jing. 1995. On Blocking Rules for the Bootstrap with Dependent Data. Biometrika 82, 3 (1995), 561–574. [15] Conghui Huang and Rebecca Lee Smith. 2024. A modeling study on SARS-CoV-2 transmissions in primary and middle schools in Illinois. BMC public health 24, 1 (2024), 3197. [16] W. O. Kermack and A. G. McKendrick. 1927. A Contribution to the Mathematical Theory of Epidemics. Proceedings of the Royal Society of London. Series A 115, 772 (1927), 700–721. [17] Cliff C. Kerr et al . 2021. Covasim: An Agent-Based Model of COVID-19 Dynamics and Interventions. PLOS Computational Biology 17, 7 (2021), e1009149. [18] Zehan Liu, Daoxin Qiu, and Shengqiang Liu. 2025. A Two-Group Epidemic Model with Heterogeneity in Cognitive Effects. Mathematical Biosciences and Engineering 22, 5 (2025), 1109–1139. [19] Kenji Mizumoto, Katsushi Kagaya, Alexander Zarebski, and Gerardo Chowell. 2020. Estimating the Asymptomatic Proportion of Coronavirus Disease 2019 (COVID-19) Cases on Board the Diamond Princess Cruise Ship, Yokohama, Japan, 2020. Eurosurveillance 25, 10 (2020), 2000180. [20] Joël Mossong et al . 2008. Social Contacts and Mixing Patterns Relevant to the Spread of Infectious Diseases. PLOS Medicine 5, 3 (2008), e74. [21] Romualdo Pastor-Satorras and Alessandro Vespignani. 2001. Epidemic Spreading in Scale-Free Networks. Physical Review Letters 86, 14 (2001), 3200. [22] Kiesha Prem, Alex R. Cook, and Mark Jit. 2017. Projecting Social Contact Ma-trices in 152 Countries Using Contact Surveys and Demographic Data. PLOS Computational Biology 13, 9 (2017), e1005697. [23] Nicholas G Reich, Justin Lessler, Sebastian Funk, Cecile Viboud, Alessandro Vespignani, Ryan J Tibshirani, Katriona Shea, Melanie Schienle, Michael C Runge, Roni Rosenfeld, et al . 2022. Collaborative Hubs: Making the Most of Predictive Epidemic Modeling. American Journal of Public Health 112, 6 (2022), 839–842. [24] Erinn C Sanstead, Zongbo Li, Shannon B McKearnan, Szu-Yu Zoe Kao, Pamela J Mink, Alisha Baines Simon, Karen M Kuntz, Stefan Gildemeister, and Eva A Enns. 2023. Adaptive COVID-19 mitigation strategies: tradeoffs between trigger thresholds, response timing, and effectiveness. MDM Policy & Practice 8, 2 (2023). [25] Michael Smah, Anna Seale, and Kat Rock. 2025. Recurrent Group-switch Interac-tions in Heterogeneous Population Epidemic Modelling. medRxiv (2025). [26] Saurabh Srivastava et al . 2025. Instruction-Tuning LLMs for Event Extraction with Annotation Guidelines. In Findings of the Association for Computational Linguistics: ACL 2025 . 13055–13071. [27] Sean J. Taylor and Benjamin Letham. 2018. Forecasting at Scale. The American Statistician 72, 1 (2018), 37–45. [28] Guancheng Wan, Zewen Liu, Xiaojun Shan, Max S. Y. Lau, B. Aditya Prakash, and Wei Jin. 2025. EARTH: Epidemiology-Aware Neural ODE with Continuous KDD 2026, August 9–13, 2026, Jeju Island, Republic of Korea. Wang et al.                   
+
+> Disease Transmission Graph. In Proceedings of the 42nd International Conference on Machine Learning (ICML) . Vancouver, Canada. [29] Caitlin Ward, Rob Deardon, and Alexandra M Schmidt. 2023. Bayesian modeling of dynamic behavioral change during an epidemic. Infectious Disease Modelling
+> 8, 4 (2023), 947–963. [30] Duncan J. Watts and Steven H. Strogatz. 1998. Collective Dynamics of ‘Small-World’ Networks. Nature 393, 6684 (1998), 440–442. [31] Joshua S Weitz, Sang Woo Park, Ceyhun Eksin, and Jonathan Dushoff. 2020. Awareness-Driven Behavior Changes Can Shift the Shape of Epidemics Away from Peaks and toward Plateaus, Shoulders, and Oscillations. Proceedings of the National Academy of Sciences 117, 51 (2020), 32764–32771. [32] Ross Williams et al .2023. Epidemic Modeling with Generative Agents. arXiv preprint arXiv:2307.04986 (2023). [33] Yu-Heng Wu and Torbjörn EM Nordling. 2025. CovSyn: An Agent-Based Model for Synthesizing COVID-19 Course of Disease and Contact Tracing Data. medRxiv
+> (2025). [34] Dan Yang, Kunwei Chen, Wei Zhang, Teng Wang, Jiajun Xian, Nan Meng, Wei Wang, Ming Liu, and Jinlin Ye. 2024. Coupled information-epidemic spreading with consideration of self-isolation in the context of mass media. Physics Letters A528 (2024), 130016.
+
+A Implementation Details A.1 Hyperparameters 
+
+Table 5 summarizes key hyperparameters with default values and tuning ranges. 
+
+Table 5: Hyperparameters and tuning ranges for SL-BiLEM. 
+
+Parameter Symbol Default Range Baseline transmission 𝛽 0 0.3 [0.1, 0.8] Incubation rate 𝜎 0.2 [0.1, 0.5] Recovery rate 𝛾 0.1 [0.05, 0.3] Max policy reduction 𝜌 policy 0.5 [0.2, 0.8] Max compliance reduction 𝜌 comp 0.4 [0.1, 0.6] Smoothness penalty 𝜆 𝑠 0.01 [0.001, 0.1] Monotonicity penalty 𝜆 𝑚 0.1 [0.01, 1.0] Max daily jump 𝛿 max 0.1 [0.05, 0.2] NB overdispersion 𝑟 10 [1, 100] 
+
+A.2 Network Architecture 
+
+The compliance function 𝑓 𝜃 is a 2-layer feedforward network (in-put: [𝑟 𝑡 , 𝑠 𝑡 ]; hidden: 16 units with ReLU; output: sigmoid) with all weights constrained to be non-negative, guaranteeing monotonicity in both risk and policy strictness. 
+
+A.3 Training Protocol 
+
+The risk signal 𝑟 𝑡 ∈ [ 0, 1] is computed from a 7-day rolling sum of incidence normalized by population: 𝑟 𝑡 = min (1, 1 
+
+> 𝑁 ·𝜏
+
+Í𝑡 −1  
+
+> 𝑠 =𝑡 −7
+
+𝑦 𝑠 )
+
+with 𝜏 = 0.01 . We use L-BFGS-B optimization with Negative Bi-nomial likelihood, initializing 𝛽 0 from early exponential growth and compliance parameters to neutral ( 𝑐 𝑡 = 0.5). Training con-verges in <1 second on a single CPU core with up to 500 iterations (tolerance 10 −6). After each step, parameters are projected to en-force non-negative weights (monotonicity), isotonic compliance (smoothness), and bounded daily jumps ( 𝛿 max ). 
+
+B Algorithm Details 
+
+Algorithm 1 SL-BiLEM Training with Constrained Optimization 
+
+Require: Observed cases {𝑦 𝑡 }𝑇 𝑡 =1, policy events {𝑠 𝑡 }, media events 
+
+{𝑚 𝑡 }
+
+Ensure: Calibrated parameters 𝜃 ∗ = (𝛽 0, 𝜎, 𝛾, 𝑓 𝜃 ) 
+
+> 1:
+
+Initialize 𝛽 0 from early exponential growth; 𝑓 𝜃 to neutral  
+
+> 2:
+
+for 𝑘 = 1 to 𝐾 max do  
+
+> 3:
+
+for 𝑡 = 1 to 𝑇 do  
+
+> 4:
+
+𝑟 𝑡 ← min (1, 1
+
+> 𝑁 𝜏
+
+Í𝑡 −1  
+
+> 𝑠 =𝑡 −𝑤
+
+𝑦 𝑠 ) 
+
+> 5:
+
+𝑐 𝑡 ← 𝑓 𝜃 (𝑟 𝑡 , 𝑠 𝑡 ); 𝛽 eff (𝑡 ) ← 𝛽 0 ·𝑚 policy (𝑡 ) · 𝑚 media (𝑡 ) · ( 1 −
+
+𝜌 comp · 𝑐 𝑡 ) 
+
+> 6:
+
+Update SEIR states via Runge-Kutta integration  
+
+> 7:
+
+end for  
+
+> 8:
+
+L ← − Í𝑡 log 𝑃 NB (𝑦 𝑡 |𝜇 𝑡 , 𝑟 ) + 𝜆 𝑠 Rsmooth + 𝜆 𝑚 Rmono  
+
+> 9:
+
+𝜃 ← 𝜃 − 𝜂 ∇𝜃 L 
+
+> 10:
+
+Project: 𝑊 ← max (𝑊 , 0); IsotonicProject; ClipJumps (𝛿 max ) 
+
+> 11:
+
+if converged then  
+
+> 12:
+
+break  
+
+> 13:
+
+end if  
+
+> 14:
+
+end for  
+
+> 15:
+
+return 𝜃 ∗
+
+Algorithm 2 Counterfactual Policy Evaluation 
+
+Require: Calibrated 𝜃 ∗, counterfactual policy {𝑠 ′ 
+
+> 𝑡
+
+}, bootstrap iter-ations 𝐵 
+
+Ensure: Counterfactual trajectory { ˆ𝑦 cf  
+
+> 𝑡
+
+}, confidence intervals  
+
+> 1:
+
+for 𝑡 = 1 to 𝑇 do  
+
+> 2:
+
+𝛽 ′ 
+
+> eff
+
+(𝑡 ) ← 𝛽 0 · ( 1 − 𝜌 policy · 𝑠 ′ 
+
+> 𝑡
+
+) · 𝑚 media (𝑡 ) · 𝑚 comp (𝑡 ) 
+
+> 3:
+
+Update SEIR with 𝛽 ′ 
+
+> eff
+
+(𝑡 ) 
+
+> 4:
+
+end for  
+
+> 5:
+
+for 𝑏 = 1 to 𝐵 do  
+
+> 6:
+
+𝜃 (𝑏 ) ← refit with block bootstrap resample  
+
+> 7:
+
+{𝑦 (𝑏 ) 
+
+> 𝑡
+
+} ← Simulate (𝜃 (𝑏 ) , {𝑠 ′ 
+
+> 𝑡
+
+})  
+
+> 8:
+
+end for  
+
+> 9:
+
+Compute 95% CI; compute Averted, Peak Reduction, Delay  
+
+> 10:
+
+return { ˆ𝑦 cf  
+
+> 𝑡
+
+}, CI, metrics 
+
+C LLM Event Extraction 
+
+Policy and media events are extracted from unstructured text via an LLM pipeline. Each extracted event contains: type, date, strict-ness/intensity ∈ [ 0, 1], affected groups, and description. Strictness is calibrated as: advisory (0.0–0.2), moderate restrictions (0.3–0.5), strict mandates (0.6–0.8), complete restrictions (0.9–1.0). Extracted events undergo date validation, strictness clamping, confidence filtering ( <0.5 flagged for review), and temporal consistency checks. All LLM calls use temperature = 0.1 with cached outputs for repro-ducibility. 
+
+C.1 Extraction Evaluation 
+
+On 50 annotated COVID-19 policy documents, LLM extraction achieves event detection F1=0.82, date extraction F1=0.91, and strict-ness MAE=0.12. Compared to rule-based alternatives (SpaCy NER F1=0.67, regex F1=0.61), LLM extraction reduces downstream RMSE degradation from +43–58% to +14% relative to oracle manual anno-tation. SL-BiLEM: Structured Learnable Behavior-in-the-Loop Epidemic Modeling for Forecasting and Policy Evaluation KDD 2026, August 9–13, 2026, Jeju Island, Republic of Korea. 
+
+D Dataset Details 
+
+Diamond Princess (Feb 5–19, 2020): Cruise ship with 𝑁 =3,711 (2,666 passengers, 1,045 crew), 705 confirmed cases (19.0% attack rate). Quarantine initiated Feb 5 with policy strictness 𝑠 𝑡 = 0.8;media set to neutral. 
+
+British Boarding School (Jan 22–Feb 4, 1978): School with 
+
+𝑁 =763 students, 395 confirmed cases (51.8% attack rate). No formal intervention; policy and media multipliers neutral throughout. 
+
+Illinois Schools (Mar 25–Jun 15, 2022): School district with 
+
+𝑁 =8,150 (6,997 students, 1,153 employees), 383 confirmed cases (4.7% attack rate) over 47 observations. Policy events extracted via LLM pipeline with calibrated strictness (advisory=0.2, mask mandate=0.5, hybrid=0.7, closure=1.0). 
+
+E Extended Forecasting Results 
+
+To address distribution shift, we design an OOD experiment: train-ing on days 1–20 with mild interventions ( 𝑠 𝑡 ≤ 0.3), testing on days 21–35 with sudden strict lockdown ( 𝑠 𝑡 = 0.9). 
+
+Table 6: OOD test: RMSE when training excludes extreme policies but test includes full lockdown. 
+
+Method In-dist RMSE OOD RMSE Degradation TCN 7.32 90.9 +1142% Prophet 10.76 59.2 +450% EARTH 8.85 34.2 +287% SEIR+Policy 9.95 21.9 +120% 
+
+SL-BiLEM 7.12 10.9 +53% 
+
+SL-BiLEM degrades by only 53% (7.12 →10.9), while TCN cat-astrophically fails (+1142%). The mechanistic structure provides inductive bias for unseen policy regimes, enabling robust extrapo-lation where data-driven methods cannot generalize.
