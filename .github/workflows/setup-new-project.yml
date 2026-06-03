@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
-      PGHOST: db.ekjqhiiaqstbdlzbqitn.supabase.co
+      PGHOST: db.xnxqplrynpdrozvxvyzg.supabase.co
       PGPORT: "5432"
       PGUSER: postgres
       PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
