@@ -8,7 +8,7 @@ arxiv_paper_setting:
   prefer_supabase_read: true
 supabase:
   enabled: true
-  url: https://ekjqhiiaqstbdlzbqitn.supabase.co
+  url: https://xnxqplrynpdrozvxvyzg.supabase.co
   anon_key: sb_publishable_lX-oi64Uxyd7SIVv3_w2Uw_MTOojeKq
   papers_table: arxiv_papers
   use_vector_rpc: true
