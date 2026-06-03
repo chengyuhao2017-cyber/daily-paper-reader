@@ -1,19 +1,25 @@
 #!/usr/bin/env python
-"""Elsevier ScienceDirect 论文抓取器。
-
-通过 Elsevier Search API 检索 ScienceDirect 上的学术文献。\n需要设置环境变量 ELSEVIER_API_KEY。
 """
+Elsevier ScienceDirect Search API fetcher.
 
+Uses the ScienceDirect Search API v2 (https://api.elsevier.com/content/search/sciencedirect)
+to search for recent economics papers matching the user's research keywords.
+
+Requires: ELSEVIER_API_KEY environment variable (or --api-key argument).
+
+Outputs JSON array in the same schema as fetch_arxiv.py / fetch_serp_scholar.py.
+"""
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
 import sys
 import time
-from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, List
+from datetime import datetime, timezone
+from typing import Any, Dict, List, Optional
 
 import requests
 
@@ -23,168 +29,438 @@ if SRC_DIR not in sys.path:
 
 try:
     from source_config import load_config_with_source_migration
-except Exception:  # pragma: no cover
+except Exception:
     from src.source_config import load_config_with_source_migration
 
 SCRIPT_DIR = os.path.dirname(__file__)
 ROOT_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, "..", "..", ".."))
-CONFIG_FILE = os.path.join(ROOT_DIR, "config.yaml")
-CRAWL_STATE_FILE = os.path.join(ROOT_DIR, "archive", "sciencedirect_crawl_state.json")
+CONFIG_FILE = os.getenv("DPR_CONFIG_FILE") or os.path.join(ROOT_DIR, "config.yaml")
 SEEN_IDS_FILE = os.path.join(ROOT_DIR, "archive", "sciencedirect_seen.json")
+DATE_TOKEN_RE = re.compile(r"^\d{8}$")
 
-API_BASE = "https://api.elsevier.com/content/search/sciencedirect"
-SOURCE_KEY = "sciencedirect"
+SCIDIRECT_SEARCH_URL = "https://api.elsevier.com/content/search/sciencedirect"
+DEFAULT_RESULTS_PER_QUERY = 25
+DEFAULT_TIMEOUT = 30
+DEFAULT_INTER_QUERY_SLEEP = 1.0   # Elsevier: 3 req/s for basic tier; 1s is safe
+MAX_QUERIES_PER_RUN = 50
 
 
+# ---------------------------------------------------------------------------
+# Logging helpers
+# ---------------------------------------------------------------------------
 def log(message: str) -> None:
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
     try:
         print(f"[{ts}] {message}", flush=True)
     except BrokenPipeError:
-        try:
-            sys.stdout.close()
-        except Exception:
-            pass
+        pass
 
 
+def group_start(title: str) -> None:
+    print(f"::group::{title}", flush=True)
+
+
+def group_end() -> None:
+    print("::endgroup::", flush=True)
+
+
+# ---------------------------------------------------------------------------
+# Utilities
+# ---------------------------------------------------------------------------
 def _norm(value: Any) -> str:
     return str(value or "").strip()
 
 
-def load_config() -> dict:
-    try:
-        return load_config_with_source_migration(CONFIG_FILE, write_back=False)
-    except Exception as exc:
-        log(f"[WARN] 读取 config.yaml 失败：{exc}")
-        return {}
+def _make_paper_id(doi: str, title: str) -> str:
+    if doi:
+        clean = re.sub(r"[^a-zA-Z0-9/_.:@-]", "", doi)
+        return f"doi:{clean}"
+    fp = f"{title.lower().strip()}|sciencedirect"
+    sha = hashlib.sha256(fp.encode("utf-8")).hexdigest()[:20]
+    return f"scidir:{sha}"
 
 
-def load_last_crawl_at() -> datetime | None:
-    if not os.path.exists(CRAWL_STATE_FILE):
-        return None
-    try:
-        with open(CRAWL_STATE_FILE, "r", encoding="utf-8") as f:
-            payload = json.load(f) or {}
-    except Exception:
-        return None
-    raw = _norm(payload.get("last_crawl_at"))
-    if not raw:
-        return None
-    try:
-        dt = datetime.fromisoformat(raw.replace("Z", "+00:00"))
-    except Exception:
-        return None
-    if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=timezone.utc)
-    return dt.astimezone(timezone.utc)
-
-
-def save_last_crawl_at(at_time: datetime) -> None:
-    os.makedirs(os.path.dirname(CRAWL_STATE_FILE), exist_ok=True)
-    payload = {"last_crawl_at": at_time.astimezone(timezone.utc).isoformat()}
-    with open(CRAWL_STATE_FILE, "w", encoding="utf-8") as f:
-        json.dump(payload, f, ensure_ascii=False, indent=2)
-
-
-def load_seen_state() -> tuple[set[str], datetime | None]:
+# ---------------------------------------------------------------------------
+# Seen-ID persistence
+# ---------------------------------------------------------------------------
+def load_seen_ids() -> set:
     if not os.path.exists(SEEN_IDS_FILE):
-        return set(), None
+        return set()
     try:
         with open(SEEN_IDS_FILE, "r", encoding="utf-8") as f:
             payload = json.load(f) or {}
+        ids = payload.get("ids") or []
+        return set(ids) if isinstance(ids, list) else set()
     except Exception:
-        return set(), None
-    raw_ids = payload.get("ids") or []
-    if not isinstance(raw_ids, list):
-        raw_ids = []
-    seen_ids = {str(item).strip() for item in raw_ids if str(item).strip()}
-    raw_latest = _norm(payload.get("latest_published_at"))
-    latest_dt = None
-    if raw_latest:
-        try:
-            latest_dt = datetime.fromisoformat(raw_latest.replace("Z", "+00:00"))
-            if latest_dt.tzinfo is None:
-                latest_dt = latest_dt.replace(tzinfo=timezone.utc)
-            latest_dt = latest_dt.astimezone(timezone.utc)
-        except Exception:
-            latest_dt = None
-    return seen_ids, latest_dt
+        return set()
 
 
-def save_seen_state(seen_ids: set[str], latest_published_at: datetime | None) -> None:
+def save_seen_ids(seen: set) -> None:
     os.makedirs(os.path.dirname(SEEN_IDS_FILE), exist_ok=True)
     payload = {
         "updated_at": datetime.now(timezone.utc).isoformat(),
-        "latest_published_at": latest_published_at.astimezone(timezone.utc).isoformat()
-        if latest_published_at else "",
-        "ids": sorted(seen_ids),
+        "ids": sorted(seen),
     }
     with open(SEEN_IDS_FILE, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
 
 
-def fetch_papers(query: str, days: int = 7, max_results: int = 100) -> List[Dict[str, Any]]:
-    """通过 Elsevier API 检索 ScienceDirect 论文。"""
-    api_key = os.getenv("ELSEVIER_API_KEY", "")
-    if not api_key:
-        log("[WARN] 未设置 ELSEVIER_API_KEY，无法检索 ScienceDirect。")
-        return []
-    end_date = datetime.now(timezone.utc)
-    start_date = end_date - timedelta(days=days)
-    date_range = f"{start_date.strftime('%Y%m%d')}-{end_date.strftime('%Y%m%d')}"
-    headers = {"X-ELS-APIKey": api_key, "Accept": "application/json"}
-    params = {"query": query, "date": date_range, "count": min(max_results, 100), "start": 0}
-    papers: List[Dict[str, Any]] = []
-    data: dict = {}
-    for attempt in range(3):
-        try:
-            resp = requests.get(API_BASE, headers=headers, params=params, timeout=30)
-            resp.raise_for_status()
-            data = resp.json()
-            break
-        except Exception as exc:
-            log(f"[WARN] ScienceDirect API 请求失败 (第{attempt + 1}次)：{exc}")
-            if attempt < 2:
-                time.sleep(2 ** (attempt + 1))
-            else:
-                return []
-    entries = (data.get("search-results") or {}).get("entry") or []
-    for entry in entries:
-        doi = _norm(entry.get("prism:doi"))
-        paper_id = doi or _norm(entry.get("dc:identifier"))
-        if not paper_id:
+# ---------------------------------------------------------------------------
+# Config loading
+# ---------------------------------------------------------------------------
+def load_config() -> Dict[str, Any]:
+    try:
+        return load_config_with_source_migration(CONFIG_FILE, write_back=False)
+    except Exception as e:
+        log(f"[WARN] Failed to load config.yaml: {e}")
+        return {}
+
+
+def extract_search_queries(config: Dict[str, Any]) -> List[Dict[str, str]]:
+    """
+    Extract search queries from config.yaml subscriptions.intent_profiles.
+    Returns list of {"query": str, "tag": str, "profile": str} dicts.
+    """
+    subs = (config or {}).get("subscriptions") or {}
+    profiles = subs.get("intent_profiles") or []
+    queries: List[Dict[str, str]] = []
+
+    for profile in profiles or []:
+        if not isinstance(profile, dict):
             continue
-        authors_raw = entry.get("dc:creator") or ""
-        authors = [authors_raw] if isinstance(authors_raw, str) and authors_raw else []
-        pub_date = _norm(entry.get("prism:coverDate") or "")
-        url = _norm(entry.get("prism:url") or "")
-        if doi and not url:
-            url = f"https://doi.org/{doi}"
-        papers.append({
-            "id": paper_id, "title": _norm(entry.get("dc:title") or ""),
-            "abstract": _norm(entry.get("dc:description") or ""), "authors": authors,
-            "published": pub_date, "updated_at": pub_date, "url": url, "pdf_url": "",
-            "categories": [_norm(entry.get("prism:aggregationType") or "journal-article")],
-            "source": SOURCE_KEY,
-        })
-    log(f"ScienceDirect 检索到 {len(papers)} 篇论文 (query={query!r})")
-    return papers
+        if not profile.get("enabled", True):
+            continue
+        tag = _norm(profile.get("tag") or profile.get("description") or "")
+
+        for kw_entry in (profile.get("keywords") or []):
+            if not isinstance(kw_entry, dict):
+                kw_text = _norm(kw_entry)
+            else:
+                kw_text = _norm(kw_entry.get("keyword") or "")
+            if kw_text:
+                queries.append({
+                    "query": kw_text,
+                    "tag": tag,
+                    "profile": tag,
+                })
+
+        for iq in (profile.get("intent_queries") or []):
+            if not isinstance(iq, dict):
+                continue
+            if not iq.get("enabled", True):
+                continue
+            q = _norm(iq.get("query") or "")
+            if q:
+                queries.append({
+                    "query": q,
+                    "tag": tag,
+                    "profile": tag,
+                })
+
+    seen_q: set = set()
+    unique: List[Dict[str, str]] = []
+    for item in queries:
+        key = item["query"].lower()
+        if key not in seen_q:
+            seen_q.add(key)
+            unique.append(item)
+    return unique
 
 
+# ---------------------------------------------------------------------------
+# Elsevier ScienceDirect Search API
+# ---------------------------------------------------------------------------
+def _search_sciencedirect(
+    query: str,
+    api_key: str,
+    count: int = DEFAULT_RESULTS_PER_QUERY,
+    start: int = 0,
+) -> Dict[str, Any]:
+    """
+    Call Elsevier ScienceDirect Search API and return parsed JSON response.
+    """
+    params: Dict[str, Any] = {
+        "query": query,
+        "count": count,
+        "start": start,
+        "view": "COMPLETE",
+    }
+    headers = {
+        "X-ELS-APIKey": api_key,
+        "Accept": "application/json",
+    }
+
+    try:
+        resp = requests.get(
+            SCIDIRECT_SEARCH_URL,
+            params=params,
+            headers=headers,
+            timeout=DEFAULT_TIMEOUT,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+    except requests.exceptions.HTTPError as e:
+        status = getattr(resp, "status_code", 0)
+        if status == 401 or status == 403:
+            raise RuntimeError(
+                "Elsevier API authentication failed. Check your ELSEVIER_API_KEY."
+            ) from e
+        if status == 429:
+            log("[WARN] Elsevier API rate-limited. Waiting 60s before retry...")
+            time.sleep(60)
+            return {}
+        log(f"[WARN] Elsevier API HTTP {status}: {e}")
+        return {}
+    except Exception as e:
+        log(f"[WARN] Elsevier API request failed: {e}")
+        return {}
+
+    return data
+
+
+def _normalize_sciencedirect_entry(
+    entry: Dict[str, Any],
+    tag: str,
+) -> Optional[Dict[str, Any]]:
+    """
+    Normalize a single ScienceDirect search result to the project's paper schema.
+    """
+    title = _norm(entry.get("dc:title") or "")
+    if not title:
+        return None
+
+    doi = _norm(entry.get("prism:doi") or "")
+
+    # Link: prefer scidir link, fall back to prism:url or DOI link
+    links = entry.get("link") or []
+    link = ""
+    if isinstance(links, list):
+        for l in links:
+            if isinstance(l, dict) and l.get("@ref") in ("scidir", "all"):
+                link = _norm(l.get("@href") or "")
+                break
+    if not link:
+        link = _norm(entry.get("prism:url") or "")
+    if not link and doi:
+        link = f"https://doi.org/{doi}"
+
+    # Abstract: dc:description or teaser text
+    abstract = _norm(entry.get("dc:description") or "")
+    if not abstract:
+        teaser = entry.get("teaser-text")
+        if isinstance(teaser, list) and teaser:
+            abstract = _norm(teaser[0] if isinstance(teaser[0], str) else "")
+        elif isinstance(teaser, str):
+            abstract = _norm(teaser)
+
+    # Authors
+    authors: List[str] = []
+    author_data = entry.get("authors") or entry.get("author") or []
+    if isinstance(author_data, dict) and "author" in author_data:
+        author_data = author_data["author"]
+    if isinstance(author_data, list):
+        for a in author_data:
+            if isinstance(a, dict):
+                name = _norm(a.get("$") or a.get("name") or "")
+                if name:
+                    authors.append(name)
+            elif isinstance(a, str):
+                name = _norm(a)
+                if name:
+                    authors.append(name)
+    # Fallback to dc:creator
+    if not authors:
+        creator = _norm(entry.get("dc:creator") or "")
+        if creator:
+            authors = [a.strip() for a in re.split(r",\s*|;\s*", creator) if a.strip()]
+
+    # Publication date
+    published_str = ""
+    cover_date = _norm(entry.get("prism:coverDate") or "")
+    if cover_date:
+        # Parse various date formats: "2023-01-15", "2023-01", "January 2023", etc.
+        date_match = re.match(r"(\d{4})-(\d{2})-(\d{2})", cover_date)
+        if date_match:
+            published_str = f"{date_match.group(1)}-{date_match.group(2)}-{date_match.group(3)}T00:00:00+00:00"
+        else:
+            year_match = re.search(r"(\d{4})", cover_date)
+            if year_match:
+                published_str = f"{year_match.group(1)}-01-01T00:00:00+00:00"
+    if not published_str:
+        pub_year = _norm(entry.get("prism:coverDisplayDate") or entry.get("prism:coverDate") or "")
+        year_match = re.search(r"(\d{4})", pub_year)
+        if year_match:
+            published_str = f"{year_match.group(1)}-01-01T00:00:00+00:00"
+
+    # Journal / publication name
+    journal = _norm(entry.get("prism:publicationName") or "")
+
+    paper_id = _make_paper_id(doi, title)
+
+    return {
+        "id": paper_id,
+        "source": "sciencedirect",
+        "source_paper_id": doi or paper_id,
+        "doi": doi,
+        "title": title,
+        "abstract": abstract,
+        "authors": authors,
+        "primary_category": journal or tag,
+        "categories": [tag, journal] if journal else [tag],
+        "published": published_str,
+        "link": link,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Main fetch loop
+# ---------------------------------------------------------------------------
+def fetch_sciencedirect(
+    api_key: str,
+    queries: List[Dict[str, str]],
+    seen_ids: set,
+    ignore_seen: bool = False,
+    num_per_query: int = DEFAULT_RESULTS_PER_QUERY,
+    max_queries: int = MAX_QUERIES_PER_RUN,
+) -> List[Dict[str, Any]]:
+    papers: Dict[str, Dict[str, Any]] = {}
+    total_queries = min(len(queries), max_queries)
+    if len(queries) > max_queries:
+        log(f"[WARN] {len(queries)} queries found, capping at {max_queries} to control API cost.")
+
+    for i, q_info in enumerate(queries[:total_queries], start=1):
+        query = q_info["query"]
+        tag = q_info.get("tag", "")
+        group_start(f"ScienceDirect query {i}/{total_queries}: {query[:60]}")
+        log(f"🔍 [{i}/{total_queries}] tag={tag!r} | query={query!r}")
+
+        raw_data = _search_sciencedirect(
+            query=query,
+            api_key=api_key,
+            count=num_per_query,
+        )
+
+        entries = []
+        search_results = raw_data.get("search-results") or {}
+        if isinstance(search_results, dict):
+            raw_entries = search_results.get("entry") or []
+            if isinstance(raw_entries, dict):
+                raw_entries = [raw_entries]
+            entries = raw_entries if isinstance(raw_entries, list) else []
+
+        total_results = search_results.get("opensearch:totalResults", "0")
+        log(f"   Got {len(entries)} entries from ScienceDirect (total results: {total_results}).")
+        new_in_query = 0
+
+        for entry in entries:
+            if not isinstance(entry, dict):
+                continue
+            paper = _normalize_sciencedirect_entry(entry, tag)
+            if not paper:
+                continue
+            paper_id = paper["id"]
+            if not ignore_seen and paper_id in seen_ids:
+                continue
+            if paper_id in papers:
+                continue
+            papers[paper_id] = paper
+            seen_ids.add(paper_id)
+            new_in_query += 1
+
+        log(f"   ✅ {new_in_query} new papers from this query.")
+        group_end()
+
+        if i < total_queries:
+            time.sleep(DEFAULT_INTER_QUERY_SLEEP)
+
+    log(f"[INFO] ScienceDirect fetch complete: {len(papers)} unique papers collected.")
+    return list(papers.values())
+
+
+# ---------------------------------------------------------------------------
+# CLI
+# ---------------------------------------------------------------------------
 def main() -> None:
-    parser = argparse.ArgumentParser(description="ScienceDirect 论文抓取")
-    parser.add_argument("--query", default="monetary policy", help="搜索查询词")
-    parser.add_argument("--days", type=int, default=7, help="抓取最近多少天的论文")
-    parser.add_argument("--output", default="", help="输出 JSON 文件路径")
+    parser = argparse.ArgumentParser(
+        description="Search Elsevier ScienceDirect using config.yaml keywords."
+    )
+    parser.add_argument(
+        "--api-key", type=str,
+        default=os.getenv("ELSEVIER_API_KEY", ""),
+        help="Elsevier API key (default: ELSEVIER_API_KEY env var).",
+    )
+    parser.add_argument(
+        "--output", type=str, default="",
+        help="Output JSON file path.",
+    )
+    parser.add_argument(
+        "--num-per-query", type=int, default=DEFAULT_RESULTS_PER_QUERY,
+        help=f"Number of results per query (default: {DEFAULT_RESULTS_PER_QUERY}).",
+    )
+    parser.add_argument(
+        "--max-queries", type=int, default=MAX_QUERIES_PER_RUN,
+        help=f"Maximum number of queries to run (default: {MAX_QUERIES_PER_RUN}).",
+    )
+    parser.add_argument(
+        "--ignore-seen", action="store_true", default=False,
+    )
+    parser.add_argument(
+        "--skip-config-queries", action="store_true", default=False,
+        help="Do not read queries from config.yaml; use --query instead.",
+    )
+    parser.add_argument(
+        "--query", type=str, default="",
+        help="Single ad-hoc search query (overrides config-based queries).",
+    )
     args = parser.parse_args()
-    papers = fetch_papers(args.query, days=args.days)
-    if args.output:
-        os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)
-        with open(args.output, "w", encoding="utf-8") as f:
-            json.dump(papers, f, ensure_ascii=False, indent=2)
-        log(f"已写入 {len(papers)} 篇论文到 {args.output}")
+
+    api_key = _norm(args.api_key)
+    if not api_key:
+        log("[ERROR] No Elsevier API key provided. Set ELSEVIER_API_KEY env var or use --api-key.")
+        sys.exit(1)
+
+    now_utc = datetime.now(timezone.utc)
+    token = str(os.getenv("DPR_RUN_DATE") or "").strip()
+    if not DATE_TOKEN_RE.match(token):
+        token = now_utc.strftime("%Y%m%d")
+
+    output_path = _norm(args.output)
+    if not output_path:
+        raw_dir = os.path.join(ROOT_DIR, "archive", token, "raw")
+        output_path = os.path.join(raw_dir, f"sciencedirect_papers_{token}.json")
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+    if args.query:
+        queries = [{"query": args.query, "tag": "adhoc", "profile": "adhoc"}]
+    elif not args.skip_config_queries:
+        config = load_config()
+        queries = extract_search_queries(config)
+        if not queries:
+            log("[WARN] No queries found in config.yaml subscriptions.intent_profiles.")
     else:
-        print(json.dumps(papers, ensure_ascii=False, indent=2))
+        log("[ERROR] No queries specified.")
+        sys.exit(1)
+
+    log(f"[INFO] Running {len(queries)} queries via Elsevier ScienceDirect Search API.")
+
+    seen_ids = load_seen_ids() if not args.ignore_seen else set()
+
+    papers = fetch_sciencedirect(
+        api_key=api_key,
+        queries=queries,
+        seen_ids=seen_ids,
+        ignore_seen=args.ignore_seen,
+        num_per_query=args.num_per_query,
+        max_queries=args.max_queries,
+    )
+
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(papers, f, ensure_ascii=False, indent=2)
+    log(f"[INFO] Wrote {len(papers)} papers to: {output_path}")
+
+    if papers and not args.ignore_seen:
+        save_seen_ids(seen_ids)
+        log("[INFO] Updated seen IDs.")
 
 
 if __name__ == "__main__":
