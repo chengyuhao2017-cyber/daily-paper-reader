@@ -1,0 +1,66 @@
+name: setup-new-supabase-project
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PGHOST: db.ekjqhiiaqstbdlzbqitn.supabase.co
+      PGPORT: "5432"
+      PGUSER: postgres
+      PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      PGDATABASE: postgres
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Create all tables
+        run: |
+          set -euo pipefail
+          psql -c "CREATE EXTENSION IF NOT EXISTS vector;"
+
+          psql -f sql/create_papers_schema.sql
+          psql -f sql/create_biorxiv_papers_schema.sql
+          psql -f sql/create_medrxiv_papers_schema.sql
+          psql -f sql/create_chemrxiv_papers_schema.sql
+          psql -f sql/create_neurips_openreview_papers_schema.sql
+          psql -f sql/create_iclr_openreview_papers_schema.sql
+          psql -f sql/create_icml_openreview_papers_schema.sql
+          psql -f sql/create_acl_papers_schema.sql
+          psql -f sql/create_emnlp_papers_schema.sql
+          psql -f sql/create_aaai_papers_schema.sql
+          psql -f sql/create_economics_papers_schema.sql
+          psql -f sql/create_serp_scholar_papers_schema.sql
+          psql -f sql/create_scopus_papers_schema.sql
+
+          echo "All tables created."
+
+      - name: Create all RPC functions
+        run: |
+          set -euo pipefail
+
+          psql -f sql/match_papers.sql
+          psql -f sql/match_biorxiv_papers.sql
+          psql -f sql/match_medrxiv_papers.sql
+          psql -f sql/match_chemrxiv_papers.sql
+          psql -f sql/match_neurips_openreview_papers.sql
+          psql -f sql/match_iclr_openreview_papers.sql
+          psql -f sql/match_icml_openreview_papers.sql
+          psql -f sql/match_acl_papers.sql
+          psql -f sql/match_emnlp_papers.sql
+          psql -f sql/match_aaai_papers.sql
+          psql -f sql/match_economics_papers.sql
+          psql -f sql/match_serp_scholar_papers.sql
+          psql -f sql/match_scopus_papers.sql
+
+          echo "All RPC functions created."
+
+      - name: Verify
+        run: psql -c "\dt public.*"
