@@ -24,11 +24,11 @@ except Exception:  # pragma: no cover
 ARXIV_SOURCE_KEY = "arxiv"
 ECONOMICS_RSS_SOURCE_KEY = "economics_rss"
 SERP_SCHOLAR_SOURCE_KEY = "serp_scholar"
-SCIDIRECT_SOURCE_KEY = "sciencedirect"
+SCOPUS_SOURCE_KEY = "scopus"
 DEFAULT_SUPPORTED_SOURCES = (
     ARXIV_SOURCE_KEY, "biorxiv", "medrxiv", "chemrxiv",
     "neurips", "iclr", "icml", "acl", "emnlp", "aaai",
-    ECONOMICS_RSS_SOURCE_KEY, SERP_SCHOLAR_SOURCE_KEY, SCIDIRECT_SOURCE_KEY,
+    ECONOMICS_RSS_SOURCE_KEY, SERP_SCHOLAR_SOURCE_KEY, SCOPUS_SOURCE_KEY,
 )
 
 
@@ -310,22 +310,22 @@ def build_env_source_backend_overrides() -> Dict[str, Dict[str, Any]]:
             backend["anon_key"] = _norm(os.getenv("DPR_SERP_SCHOLAR_ANON_KEY"))
         out[SERP_SCHOLAR_SOURCE_KEY] = backend
 
-    # ── Elsevier ScienceDirect ──────────────────────────────────────────────
-    if _env_bool("DPR_ENABLE_SCIDIRECT_BACKEND", False):
+    # ── Elsevier Scopus ────────────────────────────────────────────────────
+    if _env_bool("DPR_ENABLE_SCOPUS_BACKEND", False):
         backend = {
-            "enabled": _env_bool("DPR_SCIDIRECT_ENABLED", True),
-            "papers_table": _norm(os.getenv("DPR_SCIDIRECT_PAPERS_TABLE") or "sciencedirect_papers"),
-            "use_vector_rpc": _env_bool("DPR_SCIDIRECT_USE_VECTOR_RPC", True),
-            "vector_rpc": _norm(os.getenv("DPR_SCIDIRECT_VECTOR_RPC") or "match_sciencedirect_papers"),
-            "vector_rpc_exact": _norm(os.getenv("DPR_SCIDIRECT_VECTOR_RPC_EXACT") or "match_sciencedirect_papers_exact"),
-            "use_bm25_rpc": _env_bool("DPR_SCIDIRECT_USE_BM25_RPC", True),
-            "bm25_rpc": _norm(os.getenv("DPR_SCIDIRECT_BM25_RPC") or "match_sciencedirect_papers_bm25"),
+            "enabled": _env_bool("DPR_SCOPUS_ENABLED", True),
+            "papers_table": _norm(os.getenv("DPR_SCOPUS_PAPERS_TABLE") or "scopus_papers"),
+            "use_vector_rpc": _env_bool("DPR_SCOPUS_USE_VECTOR_RPC", True),
+            "vector_rpc": _norm(os.getenv("DPR_SCOPUS_VECTOR_RPC") or "match_scopus_papers"),
+            "vector_rpc_exact": _norm(os.getenv("DPR_SCOPUS_VECTOR_RPC_EXACT") or "match_scopus_papers_exact"),
+            "use_bm25_rpc": _env_bool("DPR_SCOPUS_USE_BM25_RPC", True),
+            "bm25_rpc": _norm(os.getenv("DPR_SCOPUS_BM25_RPC") or "match_scopus_papers_bm25"),
         }
-        if _norm(os.getenv("DPR_SCIDIRECT_URL")):
-            backend["url"] = _norm(os.getenv("DPR_SCIDIRECT_URL"))
-        if _norm(os.getenv("DPR_SCIDIRECT_ANON_KEY")):
-            backend["anon_key"] = _norm(os.getenv("DPR_SCIDIRECT_ANON_KEY"))
-        out[SCIDIRECT_SOURCE_KEY] = backend
+        if _norm(os.getenv("DPR_SCOPUS_URL")):
+            backend["url"] = _norm(os.getenv("DPR_SCOPUS_URL"))
+        if _norm(os.getenv("DPR_SCOPUS_ANON_KEY")):
+            backend["anon_key"] = _norm(os.getenv("DPR_SCOPUS_ANON_KEY"))
+        out[SCOPUS_SOURCE_KEY] = backend
 
     return out
 
