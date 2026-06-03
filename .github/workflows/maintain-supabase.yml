@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 120
     env:
-      SUPABASE_URL: https://ekjqhiiaqstbdlzbqitn.supabase.co
+      SUPABASE_URL: https://xnxqplrynpdrozvxvyzg.supabase.co
       SUPABASE_SCHEMA: public
       SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
       SUPABASE_BACKEND_KEY: arxiv
