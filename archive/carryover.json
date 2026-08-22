@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-08-21T20:00:48.859997+00:00",
-  "updated_date": "20260821",
+  "generated_at": "2026-08-22T19:01:12.243888+00:00",
+  "updated_date": "20260822",
   "carryover_days": 9,
   "tag_states": {
     "MP": {
-      "updated_date": "20260821",
+      "updated_date": "20260822",
       "carryover_days": 9,
       "items": []
     },
@@ -14,32 +14,32 @@
       "items": []
     },
     "PN": {
-      "updated_date": "20260821",
+      "updated_date": "20260822",
       "carryover_days": 9,
       "items": []
     },
     "PE": {
-      "updated_date": "20260821",
+      "updated_date": "20260822",
       "carryover_days": 9,
       "items": []
     },
     "ER": {
-      "updated_date": "20260821",
+      "updated_date": "20260822",
       "carryover_days": 9,
       "items": []
     },
     "TR": {
-      "updated_date": "20260821",
+      "updated_date": "20260822",
       "carryover_days": 9,
       "items": []
     },
     "BC": {
-      "updated_date": "20260821",
+      "updated_date": "20260822",
       "carryover_days": 9,
       "items": []
     },
     "VAR": {
-      "updated_date": "20260821",
+      "updated_date": "20260822",
       "carryover_days": 9,
       "items": []
     }
